@@ -290,6 +290,14 @@ namespace Ogre
         case VET_FLOAT4:
             return DXGI_FORMAT_R32G32B32A32_FLOAT;
 
+        // Float16
+        case VET_HALF1:
+            return DXGI_FORMAT_R16_FLOAT;
+        case VET_HALF2:
+            return DXGI_FORMAT_R16G16_FLOAT;
+        case VET_HALF4:
+            return DXGI_FORMAT_R16G16B16A16_FLOAT;
+
         // Signed short
         case VET_SHORT1:
             return DXGI_FORMAT_R16_SINT;

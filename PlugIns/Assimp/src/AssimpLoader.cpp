@@ -32,6 +32,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreAssimpLoader.h"
+#include "OgreString.h"
+#include "OgreStringConverter.h"
 
 #include <assimp/version.h>
 #include <assimp/scene.h>
@@ -360,15 +362,39 @@ bool AssimpLoader::load(const String& source, Mesh* mesh, SkeletonPtr& skeletonP
 bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mesh, SkeletonPtr& skeletonPtr,
                          const Options& options)
 {
+    mAnimationSpeedModifier = options.animationSpeedModifier;
+    mLoaderParams = options.params;
+    mCustomAnimationName = options.customAnimationName;
+
+    float maxEdgeAngle = options.maxEdgeAngle;
+    int postProcessSteps = options.postProcessSteps;
+    auto optsAny = mesh->getUserObjectBindings().getUserAny("_AssimpLoaderOptions");
+    if(optsAny.has_value())
+    {
+        auto strOpts = any_cast<BinaryOptionList>(optsAny);
+        if(strOpts.find("quiet") != strOpts.end())
+            mLoaderParams |= LP_QUIET_MODE;
+        if(strOpts.find("customAnimationName") != strOpts.end())
+            mCustomAnimationName = strOpts["customAnimationName"];
+        if(strOpts.find("animationSpeedModifier") != strOpts.end())
+            StringConverter::parse(strOpts["animationSpeedModifier"], mAnimationSpeedModifier);
+        if(strOpts.find("maxEdgeAngle") != strOpts.end())
+            StringConverter::parse(strOpts["maxEdgeAngle"], maxEdgeAngle);
+        if(strOpts.find("postProcessSteps") != strOpts.end())
+            StringConverter::parse(strOpts["postProcessSteps"], postProcessSteps);
+        if(strOpts.find("cutAnimation") != strOpts.end())
+            mLoaderParams |= LP_CUT_ANIMATION_WHERE_NO_FURTHER_CHANGE;
+    }
+
     uint32 flags = aiProcessPreset_TargetRealtime_Fast | aiProcess_TransformUVCoords | aiProcess_FlipUVs;
     flags &= ~(aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace); // optimize for fast loading
 
-    flags |= options.postProcessSteps;
+    flags |= postProcessSteps;
 
     if((flags & (aiProcess_GenSmoothNormals | aiProcess_GenNormals)) != aiProcess_GenNormals)
         flags &= ~aiProcess_GenNormals; // prefer smooth normals
 
-    importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", options.maxEdgeAngle);
+    importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", maxEdgeAngle);
     const aiScene* scene = importer.ReadFile(name, flags);
 
     // If the import failed, report it
@@ -378,10 +404,7 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
         return false;
     }
 
-    mAnimationSpeedModifier = options.animationSpeedModifier;
-    mLoaderParams = options.params;
     mQuietMode = mLoaderParams & LP_QUIET_MODE;
-    mCustomAnimationName = options.customAnimationName;
     mNodeDerivedTransformByName.clear();
 
     String basename, extension;
@@ -415,7 +438,7 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
     {
         const aiTexture* tex = scene->mTextures[i];
         auto texname =
-            StringUtil::format("%s%s.%s", mesh->getName().c_str(), tex->mFilename.C_Str(), tex->achFormatHint);
+            StringUtil::format("%s%s%d.%s", mesh->getName().c_str(), tex->mFilename.C_Str(), i, tex->achFormatHint);
         if (TextureManager::getSingleton().resourceExists(texname, mesh->getGroup()))
             continue;
 
@@ -441,7 +464,10 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
         TextureManager::getSingleton().loadImage(texname, mesh->getGroup(), img);
     }
 
-    loadDataFromNode(scene, scene->mRootNode, mesh);
+    auto aabb = loadDataFromNode(scene, scene->mRootNode, mesh);
+    // We must indicate the bounding box
+    mesh->_setBounds(aabb);
+    mesh->_setBoundingSphereRadius((aabb.getMaximum() - aabb.getMinimum()).length() / 2);
 
     Assimp::DefaultLogger::kill();
 
@@ -888,7 +914,8 @@ static bool getTextureName(const aiMaterial* mat, aiTextureType type, const aiSc
         const aiTexture* tex = scene->GetEmbeddedTexture(path.C_Str());
         if(tex)
         {
-            basename = StringUtil::format("%s%s.%.8s", meshName.c_str(), tex->mFilename.C_Str(), tex->achFormatHint);
+            basename = StringUtil::format("%s%s%s.%.8s", meshName.c_str(), tex->mFilename.C_Str(), path.C_Str() + 1,
+                                          tex->achFormatHint);
             return true;
         }
 
@@ -1307,12 +1334,11 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     return true;
 }
 
-void AssimpLoader::loadDataFromNode(const aiScene* mScene, const aiNode* pNode, Mesh* mesh)
+AxisAlignedBox AssimpLoader::loadDataFromNode(const aiScene* mScene, const aiNode* pNode, Mesh* mesh)
 {
+    AxisAlignedBox aabb;
     if (pNode->mNumMeshes > 0)
     {
-        AxisAlignedBox mAAB = mesh->getBounds();
-
         for (unsigned int idx = 0; idx < pNode->mNumMeshes; ++idx)
         {
             aiMesh* pAIMesh = mScene->mMeshes[pNode->mMeshes[idx]];
@@ -1325,20 +1351,18 @@ void AssimpLoader::loadDataFromNode(const aiScene* mScene, const aiNode* pNode, 
             // Create a material instance for the mesh.
             const aiMaterial* pAIMaterial = mScene->mMaterials[pAIMesh->mMaterialIndex];
             MaterialPtr matptr = createMaterial(pAIMaterial, mesh->getGroup(), mesh->getName(), mScene, !mQuietMode);
-            createSubMesh(pNode->mName.data, idx, pNode, pAIMesh, matptr, mesh, mAAB);
+            createSubMesh(pNode->mName.data, idx, pNode, pAIMesh, matptr, mesh, aabb);
         }
-
-        // We must indicate the bounding box
-        mesh->_setBounds(mAAB);
-        mesh->_setBoundingSphereRadius((mAAB.getMaximum() - mAAB.getMinimum()).length() / 2);
     }
 
     // Traverse all child nodes of the current node instance
     for (unsigned int childIdx = 0; childIdx < pNode->mNumChildren; childIdx++)
     {
         const aiNode* pChildNode = pNode->mChildren[childIdx];
-        loadDataFromNode(mScene, pChildNode, mesh);
+        aabb.merge(loadDataFromNode(mScene, pChildNode, mesh));
     }
+
+    return aabb;
 }
 
 static std::vector<std::unique_ptr<Codec> > registeredCodecs;

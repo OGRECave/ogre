@@ -33,18 +33,23 @@ namespace RTShader {
 String GLSLProgramWriter::TargetLanguage = "glsl";
 
 //-----------------------------------------------------------------------
-GLSLProgramWriter::GLSLProgramWriter() : mIsGLSLES(false), mIsVulkan(false)
+GLSLProgramWriter::GLSLProgramWriter() : mGLSLVersion(100), mIsGLSLES(false), mIsVulkan(false)
 {
-    auto* rs = Root::getSingleton().getRenderSystem();
-    mGLSLVersion = rs ? rs->getNativeShadingLanguageVersion() : 120;
+    initializeStringMaps();
 
-    if(rs && rs->getCapabilities()->isShaderProfileSupported("spirv"))
+    auto* rs = Root::getSingleton().getRenderSystem();
+    if (!rs)
+        return;
+
+    mGLSLVersion = rs->getNativeShadingLanguageVersion();
+
+    if (rs->getCapabilities()->isShaderProfileSupported("spirv"))
     {
         mGLSLVersion = 460;
         mIsVulkan = true;
     }
 
-    initializeStringMaps();
+    mIsGLSLES = rs->getCapabilities()->isShaderProfileSupported("glsles");
 }
 
 //-----------------------------------------------------------------------
@@ -102,7 +107,19 @@ void GLSLProgramWriter::initializeStringMaps()
 void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
     // Write the current version (this force the driver to more fulfill the glsl standard)
-    os << "#version "<< mGLSLVersion << std::endl;
+    os << "OGRE_NATIVE_GLSL_VERSION_DIRECTIVE\n";
+
+    for(const auto& p : program->getParameters())
+    {
+        if(p->getType() != GCT_SAMPLER_EXTERNAL_OES)
+            continue;
+        if(mGLSLVersion > 100)
+            os << "#extension GL_OES_EGL_image_external_essl3 : require\n";
+        else
+            os << "#extension GL_OES_EGL_image_external : require\n";
+
+        break;
+    }
 
     // Generate dependencies.
     writeProgramDependencies(os, program);
@@ -195,14 +212,10 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     os << "void main(void) {" << std::endl;
 
     // Write local parameters.
-    const ShaderParameterList& localParams = curFunction->getLocalParameters();
-    ShaderParameterConstIterator itParam = localParams.begin();
-    ShaderParameterConstIterator itParamEnd = localParams.end();
-
-    for (; itParam != itParamEnd; ++itParam)
+    for (const auto& p : curFunction->getLocalParameters())
     {
         os << "\t";
-        writeParameter(os, *itParam);
+        writeParameter(os, p);
         os << ";" << std::endl;
     }
     os << std::endl;
@@ -235,25 +248,19 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 //-----------------------------------------------------------------------
 void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
 {
-    const ShaderParameterList& inParams = function->getInputParameters();
-
-    ShaderParameterConstIterator itParam = inParams.begin();
-    ShaderParameterConstIterator itParamEnd = inParams.end();
-
     int psInLocation = 0;
 
-    for ( ; itParam != itParamEnd; ++itParam)
+    for (const auto& p : function->getInputParameters())
     {
-        const ParameterPtr& pParam = *itParam;
-        auto paramContent = pParam->getContent();
-        auto paramSemantic = pParam->getSemantic();
-        const String& paramName = pParam->getName();
+        auto paramContent = p->getContent();
+        auto paramSemantic = p->getSemantic();
+        const String& paramName = p->getName();
 
         if (gpuType == GPT_FRAGMENT_PROGRAM)
         {
             if(paramContent == Parameter::SPC_POINTSPRITE_COORDINATE)
             {
-                pParam->_rename("gl_PointCoord");
+                p->_rename("gl_PointCoord");
                 continue;
             }
             else if(paramContent == Parameter::SPC_POINTSPRITE_SIZE)
@@ -263,19 +270,19 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
             }
             else if(paramSemantic == Parameter::SPS_POSITION)
             {
-                pParam->_rename("gl_FragCoord");
+                p->_rename("gl_FragCoord");
                 continue;
             }
             else if(paramSemantic == Parameter::SPS_FRONT_FACING)
             {
-                pParam->_rename("gl_FrontFacing");
+                p->_rename("gl_FrontFacing");
                 continue;
             }
 
             os << "IN(";
-            if(pParam->isHighP())
+            if(p->isHighP())
                 os << "f32"; // rely on unified shader vor f32vec4 etc.
-            os << mGpuConstTypeMap[pParam->getType()];
+            os << mGpuConstTypeMap[p->getType()];
             os << "\t";
             os << paramName;
             os << ", " << psInLocation++ << ")\n";
@@ -284,29 +291,28 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
         {
             // Due the fact that glsl does not have register like cg we have to rename the params
             if(paramSemantic == Parameter::SPS_TEXTURE_COORDINATES)
-                pParam->_rename(StringUtil::format("uv%d", pParam->getIndex()));
+                p->_rename(StringUtil::format("uv%d", p->getIndex()));
             else if(paramContent == Parameter::SPC_COLOR_SPECULAR)
-                pParam->_rename("secondary_colour");
+                p->_rename("secondary_colour");
             else
-                pParam->_rename(mParamSemanticToNameMap[paramSemantic]);
-
+                p->_rename(mParamSemanticToNameMap[paramSemantic]);
             os << "IN(";
             // all uv texcoords passed by ogre are at least vec4
-            if ((paramSemantic == Parameter::SPS_TEXTURE_COORDINATES) && (pParam->getType() < GCT_FLOAT4))
+            if ((paramSemantic == Parameter::SPS_TEXTURE_COORDINATES) && (p->getType() < GCT_FLOAT4))
             {
                 os << "vec4";
             }
             else
             {
                 // the gl rendersystems only pass float attributes
-                GpuConstantType type = pParam->getType();
+                GpuConstantType type = p->getType();
                 if(!mIsVulkan && !GpuConstantDefinition::isFloat(type))
                     type = GpuConstantType(type & ~GpuConstantDefinition::getBaseType(type));
                 os << mGpuConstTypeMap[type];
             }
             os << "\t";
-            os << pParam->getName() << ", ";
-            writeParameterSemantic(os, pParam);  // maps to location
+            os << p->getName() << ", ";
+            writeParameterSemantic(os, p);  // maps to location
             os << ")\n";
         }
     }

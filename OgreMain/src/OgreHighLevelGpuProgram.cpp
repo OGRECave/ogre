@@ -218,6 +218,9 @@ namespace Ogre
         auto ver = renderSystem ? renderSystem->getNativeShadingLanguageVersion() : 0;
         defines += StringUtil::format("OGRE_%s=%d", tmp.c_str(), ver);
 
+        // supporting rendersystems will handle this by other means
+        defines += ",OGRE_NATIVE_GLSL_VERSION_DIRECTIVE=";
+
         // OGRE_VERTEX_SHADER, OGRE_FRAGMENT_SHADER
         tmp = GpuProgram::getProgramTypeName(getType());
         StringUtil::toUpperCase(tmp);

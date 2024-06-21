@@ -1,10 +1,9 @@
+OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 #ifdef USE_LAYOUT
-#version 150
 out vec4 colour;
 layout(triangles) in;
 layout(line_strip, max_vertices = 6) out;
 #else
-#version 120
 varying out vec4 colour;
 #endif
 

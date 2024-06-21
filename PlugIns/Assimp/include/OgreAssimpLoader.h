@@ -65,7 +65,7 @@ namespace Ogre
 * %Codec for loading geometry using the [Open-Asset-Importer](https://github.com/assimp/assimp)
 * @{
 */
-class _OgreAssimpExport AssimpLoader
+class AssimpLoader
 {
 public:
     enum LoaderParams
@@ -109,7 +109,7 @@ private:
                                       const aiMatrix4x4& accTransform);
     void createBonesFromNode(const aiScene* mScene, const aiNode* pNode);
     void createBoneHiearchy(const aiScene* mScene, const aiNode* pNode);
-    void loadDataFromNode(const aiScene* mScene, const aiNode* pNode, Mesh* mesh);
+    AxisAlignedBox loadDataFromNode(const aiScene* mScene, const aiNode* pNode, Mesh* mesh);
     void markAllChildNodesAsNeeded(const aiNode* pNode);
     void flagNodeAsNeeded(const char* name);
     bool isNodeNeeded(const char* name);

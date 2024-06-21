@@ -956,7 +956,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Real Camera::getNearClipDistance(void) const
+    float Camera::getNearClipDistance(void) const
     {
         if (mCullFrustum)
         {
@@ -968,7 +968,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Real Camera::getFarClipDistance(void) const
+    float Camera::getFarClipDistance(void) const
     {
         if (mCullFrustum)
         {

@@ -160,6 +160,7 @@ JNIEnv* OgreJNIGetEnv() {
 
 %define SHARED_PTR(classname)
 // %shared_ptr(type);
+%ignore Ogre::SharedPtr<Ogre::classname >::operator const shared_ptr<Ogre::classname >&;
 %template(classname ## Ptr) Ogre::SharedPtr<Ogre::classname >;
 %enddef
 
@@ -447,6 +448,7 @@ ADD_REPR(Matrix4)
     Ogre::Vector4 operator*(const Ogre::Vector4& v) { return *$self * v; }
     Ogre::Vector3 operator*(const Ogre::Vector3& v) { return *$self * v; }
     Ogre::Matrix4 operator*(const Ogre::Matrix4& m) { return *$self * m; }
+    Ogre::Matrix4 operator*(const Ogre::Affine3& m) { return *$self * m; }
     Ogre::Matrix4 operator+(const Ogre::Matrix4& m) { return *$self + m; }
     Ogre::Matrix4 operator-(const Ogre::Matrix4& m) { return *$self - m; }
     Ogre::Real __getitem__(int row, int column) { return (*$self)[row][column]; }
@@ -457,6 +459,7 @@ ADD_REPR(Affine3)
     Ogre::Vector4 operator*(const Ogre::Vector4& v) { return *$self * v; }
     Ogre::Vector3 operator*(const Ogre::Vector3& v) { return *$self * v; }
     Ogre::Affine3 operator*(const Ogre::Affine3& m) { return *$self * m; }
+    Ogre::Matrix4 operator*(const Ogre::Matrix4& m) { return *$self * m; }
 }
 %include "OgreQuaternion.h"
 ADD_REPR(Quaternion)
@@ -528,6 +531,7 @@ SHARED_PTR(FileHandleDataStream);
 %ignore Ogre::ColourValue::getHSB; // deprecated
 %include "OgreColourValue.h"
 ADD_REPR(ColourValue)
+%ignore Ogre::PixelUtil::unpackColour(ColourValue*, PixelFormat, const void*);
 %include "OgrePixelFormat.h"
 #ifdef SWIGCSHARP
 %extend Ogre::PixelBox
@@ -598,6 +602,7 @@ SHARED_PTR(StringInterface);
 %ignore Ogre::TextureUnitState::setIsAlpha;
 %ignore Ogre::TextureUnitState::setTextureNameAlias;
 %ignore Ogre::TextureUnitState::getTextureNameAlias;
+%ignore Ogre::TextureUnitState::setAnimatedTextureName( const String* const, size_t, Real = 0 );
 %include "OgreTextureUnitState.h"
 %template(ControllerFloat) Ogre::Controller<float>;
 %template(ControllerValueFloatPtr) Ogre::SharedPtr<Ogre::ControllerValue<float> >;
@@ -654,7 +659,7 @@ SHARED_PTR(HardwarePixelBuffer);
     %ignore Ogre::TextureManager::createManual(const String&, const String&,TextureType,uint,uint,int,PixelFormat);
     %ignore Ogre::TextureManager::load(const String&, const String&,TextureType,int,float,bool,PixelFormat=PF_UNKNOWN,bool=false);
     %include "OgreTextureManager.h"
-    %ignore Ogre::TextureManager::getByName(const String&, const String&,bool) const;
+    %ignore Ogre::GpuProgramManager::getByName(const String&, const String&,bool) const;
     %include "OgreGpuProgramManager.h"
     %include "OgreHighLevelGpuProgramManager.h"
 // animations

@@ -428,6 +428,7 @@ namespace Ogre {
         }
 
         rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
+        rsc->setCapability(RSC_VERTEX_FORMAT_16X3);
         rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
 
         // Check for Float textures

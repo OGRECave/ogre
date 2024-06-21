@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreD3D9Mappings.h"
+#include "OgreHardwareVertexBuffer.h"
 #include "OgreString.h"
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
@@ -530,6 +531,10 @@ namespace Ogre
         case VET_USHORT4_NORM:
             // valid only with vertex shaders >= 2.0
             return D3DDECLTYPE_USHORT4N;
+        case VET_HALF2:
+            return D3DDECLTYPE_FLOAT16_2;
+        case VET_HALF4:
+            return D3DDECLTYPE_FLOAT16_4;
         }
         // to keep compiler happy
         return D3DDECLTYPE_FLOAT3;

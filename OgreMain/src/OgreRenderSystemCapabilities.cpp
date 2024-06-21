@@ -193,6 +193,8 @@ namespace Ogre {
                          StringConverter::toString(hasCapability(RSC_PRIMITIVE_RESTART), true));
         pLog->logMessage("   - INT_10_10_10_2_NORM element type: " +
                          StringConverter::toString(hasCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2), true));
+        pLog->logMessage("   - 16x3 element types: " +
+                            StringConverter::toString(hasCapability(RSC_VERTEX_FORMAT_16X3), true));
         pLog->logMessage(" * Vertex texture fetch: " +
                          StringConverter::toString(hasCapability(RSC_VERTEX_TEXTURE_FETCH), true));
         if (hasCapability(RSC_VERTEX_TEXTURE_FETCH))

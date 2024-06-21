@@ -146,8 +146,6 @@ namespace Ogre {
         mutable AxisAlignedBox mWorldAABB;
         // Cached world bounding sphere
         mutable Sphere mWorldBoundingSphere;
-        /// World space AABB of this object's dark cap
-        mutable AxisAlignedBox mWorldDarkCapBounds;
         /// List of lights for this object
         mutable LightList mLightList;
         /// The last frame that this light list was updated in
@@ -490,15 +488,6 @@ namespace Ogre {
         */
         LightList* _getLightList() { return &mLightList; }
 
-        /// Returns details of the edges which might be used to determine a silhouette
-        EdgeData* getEdgeList(void) override { return NULL; }
-        /// Define a default implementation of method from ShadowCaster which implements no shadows
-        const ShadowRenderableList& getShadowVolumeRenderableList(
-            const Light* light, const HardwareIndexBufferPtr& indexBuffer,
-            size_t& indexBufferUsedSize, float extrusionDist, int flags = 0) override;
-
-        const AxisAlignedBox& getLightCapBounds(void) const override;
-        const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const override;
         /** Sets whether or not this object will cast shadows.
 
         This setting simply allows you to turn on/off shadows for a given object.

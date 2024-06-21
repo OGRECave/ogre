@@ -131,16 +131,16 @@ namespace Ogre {
         virtual bool getCastShadows(void) const = 0;
 
         /** Returns details of the edges which might be used to determine a silhouette. */
-        virtual EdgeData* getEdgeList(void) = 0;
+        virtual EdgeData* getEdgeList(void) { return NULL; }
         /** Returns whether the object has a valid edge list. */
         bool hasEdgeList() { return getEdgeList() != NULL; }
 
         /** Get the world bounding box of the caster. */
         virtual const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const = 0;
         /** Gets the world space bounding box of the light cap. */
-        virtual const AxisAlignedBox& getLightCapBounds(void) const = 0;
+        const AxisAlignedBox& getLightCapBounds(void) const { return getWorldBoundingBox(); }
         /** Gets the world space bounding box of the dark cap, as extruded using the light provided. */
-        virtual const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const = 0;
+        const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const;
 
         typedef Ogre::ShadowRenderableList ShadowRenderableList;
         typedef VectorIterator<ShadowRenderableList> ShadowRenderableListIterator;
@@ -167,7 +167,7 @@ namespace Ogre {
         virtual const ShadowRenderableList&
         getShadowVolumeRenderableList(const Light* light, const HardwareIndexBufferPtr& indexBuffer,
                                       size_t& indexBufferUsedSize, float extrusionDistance,
-                                      int flags = 0) = 0;
+                                      int flags = 0);
 
         /** Common implementation of releasing shadow renderables.*/
         static void clearShadowRenderableList(ShadowRenderableList& shadowRenderables);
@@ -208,8 +208,7 @@ namespace Ogre {
         @param lightPos
             4D vector representing the light, a directional light has w=0.0.
        */
-        virtual void updateEdgeListLightFacing(EdgeData* edgeData, 
-            const Vector4& lightPos);
+        void updateEdgeListLightFacing(EdgeData* edgeData, const Vector4& lightPos);
 
         /** Generates the indexes required to render a shadow volume into the 
             index buffer which is passed in, and updates shadow renderables
@@ -233,7 +232,7 @@ namespace Ogre {
         @param flags
             Additional controller flags, see ShadowRenderableFlags.
         */
-        virtual void generateShadowVolume(EdgeData* edgeData, 
+        void generateShadowVolume(EdgeData* edgeData,
             const HardwareIndexBufferSharedPtr& indexBuffer, size_t& indexBufferUsedSize,
             const Light* light, ShadowRenderableList& shadowRenderables, unsigned long flags);
         /** Utility method for extruding a bounding box. 
@@ -245,10 +244,10 @@ namespace Ogre {
         @param extrudeDist
             The distance to extrude.
         */
-        virtual void extrudeBounds(AxisAlignedBox& box, const Vector4& lightPos, 
-            Real extrudeDist) const;
+        void extrudeBounds(AxisAlignedBox& box, const Vector4& lightPos, Real extrudeDist) const;
 
-
+        /// World space AABB of this object's dark cap
+        mutable AxisAlignedBox mWorldDarkCapBounds;
     };
     /** @} */
     /** @} */

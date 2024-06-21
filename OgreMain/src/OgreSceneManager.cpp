@@ -56,9 +56,6 @@ SceneManager::SceneManager(const String& name) :
 mName(name),
 mCameraInProgress(0),
 mCurrentViewport(0),
-mSkyPlane(this),
-mSkyBox(this),
-mSkyDome(this),
 mFogMode(FOG_NONE),
 mFogColour(),
 mFogStart(0),
@@ -485,6 +482,8 @@ void SceneManager::clearScene(void)
     // Clear root node of all children
     getRootSceneNode()->removeAllChildren();
     getRootSceneNode()->detachAllObjects();
+
+    mSkyRenderer = nullptr;
 
     // Delete all SceneNodes, except root that is
     for (auto *n : mSceneNodes)
@@ -1170,8 +1169,14 @@ void SceneManager::_setSkyPlane(bool enable, const Plane& plane, const String& m
                                 Real gscale, Real tiling, uint8 renderQueue, Real bow,
                                 int xsegments, int ysegments, const String& groupName)
 {
-    mSkyPlane.setSkyPlane(enable, plane, materialName, gscale, tiling, renderQueue, bow,
-                             xsegments, ysegments, groupName);
+    setSkyRenderingEnabled(false);
+    if(!enable)
+        return;
+
+    auto skyPlane = new SkyPlaneRenderer(this);
+    skyPlane->create(plane, materialName, gscale, tiling, renderQueue, bow, xsegments, ysegments, groupName);
+    mSkyRenderer.reset(skyPlane);
+    mSkyRenderer->setEnabled(true);
 }
 
 //-----------------------------------------------------------------------
@@ -1191,7 +1196,14 @@ void SceneManager::_setSkyBox(bool enable, const String& materialName, Real dist
                               uint8 renderQueue, const Quaternion& orientation,
                               const String& groupName)
 {
-    mSkyBox.setSkyBox(enable, materialName, distance, renderQueue, orientation, groupName);
+    setSkyRenderingEnabled(false);
+    if(!enable)
+        return;
+
+    auto skyBox = new SkyBoxRenderer(this);
+    skyBox->create(materialName, distance, renderQueue, orientation, groupName);
+    mSkyRenderer.reset(skyBox);
+    mSkyRenderer->setEnabled(true);
 }
 
 //-----------------------------------------------------------------------
@@ -1216,8 +1228,15 @@ void SceneManager::_setSkyDome(bool enable, const String& materialName, Real cur
                                int xsegments, int ysegments, int ysegments_keep,
                                const String& groupName)
 {
-    mSkyDome.setSkyDome(enable, materialName, curvature, tiling, distance, renderQueue,
-                            orientation, xsegments, ysegments, ysegments_keep, groupName);
+    setSkyRenderingEnabled(false);
+    if(!enable)
+        return;
+
+    auto skyDome = new SkyDomeRenderer(this);
+    skyDome->create(materialName, curvature, tiling, distance, renderQueue, orientation, xsegments, ysegments,
+                    ysegments_keep, groupName);
+    mSkyRenderer.reset(skyDome);
+    mSkyRenderer->setEnabled(true);
 }
 
 //-----------------------------------------------------------------------

@@ -183,6 +183,7 @@ namespace Ogre
         rsc->setCapability(RSC_VERTEX_PROGRAM);
         rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
+        rsc->setCapability(RSC_VERTEX_FORMAT_16X3);
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
         rsc->setMaxPointSize(256);

@@ -31,6 +31,15 @@ THE SOFTWARE.
 #include "OgreOptimisedUtil.h"
 
 namespace Ogre {
+    /** Comparator for sorting geometries by vertex set */
+    struct geometryLess {
+        bool operator()(const EdgeListBuilder::Geometry& a, const EdgeListBuilder::Geometry& b) const
+        {
+            if (a.vertexSet < b.vertexSet) return true;
+            if (a.vertexSet > b.vertexSet) return false;
+            return a.indexSet < b.indexSet;
+        }
+    };
 
     EdgeData::EdgeData() : isClosed(false){}
     
@@ -190,8 +199,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void EdgeListBuilder::buildTrianglesEdges(const Geometry &geometry)
     {
-        size_t indexSet = geometry.indexSet;
-        size_t vertexSet = geometry.vertexSet;
+        uint32 indexSet = geometry.indexSet;
+        uint32 vertexSet = geometry.vertexSet;
         const IndexData* indexData = geometry.indexData;
         RenderOperation::OperationType opType = geometry.opType;
 
@@ -232,7 +241,7 @@ namespace Ogre {
         unsigned int index[3];
         // Get the triangle start, if we have more than one index set then this
         // will not be zero
-        size_t triangleIndex = mEdgeData->triangles.size();
+        uint32 triangleIndex = mEdgeData->triangles.size();
         // If it's first time dealing with the edge group, setup triStart for it.
         // Note that we are assume geometries sorted by vertex set.
         if (!eg.triCount)
@@ -282,7 +291,7 @@ namespace Ogre {
                     index[2] = *p16Idx++;
             }
 
-            Vector3 v[3];
+            Vector3f v[3];
             for (size_t i = 0; i < 3; ++i)
             {
                 // Populate tri original vertex index
@@ -292,9 +301,7 @@ namespace Ogre {
                 unsigned char* pVertex = pBaseVertex + (index[i] * vbuf->getVertexSize());
                 float* pFloat;
                 posElem->baseVertexPointerToElement(pVertex, &pFloat);
-                v[i].x = *pFloat++;
-                v[i].y = *pFloat++;
-                v[i].z = *pFloat++;
+                memcpy(v[i].ptr(), pFloat, sizeof(Vector3f));
                 // find this vertex in the existing vertex map, or create it
                 tri.sharedVertIndex[i] = 
                     findOrCreateCommonVertex(v[i], vertexSet, indexSet, index[i]);
@@ -308,7 +315,7 @@ namespace Ogre {
                 // Calculate triangle normal (NB will require recalculation for 
                 // skeletally animated meshes)
                 mEdgeData->triangleFaceNormals.push_back(
-                    Math::calculateFaceNormalWithoutNormalize(v[0], v[1], v[2]));
+                    Math::calculateFaceNormalWithoutNormalize(Vector3(v[0]), Vector3(v[1]), Vector3(v[2])));
                 // Add triangle to list
                 mEdgeData->triangles.push_back(tri);
                 // Connect or create edges from common list
@@ -330,12 +337,12 @@ namespace Ogre {
         eg.triCount = triangleIndex - eg.triStart;
     }
     //---------------------------------------------------------------------
-    void EdgeListBuilder::connectOrCreateEdge(size_t vertexSet, size_t triangleIndex, 
-        size_t vertIndex0, size_t vertIndex1, size_t sharedVertIndex0, 
-        size_t sharedVertIndex1)
+    void EdgeListBuilder::connectOrCreateEdge(uint32 vertexSet, uint32 triangleIndex,
+        uint32 vertIndex0, uint32 vertIndex1, uint32 sharedVertIndex0,
+        uint32 sharedVertIndex1)
     {
         // Find the existing edge (should be reversed order) on shared vertices
-        EdgeMap::iterator emi = mEdgeMap.find(std::pair<size_t, size_t>(sharedVertIndex1, sharedVertIndex0));
+        EdgeMap::iterator emi = mEdgeMap.find(std::make_pair(sharedVertIndex1, sharedVertIndex0));
         if (emi != mEdgeMap.end())
         {
             // The edge already exist, connect it
@@ -350,14 +357,14 @@ namespace Ogre {
         else
         {
             // Not found, create new edge
-            mEdgeMap.emplace(std::pair<size_t, size_t>(sharedVertIndex0, sharedVertIndex1),
-                             std::pair<size_t, size_t>(vertexSet, mEdgeData->edgeGroups[vertexSet].edges.size()));
+            mEdgeMap.emplace(std::make_pair(sharedVertIndex0, sharedVertIndex1),
+                             std::make_pair(vertexSet, uint32(mEdgeData->edgeGroups[vertexSet].edges.size())));
             EdgeData::Edge e;
             e.degenerate = true; // initialise as degenerate
 
             // Set only first tri, the other will be completed in connect existing edge
             e.triIndex[0] = triangleIndex;
-            e.triIndex[1] = static_cast<size_t>(~0);
+            e.triIndex[1] = static_cast<uint32>(~0);
             e.sharedVertIndex[0] = sharedVertIndex0;
             e.sharedVertIndex[1] = sharedVertIndex1;
             e.vertIndex[0] = vertIndex0;
@@ -366,8 +373,8 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    size_t EdgeListBuilder::findOrCreateCommonVertex(const Vector3& vec, 
-        size_t vertexSet, size_t indexSet, size_t originalIndex)
+    uint32 EdgeListBuilder::findOrCreateCommonVertex(const Vector3f& vec,
+        uint32 vertexSet, uint32 indexSet, uint32 originalIndex)
     {
         // Because the algorithm doesn't care about manifold or not, we just identifying
         // the common vertex by EXACT same position.
@@ -545,7 +552,7 @@ namespace Ogre {
                 l->logMessage("Common vertex " + StringConverter::toString(k) + 
                     ": (vertexSet=" + StringConverter::toString(c.vertexSet) + 
                     ", originalIndex=" + StringConverter::toString(c.originalIndex) + 
-                    ", position=" + StringConverter::toString(c.position));
+                    ", position=" + StringConverter::toString(Vector3(c.position)));
             }
         }
 

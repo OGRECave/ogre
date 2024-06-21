@@ -106,26 +106,16 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void SubEntity::setIndexDataStartIndex(size_t start_index)
+    void SubEntity::setIndexDataStartIndex(uint32 start_index)
     {
         if(start_index < mSubMesh->indexData->indexCount)
             mIndexStart = start_index;
     }
     //-----------------------------------------------------------------------
-    size_t SubEntity::getIndexDataStartIndex() const
+    void SubEntity::setIndexDataEndIndex(uint32 end_index)
     {
-        return mIndexStart;
-    }
-    //-----------------------------------------------------------------------
-    void SubEntity::setIndexDataEndIndex(size_t end_index)
-    {
-        if(end_index > 0 && end_index <= mSubMesh->indexData->indexCount)
+        if(end_index <= mSubMesh->indexData->indexCount)
             mIndexEnd = end_index;
-    }
-    //-----------------------------------------------------------------------
-    size_t SubEntity::getIndexDataEndIndex() const
-    {
-        return mIndexEnd;
     }
     //-----------------------------------------------------------------------
     void SubEntity::resetIndexDataStartEndIndex()

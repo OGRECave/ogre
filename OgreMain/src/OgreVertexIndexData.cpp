@@ -69,11 +69,26 @@ namespace Ogre {
             pFloat[3] = pPacked->w;
     }
 
-    static void copy_float3(uint8* pDst, uint8* pSrc, int elemOffset)
+    static void extract_float3(uint8* pDst, uint8* pSrc, int elemOffset)
     {
         memcpy(pDst, pSrc + elemOffset, sizeof(float) * 3);
     }
 
+    static void pad_16x3(uint8* pDst, uint8* pSrc, int elemOffset)
+    {
+        // for half3, we want 1.0 in the 4th component
+        // for others we dont care, so do it unconditionally
+        static const uint16 one16f = Bitwise::floatToHalf(1.0f);
+        memcpy(pDst + elemOffset, pSrc + elemOffset, sizeof(uint16) * 3);
+        memcpy(pDst + elemOffset + sizeof(uint16) * 3, &one16f, sizeof(uint16));
+    }
+
+    /** Splice out an element from a vertex buffer
+     * @param elem The element to splice out of the vertex
+     * @param srcBuf Source buffer
+     * @param pDst Destination buffer for the vertex without the element
+     * @param pElemDst Destination buffer for the element (can be the same as pDst)
+     */
     static void spliceElement(const VertexElement* elem, const HardwareVertexBufferPtr& srcBuf, uint8* pDst,
                               uint8* pElemDst, uint32 newElemSize, void (*elemConvert)(uint8*, uint8*, int))
     {
@@ -131,7 +146,7 @@ namespace Ogre {
             if (&e == elem)
             {
                 // Modify element
-                decl->modifyElement(idx, newSource, newElemOffset, newType, elem->getSemantic());
+                decl->modifyElement(idx, newSource, newElemOffset, newType, elem->getSemantic(), elem->getIndex());
             }
             else if (e.getSource() == oldSource && e.getOffset() > oldElemOffset)
             {
@@ -241,12 +256,16 @@ namespace Ogre {
         return dest;
     }
 
-    void VertexData::convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType)
+    void VertexData::convertVertexElement(VertexElementSemantic semantic, VertexElementType dstType, uint16 index)
     {
-        auto elem = vertexDeclaration->findElementBySemantic(semantic);
+        auto elem = vertexDeclaration->findElementBySemantic(semantic, index);
 
-        if (!elem || VertexElement::getBaseType(elem->getType()) == VertexElement::getBaseType(dstType))
+        if(!elem)
             return; // nothing to do
+
+        auto srcBaseType = VertexElement::getBaseType(elem->getType());
+        if (srcBaseType == VET_FLOAT1 && srcBaseType == VertexElement::getBaseType(dstType))
+            return; // silently ignore floatX > floatY conversions
 
         auto srcType = elem->getType();
         auto vbuf = vertexBufferBinding->getBuffer(elem->getSource());
@@ -279,6 +298,12 @@ namespace Ogre {
             {
                 OgreAssert(srcType == VET_INT_10_10_10_2_NORM, "unsupported conversion");
                 spliceElement(elem, vbuf, pDst, pDst, newElemSize, unpack_10_10_10_2<true>);
+            }
+            else if(dstType == VET_HALF4 || dstType == VET_SHORT4 || dstType == VET_USHORT4)
+            {
+                // pad 16x3 formats to 16x4
+                OgreAssert(srcType == VET_HALF3 || srcType == VET_SHORT3 || srcType == VET_USHORT3, "unsupported conversion");
+                spliceElement(elem, vbuf, pDst, pDst, newElemSize, pad_16x3);
             }
             else
             {
@@ -340,7 +365,7 @@ namespace Ogre {
         {
             // Basically we just memcpy the vertex excluding the position
             HardwareBufferLockGuard destRemLock(newRemainderBuffer, HardwareBuffer::HBL_DISCARD);
-            spliceElement(posElem, vbuf, (uint8*)destRemLock.pData, (uint8*)pDest, posElem->getSize(), copy_float3);
+            spliceElement(posElem, vbuf, (uint8*)destRemLock.pData, (uint8*)pDest, posElem->getSize(), extract_float3);
         }
         else
         {

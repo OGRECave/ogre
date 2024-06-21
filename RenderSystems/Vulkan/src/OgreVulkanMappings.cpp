@@ -159,14 +159,22 @@ namespace Ogre
             return VK_FORMAT_R32G32B32_SFLOAT;
         case VET_FLOAT4:
             return VK_FORMAT_R32G32B32A32_SFLOAT;
+        case VET_SHORT1:
+            return VK_FORMAT_R16_SINT;
         case VET_SHORT2:
             return VK_FORMAT_R16G16_SINT;
+        case VET_SHORT3:
+            return VK_FORMAT_R16G16B16_SINT;
         case VET_SHORT4:
             return VK_FORMAT_R16G16B16A16_SINT;
         case VET_UBYTE4:
             return VK_FORMAT_R8G8B8A8_UINT;
+        case VET_USHORT1:
+            return VK_FORMAT_R16_UINT;
         case VET_USHORT2:
             return VK_FORMAT_R16G16_UINT;
+        case VET_USHORT3:
+            return VK_FORMAT_R16G16B16_UINT;
         case VET_USHORT4:
             return VK_FORMAT_R16G16B16A16_UINT;
         case VET_INT1:
@@ -187,31 +195,33 @@ namespace Ogre
             return VK_FORMAT_R32G32B32A32_SINT;
         case VET_BYTE4:
             return VK_FORMAT_R8G8B8A8_SINT;
-        //case VET_BYTE4_SNORM:
-        //    return VK_FORMAT_R8G8B8A8_SNORM;
+        case VET_BYTE4_NORM:
+            return VK_FORMAT_R8G8B8A8_SNORM;
         case VET_UBYTE4_NORM:
             return VK_FORMAT_R8G8B8A8_UNORM;
-        //case VET_SHORT2_SNORM:
-        //    return VK_FORMAT_R16G16_SNORM;
-        //case VET_SHORT4_SNORM:
-        //    return VK_FORMAT_R16G16B16A16_SNORM;
+        case VET_SHORT2_NORM:
+            return VK_FORMAT_R16G16_SNORM;
+        case VET_SHORT4_NORM:
+            return VK_FORMAT_R16G16B16A16_SNORM;
         case VET_USHORT2_NORM:
             return VK_FORMAT_R16G16_UNORM;
         case VET_USHORT4_NORM:
             return VK_FORMAT_R16G16B16A16_UNORM;
-        //case VET_HALF2:
-        //    return VK_FORMAT_R16G16_SFLOAT;
-        //case VET_HALF4:
-        //    return VK_FORMAT_R16G16B16A16_SFLOAT;
+        case VET_HALF1:
+            return VK_FORMAT_R16_SFLOAT;
+        case VET_HALF2:
+            return VK_FORMAT_R16G16_SFLOAT;
+        case VET_HALF3:
+            return VK_FORMAT_R16G16B16_SFLOAT;
+        case VET_HALF4:
+            return VK_FORMAT_R16G16B16A16_SFLOAT;
         case VET_INT_10_10_10_2_NORM:
             return VK_FORMAT_A2B10G10R10_SNORM_PACK32;
-        default:
+        case _DETAIL_SWAP_RB:
         case VET_DOUBLE1:
         case VET_DOUBLE2:
         case VET_DOUBLE3:
         case VET_DOUBLE4:
-        case VET_USHORT1:
-        case VET_USHORT3:
             return VK_FORMAT_UNDEFINED;
         }
 

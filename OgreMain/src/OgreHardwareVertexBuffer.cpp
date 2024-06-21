@@ -132,19 +132,23 @@ namespace Ogre {
             return sizeof(double)*4;
         case VET_SHORT1:
         case VET_USHORT1:
+        case VET_HALF1:
             return sizeof( short );
         case VET_SHORT2:
         case VET_SHORT2_NORM:
         case VET_USHORT2:
         case VET_USHORT2_NORM:
+        case VET_HALF2:
             return sizeof( short ) * 2;
         case VET_SHORT3:
         case VET_USHORT3:
+        case VET_HALF3:
             return sizeof( short ) * 3;
         case VET_SHORT4:
         case VET_SHORT4_NORM:
         case VET_USHORT4:
         case VET_USHORT4_NORM:
+        case VET_HALF4:
             return sizeof( short ) * 4;
         case VET_INT1:
         case VET_UINT1:
@@ -180,6 +184,7 @@ namespace Ogre {
         case VET_UINT1:
         case VET_INT1:
         case VET_DOUBLE1:
+        case VET_HALF1:
             return 1;
         case VET_FLOAT2:
         case VET_SHORT2:
@@ -189,6 +194,7 @@ namespace Ogre {
         case VET_UINT2:
         case VET_INT2:
         case VET_DOUBLE2:
+        case VET_HALF2:
             return 2;
         case VET_FLOAT3:
         case VET_SHORT3:
@@ -196,6 +202,7 @@ namespace Ogre {
         case VET_UINT3:
         case VET_INT3:
         case VET_DOUBLE3:
+        case VET_HALF3:
             return 3;
         case VET_FLOAT4:
         case VET_SHORT4:
@@ -211,6 +218,7 @@ namespace Ogre {
         case VET_UBYTE4_NORM:
         case _DETAIL_SWAP_RB:
         case VET_INT_10_10_10_2_NORM:
+        case VET_HALF4:
             return 4;
         }
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid type", 
@@ -228,6 +236,7 @@ namespace Ogre {
         case VET_DOUBLE1:
         case VET_INT1:
         case VET_UINT1:
+        case VET_HALF1:
             // evil enumeration arithmetic
             return static_cast<VertexElementType>( baseType + count - 1 );
 
@@ -292,6 +301,11 @@ namespace Ogre {
             case VET_FLOAT3:
             case VET_FLOAT4:
                 return VET_FLOAT1;
+            case VET_HALF1:
+            case VET_HALF2:
+            case VET_HALF3:
+            case VET_HALF4:
+                return VET_HALF1;
             case VET_DOUBLE1:
             case VET_DOUBLE2:
             case VET_DOUBLE3:

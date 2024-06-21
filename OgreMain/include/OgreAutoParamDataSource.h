@@ -260,9 +260,9 @@ namespace Ogre {
         Vector3 getViewDirection() const;
         Vector3 getViewSideVector() const;
         Vector3 getViewUpVector() const;
-        Real getFOV() const;
-        Real getNearClipDistance() const;
-        Real getFarClipDistance() const;
+        float getFOV() const;
+        float getNearClipDistance() const;
+        float getFarClipDistance() const;
         int getPassNumber(void) const;
         int getMaterialLodIndex() const;
         void setPassNumber(const int passNumber);
