@@ -16,6 +16,19 @@
 #include <QResizeEvent>
 #include <QKeyEvent>
 
+#ifdef OGRE_WAYLAND
+// This is a private, unstable header (package: qtbase5-private-dev)
+// Since Qt 6.5 another stable native interface becomes available, QWaylandApplication
+#include <5.15.8/QtGui/qpa/qplatformnativeinterface.h>
+#include <wayland-client-protocol.h>
+#include <wayland-egl.h>
+#define EGL_NO_X11
+#ifndef WL_EGL_PLATFORM
+#define WL_EGL_PLATFORM 1
+#endif
+#include <EGL/egl.h>
+#endif
+
 namespace OgreBites
 {
     static Event convert(const QEvent* in)
@@ -130,6 +143,30 @@ namespace OgreBites
         p.height= window->height();
 
         p.miscParams["externalWindowHandle"] = std::to_string(size_t(window->winId()));
+
+#ifdef OGRE_WAYLAND
+
+        QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
+
+        if (!nativeInterface){
+          Ogre::LogManager::getSingleton().logMessage("[Qt] Native interface is nullptr!");
+        }
+
+        auto display = static_cast<wl_display*>(nativeInterface->nativeResourceForWindow("display", nullptr));
+        auto surface = static_cast<wl_surface*>(nativeInterface->nativeResourceForWindow("surface", window));
+
+        // Is this needed?
+        auto egldisplay = static_cast<EGLDisplay>(nativeInterface->nativeResourceForWindow("egldisplay", nullptr));
+
+        // Is window (QWindow) actually an instance of wl_egl_window?
+        p.miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(window));
+        p.miscParams["externalDisplay"] = Ogre::StringConverter::toString(size_t(display));
+        p.miscParams["externalSurface"] = Ogre::StringConverter::toString(size_t(surface));
+
+        // Should external compositor be fetched too?
+        // @TODO: xdg-stuff
+
+#endif
 
         if (!mWindows.empty())
         {

@@ -199,10 +199,14 @@ if(Qt6_FOUND OR Qt5_FOUND)
   add_library(OgreBitesQt ${OGRE_COMP_LIB_TYPE} ${MOC_SRC} "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreApplicationContextQt.cpp")
   set_target_properties(OgreBitesQt PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
   target_link_libraries(OgreBitesQt PUBLIC Qt${QT_VERSION_MAJOR}::Gui OgreBites)
+  if(OGRE_GLSUPPORT_USE_WAYLAND)
+    target_compile_definitions(OgreBitesQt PRIVATE OGRE_WAYLAND)
+    target_link_libraries(OgreBitesQt PRIVATE PkgConfig::waylands)
+  endif()
   ogre_config_component(OgreBitesQt)
 endif()
 
-# install 
+# install
 ogre_config_framework(OgreBites)
 ogre_config_component(OgreBites)
 

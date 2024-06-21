@@ -83,6 +83,7 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
 
             LogManager::getSingleton().logWarning("GOT WINDOW HANDLE:" + tokens[0]);
 
+            // Qt: This casts QWindow to wl_egl_window, which may not work..
             mWindow = (wl_egl_window*)StringConverter::parseSizeT(tokens[0]);
             mIsExternal = true;
             mIsTopLevel = true;
@@ -90,10 +91,11 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
         if ((opt = miscParams->find("externalSurface")) != end)
         {
             StringVector tokens = StringUtil::split(opt->second, " :");
-            LogManager::getSingleton().logWarning("GOT SURFACE HANDLE:" + tokens[0]);
+            LogManager::getSingleton().logWarning("GOT SURFACE POINTER:" + tokens[0]);
 
             mGLSupport->mWlSurface = (wl_surface*)StringConverter::parseSizeT(tokens[0]);
         }
+        // Are these really needed?
         if ((opt = miscParams->find("externalXdgSurface")) != end)
         {
             StringVector tokens = StringUtil::split(opt->second, " :");
@@ -351,7 +353,13 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
     // https://github.com/libsdl-org/SDL/issues/5386
     // https://github.com/libsdl-org/SDL/pull/8789
     // See ApplicationContextSDL
-    mEglSurface = createSurfaceFromWindow(mGLSupport->getGLDisplay(), mWindow);
+    EGLDisplay disp = mGLSupport->getGLDisplay();
+    LogManager::getSingleton().logWarning("Got EGLDisplay");
+    // Qt problem:
+    // By default, mWindow is WId, can get QWindow* using QWindow::fromWinId(id), but there are limitations on using this
+    // How to get wl_egl_window from QWindow?
+    // This function call will fail for Qt with wayland
+    mEglSurface = createSurfaceFromWindow(disp, mWindow);
 
     LogManager::getSingleton().logWarning("Created egl surface");
 
