@@ -14,6 +14,8 @@ jobs:
         sudo apt update
         sudo apt install -y libxrandr-dev \
           libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev mesa-vulkan-drivers \
+          libwayland-dev libwayland-egl pkg-config libegl1-mesa-dev wayland-protocols \
+          qtwayland5 qtbase5-private-dev \
           libfreetype6-dev libpugixml-dev libassimp-dev libbullet-dev qtbase5-dev cargo \
           nvidia-cg-dev glslang-dev spirv-tools spirv-headers \
           swig4.0 mono-mcs python3-dev \
@@ -27,9 +29,12 @@ jobs:
         cmake --build build -- -j 4
         cmake --build build --target OgreDoc > /dev/null
       env:  # need to fix warnings on newer compilers first
+        LINUX: true
         CC: gcc-7
         CXX: g++-7
     - name: Test
+      env:
+        SDL_VIDEODRIVER: wayland
       run: |
         # doxygen warnings check
         cat build/doxygen_warnings.log
