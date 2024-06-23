@@ -83,6 +83,15 @@ namespace Ogre {
         memcpy(pDst + elemOffset + sizeof(uint16) * 3, &one16f, sizeof(uint16));
     }
 
+    static void float_to_half_3(uint8* pDst, uint8* pSrc, int elemOffset)
+    {
+        float* pFloat = (float*)(pSrc + elemOffset);
+        uint16* pHalf = (uint16*)(pDst + elemOffset);
+        pHalf[0] = Bitwise::floatToHalf(pFloat[0]);
+        pHalf[1] = Bitwise::floatToHalf(pFloat[1]);
+        pHalf[2] = Bitwise::floatToHalf(pFloat[2]);
+    }
+
     /** Splice out an element from a vertex buffer
      * @param elem The element to splice out of the vertex
      * @param srcBuf Source buffer
@@ -298,6 +307,11 @@ namespace Ogre {
             {
                 OgreAssert(srcType == VET_INT_10_10_10_2_NORM, "unsupported conversion");
                 spliceElement(elem, vbuf, pDst, pDst, newElemSize, unpack_10_10_10_2<true>);
+            }
+            else if(dstType == VET_HALF3)
+            {
+                OgreAssert(srcType == VET_FLOAT3, "unsupported conversion");
+                spliceElement(elem, vbuf, pDst, pDst, newElemSize, float_to_half_3);
             }
             else if(dstType == VET_HALF4 || dstType == VET_SHORT4 || dstType == VET_USHORT4)
             {
