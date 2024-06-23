@@ -25,21 +25,6 @@ public:
     WaylandEGLWindow(WaylandEGLSupport* glsupport);
     virtual ~WaylandEGLWindow();
 
-    /**
-
-       Get custom attribute
-
-       The following attributes are valid:
-       | Attribute | Description |
-       |---|---|
-       | TBD | TBD |
-
-       @param[in] name Attribute name
-       @param[out] pData The requested attribute
-
-    */
-    void getCustomAttribute(const String& name, void* pData) override;
-
     void create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                 const NameValuePairList* miscParams) override;
 };

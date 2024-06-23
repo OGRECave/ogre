@@ -155,9 +155,7 @@ namespace OgreBites
         auto display = static_cast<wl_display*>(nativeInterface->nativeResourceForWindow("display", nullptr));
         auto surface = static_cast<wl_surface*>(nativeInterface->nativeResourceForWindow("surface", window));
 
-        // Is window (QWindow) actually an instance of wl_egl_window?
-        p.miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(window));
-        p.miscParams["externalDisplay"] = Ogre::StringConverter::toString(size_t(display));
+        p.miscParams["externalWlDisplay"] = Ogre::StringConverter::toString(size_t(display));
         p.miscParams["externalSurface"] = Ogre::StringConverter::toString(size_t(surface));
 #endif
 

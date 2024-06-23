@@ -73,10 +73,8 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
 #ifdef OGRE_WAYLAND
         Ogre::LogManager::getSingleton().logMessage("[SDL] Creating Wayland window");
 
-        p.miscParams["externalDisplay"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.display));
+        p.miscParams["externalWlDisplay"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.display));
         p.miscParams["externalSurface"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.surface));
-#else
-        OgreAssert(false, "recompile Ogre with Wayland support");
 #endif
     }
     else if (wmInfo.subsystem == SDL_SYSWM_X11)

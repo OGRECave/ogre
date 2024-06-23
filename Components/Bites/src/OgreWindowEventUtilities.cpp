@@ -36,7 +36,7 @@ THE SOFTWARE.
 #   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #  include <windows.h>
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX && !defined(OGRE_WAYLAND)
 #  if !defined(OGRE_WAYLAND)
 #   include <X11/Xlib.h>
 #  endif

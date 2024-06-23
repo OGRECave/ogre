@@ -36,22 +36,6 @@ WaylandEGLWindow::~WaylandEGLWindow()
     mWindow = nullptr;
 }
 
-void WaylandEGLWindow::getCustomAttribute(const String& name, void* pData)
-{
-    EGLWindow::getCustomAttribute(name, pData);
-    // #TODO add support for wayland-related variables;
-    if (name == "WL_DISPLAY")
-    {
-        *static_cast<NativeDisplayType*>(pData) = mGLSupport->getNativeDisplay();
-        return;
-    }
-    else if (name == "WL_WINDOW")
-    {
-        *static_cast<NativeWindowType*>(pData) = mWindow;
-        return;
-    }
-}
-
 void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscParams)
 {
     //mNativeDisplay = mGLSupport->getNativeDisplay();
@@ -61,7 +45,7 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
         NameValuePairList::const_iterator opt;
         NameValuePairList::const_iterator end = miscParams->end();
 
-        if ((opt = miscParams->find("externalDisplay")) != end)
+        if ((opt = miscParams->find("externalWlDisplay")) != end)
         {
           StringVector tokens = StringUtil::split(opt->second, " :");
 
@@ -69,16 +53,6 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
           mNativeDisplay = tmp;
           mGLSupport->setNativeDisplay(mNativeDisplay);
 
-        }
-        if ((opt = miscParams->find("parentWindowHandle")) != end ||
-            (opt = miscParams->find("externalWindowHandle")) != end)
-        {
-            StringVector tokens = StringUtil::split(opt->second, " :");
-
-            // Qt: This casts QWindow to wl_egl_window, which may not work..
-            mWindow = (wl_egl_window*)StringConverter::parseSizeT(tokens[0]);
-            mIsExternal = true;
-            mIsTopLevel = true;
         }
         if ((opt = miscParams->find("externalSurface")) != end)
         {
@@ -93,16 +67,6 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
 void WaylandEGLWindow::createNativeWindow(uint& width, uint& height, String& title)
 {
     mEglDisplay = mGLSupport->getGLDisplay();
-
-    if (!mGLSupport->mWlSurface)
-    {
-        mGLSupport->mWlSurface = wl_compositor_create_surface(mGLSupport->mWlCompositor);
-    }
-
-    if (mGLSupport->mWlSurface == nullptr)
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Couldn't create Wayland surface");
-    }
 
     mGLSupport->mWlRegion = wl_compositor_create_region(mGLSupport->mWlCompositor);
     wl_region_add(mGLSupport->mWlRegion, 0, 0, width, height);

@@ -94,6 +94,10 @@ namespace Ogre {
             NameValuePairList::const_iterator opt;
             NameValuePairList::const_iterator end = miscParams->end();
 
+            if ((opt = miscParams->find("externalWlDisplay")) != end)
+            {
+              OgreAssert(false, "recompile Ogre with Wayland support");
+            }
             if ((opt = miscParams->find("parentWindowHandle")) != end ||
                 (opt = miscParams->find("externalWindowHandle")) != end)
             {
