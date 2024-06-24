@@ -24,9 +24,6 @@ const wl_registry_listener WaylandEGLSupport::mRegistryListener = {
 void WaylandEGLSupport::globalRegistryHandler(void* data, struct wl_registry* registry, uint32_t id,
                                               const char* interface, uint32_t version)
 {
-    /*LogManager::getSingleton().logMessage("Got a registry event for " + std::string(interface) + " " +
-                                          std::to_string(id)); //, LogMessageLevel::LML_TRIVIAL);*/
-
     auto ptr = static_cast<WaylandEGLSupport*>(data);
 
     if (std::string(interface) == std::string(wl_compositor_interface.name))
@@ -37,15 +34,12 @@ void WaylandEGLSupport::globalRegistryHandler(void* data, struct wl_registry* re
 
 void WaylandEGLSupport::globalRegistryRemover(void* data, struct wl_registry* registry, uint32_t id)
 {
-    LogManager::getSingleton().logMessage("Got a registry losing event for " + std::to_string(id), LogMessageLevel::LML_TRIVIAL);
 }
 
 WaylandEGLSupport::WaylandEGLSupport(int profile) : EGLSupport(profile)
 {
     mWlCompositor = nullptr;
     mWlSurface = nullptr;
-    mWlOutput = nullptr;
-    mWlRegion = nullptr;
     mIsExternalDisplay = false;
 }
 
@@ -68,7 +62,7 @@ void WaylandEGLSupport::doInit()
 
     if (mVideoModes.empty()) // none of the above worked
     {
-        // TODO: query and set a suitable width and height?
+        // @TODO: query and set a suitable width and height?
         mCurrentMode.width = 640;
         mCurrentMode.height = 480;
         mCurrentMode.refreshRate = 0;
@@ -159,7 +153,6 @@ EGLDisplay WaylandEGLSupport::getGLDisplay()
         if (!mNativeDisplay)
             mNativeDisplay = getNativeDisplay();
         struct wl_registry* registry = wl_display_get_registry(mNativeDisplay);
-        //
         wl_registry_add_listener(registry, &WaylandEGLSupport::mRegistryListener, this);
         wl_display_dispatch(mNativeDisplay);
         wl_display_roundtrip(mNativeDisplay);

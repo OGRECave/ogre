@@ -19,9 +19,7 @@ class _OgrePrivate WaylandEGLSupport : public EGLSupport
 {
 public:
     wl_surface* mWlSurface;
-    wl_region* mWlRegion;
     wl_compositor* mWlCompositor;
-    wl_output* mWlOutput;
     bool mIsExternalDisplay;
 
 protected:

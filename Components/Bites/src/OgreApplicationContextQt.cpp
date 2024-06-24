@@ -20,13 +20,6 @@
 // This is a private, unstable header (package: qtbase5-private-dev)
 // Since Qt 6.5 another stable native interface becomes available, QWaylandApplication
 #include <5.12.8/QtGui/qpa/qplatformnativeinterface.h>
-#include <wayland-client-protocol.h>
-#include <wayland-egl.h>
-#define EGL_NO_X11
-#ifndef WL_EGL_PLATFORM
-#define WL_EGL_PLATFORM 1
-#endif
-#include <EGL/egl.h>
 #endif
 
 namespace OgreBites
@@ -142,22 +135,27 @@ namespace OgreBites
         p.width = window->width();
         p.height= window->height();
 
-        p.miscParams["externalWindowHandle"] = std::to_string(size_t(window->winId()));
-
-#ifdef OGRE_WAYLAND
-
-        QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
-
-        if (!nativeInterface){
-          Ogre::LogManager::getSingleton().logMessage("[Qt] Native interface is nullptr!");
+        if (QGuiApplication::platformName() != "wayland") {
+          p.miscParams["externalWindowHandle"] = std::to_string(size_t(window->winId()));
         }
 
-        auto display = static_cast<wl_display*>(nativeInterface->nativeResourceForWindow("display", nullptr));
-        auto surface = static_cast<wl_surface*>(nativeInterface->nativeResourceForWindow("surface", window));
+        if (QGuiApplication::platformName() == "wayland")
+        {
+            window->create(); // This must be called since window->winId() is not called.
 
-        p.miscParams["externalWlDisplay"] = Ogre::StringConverter::toString(size_t(display));
-        p.miscParams["externalSurface"] = Ogre::StringConverter::toString(size_t(surface));
-#endif
+            QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
+
+            if (!nativeInterface)
+            {
+                Ogre::LogManager::getSingleton().logMessage("[Qt] Native interface is nullptr!");
+            }
+
+            void* display = nativeInterface->nativeResourceForWindow("display", nullptr);
+            void* surface = nativeInterface->nativeResourceForWindow("surface", window);
+
+            p.miscParams["externalWlDisplay"] = Ogre::StringConverter::toString(size_t(display));
+            p.miscParams["externalWlSurface"] = Ogre::StringConverter::toString(size_t(surface));
+        }
 
         if (!mWindows.empty())
         {

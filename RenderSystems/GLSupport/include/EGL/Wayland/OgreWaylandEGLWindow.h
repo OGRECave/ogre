@@ -17,7 +17,7 @@ protected:
     WaylandEGLSupport* mGLSupport;
 
     void initNativeCreatedWindow(const NameValuePairList* miscParams);
-    void createNativeWindow(uint& width, uint& height, String& title);
+    void createNativeWindow(uint& width, uint& height);
     void resize(unsigned int width, unsigned int height) override;
     void windowMovedOrResized() override;
 

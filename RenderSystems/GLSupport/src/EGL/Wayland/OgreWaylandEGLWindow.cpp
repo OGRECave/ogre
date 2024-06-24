@@ -21,13 +21,11 @@ namespace Ogre
 WaylandEGLWindow::WaylandEGLWindow(WaylandEGLSupport* glsupport) : EGLWindow(glsupport)
 {
     mGLSupport = glsupport;
-    mNativeDisplay = nullptr; //glsupport->getNativeDisplay();
+    mNativeDisplay = nullptr;
 }
 
 WaylandEGLWindow::~WaylandEGLWindow()
 {
-    //mNativeDisplay = mGLSupport->getNativeDisplay();
-
     if (mWindow && mIsTopLevel)
     {
         if (!mIsExternal)
@@ -38,39 +36,32 @@ WaylandEGLWindow::~WaylandEGLWindow()
 
 void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscParams)
 {
-    //mNativeDisplay = mGLSupport->getNativeDisplay();
-
     if (miscParams)
     {
         NameValuePairList::const_iterator opt;
         NameValuePairList::const_iterator end = miscParams->end();
 
+        if ((opt = miscParams->find("parentWindowHandle")) != end ||
+         (opt = miscParams->find("externalWindowHandle")) != end)
+        {
+          OgreAssert(false, "recompile Ogre without Wayland support");
+        }
         if ((opt = miscParams->find("externalWlDisplay")) != end)
         {
-          StringVector tokens = StringUtil::split(opt->second, " :");
-
-          auto tmp = (wl_display*)StringConverter::parseSizeT(tokens[0]);
-          mNativeDisplay = tmp;
+          mNativeDisplay = (wl_display*)StringConverter::parseSizeT(opt->second);
           mGLSupport->setNativeDisplay(mNativeDisplay);
-
         }
-        if ((opt = miscParams->find("externalSurface")) != end)
+        if ((opt = miscParams->find("externalWlSurface")) != end)
         {
-            StringVector tokens = StringUtil::split(opt->second, " :");
-
-            mGLSupport->mWlSurface = (wl_surface*)StringConverter::parseSizeT(tokens[0]);
+            mGLSupport->mWlSurface = (wl_surface*)StringConverter::parseSizeT(opt->second);
         }
     }
     mNativeDisplay = mGLSupport->getNativeDisplay();
 }
 
-void WaylandEGLWindow::createNativeWindow(uint& width, uint& height, String& title)
+void WaylandEGLWindow::createNativeWindow(uint& width, uint& height)
 {
     mEglDisplay = mGLSupport->getGLDisplay();
-
-    mGLSupport->mWlRegion = wl_compositor_create_region(mGLSupport->mWlCompositor);
-    wl_region_add(mGLSupport->mWlRegion, 0, 0, width, height);
-    wl_surface_set_opaque_region(mGLSupport->mWlSurface, mGLSupport->mWlRegion);
 
     if (!mWindow)
     {
@@ -138,16 +129,13 @@ void WaylandEGLWindow::windowMovedOrResized()
 void WaylandEGLWindow::create(const String& name, uint width, uint height, bool fullScreen,
                               const NameValuePairList* miscParams)
 {
-    String title = name;
     int samples = 0;
     short frequency = 0;
     int maxBufferSize(32), minBufferSize(16), maxDepthSize(16), maxStencilSize(0);
     bool vsync = false;
-    ::EGLContext eglContext = NULL;
-
+    ::EGLContext eglContext = nullptr;
     unsigned int vsyncInterval = 1;
 
-    //mNativeDisplay = mGLSupport->getNativeDisplay();
     mIsFullScreen = fullScreen;
 
     if (miscParams)
@@ -168,7 +156,6 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
             mEglDisplay = eglGetCurrentDisplay();
             EGL_CHECK_ERROR
         }
-
 
         if((opt = miscParams->find("maxColourBufferSize")) != end)
         {
@@ -214,11 +201,6 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
             mHwGamma = StringConverter::parseBool(opt->second);
         }
 
-        if ((opt = miscParams->find("title")) != end)
-        {
-            title = opt->second;
-        }
-
         if ((opt = miscParams->find("externalGLControl")) != end)
         {
             mIsExternalGLControl = StringConverter::parseBool(opt->second);
@@ -226,14 +208,11 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
     }
 
     initNativeCreatedWindow(miscParams);
-
     mGLSupport->doInit();
-
 
     if (!mEglConfig)
     {
       int MSAAminAttribs[] = {
-        //EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
         EGL_BUFFER_SIZE, minBufferSize,
         EGL_DEPTH_SIZE, 16,
         EGL_SAMPLE_BUFFERS, 1,
@@ -241,7 +220,6 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
         EGL_NONE
       };
       int MSAAmaxAttribs[] = {
-        //EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
         EGL_BUFFER_SIZE, maxBufferSize,
         EGL_DEPTH_SIZE, maxDepthSize,
         EGL_STENCIL_SIZE, maxStencilSize,
@@ -263,22 +241,8 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
         mGLSupport->switchMode(width, height, frequency);
     }
 
-    createNativeWindow(width, height, title);
-
-    LogManager::getSingleton().logWarning("Created native window");
-    // https://github.com/libsdl-org/SDL/issues/5386
-    // https://github.com/libsdl-org/SDL/pull/8789
-    // See ApplicationContextSDL
-    EGLDisplay disp = mGLSupport->getGLDisplay();
-    LogManager::getSingleton().logWarning("Got EGLDisplay");
-    // Qt problem:
-    // By default, mWindow is WId, can get QWindow* using QWindow::fromWinId(id), but there are limitations on using this
-    // How to get wl_egl_window from QWindow?
-    // This function call will fail for Qt with wayland
-    mEglSurface = createSurfaceFromWindow(disp, mWindow);
-
-    LogManager::getSingleton().logWarning("Created egl surface");
-
+    createNativeWindow(width, height);
+    mEglSurface = createSurfaceFromWindow(mGLSupport->getGLDisplay(), mWindow);
     mContext = createEGLContext(eglContext);
 
     // apply vsync settings. call setVSyncInterval first to avoid
