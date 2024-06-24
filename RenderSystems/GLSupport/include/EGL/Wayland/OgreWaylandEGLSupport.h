@@ -23,16 +23,16 @@ public:
     bool mIsExternalDisplay;
 
 protected:
-
     VideoModes mCbVideoModes;
 
 public:
     WaylandEGLSupport(int profile);
     virtual ~WaylandEGLSupport();
 
-    inline void setNativeDisplay(NativeDisplayType t){
-      mIsExternalDisplay = true;
-      mNativeDisplay = t;
+    inline void setNativeDisplay(NativeDisplayType t)
+    {
+        mIsExternalDisplay = true;
+        mNativeDisplay = t;
     }
     NativeDisplayType getNativeDisplay(void);
     // This just sets the native variables needed by EGLSupport::getGLDisplay
@@ -42,7 +42,6 @@ public:
 
     RenderWindow* newWindow(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                             const NameValuePairList* miscParams = 0) override;
-
 
     static void globalRegistryHandler(void* data, wl_registry* registry, uint32_t id, const char* interface,
                                       uint32_t version);

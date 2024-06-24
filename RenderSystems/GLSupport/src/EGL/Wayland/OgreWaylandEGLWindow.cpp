@@ -98,7 +98,6 @@ void WaylandEGLWindow::resize(uint width, uint height)
 
     if (width != 0 && height != 0)
     {
-
         if (mWindow)
         {
             wl_egl_window_resize(mWindow, width, height, 0, 0);

@@ -13,7 +13,6 @@
 
 if(EGL_FOUND)
   cmake_dependent_option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" TRUE "NOT WIN32" FALSE)
-
   cmake_dependent_option(OGRE_GLSUPPORT_USE_WAYLAND "use Wayland window manager" FALSE "UNIX;NOT APPLE;NOT EMSCRIPTEN;NOT ANDROID" FALSE)
 endif()
 

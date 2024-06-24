@@ -190,7 +190,6 @@ void WindowEventUtilities::messagePump()
     }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #if !defined(OGRE_WAYLAND)
-// TODO write wayland-alternative
     //GLX Message Pump
     Display* xDisplay = 0; // same for all windows
 
