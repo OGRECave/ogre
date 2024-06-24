@@ -12,8 +12,8 @@
 #include "OgreWaylandEGLSupport.h"
 #include "OgreWaylandEGLWindow.h"
 
-#include <thread>
 #include <chrono>
+#include <thread>
 
 namespace Ogre
 {
@@ -36,27 +36,23 @@ WaylandEGLWindow::~WaylandEGLWindow()
 
 void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscParams)
 {
+    mNativeDisplay = mGLSupport->getNativeDisplay();
+
     if (miscParams)
     {
         NameValuePairList::const_iterator opt;
         NameValuePairList::const_iterator end = miscParams->end();
 
-        if ((opt = miscParams->find("parentWindowHandle")) != end ||
-         (opt = miscParams->find("externalWindowHandle")) != end)
-        {
-          OgreAssert(false, "recompile Ogre without Wayland support");
-        }
         if ((opt = miscParams->find("externalWlDisplay")) != end)
         {
-          mNativeDisplay = (wl_display*)StringConverter::parseSizeT(opt->second);
-          mGLSupport->setNativeDisplay(mNativeDisplay);
+            mNativeDisplay = (wl_display*)StringConverter::parseSizeT(opt->second);
+            mGLSupport->setNativeDisplay(mNativeDisplay);
         }
         if ((opt = miscParams->find("externalWlSurface")) != end)
         {
             mGLSupport->mWlSurface = (wl_surface*)StringConverter::parseSizeT(opt->second);
         }
     }
-    mNativeDisplay = mGLSupport->getNativeDisplay();
 }
 
 void WaylandEGLWindow::createNativeWindow(uint& width, uint& height)
@@ -156,25 +152,26 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
             EGL_CHECK_ERROR
         }
 
-        if((opt = miscParams->find("maxColourBufferSize")) != end)
+        if ((opt = miscParams->find("maxColourBufferSize")) != end)
         {
-          maxBufferSize = Ogre::StringConverter::parseInt(opt->second);
+            maxBufferSize = Ogre::StringConverter::parseInt(opt->second);
         }
 
-        if((opt = miscParams->find("maxDepthBufferSize")) != end)
+        if ((opt = miscParams->find("maxDepthBufferSize")) != end)
         {
-          maxDepthSize = Ogre::StringConverter::parseInt(opt->second);
+            maxDepthSize = Ogre::StringConverter::parseInt(opt->second);
         }
 
-        if((opt = miscParams->find("maxStencilBufferSize")) != end)
+        if ((opt = miscParams->find("maxStencilBufferSize")) != end)
         {
-          maxStencilSize = Ogre::StringConverter::parseInt(opt->second);
+            maxStencilSize = Ogre::StringConverter::parseInt(opt->second);
         }
 
-        if((opt = miscParams->find("minColourBufferSize")) != end)
+        if ((opt = miscParams->find("minColourBufferSize")) != end)
         {
-          minBufferSize = Ogre::StringConverter::parseInt(opt->second);
-          if (minBufferSize > maxBufferSize) minBufferSize = maxBufferSize;
+            minBufferSize = Ogre::StringConverter::parseInt(opt->second);
+            if (minBufferSize > maxBufferSize)
+                minBufferSize = maxBufferSize;
         }
 
         if ((opt = miscParams->find("FSAA")) != end)
@@ -204,6 +201,10 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
         {
             mIsExternalGLControl = StringConverter::parseBool(opt->second);
         }
+
+        if ((opt = miscParams->find("parentWindowHandle")) != end ||
+            (opt = miscParams->find("externalWindowHandle")) != end)
+            OgreAssert(false, "Recompile Ogre without Wayland support");
     }
 
     initNativeCreatedWindow(miscParams);

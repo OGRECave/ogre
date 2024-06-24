@@ -6,7 +6,6 @@
 #ifndef __WaylandEGLSupport_H__
 #define __WaylandEGLSupport_H__
 
-#include <wayland-client-protocol.h>
 #include <wayland-client.h>
 #include <wayland-egl.h> // include before egl
 
@@ -19,7 +18,6 @@ class _OgrePrivate WaylandEGLSupport : public EGLSupport
 {
 public:
     wl_surface* mWlSurface;
-    wl_compositor* mWlCompositor;
     bool mIsExternalDisplay;
 
 protected:
@@ -43,12 +41,6 @@ public:
     RenderWindow* newWindow(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                             const NameValuePairList* miscParams = 0) override;
 
-    static void globalRegistryHandler(void* data, wl_registry* registry, uint32_t id, const char* interface,
-                                      uint32_t version);
-
-    static void globalRegistryRemover(void* data, wl_registry* registry, uint32_t id);
-
-    static const wl_registry_listener mRegistryListener;
 };
 
 } // namespace Ogre

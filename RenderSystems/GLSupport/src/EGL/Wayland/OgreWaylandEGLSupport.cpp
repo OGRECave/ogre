@@ -18,27 +18,8 @@ namespace Ogre
 
 GLNativeSupport* getGLSupport(int profile) { return new WaylandEGLSupport(profile); }
 
-const wl_registry_listener WaylandEGLSupport::mRegistryListener = {
-    .global = WaylandEGLSupport::globalRegistryHandler, .global_remove = WaylandEGLSupport::globalRegistryRemover};
-
-void WaylandEGLSupport::globalRegistryHandler(void* data, struct wl_registry* registry, uint32_t id,
-                                              const char* interface, uint32_t version)
-{
-    auto ptr = static_cast<WaylandEGLSupport*>(data);
-
-    if (std::string(interface) == std::string(wl_compositor_interface.name))
-    {
-        ptr->mWlCompositor = static_cast<wl_compositor*>(wl_registry_bind(registry, id, &wl_compositor_interface, 4));
-    }
-}
-
-void WaylandEGLSupport::globalRegistryRemover(void* data, struct wl_registry* registry, uint32_t id)
-{
-}
-
 WaylandEGLSupport::WaylandEGLSupport(int profile) : EGLSupport(profile)
 {
-    mWlCompositor = nullptr;
     mWlSurface = nullptr;
     mIsExternalDisplay = false;
 }
@@ -46,7 +27,7 @@ WaylandEGLSupport::WaylandEGLSupport(int profile) : EGLSupport(profile)
 void WaylandEGLSupport::doInit()
 {
     // A connection that is NOT shared to enable independent event processing:
-    // mNativeDisplay = getNativeDisplay();
+    mNativeDisplay = getNativeDisplay();
 
     // A connection that might be shared with the application for GL rendering:
     mGLDisplay = getGLDisplay();
@@ -145,24 +126,10 @@ EGLDisplay WaylandEGLSupport::getGLDisplay()
 {
     if (!mNativeDisplay)
     {
-        //
-        return nullptr;
+        mNativeDisplay = getNativeDisplay();
     }
     if (!mGLDisplay)
     {
-        if (!mNativeDisplay)
-            mNativeDisplay = getNativeDisplay();
-        struct wl_registry* registry = wl_display_get_registry(mNativeDisplay);
-        wl_registry_add_listener(registry, &WaylandEGLSupport::mRegistryListener, this);
-        wl_display_dispatch(mNativeDisplay);
-        wl_display_roundtrip(mNativeDisplay);
-
-        if (mWlCompositor == nullptr)
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Couldn't find Wayland compositor or shell display");
-            return nullptr;
-        }
-
         return EGLSupport::getGLDisplay();
     }
     return mGLDisplay;
