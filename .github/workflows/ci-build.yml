@@ -33,8 +33,6 @@ jobs:
         CC: gcc-7
         CXX: g++-7
     - name: Test
-      env:
-        SDL_VIDEODRIVER: wayland
       run: |
         # doxygen warnings check
         cat build/doxygen_warnings.log
@@ -117,3 +115,7 @@ jobs:
       run: |
         cmake -Bbuild -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none -DOGRE_CONFIG_DOUBLE=ON -DOGRE_ASSERT_MODE=1 -DOGRE_PROFILING=ON .
         cmake --build build -- -j 4
+    - name: Build with wayland
+      run: |
+        cmake -Bbuild_wayland -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none -DOGRE_CONFIG_DOUBLE=ON -DOGRE_ASSERT_MODE=1 -DOGRE_PROFILING=ON -DOGRE_GLSUPPORT_USE_WAYLAND=ON .
+        cmake --build build_wayland -- -j 4

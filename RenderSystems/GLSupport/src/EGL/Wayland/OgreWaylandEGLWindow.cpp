@@ -53,6 +53,7 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
             mGLSupport->mWlSurface = (wl_surface*)StringConverter::parseSizeT(opt->second);
         }
     }
+    OgreAssert(mGLSupport->mWlSurface, "externalWlSurface required");
 }
 
 void WaylandEGLWindow::createNativeWindow(uint& width, uint& height)
