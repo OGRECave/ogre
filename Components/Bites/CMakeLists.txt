@@ -108,7 +108,7 @@ elseif(ANDROID)
 endif()
 
 cmake_dependent_option(OGRE_BITES_NATIVE_DIALOG "Provide a platform specific ConfigDialog implementation"
-  ON "NOT ANDROID;NOT EMSCRIPTEN;NOT APPLE_IOS;NOT WINDOWS_STORE;NOT WINDOWS_PHONE;NOT UNIX OR APPLE OR XAW_LIBRARY" OFF)
+  ON "NOT OGRE_GLSUPPORT_USE_WAYLAND;NOT ANDROID;NOT EMSCRIPTEN;NOT APPLE_IOS;NOT WINDOWS_STORE;NOT WINDOWS_PHONE;NOT UNIX OR APPLE OR XAW_LIBRARY" OFF)
 
 if(NOT OGRE_BITES_NATIVE_DIALOG)
   set_source_files_properties(src/OgreBitesConfigDialog.cpp PROPERTIES COMPILE_DEFINITIONS DISABLE_NATIVE_DIALOG)
@@ -134,14 +134,13 @@ elseif(APPLE)
   set(RESOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/ogrelogo.png")
   source_group(Resources FILES ${RESOURCE_FILES})
   set(DEPENDENCIES ${DEPENDENCIES} "-framework Cocoa")
-elseif(UNIX AND XAW_LIBRARY)
+elseif(UNIX AND XAW_LIBRARY AND NOT OGRE_GLSUPPORT_USE_WAYLAND)
   list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGLXConfigDialog.cpp")
   list(APPEND DEPENDENCIES ${X11_Xt_LIB} ${XAW_LIBRARY})
   install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/misc/GLX_backdrop.png" DESTINATION "${OGRE_MEDIA_PATH}/../")
 endif()
 
-if(UNIX AND NOT APPLE)
-  # for WindowEventUtilities
+if(UNIX AND NOT APPLE AND NOT OGRE_GLSUPPORT_USE_WAYLAND)
   list(APPEND DEPENDENCIES ${X11_X11_LIB})
   set(NATIVE_INCLUDES ${X11_Xlib_INCLUDE_PATH})
 endif()
@@ -176,6 +175,10 @@ if(OGRE_STATIC AND APPLE AND OGRE_BUILD_PLUGIN_CG)
   target_include_directories(OgreBites PUBLIC ${Cg_INCLUDE_DIRS})
 endif()
 
+if(OGRE_GLSUPPORT_USE_WAYLAND)
+  target_compile_definitions(OgreBites PRIVATE OGRE_WAYLAND)
+endif()
+
 if(SDL2_FOUND)
   target_link_libraries(OgreBites PRIVATE SDL2::SDL2)
 elseif(NOT EMSCRIPTEN)
@@ -187,6 +190,21 @@ generate_export_header(OgreBites
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreBitesPrerequisites.h)
 
 if(Qt6_FOUND OR Qt5_FOUND)
+  set(_OgreBitesQt ON)
+else()
+  set(_OgreBitesQt OFF)
+endif()
+
+if(OGRE_GLSUPPORT_USE_WAYLAND)
+  if(NOT TARGET Qt${QT_VERSION_MAJOR}::GuiPrivate)
+    set(_OgreBitesQt OFF)
+  else()
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/OgreQtNativeinterface.h.in"
+      "${PROJECT_BINARY_DIR}/include_private/OgreQtNativeinterface.h" @ONLY)
+  endif()
+endif()
+
+if(_OgreBitesQt)
   if(Qt6_FOUND)
     qt6_wrap_cpp(MOC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreApplicationContextQt.h")
   else()
@@ -196,10 +214,16 @@ if(Qt6_FOUND OR Qt5_FOUND)
   add_library(OgreBitesQt ${OGRE_COMP_LIB_TYPE} ${MOC_SRC} "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreApplicationContextQt.cpp")
   set_target_properties(OgreBitesQt PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
   target_link_libraries(OgreBitesQt PUBLIC Qt${QT_VERSION_MAJOR}::Gui OgreBites)
+  if(OGRE_GLSUPPORT_USE_WAYLAND)
+    target_compile_definitions(OgreBitesQt PRIVATE OGRE_WAYLAND)
+    target_link_libraries(OgreBitesQt PRIVATE Qt${QT_VERSION_MAJOR}::GuiPrivate)
+    target_include_directories(OgreBitesQt PRIVATE
+      "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include_private>")
+  endif()
   ogre_config_component(OgreBitesQt)
 endif()
 
-# install 
+# install
 ogre_config_framework(OgreBites)
 ogre_config_component(OgreBites)
 

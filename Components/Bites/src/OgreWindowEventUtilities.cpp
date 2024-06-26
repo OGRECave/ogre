@@ -36,8 +36,8 @@ THE SOFTWARE.
 #   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #  include <windows.h>
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-#include <X11/Xlib.h>
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX && !defined(OGRE_WAYLAND)
+#   include <X11/Xlib.h>
 #endif
 
 using namespace Ogre;
@@ -47,7 +47,7 @@ typedef std::multimap<RenderWindow*, WindowEventListener*> WindowEventListeners;
 static WindowEventListeners _msListeners;
 static RenderWindowList _msWindows;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX && !defined(OGRE_WAYLAND)
 static void GLXProc( RenderWindow *win, const XEvent &event );
 #endif
 
@@ -184,7 +184,7 @@ void WindowEventUtilities::messagePump()
         TranslateMessage( &msg );
         DispatchMessage( &msg );
     }
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX && !defined(OGRE_WAYLAND)
     //GLX Message Pump
     Display* xDisplay = 0; // same for all windows
 
@@ -240,7 +240,7 @@ void WindowEventUtilities::_removeRenderWindow(RenderWindow* window)
         _msWindows.erase( i );
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX && !defined(OGRE_WAYLAND)
 //--------------------------------------------------------------------------------//
 static void GLXProc( Ogre::RenderWindow *win, const XEvent &event )
 {

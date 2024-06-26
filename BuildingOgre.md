@@ -42,25 +42,36 @@ For manually building the dependencies, please refer to the list below and get a
 ### Linux
 
 On linux you additionally need the following system headers to build the GL, GL3+, GLES2 & Vulkan RenderSystems:
-* Ubuntu
-
-    sudo apt-get install libgles2-mesa-dev libvulkan-dev glslang-dev libxrandr-dev
-
-* Fedora
-
-    sudo dnf install mesa-libGL-devel mesa-vulkan-devel glslang-devel
-
-furthermore we recommend installing the following optional packages
 
 * Ubuntu
 
-    sudo apt-get install libsdl2-dev libxt-dev libxaw7-dev doxygen
+    sudo apt-get install libgles2-mesa-dev libvulkan-dev glslang-dev
+
+    * **X11**: `sudo apt-get install libxrandr-dev`
+    * **Wayland**: `sudo apt-get install pkg-config libwayland-dev libwayland-egl1 libegl-dev`
 
 * Fedora
 
-    sudo dnf install SDL2-devel libXt-devel libXaw-devel doxygen pugixml-devel
+    sudo dnf install mesa-libGL-devel mesa-libEGL-devel mesa-vulkan-devel glslang-devel
 
-these will enable input handling in the SampleBrowser, the X11 ConfigDialog and allow building the documentation.
+    * **X11**: `sudo dnf install libXrandr-devel`
+    * **Wayland**: `sudo dnv install pkgconfig wayland-devel egl-wayland`
+
+Furthermore, we recommend installing the following optional packages
+
+* Ubuntu
+
+    sudo apt-get install libsdl2-dev doxygen
+
+    * **X11**: `sudo apt-get install libxt-dev libxaw7-dev`
+
+* Fedora
+
+    sudo dnf install SDL2-devel doxygen
+
+    * **X11**: `sudo dnf install libXt-devel libXaw-devel`
+
+These will enable input handling in the SampleBrowser, the X11 ConfigDialog and allow building the documentation.
 
 ### Recommended dependencies
 
@@ -79,6 +90,7 @@ these will enable input handling in the SampleBrowser, the X11 ConfigDialog and 
 * Remotery: https://github.com/Celtoys/Remotery
 * SWIG: http://www.swig.org/
 * %Assimp: https://www.assimp.org/
+* Wayland: https://wayland.freedesktop.org/
 
 Running CMake
 -------------
@@ -106,6 +118,7 @@ particular component/ plugin from being built
 - `OGRE_ASSERT_MODE` allows you to to disable all runtime assertion exceptions or turn them into calls to `std::abort`.
 - `OGRE_RESOURCEMANGER_STRICT` allows you to turn on resource lookup related quirks for pre ogre 1.10 compatibility.
 - `OGRE_NODELESS_POSITIONING` allows to use Lights and Cameras without attaching them to nodes (only for legacy code).
+- `OGRE_GLSUPPORT_USE_WAYLAND` will use Wayland window system instead of X11 on Linux for GL-based RenderSystems.
 
 Once you are satisfied, hit
 *Configure* again and then click on *Generate*. CMake will then create

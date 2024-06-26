@@ -16,6 +16,10 @@
 #include <QResizeEvent>
 #include <QKeyEvent>
 
+#ifdef OGRE_WAYLAND
+#include "OgreQtNativeinterface.h"
+#endif
+
 namespace OgreBites
 {
     static Event convert(const QEvent* in)
@@ -129,8 +133,29 @@ namespace OgreBites
         p.width = window->width();
         p.height= window->height();
 
-        p.miscParams["externalWindowHandle"] = std::to_string(size_t(window->winId()));
+        if (QGuiApplication::platformName() != "wayland") {
+          p.miscParams["externalWindowHandle"] = std::to_string(size_t(window->winId()));
+        }
 
+        if (QGuiApplication::platformName() == "wayland")
+        {
+            window->create(); // This must be called since window->winId() is not called.
+
+#ifdef OGRE_WAYLAND
+
+            QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
+            if (!nativeInterface)
+            {
+                Ogre::LogManager::getSingleton().logMessage("[Qt] Native interface is nullptr!");
+            }
+
+            void* display = nativeInterface->nativeResourceForWindow("display", nullptr);
+            void* surface = nativeInterface->nativeResourceForWindow("surface", window);
+
+            p.miscParams["externalWlDisplay"] = Ogre::StringConverter::toString(size_t(display));
+            p.miscParams["externalWlSurface"] = Ogre::StringConverter::toString(size_t(surface));
+#endif
+        }
         if (!mWindows.empty())
         {
             // additional windows should reuse the context

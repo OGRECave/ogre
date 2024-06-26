@@ -107,8 +107,13 @@ jobs:
   custombuild:
     runs-on: ubuntu-20.04
     steps:
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y libwayland-dev libwayland-egl1 pkg-config libegl-dev \
+          qtwayland5 qtbase5-private-dev
     - uses: actions/checkout@v4
     - name: Build
       run: |
-        cmake -Bbuild -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none -DOGRE_CONFIG_DOUBLE=ON -DOGRE_ASSERT_MODE=1 -DOGRE_PROFILING=ON .
+        cmake -Bbuild -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none -DOGRE_CONFIG_DOUBLE=ON -DOGRE_ASSERT_MODE=1 -DOGRE_PROFILING=ON -DOGRE_GLSUPPORT_USE_WAYLAND=ON .
         cmake --build build -- -j 4

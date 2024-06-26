@@ -30,9 +30,6 @@ THE SOFTWARE.
 #ifndef __X11EGLSupport_H__
 #define __X11EGLSupport_H__
 
-// Tell EGL that we are using X11 (to select the appropriate definitions)
-#define USE_X11
-
 #include "OgreEGLSupport.h"
 
 #ifndef Status

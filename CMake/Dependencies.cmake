@@ -219,8 +219,19 @@ macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.f
 
 # Find X11
 if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
-  find_package(X11 REQUIRED)
+  find_package(PkgConfig)
+  if (PKG_CONFIG_FOUND)
+    pkg_check_modules(waylands IMPORTED_TARGET wayland-client wayland-egl egl)
+    macro_log_feature(waylands_FOUND "Wayland" "Wayland window system" "https://wayland.freedesktop.org")
+  endif ()
+
+  if (NOT waylands_FOUND)
+    find_package(X11 REQUIRED)
+  else ()
+    find_package(X11)
+  endif ()
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org")
+
 endif ()
 
 

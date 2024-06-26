@@ -385,6 +385,8 @@ namespace Ogre
         | displayFrequency | Refresh rate in Hertz (e.g. 60, 75, 100) | Desktop vsync rate | Display frequency rate, for fullscreen mode |  |
         | externalWindowHandle | <ul><li>Win32: HWND as int<li>Linux: X11 Window as ulong<li>OSX: OgreGLView address as an integer. You can pass NSView or NSWindow too, but should perform OgreGLView callbacks into the Ogre manually<li>iOS: UIWindow address as an integer<li>Emscripten: canvas selector String ("#canvas")</ul> | 0 (none) | External window handle, for embedding the OGRE render in an existing window |  |
         | externalGLControl | true, false | false | Let the external window control OpenGL i.e. don't select a pixel format for the window, do not change v-sync and do not swap buffer. When set to true, the calling application is responsible of OpenGL initialization and buffer swapping. It should also create an OpenGL context for its own rendering, Ogre will create one for its use. Then the calling application must also enable Ogre OpenGL context before calling any Ogre function and restore its OpenGL context after these calls. | OpenGL |
+        | externalWlDisplay | wl_display address as an integer | 0 (none) | Wayland display connection | Linux |
+        | externalWlSurface | wl_surface address as an integer | 0 (none) | Wayland onscreen surface | Linux |
         | currentGLContext | true, false | false | Use an externally created GL context. (Must be current) | OpenGL |
         | minColourBufferSize | Positive integer (usually 16, 32) | 16 | Min total colour buffer size. See EGL_BUFFER_SIZE | OpenGL |
         | windowProc | WNDPROC | DefWindowProc | function that processes window messages | Win 32 |
