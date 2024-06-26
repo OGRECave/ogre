@@ -80,7 +80,6 @@ elseif (UNIX)
       list(APPEND _EGL_SOURCES "src/X11/*.cpp")
       list(APPEND NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL/X11)
-      
       set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${EGL_LIBRARIES})
     endif()
 
