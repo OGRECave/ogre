@@ -73,19 +73,19 @@ elseif (UNIX)
       list(APPEND _EGL_SOURCES "src/EGL/Wayland/*.cpp")
       list(APPEND NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL/Wayland)
-      set(WAYLAND_LIBRARIES PkgConfig::waylands)
+      set(PLATFORM_LIBS ${EGL_LIBRARIES} PkgConfig::waylands)
     else()
       list(APPEND _EGL_HEADERS "include/EGL/X11/*.h")
       list(APPEND _EGL_SOURCES "src/EGL/X11/*.cpp")
       list(APPEND _EGL_SOURCES "src/X11/*.cpp")
       list(APPEND NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL/X11)
+      
+      set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${EGL_LIBRARIES})
     endif()
 
     file(GLOB PLATFORM_HEADERS ${_EGL_HEADERS})
     file(GLOB PLATFORM_SOURCES ${_EGL_SOURCES})
-
-    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${EGL_LIBRARIES} ${WAYLAND_LIBRARIES})
   else()
     file(GLOB PLATFORM_HEADERS "include/GLX/*.h")
     file(GLOB PLATFORM_SOURCES "src/GLX/*.cpp" "src/X11/*.cpp")
