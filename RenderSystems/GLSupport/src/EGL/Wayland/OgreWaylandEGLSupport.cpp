@@ -41,15 +41,6 @@ void WaylandEGLSupport::doInit()
         mVideoModes.push_back(mCurrentMode);
     }
 
-    if (mVideoModes.empty()) // none of the above worked
-    {
-        // @TODO: query and set a suitable width and height?
-        mCurrentMode.width = 640;
-        mCurrentMode.height = 480;
-        mCurrentMode.refreshRate = 0;
-        mVideoModes.push_back(mCurrentMode);
-    }
-
     mOriginalMode = mCurrentMode;
 
     EGLConfig* glConfigs;
