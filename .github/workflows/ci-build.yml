@@ -110,6 +110,11 @@ jobs:
   custombuild:
     runs-on: ubuntu-20.04
     steps:
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y libwayland-dev libwayland-egl1 pkg-config libegl-dev \
+          qtwayland5 qtbase5-private-dev
     - uses: actions/checkout@v4
     - name: Build
       run: |

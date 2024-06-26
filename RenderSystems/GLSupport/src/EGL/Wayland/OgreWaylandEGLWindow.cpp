@@ -201,9 +201,8 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
             mIsExternalGLControl = StringConverter::parseBool(opt->second);
         }
 
-        if ((opt = miscParams->find("parentWindowHandle")) != end ||
-            (opt = miscParams->find("externalWindowHandle")) != end)
-            OgreAssert(false, "Recompile Ogre without Wayland support");
+        OgreAssert(miscParams->find("parentWindowHandle") == end && miscParams->find("externalWindowHandle") == end,
+                   "Recompile with OGRE_GLSUPPORT_USE_WAYLAND=OFF");
     }
 
     initNativeCreatedWindow(miscParams);

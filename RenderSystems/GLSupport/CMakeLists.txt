@@ -134,7 +134,7 @@ target_include_directories(OgreGLSupport PUBLIC
     PRIVATE "$<BUILD_INTERFACE:${NATIVE_INCLUDES}>")
 
   if(OGRE_GLSUPPORT_USE_WAYLAND)
-    target_compile_definitions(OgreGLSupport PUBLIC OGRE_WAYLAND)
+    target_compile_definitions(OgreGLSupport PRIVATE OGRE_WAYLAND)
   endif()
 
 set_property(TARGET OgreGLSupport PROPERTY POSITION_INDEPENDENT_CODE ON)
