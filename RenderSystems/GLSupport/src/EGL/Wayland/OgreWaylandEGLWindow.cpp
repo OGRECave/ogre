@@ -36,8 +36,6 @@ WaylandEGLWindow::~WaylandEGLWindow()
 
 void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscParams)
 {
-    mNativeDisplay = mGLSupport->getNativeDisplay();
-
     if (miscParams)
     {
         NameValuePairList::const_iterator opt;

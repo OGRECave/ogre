@@ -17,9 +17,7 @@
 #include <QKeyEvent>
 
 #ifdef OGRE_WAYLAND
-// This is a private, unstable header (package: qtbase5-private-dev)
-// Since Qt 6.5 another stable native interface becomes available, QWaylandApplication
-#include <5.12.8/QtGui/qpa/qplatformnativeinterface.h>
+#include "OgreQtNativeinterface.h"
 #endif
 
 namespace OgreBites
@@ -143,8 +141,9 @@ namespace OgreBites
         {
             window->create(); // This must be called since window->winId() is not called.
 
-            QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
+#ifdef OGRE_WAYLAND
 
+            QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
             if (!nativeInterface)
             {
                 Ogre::LogManager::getSingleton().logMessage("[Qt] Native interface is nullptr!");
@@ -155,8 +154,8 @@ namespace OgreBites
 
             p.miscParams["externalWlDisplay"] = Ogre::StringConverter::toString(size_t(display));
             p.miscParams["externalWlSurface"] = Ogre::StringConverter::toString(size_t(surface));
+#endif
         }
-
         if (!mWindows.empty())
         {
             // additional windows should reuse the context

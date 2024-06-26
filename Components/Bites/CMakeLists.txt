@@ -190,6 +190,21 @@ generate_export_header(OgreBites
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreBitesPrerequisites.h)
 
 if(Qt6_FOUND OR Qt5_FOUND)
+  set(_OgreBitesQt ON)
+else()
+  set(_OgreBitesQt OFF)
+endif()
+
+if(OGRE_GLSUPPORT_USE_WAYLAND)
+  if(NOT TARGET Qt${QT_VERSION_MAJOR}::GuiPrivate)
+    set(_OgreBitesQt OFF)
+  else()
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/OgreQtNativeinterface.h.in"
+      "${PROJECT_BINARY_DIR}/include_private/OgreQtNativeinterface.h" @ONLY)
+  endif()
+endif()
+
+if(_OgreBitesQt)
   if(Qt6_FOUND)
     qt6_wrap_cpp(MOC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreApplicationContextQt.h")
   else()
@@ -201,6 +216,9 @@ if(Qt6_FOUND OR Qt5_FOUND)
   target_link_libraries(OgreBitesQt PUBLIC Qt${QT_VERSION_MAJOR}::Gui OgreBites)
   if(OGRE_GLSUPPORT_USE_WAYLAND)
     target_compile_definitions(OgreBitesQt PRIVATE OGRE_WAYLAND)
+    target_link_libraries(OgreBitesQt PRIVATE Qt${QT_VERSION_MAJOR}::GuiPrivate)
+    target_include_directories(OgreBitesQt PRIVATE
+      "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include_private>")
   endif()
   ogre_config_component(OgreBitesQt)
 endif()
