@@ -395,6 +395,8 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
         flags &= ~aiProcess_GenNormals; // prefer smooth normals
 
     importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", maxEdgeAngle);
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_EMBEDDED_TEXTURES_LEGACY_NAMING, true);
+
     const aiScene* scene = importer.ReadFile(name, flags);
 
     // If the import failed, report it
