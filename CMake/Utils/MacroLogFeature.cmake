@@ -110,7 +110,7 @@ MACRO(MACRO_DISPLAY_FEATURE_LOG)
       SET(_elist 1)
       FILE(READ ${_file} _enabled)
       FILE(REMOVE ${_file})
-      SET(_summary "${_summary}-----------------------------------------------------------------------------\n-- The following external packages were located on your system.\n-- This installation will have the extra features provided by these packages.\n${_enabled}")
+      SET(_summary "${_summary}-----------------------------------------------------------------------------\n-- The following external packages were located on your system.\n-- This installation will have the extra features provided by these packages, unless disabled.\n${_enabled}")
    ENDIF (EXISTS ${_file})
 
    SET(_dlist 0)
