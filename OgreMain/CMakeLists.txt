@@ -130,7 +130,6 @@ if (OGRE_CONFIG_ENABLE_ASTC)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_ZIP)
-  include_directories(src/zip)
   list(APPEND HEADER_FILES include/OgreZip.h)
   list(APPEND SOURCE_FILES src/OgreZip.cpp src/zip/zip.c)
 
@@ -172,6 +171,7 @@ generate_export_header(OgreMain
 target_include_directories(OgreMain PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" 
   "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>"
+  "$<IF:$<BOOL:OGRE_CONFIG_ENABLE_ZIP>,$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/zip>,>"
   $<INSTALL_INTERFACE:include/OGRE>
   PRIVATE "${OGRE_PROFILING_REMOTERY_PATH}")
 
