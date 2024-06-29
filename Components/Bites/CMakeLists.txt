@@ -221,6 +221,9 @@ if(_OgreBitesQt)
       "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include_private>")
   endif()
   ogre_config_component(OgreBitesQt)
+  set(OGRE_BITESQT_ADDITIONAL_PACKAGES ", Qt${QT_VERSION_MAJOR}Gui")
+  configure_file(${OGRE_TEMPLATES_DIR}/OGRE-BitesQt.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-BitesQt.pc @ONLY)
+  install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-BitesQt.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
 endif()
 
 # install
