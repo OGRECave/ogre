@@ -41,11 +41,6 @@ void WaylandEGLWindow::initNativeCreatedWindow(const NameValuePairList* miscPara
         NameValuePairList::const_iterator opt;
         NameValuePairList::const_iterator end = miscParams->end();
 
-        if ((opt = miscParams->find("externalWlDisplay")) != end)
-        {
-            mNativeDisplay = (wl_display*)StringConverter::parseSizeT(opt->second);
-            mGLSupport->setNativeDisplay(mNativeDisplay);
-        }
         if ((opt = miscParams->find("externalWlSurface")) != end)
         {
             mGLSupport->mWlSurface = (wl_surface*)StringConverter::parseSizeT(opt->second);
@@ -130,6 +125,8 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
     ::EGLContext eglContext = nullptr;
     unsigned int vsyncInterval = 1;
 
+    mNativeDisplay = mGLSupport->getNativeDisplay();
+
     mIsFullScreen = fullScreen;
 
     if (miscParams)
@@ -206,7 +203,6 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
     }
 
     initNativeCreatedWindow(miscParams);
-    mGLSupport->doInit();
 
     if (!mEglConfig)
     {
