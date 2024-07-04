@@ -320,6 +320,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "eglBindAPI failed");
         }
+        EGL_CHECK_ERROR
 
         if(mContextProfile != CONTEXT_ES) {
             contextAttrs[1] = 4;
@@ -349,7 +350,7 @@ namespace Ogre {
         while(!context && (contextAttrs[1] >= 1))
         {
             context = eglCreateContext(eglDisplay, glconfig, shareList, contextAttrs);
-            EGL_CHECK_ERROR
+            eglGetError(); // errors from eglCreateContext are not fatal
             contextAttrs[1] -= contextAttrs[3] == 0; // only decrement if minor == 0
 
             if(hasEGL15)
