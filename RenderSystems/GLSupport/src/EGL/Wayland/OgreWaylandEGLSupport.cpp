@@ -62,6 +62,8 @@ void WaylandEGLSupport::doInit()
     }
 
     free(glConfigs);
+
+    initialiseExtensions();
 }
 
 WaylandEGLSupport::~WaylandEGLSupport()
@@ -106,9 +108,33 @@ RenderWindow* WaylandEGLSupport::newWindow(const String& name, unsigned int widt
 {
     EGLWindow* window = new WaylandEGLWindow(this);
 
+    if (!mInitialWindow)
+    {
+        mInitialWindow = window;
+
+        NameValuePairList::const_iterator opt;
+        NameValuePairList::const_iterator end = miscParams->end();
+
+        if ((opt = miscParams->find("externalWlDisplay")) != end)
+        {
+            mNativeDisplay = (wl_display*)StringConverter::parseSizeT(opt->second);
+            mIsExternalDisplay = true;
+        }
+
+        doInit();
+    }
+
     window->create(name, width, height, fullScreen, miscParams);
 
     return window;
+}
+
+void WaylandEGLSupport::start()
+{
+    LogManager::getSingleton().logMessage(
+        "******************************\n"
+        "*** Starting EGL Subsystem ***\n"
+        "******************************");
 }
 
 // WaylandEGLSupport::getGLDisplay sets up the native variable
