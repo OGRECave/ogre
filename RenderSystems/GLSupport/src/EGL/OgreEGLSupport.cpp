@@ -377,8 +377,11 @@ namespace Ogre {
 
     void EGLSupport::stop()
     {
-        eglTerminate(mGLDisplay);
-        EGL_CHECK_ERROR
+        if (mGLDisplay)
+        {
+            eglTerminate(mGLDisplay);
+            EGL_CHECK_ERROR
+        }
     }
 
     void EGLSupport::initialiseExtensions() {
