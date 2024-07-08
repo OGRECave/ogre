@@ -20,7 +20,6 @@ GLNativeSupport* getGLSupport(int profile) { return new WaylandEGLSupport(profil
 
 WaylandEGLSupport::WaylandEGLSupport(int profile) : EGLSupport(profile)
 {
-    mWlSurface = nullptr;
     mIsExternalDisplay = false;
 }
 

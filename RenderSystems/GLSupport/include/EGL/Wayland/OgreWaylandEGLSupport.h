@@ -17,7 +17,6 @@ namespace Ogre
 class _OgrePrivate WaylandEGLSupport : public EGLSupport
 {
 public:
-    wl_surface* mWlSurface;
     bool mIsExternalDisplay;
 
 protected:
