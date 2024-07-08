@@ -15,6 +15,7 @@ class _OgrePrivate WaylandEGLWindow : public EGLWindow
 {
 protected:
     WaylandEGLSupport* mGLSupport;
+    wl_surface* mWlSurface;
 
     void initNativeCreatedWindow(const NameValuePairList* miscParams);
     void createNativeWindow(uint& width, uint& height);
