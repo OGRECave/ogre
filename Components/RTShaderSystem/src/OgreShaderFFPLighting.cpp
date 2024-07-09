@@ -336,7 +336,8 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 	
 	setTrackVertexColourType(srcPass->getVertexColourTracking());
 
-	mSpecularEnable = srcPass->getShininess() > 0.0 && srcPass->getSpecular() != ColourValue::Black;
+	mSpecularEnable = srcPass->getShininess() > 0.0 &&
+		(srcPass->getSpecular() != ColourValue::Black || (srcPass->getVertexColourTracking() & TVC_SPECULAR) != 0);
 
 	// Case this pass should run once per light(s) -> override the light policy.
 	if (srcPass->getIteratePerLight())
