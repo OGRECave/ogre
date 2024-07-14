@@ -1506,16 +1506,22 @@ namespace Ogre {
     void ResourceGroupManager::ResourceGroup::addToIndex(const String& filename, Archive* arch)
     {
         // internal, assumes mutex lock has already been obtained
-        this->resourceIndexCaseSensitive.emplace(filename, arch);
+        bool added = this->resourceIndexCaseSensitive.emplace(filename, arch).second;
 
 #if !OGRE_RESOURCEMANAGER_STRICT
         if (!arch->isCaseSensitive())
         {
             String lcase = filename;
             StringUtil::toLowerCase(lcase);
-            this->resourceIndexCaseInsensitive.emplace(lcase, arch);
+            added = this->resourceIndexCaseInsensitive.emplace(lcase, arch).second;
         }
 #endif
+        if (!added)
+        {
+            LogManager::getSingleton().logWarning(
+                StringUtil::format("Skipping '%s' because it already exists in resource group '%s'", filename.c_str(),
+                                   this->name.c_str()));
+        }
     }
     //---------------------------------------------------------------------
     void ResourceGroupManager::ResourceGroup::removeFromIndex(const String& filename, Archive* arch)
