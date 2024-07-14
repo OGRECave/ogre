@@ -2003,6 +2003,7 @@ namespace Ogre {
         size_t size = MSTREAM_OVERHEAD_SIZE;
         // float time
         size += sizeof(float);
+        size += sizeof(char); // bool includesNormals
         // float x,y,z[,nx,ny,nz]
         bool includesNormals = kf->getVertexBuffer()->getVertexSize() > (sizeof(float) * 3);
         size += sizeof(float) * (includesNormals ? 6 : 3) * vertexCount;
