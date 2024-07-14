@@ -19,11 +19,11 @@ list(APPEND HEADER_FILES
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
-  set(IMGUI_DIR "${PROJECT_BINARY_DIR}/imgui-1.90.4" CACHE PATH "")
+  set(IMGUI_DIR "${PROJECT_BINARY_DIR}/imgui-1.90.9" CACHE PATH "")
   if(NOT EXISTS ${IMGUI_DIR})
     message(STATUS "Downloading imgui")
     file(DOWNLOAD
-        https://github.com/ocornut/imgui/archive/v1.90.4.tar.gz
+        https://github.com/ocornut/imgui/archive/v1.90.9.tar.gz
         ${PROJECT_BINARY_DIR}/imgui.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
         -E tar xf imgui.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -76,7 +76,7 @@ if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
     set_source_files_properties(${IMGUI_DIR}/imgui_draw.cpp PROPERTIES
       COMPILE_FLAGS "-Wno-cast-qual")
     set_source_files_properties(${IMGUI_DIR}/imgui.cpp PROPERTIES
-      COMPILE_FLAGS "-Wno-cast-qual")
+      COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-variable")
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
       set_property(SOURCE ${IMGUI_DIR}/misc/freetype/imgui_freetype.cpp
         APPEND PROPERTY COMPILE_OPTIONS "-Wno-unknown-warning-option")
