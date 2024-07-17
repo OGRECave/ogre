@@ -689,9 +689,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool TerrainGroup::isDerivedDataUpdateInProgress() const
     {
-        for (TerrainSlotMap::const_iterator i = mTerrainSlots.begin(); i != mTerrainSlots.end(); ++i)
+        for (const auto& t : mTerrainSlots)
         {
-            if (i->second->instance && i->second->instance->isDerivedDataUpdateInProgress())
+            if (t.second->instance && t.second->instance->isDerivedDataUpdateInProgress())
                 return true;
         }
         return false;
