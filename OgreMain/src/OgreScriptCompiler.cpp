@@ -30,11 +30,34 @@ THE SOFTWARE.
 #include "OgreScriptParser.h"
 #include "OgreBuiltinScriptTranslators.h"
 #include "OgreComponents.h"
+#include "OgreScriptIDs.h"
 
 #define DEBUG_AST 0
 
 namespace Ogre
 {
+    /** This abstract node represents an import statement */
+    class ImportAbstractNode : public AbstractNode
+    {
+    public:
+        String target, source;
+    public:
+        ImportAbstractNode();
+        AbstractNode *clone() const override;
+        const String& getValue() const override { return target; }
+    };
+
+    /** This abstract node represents a variable assignment */
+    class VariableAccessAbstractNode : public AbstractNode
+    {
+    public:
+        String name;
+    public:
+        VariableAccessAbstractNode(AbstractNode *ptr);
+        AbstractNode *clone() const override;
+        const String& getValue() const override { return name; }
+    };
+
     // AbstractNode
     AbstractNode::AbstractNode(AbstractNode *ptr)
         :line(0), type(ANT_UNKNOWN), parent(ptr)
