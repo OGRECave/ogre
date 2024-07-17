@@ -33,14 +33,14 @@ namespace Ogre {
 namespace Volume {
 
     size_t DualGridGenerator::mDualGridI = 0;
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::nodeProc(const OctreeNode *n)
     {
         if (n->isSubdivided())
         {
-        
+
             const OctreeNode *c0 = n->getChild(0);
             const OctreeNode *c1 = n->getChild(1);
             const OctreeNode *c2 = n->getChild(2);
@@ -58,7 +58,7 @@ namespace Volume {
             nodeProc(c5);
             nodeProc(c6);
             nodeProc(c7);
-        
+
             faceProcXY(c0, c3);
             faceProcXY(c1, c2);
             faceProcXY(c4, c7);
@@ -73,7 +73,7 @@ namespace Volume {
             faceProcXZ(c5, c1);
             faceProcXZ(c7, c3);
             faceProcXZ(c6, c2);
-        
+
             edgeProcX(c0, c3, c7, c4);
             edgeProcX(c1, c2, c6, c5);
 
@@ -86,7 +86,7 @@ namespace Volume {
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
     }
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::faceProcXY(const OctreeNode *n0, const OctreeNode *n1)
@@ -105,21 +105,21 @@ namespace Volume {
             const OctreeNode *c5 = n0Subdivided ? n0->getChild(6) : n0;
             const OctreeNode *c6 = n1Subdivided ? n1->getChild(5) : n1;
             const OctreeNode *c7 = n1Subdivided ? n1->getChild(4) : n1;
-        
+
             faceProcXY(c0, c3);
             faceProcXY(c1, c2);
             faceProcXY(c4, c7);
             faceProcXY(c5, c6);
-    
+
             edgeProcX(c0, c3, c7, c4);
             edgeProcX(c1, c2, c6, c5);
             edgeProcY(c0, c1, c2, c3);
             edgeProcY(c4, c5, c6, c7);
-    
+
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
     }
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::faceProcZY(const OctreeNode *n0, const OctreeNode *n1)
@@ -143,16 +143,16 @@ namespace Volume {
             faceProcZY(c3, c2);
             faceProcZY(c4, c5);
             faceProcZY(c7, c6);
-    
+
             edgeProcY(c0, c1, c2, c3);
             edgeProcY(c4, c5, c6, c7);
             edgeProcZ(c7, c6, c2, c3);
             edgeProcZ(c4, c5, c1, c0);
-    
+
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
     }
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::faceProcXZ(const OctreeNode *n0, const OctreeNode *n1)
@@ -171,7 +171,7 @@ namespace Volume {
             const OctreeNode *c5 = n0Subdivided ? n0->getChild(1) : n0;
             const OctreeNode *c6 = n0Subdivided ? n0->getChild(2) : n0;
             const OctreeNode *c7 = n0Subdivided ? n0->getChild(3) : n0;
-    
+
             faceProcXZ(c4, c0);
             faceProcXZ(c5, c1);
             faceProcXZ(c7, c3);
@@ -181,11 +181,11 @@ namespace Volume {
             edgeProcX(c1, c2, c6, c5);
             edgeProcZ(c7, c6, c2, c3);
             edgeProcZ(c4, c5, c1, c0);
-        
+
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
     }
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::edgeProcX(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3)
@@ -208,15 +208,15 @@ namespace Volume {
 
             edgeProcX(c0, c3, c7, c4);
             edgeProcX(c1, c2, c6, c5);
-    
+
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
     }
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::edgeProcY(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3)
-    {  
+    {
         const bool n0Subdivided = n0->isSubdivided();
         const bool n1Subdivided = n1->isSubdivided();
         const bool n2Subdivided = n2->isSubdivided();
@@ -232,14 +232,14 @@ namespace Volume {
             const OctreeNode *c5 = n1Subdivided ? n1->getChild(7) : n1;
             const OctreeNode *c6 = n2Subdivided ? n2->getChild(4) : n2;
             const OctreeNode *c7 = n3Subdivided ? n3->getChild(5) : n3;
-        
+
             edgeProcY(c0, c1, c2, c3);
             edgeProcY(c4, c5, c6, c7);
-    
+
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
     }
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::edgeProcZ(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3)
@@ -262,11 +262,11 @@ namespace Volume {
 
             edgeProcZ(c7, c6, c2, c3);
             edgeProcZ(c4, c5, c1, c0);
-    
+
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
     }
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::vertProc(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3, const OctreeNode *n4, const OctreeNode *n5, const OctreeNode *n6, const OctreeNode *n7)
@@ -279,7 +279,7 @@ namespace Volume {
         const bool n5Subdivided = n5->isSubdivided();
         const bool n6Subdivided = n6->isSubdivided();
         const bool n7Subdivided = n7->isSubdivided();
-    
+
         if (n0Subdivided || n1Subdivided || n2Subdivided || n3Subdivided ||
             n4Subdivided || n5Subdivided || n6Subdivided || n7Subdivided)
         {
@@ -291,7 +291,7 @@ namespace Volume {
             const OctreeNode *c5 = n5Subdivided ? n5->getChild(3) : n5;
             const OctreeNode *c6 = n6Subdivided ? n6->getChild(0) : n6;
             const OctreeNode *c7 = n7Subdivided ? n7->getChild(1) : n7;
-        
+
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
         else
@@ -317,7 +317,7 @@ namespace Volume {
             createBorderCells(n0, n1, n2, n3, n4, n5, n6, n7);
         }
     }
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::createBorderCells(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3, const OctreeNode *n4, const OctreeNode *n5, const OctreeNode *n6, const OctreeNode *n7)
@@ -383,7 +383,7 @@ namespace Volume {
             }
             if (n3->isBorderBottom(*mRoot) && n2->isBorderBottom(*mRoot))
             {
-                addDualCell(n3->getCenterBottom(), n2->getCenterBottom(), n2->getCenterFrontBottom(), n3->getCenterFrontBottom(), 
+                addDualCell(n3->getCenterBottom(), n2->getCenterBottom(), n2->getCenterFrontBottom(), n3->getCenterFrontBottom(),
                     n3->getCenter(), n2->getCenter(), n2->getCenterFront(), n3->getCenterFront());
                 // Generate back bottom corner cells
                 if (n3->isBorderLeft(*mRoot))
@@ -467,7 +467,7 @@ namespace Volume {
     DualGridGenerator::DualGridGenerator(): mDualGrid(0), mRoot(0), mSaveDualCells(0), mIs(0), mMb(0), mMaxMSDistance(0)
     {
     }
-    
+
     //-----------------------------------------------------------------------
 
     void DualGridGenerator::generateDualGrid(const OctreeNode *root, IsoSurface *is, MeshBuilder *mb, Real maxMSDistance, const Vector3 &totalFrom, const Vector3 &totalTo, bool saveDualCells)
@@ -504,7 +504,7 @@ namespace Volume {
                 root->getCenterLeftTop(), root->getCenterTop(), root->getCenterFrontTop(), root->getCorner7());
         }
     }
-    
+
     //-----------------------------------------------------------------------
 
     Entity* DualGridGenerator::getDualGrid(SceneManager *sceneManager)
@@ -518,18 +518,18 @@ namespace Volume {
             manual->estimateIndexCount(mDualCells.size() * 24);
 
             uint32 baseIndex = 0;
-            for (VecDualCell::iterator it = mDualCells.begin(); it != mDualCells.end(); ++it)
+            for (const auto& c : mDualCells)
             {
                 MeshBuilder::addCubeToManualObject(
                     manual,
-                    it->mC0,
-                    it->mC1,
-                    it->mC2,
-                    it->mC3,
-                    it->mC4,
-                    it->mC5,
-                    it->mC6,
-                    it->mC7,
+                    c.mC0,
+                    c.mC1,
+                    c.mC2,
+                    c.mC3,
+                    c.mC4,
+                    c.mC5,
+                    c.mC6,
+                    c.mC7,
                     baseIndex);
             }
 
