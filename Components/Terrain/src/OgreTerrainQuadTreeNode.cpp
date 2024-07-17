@@ -142,8 +142,8 @@ namespace Ogre
         destroyGpuVertexData();
         destroyGpuIndexData();
 
-        for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
-            OGRE_DELETE *i;
+        for (auto& l : mLodLevels)
+            OGRE_DELETE l;
 
         OGRE_DELETE mVertexDataRecord;
     }
@@ -324,8 +324,8 @@ namespace Ogre
             if (rect.left <= mOffsetX && rect.right > mBoundaryX
                 && rect.top <= mOffsetY && rect.bottom > mBoundaryY)
             {
-                for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
-                    (*i)->calcMaxHeightDelta = 0.0;
+                for (auto& l : mLodLevels)
+                    l->calcMaxHeightDelta = 0.0;
             }
 
             // pass on to children
@@ -358,7 +358,7 @@ namespace Ogre
                 for (int i = 0; i < 4; ++i)
                 {
                     mChildren[i]->notifyDelta(x, y, lod, delta);
-                                }
+                }
             }
 
         }
