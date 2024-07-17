@@ -104,7 +104,7 @@ namespace Volume {
 
     /** To hold indices.
     */
-    typedef std::vector<size_t> VecIndices;
+    typedef std::vector<uint32> VecIndices;
 
     /** Callback class when the user needs information about the triangles of
         chunks of a LOD level.
@@ -139,7 +139,7 @@ namespace Volume {
         static const unsigned short MAIN_BINDING;
 
         /// Map to get a vertex index.
-        typedef std::map<Vertex, size_t> UMapVertexIndex;
+        typedef std::map<Vertex, uint32> UMapVertexIndex;
         UMapVertexIndex mIndexMap;
 
          /// Holds the vertices of the mesh.
@@ -160,7 +160,7 @@ namespace Volume {
         */
         inline void addVertex(const Vertex &v)
         {
-            size_t i = 0;
+            uint32 i = 0;
             if (mIndexMap.find(v) == mIndexMap.end())
             {
                 i = mVertices.size();
