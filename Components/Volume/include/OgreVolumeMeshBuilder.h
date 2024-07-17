@@ -168,38 +168,7 @@ namespace Volume {
                 mVertices.push_back(v);
 
                 // Update bounding box
-                if (!mBoxInit)
-                {
-                    mBox.setExtents(v.x, v.y, v.z, v.x, v.y, v.z);
-                    mBoxInit = true;
-                }
-                else
-                {
-                    if (v.x < mBox.getMinimum().x)
-                    {
-                        mBox.setMinimumX(v.x);
-                    }
-                    if (v.y < mBox.getMinimum().y)
-                    {
-                        mBox.setMinimumY(v.y);
-                    }
-                    if (v.z < mBox.getMinimum().z)
-                    {
-                        mBox.setMinimumZ(v.z);
-                    }
-                    if (v.x > mBox.getMaximum().x)
-                    {
-                        mBox.setMaximumX(v.x);
-                    }
-                    if (v.y > mBox.getMaximum().y)
-                    {
-                        mBox.setMaximumY(v.y);
-                    }
-                    if (v.z > mBox.getMaximum().z)
-                    {
-                        mBox.setMaximumZ(v.z);
-                    }
-                }
+                mBox.merge(Vector3(v.x, v.y, v.z));
             }
             else
             {
