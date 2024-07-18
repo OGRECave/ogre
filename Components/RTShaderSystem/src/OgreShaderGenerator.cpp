@@ -709,9 +709,9 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
 //-----------------------------------------------------------------------------
 static bool hasFixedFunctionPass(Technique* tech)
 {
-    for (unsigned short i=0; i < tech->getNumPasses(); ++i)
+    for (const auto& p : tech->getPasses())
     {
-        if (!tech->getPass(i)->isProgrammable())
+        if (!p->isProgrammable())
         {
             return true;
         }
@@ -965,13 +965,9 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
                         RenderState* srcRenderState = t->getRenderState(pi);
                         RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMat, pi);
 
-                        const SubRenderStateList& srcSubRenderState =
-                            srcRenderState->getSubRenderStates();
-
-                        SubRenderStateList::const_iterator itSubState = srcSubRenderState.begin(), itSubStateEnd = srcSubRenderState.end();
-                        for(;itSubState != itSubStateEnd ; ++itSubState)
+                        for(const auto& s : srcRenderState->getSubRenderStates())
                         {
-                            SubRenderState* srcSubState = *itSubState;
+                            SubRenderState* srcSubState = s;
                             SubRenderState* dstSubState = createSubRenderState(srcSubState->getType());
                             (*dstSubState) = (*srcSubState);
                             dstRenderState->addTemplateSubRenderState(dstSubState);
