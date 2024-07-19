@@ -30,6 +30,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLHardwarePixelBufferCommon.h"
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreRoot.h"
+#include "OgreViewport.h"
 
 namespace Ogre {
 
@@ -71,6 +72,38 @@ namespace Ogre {
         // Re-initialise if buffer 0 still bound
         if(mColour[0].buffer)
             initialise();
+    }
+
+    void GLFrameBufferObjectCommon::determineFBOBufferSharingAllowed(RenderTarget& target)
+    {
+        if (mNumSamples == 0)
+        {
+            // Only the multisampled buffer would be shared
+            return;
+        }
+
+        bool sharingRenderBufferIsAllowed = true;
+        for (unsigned short i = 0; i < target.getNumViewports(); ++i)
+        {
+            if (!target.getViewport(i)->getClearEveryFrame())
+            {
+                // When there's at least one viewport that doesn't clear every frame,
+                // sharing the render buffer is not allowed.
+                // The shared buffer could contain data from other multisampled FBO's which wouldn't be cleared.
+                sharingRenderBufferIsAllowed = false;
+                break;
+            }
+        }
+        setAllowRenderBufferSharing(sharingRenderBufferIsAllowed);
+    }
+
+    void GLFrameBufferObjectCommon::setAllowRenderBufferSharing(bool allowRenderBufferSharing)
+    {
+        if(mAllowRenderBufferSharing!=allowRenderBufferSharing)
+        {
+            mAllowRenderBufferSharing = allowRenderBufferSharing;
+            initialise();
+        }
     }
 
     uint32 GLFrameBufferObjectCommon::getWidth() const

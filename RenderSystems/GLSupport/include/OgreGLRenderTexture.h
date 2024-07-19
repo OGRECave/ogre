@@ -68,6 +68,14 @@ namespace Ogre {
         */
         void unbindSurface(size_t attachment);
 
+        /** Determines and sets mAllowRenderBufferSharing based on given render target properties
+         */
+        void determineFBOBufferSharingAllowed(RenderTarget&);
+
+        /** Sets mAllowRenderBufferSharing, triggers re-initialization if value is different
+         */
+        void setAllowRenderBufferSharing(bool);
+
         /// Accessors
         int32 getFSAA() const { return mNumSamples; }
         uint32 getWidth() const;
@@ -93,6 +101,7 @@ namespace Ogre {
         uint32 mFB;
         uint32 mMultisampleFB;
         int32 mNumSamples;
+        bool mAllowRenderBufferSharing = true;
 
         /** Initialise object (find suitable depth and stencil format).
             Must be called every time the bindings change.

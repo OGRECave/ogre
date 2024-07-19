@@ -487,7 +487,10 @@ static const uchar depthBits[] =
     {
         /// Check if the render target is in the rendertarget->FBO map
         if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
+        {
+            fbo->determineFBOBufferSharingAllowed(*target);
             fbo->bind(true);
+        }
         else
             // Old style context (window/pbuffer) or copying render texture
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -512,14 +515,21 @@ static const uchar depthBits[] =
             else
             {
                 // New one
-                GLRenderBuffer *rb = new GLRenderBuffer(format, width, height, fsaa);
-                mRenderBufferMap[key] = RBRef(rb);
-                retval.buffer = rb;
-                retval.zoffset = 0;
-                retval.numSamples = fsaa;
+                retval = createNewRenderBuffer(format, width, height, fsaa);
+                mRenderBufferMap[key] = retval.buffer;
             }
         }
         //std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
+        return retval;
+    }
+
+    GLSurfaceDesc GLFBOManager::createNewRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
+    {
+        GLSurfaceDesc retval;
+        auto* rb = new GLRenderBuffer(format, width, height, fsaa);
+        retval.buffer = rb;
+        retval.zoffset = 0;
+        retval.numSamples = fsaa;
         return retval;
     }
 }

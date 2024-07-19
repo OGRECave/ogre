@@ -70,7 +70,8 @@ namespace Ogre {
     {
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
-        mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        if (!mOwnedMultisampleColourBuffer)
+            mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // Delete framebuffer object
         glDeleteFramebuffersEXT(1, &mFB);        
         if (mMultisampleFB)
@@ -82,7 +83,12 @@ namespace Ogre {
         // Release depth and stencil, if they were bound
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
-        mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+
+        if (mOwnedMultisampleColourBuffer)
+            mOwnedMultisampleColourBuffer.reset();
+        else
+            mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+
         // First buffer must be bound
         if(!mColour[0].buffer)
         {
@@ -144,7 +150,13 @@ namespace Ogre {
             // Create AA render buffer (colour)
             // note, this can be shared too because we blit it to the final FBO
             // right after the render is finished
-            mMultisampleColourBuffer = mManager->requestRenderBuffer(format, width, height, mNumSamples);
+            if (mAllowRenderBufferSharing)
+                mMultisampleColourBuffer = mManager->requestRenderBuffer(format, width, height, mNumSamples);
+            else
+            {
+                mMultisampleColourBuffer = mManager->createNewRenderBuffer(format, width, height, mNumSamples);
+                mOwnedMultisampleColourBuffer.reset(mMultisampleColourBuffer.buffer);
+            }
 
             // Attach it, because we won't be attaching below and non-multisample has
             // actually been attached to other FBO
