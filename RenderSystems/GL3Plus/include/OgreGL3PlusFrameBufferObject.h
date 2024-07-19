@@ -61,7 +61,6 @@ namespace Ogre {
         GL3PlusFBOManager *getManager() { return mManager; }
     private:
         GL3PlusFBOManager *mManager;
-        GLSurfaceDesc mMultisampleColourBuffer;
 
         void initialise() override;
     };

@@ -70,11 +70,6 @@ namespace Ogre {
         
     private:
         GLES2FBOManager *mManager;
-        GLSurfaceDesc mMultisampleColourBuffer;
-        // mMultisampleColourBuffer.buffer is either shared through caching, or owned,
-        // if owned, mOwnedMultisampleColourBuffer contains mMultisampleColourBuffer.buffer
-        // otherwise, mOwnedMultisampleColourBuffer == nullptr
-        std::unique_ptr<GLHardwarePixelBufferCommon> mOwnedMultisampleColourBuffer;
 
         void initialise() override;
     };

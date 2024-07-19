@@ -1486,7 +1486,10 @@ namespace Ogre {
                main frame buffer.
             */
             if(auto fbo = gltarget->getFBO())
+            {
+                fbo->determineFBOBufferSharingAllowed(*target);
                 fbo->bind(true);
+            }
             else
                 _getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
 

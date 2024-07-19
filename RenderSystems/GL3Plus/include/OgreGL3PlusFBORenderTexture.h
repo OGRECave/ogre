@@ -77,9 +77,7 @@ namespace Ogre {
         GL3PlusFBORenderTexture *createRenderTexture(const String &name,
                                                              const GLSurfaceDesc &target, bool writeGamma, uint fsaa) override;
 
-        /** Request a render buffer. If format is GL_NONE, return a zero buffer.
-         */
-        GLSurfaceDesc requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa);
+        GLSurfaceDesc createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa) override;
 
         GL3PlusStateCacheManager* getStateCacheManager();
     private:

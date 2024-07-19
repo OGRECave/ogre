@@ -469,33 +469,13 @@ namespace Ogre {
         return retval;
     }
 
-    GLSurfaceDesc GL3PlusFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
+    GLSurfaceDesc GL3PlusFBOManager::createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
     {
         GLSurfaceDesc retval;
-        retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
-        if(format != GL_NONE)
-        {
-            RBFormat key(format, width, height, fsaa);
-            RenderBufferMap::iterator it = mRenderBufferMap.find(key);
-            if(it != mRenderBufferMap.end())
-            {
-                retval.buffer = it->second.buffer;
-                retval.zoffset = 0;
-                retval.numSamples = fsaa;
-                // Increase refcount
-                ++it->second.refcount;
-            }
-            else
-            {
-                // New one
-                GL3PlusRenderBuffer *rb = new GL3PlusRenderBuffer(format, width, height, fsaa);
-                mRenderBufferMap[key] = RBRef(rb);
-                retval.buffer = rb;
-                retval.zoffset = 0;
-                retval.numSamples = fsaa;
-            }
-        }
-        //        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
+        auto* rb = new GL3PlusRenderBuffer(format, width, height, fsaa);
+        retval.buffer = rb;
+        retval.zoffset = 0;
+        retval.numSamples = fsaa;
         return retval;
     }
 
