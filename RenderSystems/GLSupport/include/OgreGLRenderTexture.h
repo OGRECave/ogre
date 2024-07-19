@@ -36,6 +36,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre {
     class GLHardwarePixelBufferCommon;
+    class GLRTTManager;
 
     /** GL surface descriptor. Points to a 2D surface that can be rendered to.
      */
@@ -53,8 +54,8 @@ namespace Ogre {
     class _OgreGLExport GLFrameBufferObjectCommon
     {
     public:
-        GLFrameBufferObjectCommon(int32 fsaa);
-        virtual ~GLFrameBufferObjectCommon() {}
+        GLFrameBufferObjectCommon(int32 fsaa, GLRTTManager&);
+        virtual ~GLFrameBufferObjectCommon();
 
         /** Bind FrameBufferObject. Attempt to bind on incompatible GL context will cause FBO destruction and optional recreation.
         */
@@ -67,6 +68,14 @@ namespace Ogre {
         /** Unbind attachment
         */
         void unbindSurface(size_t attachment);
+
+        /** Determines and sets mAllowRenderBufferSharing based on given render target properties
+         */
+        void determineFBOBufferSharingAllowed(RenderTarget&);
+
+        /** Sets mAllowRenderBufferSharing, triggers re-initialization if value is different
+         */
+        void setAllowRenderBufferSharing(bool);
 
         /// Accessors
         int32 getFSAA() const { return mNumSamples; }
@@ -93,6 +102,13 @@ namespace Ogre {
         uint32 mFB;
         uint32 mMultisampleFB;
         int32 mNumSamples;
+        GLRTTManager* mRTTManager;
+        GLSurfaceDesc mMultisampleColourBuffer;
+        bool mAllowRenderBufferSharing = true;
+        // mMultisampleColourBuffer.buffer is either shared through caching, or owned,
+        // if owned, mOwnedMultisampleColourBuffer contains mMultisampleColourBuffer.buffer
+        // otherwise, mOwnedMultisampleColourBuffer == nullptr
+        std::unique_ptr<GLHardwarePixelBufferCommon> mOwnedMultisampleColourBuffer;
 
         /** Initialise object (find suitable depth and stencil format).
             Must be called every time the bindings change.
@@ -102,6 +118,8 @@ namespace Ogre {
             - Not all bound surfaces have the same internal format
         */
         virtual void initialise() = 0;
+        void releaseMultisampleColourBuffer();
+        void initialiseMultisampleColourBuffer(unsigned format, uint32 width, uint32 height);
     };
 
     /** Base class for GL Render Textures
@@ -163,6 +181,18 @@ namespace Ogre {
         static GLRTTManager& getSingleton(void);
         /// @copydoc Singleton::getSingleton()
         static GLRTTManager* getSingletonPtr(void);
+
+        /** Request a render buffer. If format is GL_NONE, return a zero buffer.
+         */
+        GLSurfaceDesc requestRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa);
+
+        /** Creates a new render buffer. Caller takes ownership.
+         */
+        virtual GLSurfaceDesc createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
+        {
+            return {};
+        }
+
     protected:
         /** Frame Buffer Object properties for a certain texture format.
          */

@@ -36,36 +36,34 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, uint fsaa)
+    : GLFrameBufferObjectCommon(fsaa, *manager), mManager(manager)
+{
+    // Generate framebuffer object
+    OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
-    GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager *manager, uint fsaa):
-        GLFrameBufferObjectCommon(fsaa), mManager(manager)
+    // Check samples supported
+    mManager->getStateCacheManager()->bindGLFrameBuffer(GL_FRAMEBUFFER, mFB);
+
+    GLint maxSamples;
+    OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
+    mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
+
+    // Will we need a second FBO to do multisampling?
+    if (mNumSamples)
     {
-        // Generate framebuffer object
-        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
-
-        // Check samples supported
-        mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mFB );
-
-        GLint maxSamples;
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
-        mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
-
-        // Will we need a second FBO to do multisampling?
-        if (mNumSamples)
-        {
-            OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-        }
-        else
-        {
-            mMultisampleFB = 0;
-        }
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
+    }
+    else
+    {
+        mMultisampleFB = 0;
+    }
     }
     
     GL3PlusFrameBufferObject::~GL3PlusFrameBufferObject()
     {
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
-        mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // Delete framebuffer object
         if(mContext && mFB)
         {
@@ -84,7 +82,9 @@ namespace Ogre {
         // Release depth and stencil, if they were bound
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
-        mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+
+        releaseMultisampleColourBuffer();
+
         // First buffer must be bound
         if(!mColour[0].buffer)
         {
@@ -144,7 +144,7 @@ namespace Ogre {
             // Create AA render buffer (colour)
             // note, this can be shared too because we blit it to the final FBO
             // right after the render is finished
-            mMultisampleColourBuffer = mManager->requestRenderBuffer(format, width, height, mNumSamples);
+            initialiseMultisampleColourBuffer(format, width, height);
 
             // Attach it, because we won't be attaching below and non-multisample has
             // actually been attached to other FBO

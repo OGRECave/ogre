@@ -30,6 +30,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLHardwarePixelBufferCommon.h"
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreRoot.h"
+#include "OgreViewport.h"
 
 namespace Ogre {
 
@@ -39,8 +40,8 @@ namespace Ogre {
 
     template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = NULL;
 
-    GLFrameBufferObjectCommon::GLFrameBufferObjectCommon(int32 fsaa)
-        : mFB(0), mMultisampleFB(0), mNumSamples(fsaa)
+    GLFrameBufferObjectCommon::GLFrameBufferObjectCommon(int32 fsaa, GLRTTManager& rttManager)
+        : mFB(0), mMultisampleFB(0), mNumSamples(fsaa), mRTTManager(&rttManager)
     {
         auto* rs = static_cast<GLRenderSystemCommon*>(
             Root::getSingleton().getRenderSystem());
@@ -53,6 +54,12 @@ namespace Ogre {
         {
             x.buffer=0;
         }
+    }
+
+    GLFrameBufferObjectCommon::~GLFrameBufferObjectCommon()
+    {
+        if (!mOwnedMultisampleColourBuffer)
+            mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer);
     }
 
     void GLFrameBufferObjectCommon::bindSurface(size_t attachment, const GLSurfaceDesc &target)
@@ -71,6 +78,38 @@ namespace Ogre {
         // Re-initialise if buffer 0 still bound
         if(mColour[0].buffer)
             initialise();
+    }
+
+    void GLFrameBufferObjectCommon::determineFBOBufferSharingAllowed(RenderTarget& target)
+    {
+        if (mNumSamples == 0)
+        {
+            // Only the multisampled buffer would be shared
+            return;
+        }
+
+        bool sharingRenderBufferIsAllowed = true;
+        for (unsigned short i = 0; i < target.getNumViewports(); ++i)
+        {
+            if (!target.getViewport(i)->getClearEveryFrame())
+            {
+                // When there's at least one viewport that doesn't clear every frame,
+                // sharing the render buffer is not allowed.
+                // The shared buffer could contain data from other multisampled FBO's which wouldn't be cleared.
+                sharingRenderBufferIsAllowed = false;
+                break;
+            }
+        }
+        setAllowRenderBufferSharing(sharingRenderBufferIsAllowed);
+    }
+
+    void GLFrameBufferObjectCommon::setAllowRenderBufferSharing(bool allowRenderBufferSharing)
+    {
+        if(mAllowRenderBufferSharing!=allowRenderBufferSharing)
+        {
+            mAllowRenderBufferSharing = allowRenderBufferSharing;
+            initialise();
+        }
     }
 
     uint32 GLFrameBufferObjectCommon::getWidth() const
@@ -153,6 +192,34 @@ namespace Ogre {
         return PF_BYTE_RGBA; // native endian
     }
 
+    GLSurfaceDesc GLRTTManager::requestRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
+    {
+        GLSurfaceDesc retval;
+        retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
+        if (format != 0)
+        {
+            RBFormat key(format, width, height, fsaa);
+            RenderBufferMap::iterator it = mRenderBufferMap.find(key);
+            if (it != mRenderBufferMap.end())
+            {
+                retval.buffer = it->second.buffer;
+                retval.zoffset = 0;
+                retval.numSamples = fsaa;
+                // Increase refcount
+                ++it->second.refcount;
+            }
+            else
+            {
+                // New one
+                retval = createNewRenderBuffer(format, width, height, fsaa);
+                mRenderBufferMap[key] = retval.buffer;
+            }
+        }
+        // std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width <<
+        // "x" << height << " :" << retval.buffer << std::endl;
+        return retval;
+    }
+
     void GLRTTManager::releaseRenderBuffer(const GLSurfaceDesc &surface)
     {
         if(surface.buffer == 0)
@@ -171,6 +238,27 @@ namespace Ogre {
                 //                              std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
                 //                                      << " of " << key.width << "x" << key.height << std::endl;
             }
+        }
+    }
+
+    void GLFrameBufferObjectCommon::releaseMultisampleColourBuffer()
+    {
+        if (mOwnedMultisampleColourBuffer)
+            mOwnedMultisampleColourBuffer.reset();
+        else
+        {
+            mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        }
+    }
+
+    void GLFrameBufferObjectCommon::initialiseMultisampleColourBuffer(unsigned format, uint32 width, uint32 height)
+    {
+        if (mAllowRenderBufferSharing)
+            mMultisampleColourBuffer = mRTTManager->requestRenderBuffer(format, width, height, mNumSamples);
+        else
+        {
+            mMultisampleColourBuffer = mRTTManager->createNewRenderBuffer(format, width, height, mNumSamples);
+            mOwnedMultisampleColourBuffer.reset(mMultisampleColourBuffer.buffer);
         }
     }
 

@@ -70,7 +70,6 @@ namespace Ogre {
         
     private:
         GLES2FBOManager *mManager;
-        GLSurfaceDesc mMultisampleColourBuffer;
 
         void initialise() override;
     };
