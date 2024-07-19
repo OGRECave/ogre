@@ -965,7 +965,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
                         RenderState* srcRenderState = t->getRenderState(pi);
                         RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMat, pi);
 
-                        for(SubRenderState* srcSubState : srcRenderState->getSubRenderStates())
+                        for(SubRenderState* s : srcRenderState->getSubRenderStates())
                         {
                             SubRenderState* srcSubState = s;
                             SubRenderState* dstSubState = createSubRenderState(srcSubState->getType());
