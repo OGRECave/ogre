@@ -956,7 +956,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
             if (createShaderBasedTechnique(dstMat, srcFromTechniqueScheme, srcToTechniqueScheme))
             {
                 //check for custom render states in the source material
-                unsigned short passCount =  t->getSourceTechnique()->getNumPasses();
+                unsigned short passCount = t->getSourceTechnique()->getNumPasses();
                 for(unsigned short pi = 0 ; pi < passCount ; ++pi)
                 {
                     if (t->hasRenderState(pi))
@@ -965,11 +965,11 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
                         RenderState* srcRenderState = t->getRenderState(pi);
                         RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMat, pi);
 
-                        for(SubRenderState* s : srcRenderState->getSubRenderStates())
+                        for(SubRenderState* srcSubState : srcRenderState->getSubRenderStates())
                         {
-                            SubRenderState* d = createSubRenderState(s->getType());
-                            *d = *s;
-                            dstRenderState->addTemplateSubRenderState(d);
+                            SubRenderState* dstSubState = createSubRenderState(srcSubState->getType());
+                            (*dstSubState) = (*srcSubState);
+                            dstRenderState->addTemplateSubRenderState(dstSubState);
                         }
                     }
                 }
