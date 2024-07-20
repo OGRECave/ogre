@@ -253,9 +253,8 @@ void Compositor::createGlobalTextures()
         bool isConsistent = true;
         size_t numGlobals = 0;
         CompositionTechnique* technique = mSupportedTechniques[i];
-        for (const auto& t2 : technique->getTextureDefinitions())
+        for (auto *texDef : technique->getTextureDefinitions())
         {
-            CompositionTechnique::TextureDefinition* texDef = t2;
             if (texDef->scope == CompositionTechnique::TS_GLOBAL)
             {
                 if (globalTextureNames.find(texDef->name) == globalTextureNames.end())
