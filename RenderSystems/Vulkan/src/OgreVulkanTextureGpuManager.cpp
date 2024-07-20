@@ -142,7 +142,7 @@ namespace Ogre
     bool VulkanTextureGpuManager::checkSupport( PixelFormatGpu format, uint32 textureFlags ) const
     {
         OGRE_ASSERT_LOW(
-            textureFlags != TU_NOT_SRV &&
+            textureFlags != TU_NOT_SAMPLED &&
             "Invalid textureFlags combination. Asking to check if format is supported to do nothing" );
 
         const VkFormat vkFormat = VulkanMappings::get( format );
@@ -152,7 +152,7 @@ namespace Ogre
 
         uint32 features = 0;
 
-        if( !( textureFlags & TU_NOT_SRV ) )
+        if( !( textureFlags & TU_NOT_SAMPLED ) )
             features |= VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
 
         if( textureFlags & TU_UNORDERED_ACCESS )

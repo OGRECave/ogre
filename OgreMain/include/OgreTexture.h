@@ -62,21 +62,23 @@ namespace Ogre {
         /// Mipmaps will be automatically generated for this texture
         TU_AUTOMIPMAP = 0x10,
         /** This texture will be a render target, i.e. used as a target for render to texture
-            setting this flag will ignore all other texture usages except TU_AUTOMIPMAP, TU_UAV, TU_NOT_SRV */
+            setting this flag will ignore all other texture usages except TU_AUTOMIPMAP, TU_UNORDERED_ACCESS, TU_NOT_SAMPLED */
         TU_RENDERTARGET = 0x20,
-        /// Texture would not be used as Shader Resource View, i.e. as regular texture.
-        /// That flag could be combined with TU_RENDERTARGET or TU_UAV to remove possible limitations on some hardware
-        TU_NOT_SRV = 0x40,
+        /// Texture will not be sampled inside a shader i.e. used as regular texture.
+        /// When used with TU_RENDERTARGET this can improve performance and compatibility with FL9.1 hardware
+        TU_NOT_SAMPLED = 0x40,
         /// Texture can be bound as an Unordered Access View
         /// (imageStore/imageRead/glBindImageTexture in GL jargon)
         TU_UNORDERED_ACCESS = 0x80,
-        /// Texture can be used as an UAV, but not as a regular texture.
-        TU_UAV_NOT_SRV = TU_UNORDERED_ACCESS | TU_NOT_SRV,
         /// Default to automatic mipmap generation static textures
         TU_DEFAULT = TU_AUTOMIPMAP | HBU_GPU_ONLY,
 
         /// @deprecated
-        TU_NOTSHADERRESOURCE = TU_NOT_SRV,
+        TU_UAV_NOT_SRV = TU_UNORDERED_ACCESS | TU_NOT_SAMPLED,
+        /// @deprecated
+        TU_NOT_SRV = TU_NOT_SAMPLED,
+        /// @deprecated
+        TU_NOTSHADERRESOURCE = TU_NOT_SAMPLED,
         /// @deprecated
         TU_UAV = TU_UNORDERED_ACCESS
     };

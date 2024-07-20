@@ -753,7 +753,7 @@ namespace Ogre
 		}
 
         UINT retVal = 0;
-        if( !(usage & TU_NOT_SRV) )
+        if( !(usage & TU_NOT_SAMPLED) )
             retVal |= D3D11_BIND_SHADER_RESOURCE;
 
         if( isRenderTarget )
