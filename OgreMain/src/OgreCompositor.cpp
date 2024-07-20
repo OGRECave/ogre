@@ -169,7 +169,7 @@ void Compositor::createGlobalTextures()
     //Initialize global textures from first supported technique
     CompositionTechnique* firstTechnique = mSupportedTechniques[0];
 
-    for (const auto *def : firstTechnique->getTextureDefinitions())
+    for (auto *def : firstTechnique->getTextureDefinitions())
     {
         if (def->scope == CompositionTechnique::TS_GLOBAL)
         {
