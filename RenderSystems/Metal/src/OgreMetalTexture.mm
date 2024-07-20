@@ -112,7 +112,7 @@ namespace Ogre
         if( mUsage & TU_UNORDERED_ACCESS )
             desc.usage |= MTLTextureUsageShaderWrite;
 
-        if( mUsage & (TU_UNORDERED_ACCESS|TU_NOT_SRV|TU_RENDERTARGET) )
+        if( mUsage & (TU_UNORDERED_ACCESS|TU_NOT_SAMPLED|TU_RENDERTARGET) )
             desc.storageMode = MTLStorageModePrivate;
 
         mTexture = [mDevice->mDevice newTextureWithDescriptor:desc];
