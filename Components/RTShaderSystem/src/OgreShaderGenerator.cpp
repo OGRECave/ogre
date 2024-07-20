@@ -709,9 +709,9 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
 //-----------------------------------------------------------------------------
 static bool hasFixedFunctionPass(Technique* tech)
 {
-    for (unsigned short i=0; i < tech->getNumPasses(); ++i)
+    for (const auto& p : tech->getPasses())
     {
-        if (!tech->getPass(i)->isProgrammable())
+        if (!p->isProgrammable())
         {
             return true;
         }
@@ -956,7 +956,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
             if (createShaderBasedTechnique(dstMat, srcFromTechniqueScheme, srcToTechniqueScheme))
             {
                 //check for custom render states in the source material
-                unsigned short passCount =  t->getSourceTechnique()->getNumPasses();
+                unsigned short passCount = t->getSourceTechnique()->getNumPasses();
                 for(unsigned short pi = 0 ; pi < passCount ; ++pi)
                 {
                     if (t->hasRenderState(pi))
@@ -965,13 +965,8 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
                         RenderState* srcRenderState = t->getRenderState(pi);
                         RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMat, pi);
 
-                        const SubRenderStateList& srcSubRenderState =
-                            srcRenderState->getSubRenderStates();
-
-                        SubRenderStateList::const_iterator itSubState = srcSubRenderState.begin(), itSubStateEnd = srcSubRenderState.end();
-                        for(;itSubState != itSubStateEnd ; ++itSubState)
+                        for(SubRenderState* srcSubState : srcRenderState->getSubRenderStates())
                         {
-                            SubRenderState* srcSubState = *itSubState;
                             SubRenderState* dstSubState = createSubRenderState(srcSubState->getType());
                             (*dstSubState) = (*srcSubState);
                             dstRenderState->addTemplateSubRenderState(dstSubState);
