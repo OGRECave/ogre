@@ -967,9 +967,9 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
 
                         for(SubRenderState* s : srcRenderState->getSubRenderStates())
                         {
-                            SubRenderState* dstSubState = createSubRenderState(srcSubState->getType());
-                            (*dstSubState) = (*srcSubState);
-                            dstRenderState->addTemplateSubRenderState(dstSubState);
+                            SubRenderState* d = createSubRenderState(s->getType());
+                            *d = *s;
+                            dstRenderState->addTemplateSubRenderState(d);
                         }
                     }
                 }
