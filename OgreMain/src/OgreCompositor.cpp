@@ -248,11 +248,12 @@ void Compositor::createGlobalTextures()
     }
 
     //Validate that all other supported techniques expose the same set of global textures.
-    for (const auto& t : mSupportedTechniques)
+    for (size_t i = 1; i < mSupportedTechniques.size(); i++)
     {
         bool isConsistent = true;
         size_t numGlobals = 0;
-        for (const auto& t2 : t->getTextureDefinitions())
+        CompositionTechnique* technique = mSupportedTechniques[i];
+        for (const auto& t2 : technique->getTextureDefinitions())
         {
             CompositionTechnique::TextureDefinition* texDef = t2;
             if (texDef->scope == CompositionTechnique::TS_GLOBAL)
