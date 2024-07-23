@@ -1119,6 +1119,9 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     aiVector3D* tang = mesh->mTangents;
     aiColor4D *col = mesh->mColors[0];
 
+    if(!norm)
+        matptr->setLightingEnabled(false);
+
     // We must create the vertex data, indicating how many vertices there will be
     submesh->createVertexData();
     submesh->vertexData->vertexStart = 0;
