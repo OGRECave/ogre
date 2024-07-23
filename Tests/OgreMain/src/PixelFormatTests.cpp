@@ -78,33 +78,20 @@ TEST_F(PixelFormatTests,IntegerPackUnpack)
 TEST_F(PixelFormatTests,FloatPackUnpack)
 {
     // Float32
-    float data[4] = {1.0f, 2.0f, 3.0f, 4.0f};
+    ColourValue src{0.99999f, -0.9999f, 1.49999f, 1.99999f};
     float r,g,b,a;
-    PixelUtil::unpackColour(&r, &g, &b, &a, PF_FLOAT32_RGBA, data);
-    EXPECT_EQ(r, 1.0f);
-    EXPECT_EQ(g, 2.0f);
-    EXPECT_EQ(b, 3.0f);
-    EXPECT_EQ(a, 4.0f);
+    PixelUtil::unpackColour(&r, &g, &b, &a, PF_FLOAT32_RGBA, src.ptr());
+    EXPECT_EQ(src, ColourValue(r, g, b, a));
 
     // Float16
-    setupBoxes(PF_A8B8G8R8, PF_FLOAT16_RGBA);
-    mDst2.format = PF_A8B8G8R8;
-    unsigned int eob = mSrc.getWidth()*4;
+    ColourValue  ref{1.0f, -1.0f, 1.5f, 2.0f}; // conversion to float16 should round to nearest
+    uint16 data2[4];
+    ColourValue  dst;
 
-    PixelUtil::bulkPixelConversion(mSrc, mDst1);
-    PixelUtil::bulkPixelConversion(mDst1, mDst2);
+    PixelUtil::bulkPixelConversion(src.ptr(), PF_FLOAT32_RGBA, data2, PF_FLOAT16_RGBA, 1);
+    PixelUtil::bulkPixelConversion(data2, PF_FLOAT16_RGBA, dst.ptr(), PF_FLOAT32_RGBA, 1);
 
-    // Locate errors
-    std::stringstream s;
-    unsigned int x;
-    for(x=0; x<eob; x++) {
-        if(mTemp2[x] != mRandomData[x])
-            s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) mRandomData[x]
-              << "!= " << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) mTemp2[x] << " ";
-    }
-
-    // src and dst2 should match
-    EXPECT_TRUE(memcmp(mSrc.data, mDst2.data, eob) == 0) << "PF_FLOAT16_RGBA<->PF_A8B8G8R8 conversion was not lossless "+s.str();
+    EXPECT_EQ(dst, ref);
 }
 //--------------------------------------------------------------------------
 // Pure 32 bit float precision brute force pixel conversion; for comparison
