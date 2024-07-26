@@ -30,8 +30,6 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreEntity.h"
-#include "OgreSubEntity.h"
 #include "OgreViewport.h"
 
 namespace Ogre {
