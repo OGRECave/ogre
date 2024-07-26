@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreTagPoint.h"
-#include "OgreEntity.h"
 
 
 namespace Ogre {

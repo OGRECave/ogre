@@ -41,7 +41,6 @@ THE SOFTWARE.
 #include "OgrePlugin.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreResourceBackgroundQueue.h"
-#include "OgreEntity.h"
 #include "OgreBillboardSet.h"
 #include "OgreBillboardChain.h"
 #include "OgreRibbonTrail.h"

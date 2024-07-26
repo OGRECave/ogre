@@ -26,8 +26,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreEntity.h"
-#include "OgreSubEntity.h"
 #include "OgreTagPoint.h"
 #include "OgreSkeletonInstance.h"
 #include "OgreOptimisedUtil.h"

@@ -27,13 +27,11 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
-#include "OgreEntity.h"
 #include "OgreControllerManager.h"
 #include "OgreAnimation.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreBillboardSet.h"
 #include "OgreStaticGeometry.h"
-#include "OgreSubEntity.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreBillboardChain.h"
 #include "OgreRibbonTrail.h"
