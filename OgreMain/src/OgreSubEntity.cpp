@@ -49,11 +49,6 @@ namespace Ogre {
     }
     SubEntity::~SubEntity() = default; // ensure unique_ptr destructors are in cpp
     //-----------------------------------------------------------------------
-    SubMesh* SubEntity::getSubMesh(void)
-    {
-        return mSubMesh;
-    }
-    //-----------------------------------------------------------------------
     const String& SubEntity::getMaterialName(void) const
     {
         return mMaterialPtr ? mMaterialPtr->getName() : BLANKSTRING;

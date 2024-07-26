@@ -183,7 +183,7 @@ namespace Ogre {
 
         /** Accessor method to read mesh data.
         */
-        SubMesh* getSubMesh(void);
+        SubMesh* getSubMesh(void) const { return mSubMesh; }
 
         /** Accessor to get parent Entity */
         Entity* getParent(void) const { return mParentEntity; }
