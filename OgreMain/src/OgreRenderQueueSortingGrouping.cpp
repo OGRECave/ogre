@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreRenderQueueSortingGrouping.h"
+#include <algorithm>
 
 namespace Ogre {
 namespace {
@@ -358,9 +359,26 @@ namespace {
                     DistanceSortDescendingLess(cam));
             }
         }
+        else if (mOrganisationMode & OM_PASS_GROUP)
+        {
+            // sort
+            for(auto& it : mGrouped)
+            {
+                auto instanced = it.first->hasVertexProgram() && it.first->getVertexProgram()->isInstancingIncluded();
+                if (!instanced)
+                    continue;
 
-        // Nothing needs to be done for pass groups, they auto-organise
-
+                std::sort(it.second.begin(), it.second.end(),
+                          [](const Renderable* a, const Renderable* b)
+                          {
+                              auto sa = dynamic_cast<const SubEntity*>(a);
+                              auto sb = dynamic_cast<const SubEntity*>(b);
+                              if (!sa || !sb)
+                                  return a < b;
+                              return sa->getSubMesh() < sb->getSubMesh();
+                          });
+            }
+        }
     }
     //-----------------------------------------------------------------------
     void QueuedRenderableCollection::addRenderable(Pass* pass, Renderable* rend)
