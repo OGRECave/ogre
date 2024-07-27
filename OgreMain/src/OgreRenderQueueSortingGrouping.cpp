@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRenderQueueSortingGrouping.h"
 #include <algorithm>
+#include <unordered_map>
 
 namespace Ogre {
 namespace {
@@ -361,25 +362,29 @@ namespace {
         }
         else if (mOrganisationMode & OM_PASS_GROUP)
         {
-            // sort
+            // cluster by submesh
             for(auto& it : mGrouped)
             {
                 auto instanced = it.first->hasVertexProgram() && it.first->getVertexProgram()->isInstancingIncluded();
                 if (!instanced)
                     continue;
 
-                std::sort(it.second.begin(), it.second.end(),
-                          [](const Renderable* a, const Renderable* b)
-                          {
-                              auto sa = dynamic_cast<const SubEntity*>(a);
-                              auto sb = dynamic_cast<const SubEntity*>(b);
-                              if (!sa || !sb)
-                                  return a < b;
-                              return sa->getSubMesh() < sb->getSubMesh();
-                          });
+                std::unordered_map<SubMesh*, RenderableList> bySubMesh;
+                for (auto* rend : it.second)
+                {
+                    auto subEntity = dynamic_cast<SubEntity*>(rend);
+                    SubMesh* subMesh = subEntity ? subEntity->getSubMesh() : 0;
+                    bySubMesh[subMesh].push_back(rend);
+                }
+                it.second.clear();
+                for (auto& it2 : bySubMesh)
+                {
+                    it.second.insert(it.second.end(), it2.second.begin(), it2.second.end());
+                }
             }
         }
     }
+
     //-----------------------------------------------------------------------
     void QueuedRenderableCollection::addRenderable(Pass* pass, Renderable* rend)
     {
