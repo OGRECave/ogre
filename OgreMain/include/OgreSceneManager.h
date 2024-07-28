@@ -682,8 +682,6 @@ namespace Ogre {
         /// Internal method for destroying shadow textures (texture-based shadows)
         void destroyShadowTextures(void);
 
-        /** Internal method for rendering all objects using the default queue sequence. */
-        void renderVisibleObjectsDefaultSequence(void);
         /** Internal method for preparing the render queue for use with each render. */
         void prepareRenderQueue(void);
 
@@ -1770,7 +1768,7 @@ namespace Ogre {
 
         /** Sends visible objects found in _findVisibleObjects to the rendering engine.
         */
-        void _renderVisibleObjects(void) { renderVisibleObjectsDefaultSequence(); }
+        void _renderVisibleObjects(void);
 
         /** Prompts the class to send its contents to the renderer.
 

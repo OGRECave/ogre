@@ -1263,7 +1263,7 @@ void SceneManager::_findVisibleObjects(
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::renderVisibleObjectsDefaultSequence(void)
+void SceneManager::_renderVisibleObjects(void)
 {
     firePreRenderQueues();
 
