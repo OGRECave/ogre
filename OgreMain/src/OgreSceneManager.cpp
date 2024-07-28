@@ -1625,6 +1625,8 @@ static PolygonMode derivePolygonMode(const Pass* pass, const Renderable* rend, c
 void SceneManager::renderInstancedObject(const RenderableList& rends, const Pass* pass, bool lightScissoringClipping,
                                          bool doLightIteration, const LightList* manualLightList)
 {
+    OgreGpuEventScope(static_cast<SubEntity*>(rends.front())->getParent()->getName());
+
     mAutoParamDataSource->setCurrentRenderable(rends.front());
     // override: this is passed through the instance buffer
     mAutoParamDataSource->setWorldMatrices(&Affine3::IDENTITY, 1);
