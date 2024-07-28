@@ -472,7 +472,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Camera::_renderScene(Viewport *vp)
     {
-        OgreProfileBeginGPUEvent(getName());
+        OgreGpuEventScope(getName());
 
         //update the pixel display ratio
         if (mProjType == Ogre::PT_PERSPECTIVE)
@@ -502,7 +502,6 @@ namespace Ogre {
         {
             i->cameraPostRenderScene(this);
         }
-        OgreProfileEndGPUEvent(getName());
     }
     //---------------------------------------------------------------------
     void Camera::addListener(Listener* l)

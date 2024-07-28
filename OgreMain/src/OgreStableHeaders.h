@@ -134,10 +134,22 @@ extern "C" {
 #define OGRE_SERIALIZER_VALIDATE_CHUNKSIZE OGRE_DEBUG_MODE
 #endif
 
+#if OGRE_PROFILING == 1
+#define OgreGpuEventScope(name) GpuEventScope _gpuEventScope(name)
+#else
+#define OgreGpuEventScope(name)
+#endif
+
 namespace Ogre
 {
 void logMaterialNotFound(const String& name, const String& groupName, const String& destType, const String& destName,
                          LogMessageLevel lml = LML_CRITICAL);
+
+struct GpuEventScope
+{
+    GpuEventScope(const String& name) { Root::getSingleton().getRenderSystem()->beginProfileEvent(name); }
+    ~GpuEventScope() { Root::getSingleton().getRenderSystem()->endProfileEvent(); }
+};
 }
 
 #endif 
