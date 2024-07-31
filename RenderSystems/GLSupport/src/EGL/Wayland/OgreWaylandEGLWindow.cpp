@@ -207,23 +207,23 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
 
     if (!mEglConfig)
     {
-      int MSAAminAttribs[] = {
-        EGL_BUFFER_SIZE, minBufferSize,
-        EGL_DEPTH_SIZE, 16,
-        EGL_SAMPLE_BUFFERS, 1,
-        EGL_SAMPLES, samples,
-        EGL_NONE
-      };
-      int MSAAmaxAttribs[] = {
-        EGL_BUFFER_SIZE, maxBufferSize,
-        EGL_DEPTH_SIZE, maxDepthSize,
-        EGL_STENCIL_SIZE, maxStencilSize,
-        EGL_SAMPLE_BUFFERS, 1,
-        EGL_SAMPLES, samples,
-        EGL_NONE
-      };
+        int minAttribs[] = {
+            EGL_BUFFER_SIZE, minBufferSize,
+            EGL_DEPTH_SIZE, 16,
+            EGL_SAMPLE_BUFFERS, 0,
+            EGL_SAMPLES, samples,
+            EGL_NONE
+        };
+        int maxAttribs[] = {
+            EGL_BUFFER_SIZE, maxBufferSize,
+            EGL_DEPTH_SIZE, maxDepthSize,
+            EGL_STENCIL_SIZE, maxStencilSize,
+            EGL_SAMPLE_BUFFERS, 1,
+            EGL_SAMPLES, samples,
+            EGL_NONE
+        };
 
-      mEglConfig = mGLSupport->selectGLConfig(MSAAminAttribs, MSAAmaxAttribs);
+        mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
     }
 
     if (!mIsTopLevel)
