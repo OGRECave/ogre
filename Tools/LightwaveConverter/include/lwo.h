@@ -3,7 +3,7 @@
 Lightwave Object Loader
 (LWOB, LWLO, LWO2)
 
-converted by Dennis Verbeek (dennis.verbeek@chello.nl)
+converted by Dennis Verbeek ( dverbeek@hotmail.comi )
 
 These files were originally coded by Ernie Wright and were included in the 
 Lightwave SDK.

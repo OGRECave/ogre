@@ -378,7 +378,7 @@ void help( char *filename )
 {
     cout << "lwo2mesh v0.89b (2005.02.09) by Dennis Verbeek." << nl
         << "Converts a Lightwave object to an Ogre mesh." << nl
-        << "Please send any feedback to: dennis.verbeek@chello.nl" << nl << nl
+        << "Please send any feedback to: dverbeek@hotmail.com" << nl << nl
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
         << "Linux Port (2004.10.16) by Magnus Møller Petersen." << nl
         << "Please send feedback concerning Linux to: magnus@moaner.dk" << nl << nl

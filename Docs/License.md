@@ -239,8 +239,8 @@ Licensed Under:</td>
             site</p>
     </li>
     <li>
-        <p style="margin-bottom: 0cm;">The 'Razor 2' mesh is by Dennis
-            Verbeek</p>
+        <p style="margin-bottom: 0cm;">The 'Razor 2' mesh is by <a href="https://github.com/dennizzzz">Dennis
+            Verbeek<a></p> and can be used freely.
     </li>
     <li>
         <p style="margin-bottom: 0cm;">Skyboxes in cubemapJS.zip are
