@@ -1,8 +1,8 @@
 /*
     Lwo2MeshWriter based on the MilkShape exporter
-    Dennis Verbeek ( dverbeek@hotmail.comi )
+    Dennis Verbeek ( dverbeek@hotmail.com )
 
-    Linux port by Magnus Møller Petersen ( magnus@moaner.dk )
+    Linux port by Magnus MÃ¸ller Petersen ( magnus@moaner.dk )
 
     doExportSkeleton is unfinished
 */
