@@ -220,8 +220,7 @@ namespace Ogre {
         typedef std::vector<unsigned short> ContentTypeLookup;
         mutable ContentTypeLookup mShadowContentTypeLookup;
 
-        /// Vertex program details
-        std::unique_ptr<GpuProgramUsage> mProgramUsage[GPT_COUNT];
+        std::unique_ptr<GpuProgramUsage> mProgramUsage[GPT_PIPELINE_COUNT];
         /// Number of pass iterations to perform
         size_t mPassIterationCount;
         /// Point size, applies when not using per-vertex point size

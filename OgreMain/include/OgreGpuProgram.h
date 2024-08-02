@@ -55,7 +55,9 @@ namespace Ogre {
         GPT_COMPUTE_PROGRAM
     };
     enum {
-        GPT_COUNT = GPT_COMPUTE_PROGRAM + 1
+        GPT_COUNT = GPT_COMPUTE_PROGRAM + 1,
+        /// max programs that can be active in a pipeline (e.g compute is separate)
+        GPT_PIPELINE_COUNT = GPT_HULL_PROGRAM + 1
     };
 
     /** Defines a program which runs on the GPU such as a vertex or fragment program.
