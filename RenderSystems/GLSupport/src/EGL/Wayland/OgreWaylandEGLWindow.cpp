@@ -121,7 +121,7 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
 {
     int samples = 0;
     short frequency = 0;
-    int maxBufferSize(32), minBufferSize(16), maxDepthSize(16), maxStencilSize(0);
+    int maxBufferSize(24), minBufferSize(16), maxDepthSize(16), maxStencilSize(0);
     bool vsync = false;
     ::EGLContext eglContext = nullptr;
     unsigned int vsyncInterval = 1;
