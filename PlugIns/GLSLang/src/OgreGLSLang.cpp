@@ -317,6 +317,8 @@ static EShLanguage getShLanguage(GpuProgramType type)
     case GPT_HULL_PROGRAM:      return EShLangTessControl;
     case GPT_DOMAIN_PROGRAM:    return EShLangTessEvaluation;
     case GPT_COMPUTE_PROGRAM:   return EShLangCompute;
+    case GPT_MESH_PROGRAM:      return EShLangMeshNV;
+    case GPT_TASK_PROGRAM:      return EShLangTaskNV;
         // clang-format on
     }
 
@@ -331,6 +333,13 @@ GLSLangProgram::GLSLangProgram(ResourceManager* creator, const String& name, Res
     {
         setupBaseParamDictionary();
         memset(&DefaultTBuiltInResource.limits, 1, sizeof(TLimits));
+
+        if(sizeof(TBuiltInResource) == 420) // replace with build_info.h, when it is universally available
+        {
+            // copy VK_NV_mesh_shader limits to VK_EXT_mesh_shader
+            memcpy(&DefaultTBuiltInResource.maxMeshViewCountNV + 1, &DefaultTBuiltInResource.maxMeshOutputVerticesNV,
+                   9 * sizeof(int));
+        }
     }
 }
 
@@ -412,7 +421,15 @@ void GLSLangProgram::prepareImpl()
     if(mSyntaxCode == "gl_spirv")
         shader.setEnvClient(glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
     else if(mSyntaxCode == "spirv")
+    {
         shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_0);
+
+        if(mType == GPT_MESH_PROGRAM || mType == GPT_TASK_PROGRAM)
+        {
+            shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_2);
+            shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_4);
+        }
+    }
 
     // minimal version is 430 for explicit uniform location, but we use latest to get all features
     if (!shader.parse(&DefaultTBuiltInResource, 460, false, EShMsgSpvRules))

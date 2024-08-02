@@ -762,6 +762,14 @@ namespace Ogre
                     }
                     else if( extensionName == VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME )
                         deviceExtensions.push_back( VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME );
+#ifdef VK_EXT_mesh_shader
+                    else if( extensionName == VK_EXT_MESH_SHADER_EXTENSION_NAME)
+                    {
+                        deviceExtensions.push_back( VK_EXT_MESH_SHADER_EXTENSION_NAME );
+                        deviceExtensions.push_back( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
+                        mRealCapabilities->setCapability(RSC_MESH_PROGRAM);
+                    }
+#endif
                 }
             }
 
@@ -1034,7 +1042,14 @@ namespace Ogre
         vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline );
 
         // Render to screen!
-        if( op.useIndexes )
+        if(mProgramBound[GPT_MESH_PROGRAM])
+        {
+#ifdef VK_EXT_mesh_shader
+            OgreAssert(op.indexData, "indexData required for mesh shader");
+            vkCmdDrawMeshTasksEXT(cmdBuffer, op.indexData->indexCount, 1, 1);
+#endif
+        }
+        else if( op.useIndexes )
         {
             do
             {
@@ -1076,8 +1091,10 @@ namespace Ogre
     void VulkanRenderSystem::bindGpuProgram(GpuProgram* prg)
     {
         auto shader = static_cast<VulkanProgram*>(prg);
-        shaderStages[prg->getType()] = shader->getPipelineShaderStageCi();
+        shaderStages[prg->getType() % GPT_PIPELINE_COUNT] = shader->getPipelineShaderStageCi();
         mBoundGpuPrograms[prg->getType()] = prg->_getHash();
+
+        RenderSystem::bindGpuProgram(prg);
     }
     void VulkanRenderSystem::bindGpuProgramParameters( GpuProgramType gptype,
                                                        const GpuProgramParametersPtr& params,

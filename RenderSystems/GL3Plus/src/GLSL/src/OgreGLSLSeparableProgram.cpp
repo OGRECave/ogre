@@ -67,12 +67,14 @@ namespace Ogre
             }
         }
 
+            #define GL_MESH_SHADER_BIT_NV 0x00000040
             GLenum ogre2gltype[GPT_COUNT] = {
                 GL_VERTEX_SHADER_BIT,
                 GL_FRAGMENT_SHADER_BIT,
                 GL_GEOMETRY_SHADER_BIT,
                 GL_TESS_EVALUATION_SHADER_BIT,
                 GL_TESS_CONTROL_SHADER_BIT,
+                GL_MESH_SHADER_BIT_NV,
                 GL_COMPUTE_SHADER_BIT
             };
 

@@ -134,6 +134,7 @@ namespace Ogre {
             pLog->logMessage("   - Domain program constant 4-vectors: " +
                              StringConverter::toString(mConstantFloatCount[GPT_DOMAIN_PROGRAM]));
         }
+        pLog->logMessage(" * Mesh programs: " + StringConverter::toString(hasCapability(RSC_MESH_PROGRAM), true));
         pLog->logMessage(" * Compute programs: " + StringConverter::toString(hasCapability(RSC_COMPUTE_PROGRAM), true));
         if (hasCapability(RSC_COMPUTE_PROGRAM))
         {

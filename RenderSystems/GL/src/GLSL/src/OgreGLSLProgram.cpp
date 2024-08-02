@@ -208,6 +208,8 @@ namespace Ogre {
             case GPT_COMPUTE_PROGRAM:
             case GPT_DOMAIN_PROGRAM:
             case GPT_HULL_PROGRAM:
+            case GPT_MESH_PROGRAM:
+            case GPT_TASK_PROGRAM:
                 break;
             }
             mGLShaderHandle = (size_t)glCreateShaderObjectARB(shaderType);

@@ -1,3 +1,4 @@
+// Atomic counters
 shared_params CounterBuffer
 {
     shared_param_named ac uint 0
@@ -22,6 +23,30 @@ material Example/RasterizationOrder
 		{
             vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified {}
 			fragment_program_ref Ogre/RasterizationOrderFp {}
+		}
+	}
+}
+
+// Mesh shader
+fragment_program Ogre/MeshShaderFp glslang
+{
+	source MeshShaderFp.frag
+}
+
+mesh_program Ogre/MeshShader glslang
+{
+	source MeshProgram.glsl
+}
+
+material Example/MeshShader
+{
+    technique
+    {
+		pass
+		{
+            mesh_program_ref Ogre/MeshShader {}
+			fragment_program_ref Ogre/MeshShaderFp {}
+			cull_hardware none
 		}
 	}
 }

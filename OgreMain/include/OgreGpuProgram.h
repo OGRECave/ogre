@@ -52,10 +52,12 @@ namespace Ogre {
         GPT_GEOMETRY_PROGRAM,
         GPT_DOMAIN_PROGRAM,
         GPT_HULL_PROGRAM,
-        GPT_COMPUTE_PROGRAM
+        GPT_MESH_PROGRAM, // aliases with vertex
+        GPT_COMPUTE_PROGRAM, // aliases with fragment
+        GPT_TASK_PROGRAM
     };
     enum {
-        GPT_COUNT = GPT_COMPUTE_PROGRAM + 1,
+        GPT_COUNT = GPT_TASK_PROGRAM + 1,
         /// max programs that can be active in a pipeline (e.g compute is separate)
         GPT_PIPELINE_COUNT = GPT_HULL_PROGRAM + 1
     };

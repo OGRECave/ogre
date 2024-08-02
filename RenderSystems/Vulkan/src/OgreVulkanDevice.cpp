@@ -87,7 +87,7 @@ namespace Ogre
 
         appInfo.pEngineName = "Ogre3D Vulkan Engine";
         appInfo.engineVersion = OGRE_VERSION;
-        appInfo.apiVersion = VK_API_VERSION_1_0;
+        appInfo.apiVersion = VK_API_VERSION_1_2;
 
         createInfo.pApplicationInfo = &appInfo;
         createInfo.enabledLayerCount = layers.size();
@@ -249,7 +249,20 @@ namespace Ogre
 
         extensions.push_back( VK_KHR_SWAPCHAIN_EXTENSION_NAME );
 
+        VkPhysicalDeviceFeatures2 features2 = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+
+#ifdef VK_EXT_mesh_shader
+        VkPhysicalDeviceMeshShaderFeaturesEXT meshShaderFeatures = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT};
+        if(mRenderSystem->getCapabilities()->hasCapability(RSC_MESH_PROGRAM))
+        {
+            meshShaderFeatures.taskShader = VK_TRUE;
+            meshShaderFeatures.meshShader = VK_TRUE;
+            features2.pNext = &meshShaderFeatures;
+        }
+#endif
+
         VkDeviceCreateInfo createInfo = {VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
+        createInfo.pNext = &features2;
 
         createInfo.enabledExtensionCount = static_cast<uint32>( extensions.size() );
         createInfo.ppEnabledExtensionNames = extensions.data();
@@ -257,7 +270,7 @@ namespace Ogre
         createInfo.queueCreateInfoCount = static_cast<uint32>( queueCreateInfo.size() );
         createInfo.pQueueCreateInfos = &queueCreateInfo[0];
 
-        createInfo.pEnabledFeatures = &mDeviceFeatures;
+        //features2.features = mDeviceFeatures;
 
         OGRE_VK_CHECK(vkCreateDevice(mPhysicalDevice, &createInfo, NULL, &mDevice));
 

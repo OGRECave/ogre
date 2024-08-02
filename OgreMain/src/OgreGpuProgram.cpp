@@ -233,7 +233,8 @@ namespace Ogre
         if ((getType() == GPT_GEOMETRY_PROGRAM && !caps->hasCapability(RSC_GEOMETRY_PROGRAM)) ||
             ((getType() == GPT_DOMAIN_PROGRAM || getType() == GPT_HULL_PROGRAM) &&
              !caps->hasCapability(RSC_TESSELLATION_PROGRAM)) ||
-            (getType() == GPT_COMPUTE_PROGRAM && !caps->hasCapability(RSC_COMPUTE_PROGRAM)))
+            (getType() == GPT_COMPUTE_PROGRAM && !caps->hasCapability(RSC_COMPUTE_PROGRAM)) ||
+            ((getType() == GPT_MESH_PROGRAM || getType() == GPT_TASK_PROGRAM) && !caps->hasCapability(RSC_MESH_PROGRAM)))
         {
             return false;
         }
@@ -376,6 +377,10 @@ namespace Ogre
             return "hull";
         case GPT_COMPUTE_PROGRAM:
             return "compute";
+        case GPT_MESH_PROGRAM:
+            return "mesh";
+        case GPT_TASK_PROGRAM:
+            return "task";
         default:
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Unexpected GPU program type",

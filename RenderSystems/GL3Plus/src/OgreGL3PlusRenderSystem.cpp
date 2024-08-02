@@ -418,6 +418,11 @@ namespace Ogre {
             // OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &workgroupInvocations));
         }
 
+        if (checkExtension("GL_NV_mesh_shader"))
+        {
+            rsc->setCapability(RSC_MESH_PROGRAM);
+        }
+
         if (hasMinGLVersion(4, 1) || checkExtension("GL_ARB_get_program_binary"))
         {
             GLint formats = 0;
@@ -1101,6 +1106,14 @@ namespace Ogre {
                 //OGRE_CHECK_GL_ERROR(glDrawArrays(GL_PATCHES, 0, primCount));
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
+        }
+        else if (mCurrentShader[GPT_MESH_PROGRAM])
+        {
+            OgreAssert(op.indexData, "indexData required for mesh shader");
+
+            typedef void (APIENTRYP PFNGLDRAWMESHTASKSNVPROC) (GLuint first, GLuint count);
+            auto glDrawMeshTasksNV = (PFNGLDRAWMESHTASKSNVPROC)mGLSupport->getProcAddress("glDrawMeshTasksNV");
+            OGRE_CHECK_GL_ERROR(glDrawMeshTasksNV(0, op.indexData->indexCount));
         }
         else if (op.useIndexes)
         {

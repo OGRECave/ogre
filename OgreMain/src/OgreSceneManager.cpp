@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgreGpuProgram.h"
 #include "OgreStableHeaders.h"
 
 #include "OgreControllerManager.h"
@@ -667,7 +668,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
     {
         bindGpuProgram(vprog->_getBindingDelegate());
     }
-    else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION))
+    else if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_FIXED_FUNCTION) &&
+             !pass->hasGpuProgram(GPT_MESH_PROGRAM))
     {
         OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                     "RenderSystem does not support FixedFunction, "
@@ -686,7 +688,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
         // Set fixed-function vertex parameters
     }
 
-    for(auto gptype : {GPT_DOMAIN_PROGRAM, GPT_HULL_PROGRAM, GPT_GEOMETRY_PROGRAM})
+    for(auto gptype : {GPT_DOMAIN_PROGRAM, GPT_HULL_PROGRAM, GPT_GEOMETRY_PROGRAM, GPT_MESH_PROGRAM, GPT_TASK_PROGRAM})
     {
         if (pass->hasGpuProgram(gptype))
         {
