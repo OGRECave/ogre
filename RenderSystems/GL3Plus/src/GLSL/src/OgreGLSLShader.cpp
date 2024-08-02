@@ -235,6 +235,8 @@ namespace Ogre {
     /// Get OpenGL GLSL shader type from OGRE GPU program type.
     static GLenum getGLShaderType(GpuProgramType programType)
     {
+        #define GL_MESH_SHADER_NV 0x9559
+        #define GL_TASK_SHADER_NV 0x955A
         switch (programType)
         {
         case GPT_VERTEX_PROGRAM:
@@ -249,6 +251,10 @@ namespace Ogre {
             return GL_FRAGMENT_SHADER;
         case GPT_COMPUTE_PROGRAM:
             return GL_COMPUTE_SHADER;
+        case GPT_MESH_PROGRAM:
+            return GL_MESH_SHADER_NV;
+        case GPT_TASK_PROGRAM:
+            return GL_TASK_SHADER_NV;
         }
 
         return 0;
@@ -352,6 +358,8 @@ namespace Ogre {
                         break;
                     case GPT_FRAGMENT_PROGRAM:
                     case GPT_COMPUTE_PROGRAM:
+                    case GPT_MESH_PROGRAM:
+                    case GPT_TASK_PROGRAM:
                         // Fragment and compute shaders do
                         // not have standard blocks.
                         break;

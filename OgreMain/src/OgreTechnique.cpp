@@ -188,7 +188,7 @@ namespace Ogre {
             if (!caps->hasCapability(RSC_FIXED_FUNCTION) && currPass->isProgrammable() &&
                 !currPass->hasGpuProgram(GPT_COMPUTE_PROGRAM))
             {
-                if (!currPass->hasVertexProgram() ||
+                if ((!currPass->hasVertexProgram() && !currPass->hasGpuProgram(GPT_MESH_PROGRAM)) ||
                     (!currPass->hasFragmentProgram() && !currPass->hasGeometryProgram()))
                 {
                     compileErrors << "Pass " << passNum << ": RenderSystem requires both vertex and fragment programs";

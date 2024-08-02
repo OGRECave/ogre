@@ -95,6 +95,8 @@ namespace Ogre
         case GPT_HULL_PROGRAM:      return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
         case GPT_DOMAIN_PROGRAM:    return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
         case GPT_COMPUTE_PROGRAM:   return VK_SHADER_STAGE_COMPUTE_BIT;
+        case GPT_MESH_PROGRAM:      return VK_SHADER_STAGE_MESH_BIT_NV;
+        case GPT_TASK_PROGRAM:      return VK_SHADER_STAGE_TASK_BIT_NV;
             // clang-format on
         }
         return VK_SHADER_STAGE_FRAGMENT_BIT;

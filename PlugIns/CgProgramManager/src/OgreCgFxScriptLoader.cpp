@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreCgFxScriptLoader.h"
+#include "OgreGpuProgram.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreTechnique.h"
@@ -2814,6 +2815,8 @@ namespace Ogre {
         case GPT_COMPUTE_PROGRAM:
         case GPT_DOMAIN_PROGRAM:
         case GPT_HULL_PROGRAM:
+        case GPT_MESH_PROGRAM:
+        case GPT_TASK_PROGRAM:
             break;
         }
         CGstateassignment cgStateAssignment = cgGetNamedStateAssignment(cgPass, stateName);
@@ -2833,6 +2836,8 @@ namespace Ogre {
             case GPT_COMPUTE_PROGRAM:
             case GPT_DOMAIN_PROGRAM:
             case GPT_HULL_PROGRAM:
+            case GPT_MESH_PROGRAM:
+            case GPT_TASK_PROGRAM:
                 break;
             }
 
@@ -2906,6 +2911,8 @@ namespace Ogre {
             case GPT_DOMAIN_PROGRAM:
             case GPT_COMPUTE_PROGRAM:
             case GPT_HULL_PROGRAM:
+            case GPT_MESH_PROGRAM:
+            case GPT_TASK_PROGRAM:
                 break;
             }
 

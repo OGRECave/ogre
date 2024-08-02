@@ -2250,6 +2250,10 @@ namespace Ogre
                 mBoundComputeProgram = static_cast<D3D11HLSLProgram*>(prg);
             }
             break;
+        case GPT_MESH_PROGRAM:
+        case GPT_TASK_PROGRAM:
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Mesh and task shaders are not supported in D3D11");
+            break;
         };
 
         RenderSystem::bindGpuProgram(prg);

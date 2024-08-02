@@ -859,6 +859,10 @@ namespace Ogre {
         case GPT_COMPUTE_PROGRAM:
             CreateComputeShader();
             break;
+        case GPT_MESH_PROGRAM:
+        case GPT_TASK_PROGRAM:
+            OgreAssertDbg(false, "should never get here");
+            break;
         }
     }
 

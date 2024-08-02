@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreScriptCompiler.h"
 #include "OgreStableHeaders.h"
 #include "OgreBuiltinScriptTranslators.h"
 #include "OgreGpuProgramManager.h"
@@ -533,6 +534,12 @@ namespace Ogre{
         case ID_COMPUTE_PROGRAM:
         case ID_COMPUTE_PROGRAM_REF:
             return GPT_COMPUTE_PROGRAM;
+        case ID_MESH_PROGRAM:
+        case ID_MESH_PROGRAM_REF:
+            return GPT_MESH_PROGRAM;
+        case ID_TASK_PROGRAM:
+        case ID_TASK_PROGRAM_REF:
+            return GPT_TASK_PROGRAM;
         }
     }
 
@@ -2212,6 +2219,8 @@ namespace Ogre{
                 case ID_TESSELLATION_HULL_PROGRAM_REF:
                 case ID_TESSELLATION_DOMAIN_PROGRAM_REF:
                 case ID_COMPUTE_PROGRAM_REF:
+                case ID_MESH_PROGRAM_REF:
+                case ID_TASK_PROGRAM_REF:
                     translateProgramRef(getProgramType(child->id), compiler, child);
                     break;
                 case ID_SHADOW_CASTER_VERTEX_PROGRAM_REF:
@@ -2235,6 +2244,8 @@ namespace Ogre{
                 case ID_TESSELLATION_HULL_PROGRAM:
                 case ID_TESSELLATION_DOMAIN_PROGRAM:
                 case ID_COMPUTE_PROGRAM:
+                case ID_MESH_PROGRAM:
+                case ID_TASK_PROGRAM:
                 {
                     // auto assign inline defined programs
                     processNode(compiler, i);
@@ -5264,7 +5275,9 @@ namespace Ogre{
                     obj->id == ID_GEOMETRY_PROGRAM ||
                     obj->id == ID_TESSELLATION_HULL_PROGRAM || 
                     obj->id == ID_TESSELLATION_DOMAIN_PROGRAM ||
-                    obj->id == ID_COMPUTE_PROGRAM)
+                    obj->id == ID_COMPUTE_PROGRAM ||
+                    obj->id == ID_MESH_PROGRAM ||
+                    obj->id == ID_TASK_PROGRAM)
                 translator = &mGpuProgramTranslator;
             else if(obj->id == ID_SHARED_PARAMS)
                 translator = &mSharedParamsTranslator;

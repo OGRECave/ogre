@@ -833,7 +833,10 @@ namespace Ogre
         ID_CAMERA,
         ID_ALIGN_TO_FACE,
         ID_UNORDERED_ACCESS_MIP,
-
+        ID_MESH_PROGRAM,
+        ID_MESH_PROGRAM_REF,
+        ID_TASK_PROGRAM,
+        ID_TASK_PROGRAM_REF,
         ID_END_BUILTIN_IDS
     };
     /** @} */
