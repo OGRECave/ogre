@@ -345,7 +345,7 @@ const String& GLSLangProgram::getLanguage(void) const
 }
 
 bool GLSLangProgram::isSupported() const
-{   bool ret = !mCompileError;
+{   bool ret = !mCompileError && isRequiredCapabilitiesSupported();
     if(mSyntaxCode != "glslang") // in case this is provided by user
         ret = ret && GpuProgramManager::isSyntaxSupported(mSyntaxCode);
     return ret;
