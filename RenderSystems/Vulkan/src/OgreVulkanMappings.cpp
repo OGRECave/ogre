@@ -44,6 +44,10 @@ namespace Ogre
         case RenderOperation::OT_TRIANGLE_LIST:  return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         case RenderOperation::OT_TRIANGLE_STRIP: return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
         case RenderOperation::OT_TRIANGLE_FAN:   return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN;
+        case RenderOperation::OT_LINE_LIST_ADJ:  return VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY;
+        case RenderOperation::OT_LINE_STRIP_ADJ: return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY;
+        case RenderOperation::OT_TRIANGLE_LIST_ADJ:  return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY;
+        case RenderOperation::OT_TRIANGLE_STRIP_ADJ: return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY;
         default:
             return VK_PRIMITIVE_TOPOLOGY_PATCH_LIST;
             // clang-format on
