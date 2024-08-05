@@ -18,10 +18,12 @@ set( SOURCE_FILES ${SOURCE_FILES})
 
 add_library(RenderSystem_Vulkan ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 
-if(WIN32)
-    target_include_directories(RenderSystem_Vulkan PRIVATE $ENV{VULKAN_SDK}/Include)
-    target_link_directories(RenderSystem_Vulkan PRIVATE $ENV{VULKAN_SDK}/Lib)
+if(DEFINED ENV{VULKAN_SDK})
+    target_include_directories(RenderSystem_Vulkan SYSTEM PRIVATE $ENV{VULKAN_SDK}/include)
+    target_link_directories(RenderSystem_Vulkan PUBLIC $ENV{VULKAN_SDK}/lib)
+endif()
 
+if(WIN32)
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/volk.c"
         PROPERTIES COMPILE_DEFINITIONS VK_USE_PLATFORM_WIN32_KHR)
 elseif(ANDROID)
