@@ -126,8 +126,6 @@ namespace Ogre {
             String                  Name;
         };
 
-        std::vector<String *> mSerStrings;
-
         typedef std::vector<D3D11_SHADER_BUFFER_DESC> D3d11ShaderBufferDescs;
         typedef std::vector<D3D11_SHADER_TYPE_DESC> D3d11ShaderTypeDescs;
         typedef std::vector<UINT> InterfaceSlots;
