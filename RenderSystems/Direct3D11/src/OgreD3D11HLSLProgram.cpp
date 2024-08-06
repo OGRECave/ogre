@@ -79,6 +79,16 @@ namespace Ogre {
         if(!mCompileError)
             analizeMicrocode();
     }
+
+    inline char* copyString(const char* src)
+    {
+        auto len = strlen(src);
+        char* dst = new char[len+1];
+        memcpy(dst, src, len);
+        dst[len] = '\0';
+        return dst;
+    }
+
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::getMicrocodeFromCache(uint32 id)
     {
@@ -119,11 +129,10 @@ namespace Ogre {
     curItem.member = "";                                    \
     if(length > 0)                                          \
     {                                                       \
-        String * inString = new String();                   \
-        inString->resize(length);                           \
-        cacheMicrocode->read(&(*inString)[0], length);      \
-        mSerStrings.push_back(inString);                    \
-        curItem.member = &(*inString)[0];                   \
+        char* str = new char[length + 1];                   \
+        cacheMicrocode->read(str, length);                  \
+        str[length] = '\0';                                 \
+        curItem.member = str;                               \
     }                                                       \
         }
 
@@ -379,9 +388,7 @@ namespace Ogre {
             {
                 D3D11_SIGNATURE_PARAMETER_DESC & curParam = mD3d11ShaderInputParameters[i];
                 shaderReflection->GetInputParameterDesc( i, &curParam);
-                String * name = new String(curParam.SemanticName);
-                mSerStrings.push_back(name);
-                curParam.SemanticName = &(*name)[0]; 
+                curParam.SemanticName = copyString(curParam.SemanticName);
             }
 
             // get the output parameters
@@ -390,9 +397,7 @@ namespace Ogre {
             {
                 D3D11_SIGNATURE_PARAMETER_DESC & curParam = mD3d11ShaderOutputParameters[i];
                 shaderReflection->GetOutputParameterDesc( i, &curParam);
-                String * name = new String(curParam.SemanticName);
-                mSerStrings.push_back(name);
-                curParam.SemanticName = &(*name)[0]; 
+                curParam.SemanticName = copyString(curParam.SemanticName);
             }
             /*
             if (shaderDesc.ConstantBuffers > 1)
@@ -421,9 +426,7 @@ namespace Ogre {
 							"D3D11HLSLProgram::compileMicrocode");
                     }
 
-                    String * name = new String(constantBufferDesc.Name);
-                    mSerStrings.push_back(name);
-                    constantBufferDesc.Name = &(*name)[0]; 
+                    constantBufferDesc.Name = copyString(constantBufferDesc.Name);
                     mD3d11ShaderBufferDescs.push_back(constantBufferDesc);
 
                     mConstantBufferSize += constantBufferDesc.Size;
@@ -443,10 +446,7 @@ namespace Ogre {
 							OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
 								"D3D11HLSLProgram::compileMicrocode");
                         }
-
-                        String * name = new String(curVar.Name);
-                        mSerStrings.push_back(name);
-                        curVar.Name = &(*name)[0]; 
+                        curVar.Name = copyString(curVar.Name);
                     }
 
                     switch (constantBufferDesc.Type)
@@ -458,9 +458,7 @@ namespace Ogre {
                                 D3D11_SHADER_VARIABLE_DESC varDesc;
                                 ID3D11ShaderReflectionVariable* var = shaderReflectionConstantBuffer->GetVariableByIndex(k);
                                 var->GetDesc(&varDesc);
-                                String * name = new String(varDesc.Name);
-                                mSerStrings.push_back(name);
-                                varDesc.Name = &(*name)[0]; 
+                                varDesc.Name = copyString(varDesc.Name);
                                 mVarDescPointer.push_back(varDesc);
                                 mInterfaceSlots.push_back(var->GetInterfaceSlot(0));
                             }
@@ -474,9 +472,7 @@ namespace Ogre {
                                 D3D11_SHADER_VARIABLE_DESC varDesc;
                                 ID3D11ShaderReflectionVariable* varRef = shaderReflectionConstantBuffer->GetVariableByIndex(k);
                                 varRef->GetDesc(&varDesc);
-                                String * name = new String(varDesc.Name);
-                                mSerStrings.push_back(name);
-                                varDesc.Name = &(*name)[0]; 
+                                varDesc.Name = copyString(varDesc.Name);
                                 mVarDescBuffer.push_back(varDesc);
 
                                 // Only parse if variable is used
@@ -486,14 +482,8 @@ namespace Ogre {
                                     ID3D11ShaderReflectionType* varType = varRef->GetType();
                                     varType->GetDesc(&varTypeDesc);
                                     if(varTypeDesc.Name)
-                                    {
-                                        String * name = new String(varTypeDesc.Name);
-                                        mSerStrings.push_back(name);
-                                        varTypeDesc.Name = &(*name)[0]; 
-                                    }
-
+                                        varTypeDesc.Name = copyString(varTypeDesc.Name);
                                     mD3d11ShaderTypeDescs.push_back(varTypeDesc);
-
 
                                     if (varTypeDesc.Class == D3D_SVC_STRUCT)
                                     {
@@ -505,9 +495,7 @@ namespace Ogre {
                                             memberType->GetDesc(&memberTypeDesc);
 
                                             {
-                                                String * name = new String(memberTypeDesc.Name);
-                                                mSerStrings.push_back(name);
-                                                memberTypeDesc.Name = &(*name)[0]; 
+                                                memberTypeDesc.Name = copyString(memberTypeDesc.Name);
                                                 mMemberTypeDesc.push_back(memberTypeDesc);
                                             }
                                             {
@@ -873,14 +861,33 @@ namespace Ogre {
             break;
         }
     }
+
+    inline void clearParams(D3D11HLSLProgram::D3d11ShaderParameters& params)
+    {
+        for (const D3D11_SIGNATURE_PARAMETER_DESC& p : params)
+            delete[] p.SemanticName;
+        params.clear();
+    }
+
+    template <typename descs_t>
+    void clearDesc (descs_t& descs)
+    {
+        for (const auto& p : descs)
+            delete[] p.Name;
+        descs.clear();
+    }
+
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::unprepareImpl(void)
     {
-        for(unsigned int i = 0 ; i < mSerStrings.size() ; i++)
-        {
-            delete mSerStrings[i];
-        }
-        mSerStrings.clear();
+        clearParams(mD3d11ShaderInputParameters);
+        clearParams(mD3d11ShaderOutputParameters);
+        clearDesc(mD3d11ShaderVariables);
+        clearDesc(mD3d11ShaderBufferDescs);
+        clearDesc(mVarDescBuffer);
+        clearDesc(mVarDescPointer);
+        clearDesc(mD3d11ShaderTypeDescs);
+        clearDesc(mMemberTypeDesc);
     }
     void D3D11HLSLProgram::unloadHighLevelImpl(void)
     {
@@ -896,12 +903,6 @@ namespace Ogre {
         mDefaultBuffer.reset();
 
         unprepareImpl();
-        mD3d11ShaderInputParameters.clear();
-        mD3d11ShaderOutputParameters.clear();
-        mD3d11ShaderBufferDescs.clear();
-        mD3d11ShaderVariables.clear();
-        mVarDescBuffer.clear();
-        mD3d11ShaderTypeDescs.clear();
     }
 
     //-----------------------------------------------------------------------
