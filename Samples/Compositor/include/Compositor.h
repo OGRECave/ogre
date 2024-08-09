@@ -276,7 +276,6 @@ void Sample_Compositor::setupControls(void)
     DecorWidget* debugRTTPanel = mTrayMgr->createDecorWidget(TL_NONE, "DebugRTTPanel", "SdkTrays/Picture");
     OverlayContainer* debugRTTContainer = (OverlayContainer*)debugRTTPanel->getOverlayElement();
     mDebugTextureTUS = debugRTTContainer->getMaterial()->getBestTechnique()->getPass(0)->getTextureUnitState(0);
-    //mDebugTextureTUS->setTextureName("CompositorDemo/DebugView");
     debugRTTContainer->setDimensions(128, 128);
     debugRTTContainer->getChild("DebugRTTPanel/PictureFrame")->setDimensions(144, 144);
     debugRTTPanel->hide();
