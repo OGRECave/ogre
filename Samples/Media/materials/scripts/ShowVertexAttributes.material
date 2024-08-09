@@ -61,32 +61,6 @@ vertex_program Examples/ShowTangents_v unified
 	delegate Examples/ShowTangents_vHLSL
 }
 
-vertex_program Examples/ShowNormals_vHLSL hlsl
-{
-	source Example_Basic.cg
-	entry_point basicPassthroughNormal_v
-	target vs_2_0
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-vertex_program Examples/ShowNormals_vGLSL glsl glsles
-{
-	source ShowNormals.glsl
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
-
-vertex_program Examples/ShowNormals_v unified
-{
-	delegate Examples/ShowNormals_vGLSL
-	delegate Examples/ShowNormals_vHLSL
-}
-
 material Examples/ShowUV
 {
 	technique
@@ -137,11 +111,9 @@ material Examples/ShowNormals
 	{
 		pass
 		{
-			vertex_program_ref Examples/ShowNormals_v
+			rtshader_system
 			{
-			}
-			fragment_program_ref Examples/ShowUVdir3D_p
-			{
+				lighting_stage gbuffer normal
 			}
 		}
 	}
