@@ -1076,6 +1076,65 @@ material jaiqua
 
 }
 
+material Penguin
+{
+    technique
+    {
+        pass
+        {
+		    texture_unit
+			{
+			    texture penguin.jpg
+			}
+        }
+    }
+}
+
+material RZR-002
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture RZR-002.png
+			}
+		}
+	}
+}
+
+material "spine/01 - Default"
+{
+	technique
+	{
+		pass
+		{
+			diffuse 1 1 1
+			texture_unit
+			{
+				texture circuit.dds
+			}
+		}
+	}
+}
+
+material Panels
+{
+	technique
+	{
+		pass
+		{
+			specular 0.64 0.64 0.64 32 0
+
+			texture_unit
+			{
+				texture Panels_Diffuse.png
+			}
+		}
+	}
+}
 
 material Examples/Plane/IntegratedShadows
 {

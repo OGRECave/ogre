@@ -118,7 +118,6 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 
         // Create and attach a spine entity with standard skinning.
         ent = mSceneMgr->createEntity("Spine", "spine.mesh");
-        ent->setMaterialName("spine");
         ent->getSkeleton()->getBone("Bone02")->setManuallyControlled(true);
         sn->attachObject(ent);
         sn->scale(Vector3(0.2,0.2,0.2));
@@ -129,7 +128,8 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         // Create and attach a spine entity with dual
         // quaternion skinning.
         entDQ = mSceneMgr->createEntity("SpineDQ", "spine.mesh");
-        entDQ->setMaterialName("spineDualQuat");
+        MaterialPtr dqMat = ent->getSubEntity(0)->getMaterial()->clone("spineDualQuat");
+        entDQ->getSubEntity(0)->setMaterial(dqMat); // make sure we don't share the material
         entDQ->getSkeleton()->getBone("Bone02")->setManuallyControlled(true);
         sn->attachObject(entDQ);
         sn->scale(Vector3(0.2,0.2,0.2));
@@ -151,7 +151,6 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         String value = "Software";
 
         // Change the value if hardware skinning is enabled.
-        MaterialPtr dqMat = ent->getSubEntity(0)->getMaterial();
         if(dqMat)
         {
             Technique* bestTechnique = dqMat->getBestTechnique();
