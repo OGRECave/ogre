@@ -14,3 +14,104 @@ material Tests/TwoSidedLighting
 		}
 	}
 }
+
+// Test hardware morph animation (no normals)
+material Examples/HardwareMorphAnimation
+{
+	technique
+	{
+		pass
+		{
+
+			vertex_program_ref Ogre/HardwareMorphAnimation
+			{
+				// all default
+			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
+
+			texture_unit
+			{
+				colour_op_ex source1 src_current src_current
+			}
+
+		}
+	}
+}
+
+// Test hardware pose animation (no normals)
+material Examples/HardwarePoseAnimation
+{
+	technique
+	{
+		pass
+		{
+
+			vertex_program_ref Ogre/HardwarePoseAnimation
+			{
+				// all default
+			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				colour_op_ex source1 src_current src_current
+			}
+
+		}
+	}
+}
+
+
+// Test hardware morph animation (with normals)
+material Examples/HardwareMorphAnimationWithNormals
+{
+	technique
+	{
+		pass
+		{
+
+			vertex_program_ref Ogre/HardwareMorphAnimationWithNormals
+			{
+				// all default
+			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
+
+			texture_unit
+			{
+				colour_op_ex source1 src_current src_current
+			}
+
+		}
+	}
+}
+
+// Test hardware pose animation (no normals)
+material Examples/HardwarePoseAnimationWithNormals
+{
+	technique
+	{
+		pass
+		{
+
+			vertex_program_ref Ogre/HardwarePoseAnimationWithNormals
+			{
+				// all default
+			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				colour_op_ex source1 src_current src_current
+			}
+
+		}
+	}
+}
