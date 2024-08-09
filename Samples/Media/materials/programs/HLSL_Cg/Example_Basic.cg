@@ -159,17 +159,6 @@ void basicPassthroughTangent_v(float4 position : POSITION,
 	oPosition = mul(worldViewProj, position);
 	oTangent = tangent;
 }
-void basicPassthroughNormal_v(float4 position : POSITION,
-						float3 normal       : NORMAL,
-						  
-						  out float4 oPosition : POSITION,
-						  out float3 oNormal  : TEXCOORD0,
-
-						  uniform float4x4 worldViewProj)
-{
-	oPosition = mul(worldViewProj, position);
-	oNormal = normal;
-}
 // Basic fragment program to display UV
 float4 showuv_p (float4 position : POSITION, float2 uv : TEXCOORD0) : COLOR
 {
