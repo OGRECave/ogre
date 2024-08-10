@@ -693,7 +693,7 @@ namespace Ogre {
                     mTextureViewProjMatrix[index] = 
                         Matrix4::CLIPSPACE2DTOIMAGESPACE *
                         mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
-                        mCurrentTextureProjector[index]->getViewMatrix();
+                        mCurrentTextureProjector[index]->Frustum::getViewMatrix();
                 }
                 mTextureViewProjMatrixDirty[index] = false;
             }
