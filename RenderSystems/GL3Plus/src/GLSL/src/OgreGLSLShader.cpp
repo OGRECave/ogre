@@ -315,6 +315,13 @@ namespace Ogre {
         // Assume blocks are missing if gl_Position is missing.
         if (rsc->hasCapability(RSC_GLSL_SSO_REDECLARE) && (mSource.find("vec4 gl_Position") == String::npos))
         {
+            size_t insertPos = belowVersionPos;
+            size_t extensionPos = mSource.rfind("#extension");
+            if(extensionPos != String::npos)
+            {
+                insertPos = mSource.find('\n', extensionPos) + 1;
+            }
+
             size_t mainPos = mSource.find("void main");
             // Only add blocks if shader is not a child
             // shader, i.e. has a main function.
@@ -329,19 +336,19 @@ namespace Ogre {
                     switch (mType)
                     {
                     case GPT_VERTEX_PROGRAM:
-                        mSource.insert(belowVersionPos, outBlock);
+                        mSource.insert(insertPos, outBlock);
                         break;
                     case GPT_GEOMETRY_PROGRAM:
-                        mSource.insert(belowVersionPos, outBlock);
-                        mSource.insert(belowVersionPos, inBlock);
+                        mSource.insert(insertPos, outBlock);
+                        mSource.insert(insertPos, inBlock);
                         break;
                     case GPT_DOMAIN_PROGRAM:
-                        mSource.insert(belowVersionPos, outBlock);
-                        mSource.insert(belowVersionPos, inBlock);
+                        mSource.insert(insertPos, outBlock);
+                        mSource.insert(insertPos, inBlock);
                         break;
                     case GPT_HULL_PROGRAM:
-                        mSource.insert(belowVersionPos, outBlock.substr(0, outBlock.size() - 3) + " gl_out[];\n\n");
-                        mSource.insert(belowVersionPos, inBlock);
+                        mSource.insert(insertPos, outBlock.substr(0, outBlock.size() - 3) + " gl_out[];\n\n");
+                        mSource.insert(insertPos, inBlock);
                         break;
                     case GPT_FRAGMENT_PROGRAM:
                     case GPT_COMPUTE_PROGRAM:
@@ -353,7 +360,7 @@ namespace Ogre {
                 else if(mType == GPT_VERTEX_PROGRAM && mShaderVersion >= 130) // shaderVersion < 150, means we only have vertex shaders
                 {
                 	// TODO: can we have SSO with GLSL < 130?
-                    mSource.insert(belowVersionPos, "out vec4 gl_Position;\nout float gl_PointSize;\nout "+clipDistDecl+"\n\n");
+                    mSource.insert(insertPos, "out vec4 gl_Position;\nout float gl_PointSize;\nout "+clipDistDecl+"\n\n");
                 }
             }
         }
