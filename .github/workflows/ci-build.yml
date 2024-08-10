@@ -7,7 +7,7 @@ on:
     branches: [master]
 jobs:
   linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Install Dependencies
       run: |
@@ -15,9 +15,9 @@ jobs:
         sudo apt install -y libxrandr-dev \
           libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev mesa-vulkan-drivers \
           libfreetype6-dev libpugixml-dev libassimp-dev libbullet-dev qtbase5-dev cargo \
-          nvidia-cg-dev glslang-dev spirv-tools spirv-headers \
+          nvidia-cg-dev glslang-dev spirv-tools spirv-headers libvulkan-volk-dev \
           swig4.0 mono-mcs python3-dev \
-          python3-lxml texlive-binaries texlive-base graphviz doxygen g++-7
+          python3-lxml texlive-binaries texlive-base graphviz doxygen
     - uses: actions/checkout@v4
       with:
         fetch-depth: 2
@@ -26,9 +26,6 @@ jobs:
         cmake -P ci-build.cmake
         cmake --build build -- -j 4
         cmake --build build --target OgreDoc > /dev/null
-      env:  # need to fix warnings on newer compilers first
-        CC: gcc-7
-        CXX: g++-7
     - name: Test
       run: |
         # doxygen warnings check
