@@ -57,7 +57,9 @@ namespace Ogre {
         /// @copydoc FactoryObj::getType
         const String& getType(void) const override;
 
+        //! @cond Doxygen_Suppress
         using ArchiveFactory::createInstance;
+        //! @endcond
 
         Archive *createInstance( const String& name, bool readOnly ) override;
 
