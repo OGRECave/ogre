@@ -118,7 +118,8 @@ particular component/ plugin from being built
 - `OGRE_ASSERT_MODE` allows you to to disable all runtime assertion exceptions or turn them into calls to `std::abort`.
 - `OGRE_RESOURCEMANGER_STRICT` allows you to turn on resource lookup related quirks for pre ogre 1.10 compatibility.
 - `OGRE_NODELESS_POSITIONING` allows to use Lights and Cameras without attaching them to nodes (only for legacy code).
-- `OGRE_GLSUPPORT_USE_WAYLAND` will use Wayland window system instead of X11 on Linux for GL-based RenderSystems.
+- `OGRE_GLSUPPORT_USE_EGL` use EGL instead of GLX/ WGL for GL RenderSystems. This is required for Wayland support.
+- `OGRE_USE_WAYLAND` will use Wayland window system instead of X11 on Linux.
 
 Once you are satisfied, hit
 *Configure* again and then click on *Generate*. CMake will then create

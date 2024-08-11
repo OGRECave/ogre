@@ -24,14 +24,13 @@ if(DEFINED ENV{VULKAN_SDK})
 endif()
 
 if(WIN32)
-    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/volk.c"
-        PROPERTIES COMPILE_DEFINITIONS VK_USE_PLATFORM_WIN32_KHR)
+    target_compile_definitions(RenderSystem_Vulkan PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 elseif(ANDROID)
-    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/volk.c"
-        PROPERTIES COMPILE_DEFINITIONS VK_USE_PLATFORM_ANDROID_KHR)
+    target_compile_definitions(RenderSystem_Vulkan PRIVATE VK_USE_PLATFORM_ANDROID_KHR)
+elseif(OGRE_USE_WAYLAND)
+    target_compile_definitions(RenderSystem_Vulkan PRIVATE VK_USE_PLATFORM_WAYLAND_KHR)
 else()
-    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/volk.c"
-        PROPERTIES COMPILE_DEFINITIONS VK_USE_PLATFORM_XLIB_KHR)
+    target_compile_definitions(RenderSystem_Vulkan PRIVATE VK_USE_PLATFORM_XLIB_KHR)
     target_link_libraries(RenderSystem_Vulkan PRIVATE ${X11_LIBRARIES})
 endif()
 

@@ -13,7 +13,7 @@
 
 if(EGL_FOUND)
   cmake_dependent_option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" TRUE "NOT WIN32" FALSE)
-  cmake_dependent_option(OGRE_GLSUPPORT_USE_WAYLAND "use Wayland window manager" FALSE "UNIX;NOT APPLE;NOT EMSCRIPTEN;NOT ANDROID" FALSE)
+  cmake_dependent_option(OGRE_USE_WAYLAND "use Wayland window manager" FALSE "UNIX;NOT APPLE;NOT EMSCRIPTEN;NOT ANDROID" FALSE)
 endif()
 
 if(ANDROID)
@@ -68,7 +68,7 @@ elseif (UNIX)
     list(APPEND _EGL_HEADERS "include/EGL/*.h")
     list(APPEND _EGL_SOURCES "src/EGL/*.cpp")
     list(APPEND NATIVE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL)
-    if(OGRE_GLSUPPORT_USE_WAYLAND)
+    if(OGRE_USE_WAYLAND)
       list(APPEND _EGL_HEADERS "include/EGL/Wayland/*.h")
       list(APPEND _EGL_SOURCES "src/EGL/Wayland/*.cpp")
       list(APPEND NATIVE_INCLUDES
@@ -99,7 +99,7 @@ elseif (UNIX)
 
     set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${OPENGL_glx_LIBRARY})
   endif()
-  if(NOT OGRE_GLSUPPORT_USE_WAYLAND)
+  if(NOT OGRE_USE_WAYLAND)
     list(APPEND NATIVE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/src/X11/")
   endif()
 endif ()
@@ -132,7 +132,7 @@ target_include_directories(OgreGLSupport PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL>"
     PRIVATE "$<BUILD_INTERFACE:${NATIVE_INCLUDES}>")
 
-  if(OGRE_GLSUPPORT_USE_WAYLAND)
+  if(OGRE_USE_WAYLAND)
     target_compile_definitions(OgreGLSupport PRIVATE OGRE_WAYLAND)
   endif()
 
