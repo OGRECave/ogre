@@ -94,6 +94,8 @@ namespace Ogre
 
         void createSurface(size_t windowHandle);
 
+        void createSurface(size_t wlSurface, size_t wlDisplay);
+
         std::unique_ptr<VulkanRenderPassDescriptor> mRenderPassDescriptor;
 
     public:
