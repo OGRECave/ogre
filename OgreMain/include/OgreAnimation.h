@@ -475,11 +475,11 @@ namespace Ogre {
             be achieved by applying the inverse of this reference keyframe against
             all other keyframes. Since this fundamentally changes the animation, 
             this method just marks the animation as requiring this rebase, which 
-            is performed at the next Animation 'apply' call. This is to allow the
+            is performed at the next @ref Animation::apply call. This is to allow the
             Animation to be re-saved with this flag set, but without having altered
             the keyframes yet, so no data is lost unintentionally. If you wish to
             save the animation after the adjustment has taken place, you can
-            (@see _applyBaseKeyFrame)
+            use @ref _applyBaseKeyFrame
         @param useBaseKeyFrame Whether a base keyframe should be used
         @param keyframeTime The time corresponding to the base keyframe, if any
         @param baseAnimName Optionally a different base animation (must contain the same tracks)
@@ -492,7 +492,7 @@ namespace Ogre {
         /** If a base keyframe is being used, the Animation that provides that keyframe. */
         const String& getBaseKeyFrameAnimationName() const;
         
-        /// Internal method to adjust keyframes relative to a base keyframe (@see setUseBaseKeyFrame) */
+        /// Internal method to adjust keyframes relative to a base keyframe (see @ref setUseBaseKeyFrame)
         void _applyBaseKeyFrame();
         
         void _notifyContainer(AnimationContainer* c);
