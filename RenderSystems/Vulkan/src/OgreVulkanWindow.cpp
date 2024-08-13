@@ -475,7 +475,8 @@ namespace Ogre
         createSurface(mWindowHandle, wlDisplay);
 #else
         OgreAssert( mWindowHandle, "externalWindowHandle required");
-        createSurface(mWindowHandle, wlDisplay);
+        createSurface(mWindowHandle);
+        (void)wlDisplay;
 #endif
 
         auto texMgr = TextureManager::getSingletonPtr();
