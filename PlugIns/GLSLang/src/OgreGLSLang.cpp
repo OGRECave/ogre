@@ -475,6 +475,9 @@ void GLSLangProgram::prepareImpl()
             auto uboName = String(program.getUniformBlockName(blockIdx));
             if(uboName != "OgreUniforms")
             {
+                if(mType == GPT_MESH_PROGRAM || mType == GPT_TASK_PROGRAM)
+                    continue; // SSBOs in mesh shaders are used for vertex buffers
+
                 GpuProgramManager::getSingleton().getSharedParameters(uboName);
                 // TODO: there is no public API to set the binding point and create the correct buffer yet
             }
