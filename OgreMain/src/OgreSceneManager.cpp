@@ -2072,6 +2072,16 @@ Animation* SceneManager::getAnimation(const String& name) const
     }
     return i->second;
 }
+Animation* SceneManager::getAnimation(unsigned short index) const
+{
+    assert( index < mAnimationsList.size() );
+    OGRE_LOCK_MUTEX(mAnimationsListMutex);
+
+    AnimationList::const_iterator i = mAnimationsList.begin();
+    std::advance(i, index);
+    return i->second;
+}
+
 //-----------------------------------------------------------------------
 bool SceneManager::hasAnimation(const String& name) const
 {
@@ -2079,7 +2089,7 @@ bool SceneManager::hasAnimation(const String& name) const
     return (mAnimationsList.find(name) != mAnimationsList.end());
 }
 //-----------------------------------------------------------------------
-void SceneManager::destroyAnimation(const String& name)
+void SceneManager::removeAnimation(const String& name)
 {
     OGRE_LOCK_MUTEX(mAnimationsListMutex);
 
@@ -2089,9 +2099,7 @@ void SceneManager::destroyAnimation(const String& name)
     AnimationList::iterator i = mAnimationsList.find(name);
     if (i == mAnimationsList.end())
     {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-            "Cannot find animation with name " + name, 
-            "SceneManager::getAnimation");
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot find animation with name " + name);
     }
 
     // Free memory

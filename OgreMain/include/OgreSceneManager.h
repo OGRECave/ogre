@@ -39,7 +39,7 @@ Torus Knot Software Ltd.
 #include "OgreCommon.h"
 #include "OgreSceneQuery.h"
 #include "OgreAutoParamDataSource.h"
-#include "OgreAnimationState.h"
+#include "OgreAnimation.h"
 #include "OgreRenderQueue.h"
 #include "OgreRenderQueueSortingGrouping.h"
 #include "OgreResourceGroupManager.h"
@@ -234,7 +234,7 @@ namespace Ogre {
         dependent on the Camera, which will always call back the SceneManager
         which created it to render the scene. 
      */
-    class _OgreExport SceneManager : public SceneMgtAlloc
+    class _OgreExport SceneManager : public AnimationContainer, public SceneMgtAlloc
     {
     public:
         enum QueryTypeMask : uint32
@@ -403,7 +403,6 @@ namespace Ogre {
         friend class SceneMgrQueuedRenderableVisitor;
 
         typedef std::map<String, Camera* > CameraList;
-        typedef std::map<String, Animation*> AnimationList;
         typedef std::map<String, MovableObject*> MovableObjectMap;
         typedef std::map<String, StaticGeometry* > StaticGeometryMap;
     private:
@@ -2191,25 +2190,19 @@ namespace Ogre {
             although this is more useful when performing skeletal animation (see Skeleton::createAnimation).
         @note whilst it uses the same classes, the animations created here are kept separate from the
             skeletal animations of meshes (each Skeleton owns those animations).
-        @param name The name of the animation, must be unique within this SceneManager.
-        @param length The total length of the animation.
-        */
-        Animation* createAnimation(const String& name, Real length);
 
-        /** Looks up an Animation object previously created with createAnimation. 
-        @note Throws an exception if the named instance does not exist
+        @copydetails AnimationContainer::createAnimation
         */
-        Animation* getAnimation(const String& name) const;
-        /** Returns whether an animation with the given name exists.
-        */
-        bool hasAnimation(const String& name) const;
+        Animation* createAnimation(const String& name, Real length) override;
 
-        /** Destroys an Animation. 
 
-            You should ensure that none of your code is referencing this animation objects since the 
-            memory will be freed.
-        */
-        void destroyAnimation(const String& name);
+        Animation* getAnimation(const String& name) const override;
+        bool hasAnimation(const String& name) const override;
+        uint16 getNumAnimations(void) const override { return static_cast<uint16>(mAnimationsList.size()); }
+        Animation* getAnimation(unsigned short index) const override;
+        void removeAnimation(const String& name) override;
+
+        void destroyAnimation(const String& name) { removeAnimation(name); }
 
         /** Removes all animations created using this SceneManager. */
         void destroyAllAnimations(void);

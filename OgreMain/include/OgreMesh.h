@@ -180,7 +180,6 @@ namespace Ogre {
         bool mAutoBuildEdgeLists;
 
         /// Storage of morph animations, lookup by name
-        typedef std::map<String, Animation*> AnimationList;
         AnimationList mAnimationsList;
         /// The vertex animation type associated with the shared vertex data
         mutable VertexAnimationType mSharedVertexDataAnimationType;
@@ -851,18 +850,8 @@ namespace Ogre {
         /// Returns whether animation on shared vertex data includes normals.
         bool getSharedVertexDataAnimationIncludesNormals() const { return mSharedVertexDataAnimationIncludesNormals; }
 
-        /** Creates a new Animation object for vertex animating this mesh. 
-        @param name
-            The name of this animation.
-        @param length
-            The length of the animation in seconds.
-        */
         Animation* createAnimation(const String& name, Real length) override;
 
-        /** Returns the named vertex Animation object. 
-        @param name
-            The name of the animation.
-        */
         Animation* getAnimation(const String& name) const override;
 
         /** Internal access to the named vertex Animation object - returns null 
@@ -872,17 +861,9 @@ namespace Ogre {
         */
         virtual Animation* _getAnimationImpl(const String& name) const;
 
-        /** Returns whether this mesh contains the named vertex animation. */
         bool hasAnimation(const String& name) const override;
-
-        /** Removes vertex Animation from this mesh. */
         void removeAnimation(const String& name) override;
-
-        /** Gets the number of morph animations in this mesh. */
         unsigned short getNumAnimations(void) const override;
-
-        /** Gets a single morph animation by index. 
-        */
         Animation* getAnimation(unsigned short index) const override;
 
         /** Removes all morph Animations from this mesh. */

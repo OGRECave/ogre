@@ -210,8 +210,7 @@ namespace Ogre {
         virtual void reset(bool resetManualBones = false);
 
         /** Creates a new Animation object for animating this skeleton. 
-        @param name The name of this animation
-        @param length The length of the animation in seconds
+        @copydetails AnimationContainer::createAnimation
         */
         Animation* createAnimation(const String& name, Real length) override;
 
@@ -239,10 +238,7 @@ namespace Ogre {
             const LinkedSkeletonAnimationSource** linker = 0) const;
 
 
-        /** Returns whether this skeleton contains the named animation. */
         bool hasAnimation(const String& name) const override;
-
-        /** Removes an Animation from this skeleton. */
         void removeAnimation(const String& name) override;
 
         /** Changes the state of the skeleton to reflect the application of the passed in collection of animations.
@@ -278,7 +274,6 @@ namespace Ogre {
         */
         virtual void _getBoneMatrices(Affine3* pMatrices);
 
-        /** Gets the number of animations on this skeleton. */
         unsigned short getNumAnimations(void) const override;
 
         /** Gets a single animation by index. 
@@ -422,7 +417,6 @@ namespace Ogre {
 
     protected:
         /// Storage of animations, lookup by name
-        typedef std::map<String, Animation*> AnimationList;
         AnimationList mAnimationsList;
     private:
         /// Lookup by bone name

@@ -56,6 +56,8 @@ namespace Ogre {
     class _OgreExport AnimationContainer
     {
     public:
+        typedef std::map<String, Animation*> AnimationList;
+
         virtual ~AnimationContainer() {}
 
         /** Gets the number of animations in this container. */
@@ -64,16 +66,22 @@ namespace Ogre {
         /** Retrieve an animation by index.  */
         virtual Animation* getAnimation(unsigned short index) const = 0;
         
-        /** Retrieve an animation by name. */
+        /** Looks up an Animation object previously created with createAnimation.
+        @note Throws an exception if the named instance does not exist
+        @param name The name of the animation.
+        */
         virtual Animation* getAnimation(const String& name) const = 0;
         
-        /** Create a new animation with a given length owned by this container. */
+        /** Create a new animation with a given length owned by this container
+        @param name The name of the animation, must be unique within this container.
+        @param length The length of the animation in seconds
+        */
         virtual Animation* createAnimation(const String& name, Real length) = 0;
         
         /** Returns whether this object contains the named animation. */
         virtual bool hasAnimation(const String& name) const = 0;
         
-        /** Removes an Animation from this container. */
+        /** Remove & destroy an Animation from this container. */
         virtual void removeAnimation(const String& name) = 0;
         
     };
