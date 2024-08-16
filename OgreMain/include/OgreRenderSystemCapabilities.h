@@ -126,7 +126,7 @@ namespace Ogre
         RSC_POINT_EXTENDED_PARAMETERS = RSC_POINT_SPRITES,
         /// Supports rendering to vertex buffers
         RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 23),
-        /// Supports vertex texture fetch
+        /// @deprecated use getNumVertexTextureUnits()
         RSC_VERTEX_TEXTURE_FETCH = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 24),
         /// Supports mipmap LOD biasing
         RSC_MIPMAP_LOD_BIAS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 25),

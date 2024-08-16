@@ -357,7 +357,7 @@ namespace Ogre
 
         //VTF & HW Instancing must be supported
         if( capabilities->hasCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA ) &&
-            capabilities->hasCapability( RSC_VERTEX_TEXTURE_FETCH ) )
+            capabilities->getNumVertexTextureUnits() )
         {
             //TODO: Check PF_FLOAT32_RGBA is supported (should be, since it was the 1st one)
             const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
