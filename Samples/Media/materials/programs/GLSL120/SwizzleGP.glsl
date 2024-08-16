@@ -1,12 +1,14 @@
-OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
-
-#extension GL_EXT_geometry_shader4 : enable
-
 #ifdef USE_LAYOUT
+#version 150
+#extension GL_EXT_geometry_shader4 : require
+
 out vec4 colour;
 layout(triangles) in;
 layout(line_strip, max_vertices = 6) out;
 #else
+#version 120
+#extension GL_EXT_geometry_shader4 : require
+
 varying out vec4 colour;
 #endif
 
