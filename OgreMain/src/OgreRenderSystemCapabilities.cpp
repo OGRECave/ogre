@@ -63,6 +63,7 @@ namespace Ogre {
         , mMaxPointSize(1)
         , mNonPOW2TexturesLimited(false)
         , mMaxSupportedAnisotropy(0)
+        , mNumVertexTextureUnits(0)
         , mGeometryProgramNumOutputVertices(0)
         , mNumVertexAttributes(1)
     {
@@ -149,6 +150,7 @@ namespace Ogre {
         pLog->logMessage(" * Number of vertex attributes: " + StringConverter::toString(mNumVertexAttributes));
         pLog->logMessage(" * Textures");
         pLog->logMessage("   - Number of texture units: " + StringConverter::toString(mNumTextureUnits));
+        pLog->logMessage("   - Number of vertex textures: " + StringConverter::toString(mNumVertexTextureUnits));
         pLog->logMessage("   - Floating point: " + StringConverter::toString(hasCapability(RSC_TEXTURE_FLOAT), true));
         pLog->logMessage(
             "   - Non-power-of-two: " + StringConverter::toString(hasCapability(RSC_NON_POWER_OF_2_TEXTURES), true) +
@@ -196,12 +198,6 @@ namespace Ogre {
                          StringConverter::toString(hasCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2), true));
         pLog->logMessage("   - 16x3 element types: " +
                             StringConverter::toString(hasCapability(RSC_VERTEX_FORMAT_16X3), true));
-        pLog->logMessage(" * Vertex texture fetch: " +
-                         StringConverter::toString(hasCapability(RSC_VERTEX_TEXTURE_FETCH), true));
-        if (hasCapability(RSC_VERTEX_TEXTURE_FETCH))
-        {
-            pLog->logMessage("   - Max vertex textures: " + StringConverter::toString(mNumVertexTextureUnits));
-        }
         pLog->logMessage(" * Read/Write Buffers: " +
                          StringConverter::toString(hasCapability(RSC_READ_WRITE_BUFFERS), true));
         pLog->logMessage(

@@ -241,7 +241,7 @@ namespace Ogre
 
         // Vertex texture fetch required?
         if (isVertexTextureFetchRequired() && 
-            !caps->hasCapability(RSC_VERTEX_TEXTURE_FETCH))
+            !caps->getNumVertexTextureUnits())
         {
             return false;
         }
