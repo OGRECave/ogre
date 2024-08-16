@@ -780,9 +780,9 @@ Using OGRE’s extensible class structure to animate any value.
 
 # Animation State {#Animation-State}
 
-When an entity containing animation of any type is created, it is given an ’animation state’ object per animation to allow you to specify the animation state of that single entity (you can animate multiple entities using the same animation definitions, OGRE sorts the reuse out internally).
+When an entity with any kind of animation is created, an 'animation state' object is assigned to each animation. This allows you to control both the weight and the time position (where applicable) for applying the animation to that specific entity. You can reuse the same animation definitions across multiple entities, and OGRE handles the internal management of this reuse.
 
-You can retrieve a pointer to the AnimationState object by calling Ogre::Entity::getAnimationState. You can then call methods on this returned object to update the animation, probably in the frameStarted event. Each AnimationState needs to be enabled using the setEnabled method before the animation it refers to will take effect, and you can set both the weight and the time position (where appropriate) to affect the application of the animation using correlating methods. AnimationState also has a very simple method ’addTime’ which allows you to alter the animation position incrementally, and it will automatically loop for you. addTime can take positive or negative values (so you can reverse the animation if you want).
+You can retrieve a pointer to the Ogre::AnimationState object by calling Ogre::Entity::getAnimationState. You can then call methods on this returned object to update the animation, probably in the @c frameStarted event. Each AnimationState needs to be enabled using the @c setEnabled method before the animation it refers to will take effect. AnimationState also has a very simple method @c addTime which allows you to alter the animation position incrementally, and it will automatically loop for you. addTime can take positive or negative values (so you can reverse the animation if you want).
 
 
 # Skeletal Animation {#Skeletal-Animation}
@@ -800,7 +800,7 @@ There are many grades of skeletal animation, and not all engines (or modellers f
 -   A vertex can be assigned to multiple bones and assigned weightings for smoother skinning
 -   Multiple animations can be applied to a mesh at the same time, again with a blend weighting
 
-Skeletons and the animations which go with them are held in .skeleton files, which are produced by the OGRE exporters. These files are loaded automatically when you create an Entity based on a Mesh which is linked to the skeleton in question. You then use @ref Animation-State to set the use of animation on the entity in question.
+Skeletons and the animations which go with them are held in `.skeleton` files, which are produced by the OGRE exporters. These files are loaded automatically when you create an Entity based on a Mesh which is linked to the skeleton in question. You then use @ref Animation-State to set the use of animation on the entity in question.
 
 Skeletal animation can be performed in software, or implemented in shaders (hardware skinning). Clearly the latter is preferable, since it takes some of the work away from the CPU and gives it to the graphics card, and also means that the vertex data does not need to be re-uploaded every frame. This is especially important for large, detailed models. You should try to use hardware skinning wherever possible; this basically means assigning a material which has a vertex program powered technique. See @ref Skeletal-Animation-in-Vertex-Programs for more details. Skeletal animation can be combined with vertex animation, See @ref Combining-Skeletal-and-Vertex-Animation.
 
@@ -808,7 +808,11 @@ Skeletal animation can be performed in software, or implemented in shaders (hard
 
 SceneNode animation is created from the SceneManager in order to animate the movement of SceneNodes, to make any attached objects move around automatically. You can see this performing a camera swoop in the CameraTrack Sample, or controlling how the fish move around in the pond in the Fresnel Sample.
 
-At its heart, scene node animation is mostly the same code which animates the underlying skeleton in skeletal animation. After creating the main Animation using Ogre::SceneManager::createAnimation you can create a NodeAnimationTrack per SceneNode that you want to animate, and create keyframes which control its position, orientation and scale which can be interpolated linearly or via splines. You use @ref Animation-State in the same way as you do for skeletal/vertex animation, except you obtain the state from SceneManager instead of from an individual Entity. Animations are applied automatically every frame, or the state can be applied manually in advance using the \_applySceneAnimations() method on SceneManager. See the API reference for full details of the interface for configuring scene animations.
+At its heart, scene node animation is mostly the same code which animates the underlying skeleton in skeletal animation. After creating the main Animation using Ogre::SceneManager::createAnimation you can create a NodeAnimationTrack per SceneNode that you want to animate, and create keyframes which control its position, orientation and scale which can be interpolated linearly or via splines. You use @ref Animation-State in the same way as you do for skeletal/vertex animation, except you obtain the state from SceneManager instead of from an individual Entity.
+
+@note While AnimationStates are automatically created when an entity is created, you need to manually create them for scene node animations.
+
+AnimationStates are applied automatically every frame, or the state can be applied manually in advance using the Ogre::SceneManager::_applySceneAnimations() method. See the API reference for full details of the interface for configuring scene animations.
 
 # Vertex Animation {#Vertex-Animation}
 
@@ -886,20 +890,18 @@ Skeletal animation and vertex animation (of either subtype) can both be enabled 
 
 Combining the two is, from a user perspective, as simple as just enabling both animations at the same time. When it comes to using this feature efficiently though, there are a few points to bear in mind:
 
--   [Combined Hardware Skinning](#Combined-Hardware-Skinning)
--   [Submesh Splits](#Submesh-Splits)
+### Combined Hardware Skinning {#Combined-Hardware-Skinning}
 
-<a name="Combined-Hardware-Skinning"></a><a name="Combined-Hardware-Skinning-1"></a>
-
-## Combined Hardware Skinning
-
-For complex characters it is a very good idea to implement hardware skinning by including a technique in your materials which has a vertex program which can perform the kinds of animation you are using in hardware. See [Skeletal Animation in Vertex Programs](@ref Skeletal-Animation-in-Vertex-Programs), [Morph Animation in Vertex Programs](@ref Morph-Animation-in-Vertex-Programs), [Pose Animation in Vertex Programs](@ref Pose-Animation-in-Vertex-Programs). 
+For complex characters it is a very good idea to implement hardware skinning by including a technique in your materials which has a vertex program which can perform the kinds of animation you are using in hardware.
 
 When combining animation types, your vertex programs must support both types of animation that the combined mesh needs, otherwise hardware skinning will be disabled. You should implement the animation in the same way that OGRE does, i.e. perform vertex animation first, then apply skeletal animation to the result of that. Remember that the implementation of morph animation passes 2 absolute snapshot buffers of the from & to keyframes, along with a single parametric, which you have to linearly interpolate, whilst pose animation passes the base vertex data plus ’n’ pose offset buffers, and ’n’ parametric weight values. 
 
-<a name="Submesh-Splits"></a><a name="Submesh-Splits-1"></a>
+@see
+- @ref Skeletal-Animation-in-Vertex-Programs
+- @ref Morph-Animation-in-Vertex-Programs
+- @ref Pose-Animation-in-Vertex-Programs
 
-## Submesh Splits
+### Submesh Splits {#Submesh-Splits}
 
 If you only need to combine vertex and skeletal animation for a small part of your mesh, e.g. the face, you could split your mesh into 2 parts, one which needs the combination and one which does not, to reduce the calculation overhead. Note that it will also reduce vertex buffer usage since vertex keyframe / pose buffers will also be smaller. Note that if you use hardware skinning you should then implement 2 separate vertex programs, one which does only skeletal animation, and the other which does skeletal and vertex animation.
 
@@ -911,15 +913,16 @@ Apart from the specific animation types which may well comprise the most common 
 
 ## AnimableObject
 
-Ogre::AnimableObject is an abstract interface that any class can extend in order to provide access to a number of [AnimableValue](#AnimableValue)s. It holds a ’dictionary’ of the available animable properties which can be enumerated via the getAnimableValueNames method, and when its createAnimableValue method is called, it returns a reference to a value object which forms a bridge between the generic animation interfaces, and the underlying specific object property.
+Ogre::AnimableObject is an abstract interface that any class can implement in order to provide advertise that it has animable properties.
+The interface provides methods to list the animable properties, and to create Ogre::AnimableValue objects which can be used to animate those properties.
 
-One example of this is the Ogre::Light class. It extends AnimableObject and provides AnimableValues for properties such as "diffuseColour" and "attenuation". Animation tracks can be created for these values and thus properties of the light can be scripted to change. Other objects, including your custom objects, can extend this interface in the same way to provide animation support to their properties.
+One example of this is the Ogre::Light class. It extends AnimableObject and provides AnimableValues for properties such as @c "diffuseColour" and @c "attenuation". Animation tracks can be created for these values and thus properties of the light can be scripted to change. Other objects, including your custom objects, can extend this interface in the same way to provide animation support to their properties.
 
 <a name="AnimableValue"></a><a name="AnimableValue-1"></a>
 
 ## AnimableValue
 
-When implementing custom animable properties, you have to also implement a number of methods on the AnimableValue interface - basically anything which has been marked as unimplemented. These are not pure virtual methods simply because you only have to implement the methods required for the type of value you’re animating. Again, see the examples in Light to see how this is done.
+When implementing custom animable properties, you have to also implement a number of methods on the Ogre::AnimableValue interface - basically anything which has been marked as unimplemented. These are not pure virtual methods simply because you only have to implement the methods required for the type of value you’re animating. Again, see the examples in Light to see how this is done.
 
 
 @page Instancing Instancing
