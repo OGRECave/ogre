@@ -2055,6 +2055,7 @@ Animation* SceneManager::createAnimation(const String& name, Real length)
     }
 
     Animation* pAnim = OGRE_NEW Animation(name, length);
+    pAnim->_notifyContainer(this);
     mAnimationsList[name] = pAnim;
     return pAnim;
 }
