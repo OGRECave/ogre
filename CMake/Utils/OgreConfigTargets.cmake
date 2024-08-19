@@ -172,7 +172,7 @@ function(ogre_config_lib LIBNAME EXPORT)
   if (OGRE_INSTALL_PDB)
     # install debug pdb files
     if (OGRE_STATIC)
-	  install(FILES ${PROJECT_BINARY_DIR}/lib${OGRE_LIB_DEBUG_PATH}/${LIBNAME}Static_d.pdb
+	  install(FILES ${PROJECT_BINARY_DIR}/lib/Debug/${OGRE_LIB_DEBUG_PATH}/${LIBNAME}Static_d.pdb
 	    DESTINATION ${OGRE_LIB_DIRECTORY}${OGRE_LIB_DEBUG_PATH}
 		CONFIGURATIONS Debug
 	  )
@@ -250,7 +250,7 @@ function(ogre_config_plugin PLUGINNAME)
   if (OGRE_INSTALL_PDB)
     # install debug pdb files
     if (OGRE_STATIC)
-	  install(FILES ${PROJECT_BINARY_DIR}/lib${OGRE_LIB_DEBUG_PATH}/${PLUGINNAME}Static_d.pdb
+	  install(FILES ${PROJECT_BINARY_DIR}/lib/Debug/${OGRE_LIB_DEBUG_PATH}/${PLUGINNAME}Static_d.pdb
 	    DESTINATION ${OGRE_LIB_DIRECTORY}${OGRE_LIB_DEBUG_PATH}/opt
 		CONFIGURATIONS Debug
 	  )
