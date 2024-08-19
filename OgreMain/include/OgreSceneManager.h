@@ -699,10 +699,14 @@ namespace Ogre {
         void firePreUpdateSceneGraph(Camera* camera);
         /// Internal method for firing post update scene graph event
         void firePostUpdateSceneGraph(Camera* camera);
+
+        protected:
         /// Internal method for firing find visible objects event
         void firePreFindVisibleObjects(Viewport* v);
         /// Internal method for firing find visible objects event
         void firePostFindVisibleObjects(Viewport* v);
+
+        private:
         /// Internal method for firing destruction event
         void fireSceneManagerDestroyed();
 
@@ -742,8 +746,12 @@ namespace Ogre {
         /** Flag that indicates if all of the scene node's bounding boxes should be shown as a wireframe. */
         bool mShowBoundingBoxes;
 
+        protected:
+
         /// Utility class for calculating automatic parameters for gpu programs
         std::unique_ptr<AutoParamDataSource> mAutoParamDataSource;
+
+        private:
 
         GpuProgramParametersPtr mFixedFunctionParams;
 
@@ -760,6 +768,8 @@ namespace Ogre {
         void updateDirtyInstanceManagers(void);
 
         void _destroySceneNode(SceneNodeList::iterator it);
+
+        protected:
 
         struct _OgreExport ShadowRenderer
         {
@@ -953,6 +963,8 @@ namespace Ogre {
             void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
             void sortLightsAffectingFrustum(LightList& lightList) const;
         } mShadowRenderer;
+
+        private:
 
         /// Struct for caching light clipping information for re-use in a frame
         struct LightClippingInfo
