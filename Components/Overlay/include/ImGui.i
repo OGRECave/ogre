@@ -21,6 +21,8 @@
 %ignore ImGui::SetTooltipV;
 %ignore ImGui::SetItemTooltipV;
 %ignore ImGuiTextBuffer::appendfv;
+%ignore ImGui::DebugLogV;
+%ignore ImGuiSelectionBasicStorage;
 
 %typemap(in) ImTextureID {
     size_t argp;
