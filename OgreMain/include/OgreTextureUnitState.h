@@ -313,13 +313,13 @@ namespace Ogre {
         */
         struct TextureEffect {
             TextureEffectType type;
-            Real arg1, arg2;
+            float arg1, arg2;
             int subtype;
             WaveformType waveType;
-            Real base;
-            Real frequency;
-            Real phase;
-            Real amplitude;
+            float base;
+            float frequency;
+            float phase;
+            float amplitude;
             ControllerFloat* controller;
             const Frustum* frustum;
         };
@@ -587,31 +587,31 @@ namespace Ogre {
         @param v
             The amount the texture should be moved vertically (v direction).
         */
-        void setTextureScroll(Real u, Real v);
+        void setTextureScroll(float u, float v);
 
         /** As setTextureScroll, but sets only U value.
         */
-        void setTextureUScroll(Real value);
+        void setTextureUScroll(float value);
         /// Get texture uscroll value.
-        Real getTextureUScroll(void) const;
+        float getTextureUScroll(void) const;
 
         /** As setTextureScroll, but sets only V value.
         */
-        void setTextureVScroll(Real value);
+        void setTextureVScroll(float value);
         /// Get texture vscroll value.
-        Real getTextureVScroll(void) const;
+        float getTextureVScroll(void) const;
 
         /** As setTextureScale, but sets only U value.
         */
-        void setTextureUScale(Real value);
+        void setTextureUScale(float value);
         /// Get texture uscale value.
-        Real getTextureUScale(void) const;
+        float getTextureUScale(void) const;
 
         /** As setTextureScale, but sets only V value.
         */
-        void setTextureVScale(Real value);
+        void setTextureVScale(float value);
         /// Get texture vscale value.
-        Real getTextureVScale(void) const;
+        float getTextureVScale(void) const;
 
         /** Sets the scaling factor applied to texture coordinates.
 
@@ -624,7 +624,7 @@ namespace Ogre {
         @param vScale
             The value by which the texture is to be scaled vertically.
         */
-        void setTextureScale(Real uScale, Real vScale);
+        void setTextureScale(float uScale, float vScale);
 
         /** Sets the anticlockwise rotation factor applied to texture coordinates.
 
@@ -894,7 +894,7 @@ namespace Ogre {
         @param vSpeed
             The number of vertical loops per second (+ve=moving up, -ve= moving down).
         */
-        void setScrollAnimation(Real uSpeed, Real vSpeed);
+        void setScrollAnimation(float uSpeed, float vSpeed);
 
         /** Sets up an animated texture rotation for this layer.
 
@@ -902,7 +902,7 @@ namespace Ogre {
         @param speed
             The number of complete anticlockwise revolutions per second (use -ve for clockwise)
         */
-        void setRotateAnimation(Real speed);
+        void setRotateAnimation(float speed);
 
         /** Sets up a general time-relative texture modification effect.
 
@@ -922,7 +922,7 @@ namespace Ogre {
             Scales the output so that instead of lying within 0..1 it lies within 0..1*amplitude for exaggerated effects.
         */
         void setTransformAnimation( const TextureTransformType ttype,
-            const WaveformType waveType, Real base = 0, Real frequency = 1, Real phase = 0, Real amplitude = 1 );
+            const WaveformType waveType, float base = 0, float frequency = 1, float phase = 0, float amplitude = 1 );
 
 
         /** Enables or disables projective texturing on this texture unit.
@@ -1077,8 +1077,8 @@ private:
 
         LayerBlendModeEx mAlphaBlendMode;
         Real mGamma;
-        Real mUMod, mVMod;
-        Real mUScale, mVScale;
+        float mUMod, mVMod;
+        float mUScale, mVScale;
         Radian mRotate;
         mutable Matrix4 mTexModMatrix;
 
