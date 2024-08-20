@@ -1170,6 +1170,16 @@ namespace Ogre {
         }
 
     }
+    const Frustum* TextureUnitState::getProjectiveTexturingFrustum() const
+    {
+        EffectMap::const_iterator i = mEffects.find(ET_PROJECTIVE_TEXTURE);
+        if (i != mEffects.end())
+        {
+            return i->second.frustum;
+        }
+
+        return 0;
+    }
     //-----------------------------------------------------------------------
     void TextureUnitState::setName(const String& name)
     {

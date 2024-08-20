@@ -812,10 +812,9 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
         {
             // Manually set texture projector for shaders if present
             // This won't get set any other way if using manual projection
-            auto effi = pTex->getEffects().find(TextureUnitState::ET_PROJECTIVE_TEXTURE);
-            if (effi != pTex->getEffects().end())
+            if (auto frustum = pTex->getProjectiveTexturingFrustum())
             {
-                mAutoParamDataSource->setTextureProjector(effi->second.frustum, unit);
+                mAutoParamDataSource->setTextureProjector(frustum, unit);
             }
         }
         if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)

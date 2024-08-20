@@ -947,6 +947,10 @@ namespace Ogre {
         */
         void setProjectiveTexturing(bool enabled, const Frustum* projectionSettings = 0);
 
+        /** Gets the Frustum which is being used to derive projective texturing parameters.
+        */
+        const Frustum* getProjectiveTexturingFrustum(void) const;
+
         /** Removes all effects applied to this texture layer.
         */
         void removeAllEffects(void);

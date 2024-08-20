@@ -444,8 +444,7 @@ namespace Ogre {
         auto calcMode = tl._deriveTexCoordCalcMethod();
         if(calcMode == TEXCALC_PROJECTIVE_TEXTURE)
         {
-            auto frustum = tl.getEffects().find(TextureUnitState::ET_PROJECTIVE_TEXTURE)->second.frustum;
-            _setTextureCoordCalculation(texUnit, calcMode, frustum);
+            _setTextureCoordCalculation(texUnit, calcMode, tl.getProjectiveTexturingFrustum());
         }
         else
         {
