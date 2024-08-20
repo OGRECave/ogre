@@ -313,8 +313,8 @@ namespace Ogre {
         */
         struct TextureEffect {
             TextureEffectType type;
-            int subtype;
             Real arg1, arg2;
+            int subtype;
             WaveformType waveType;
             Real base;
             Real frequency;
@@ -547,6 +547,8 @@ namespace Ogre {
         void setUnorderedAccessMipLevel(int mipLevel) { mUnorderedAccessMipLevel = mipLevel; }
         int getUnorderedAccessMipLevel() const { return mUnorderedAccessMipLevel; }
 
+        /// @name Texture coordinate transformation
+        /// @{
         /** Sets a matrix used to transform any texture coordinates on this layer.
 
             Texture coordinates can be modified on a texture layer to create effects like scrolling
@@ -633,6 +635,7 @@ namespace Ogre {
         void setTextureRotate(const Radian& angle);
         /// Get texture rotation effects angle value.
         const Radian& getTextureRotate(void) const;
+        /// @}
 
         /// get the associated sampler
         const SamplerPtr& getSampler() const { return mSampler; }
@@ -847,6 +850,8 @@ namespace Ogre {
             Real arg2 = 1.0,
             Real manualBlend = 0.0);
 
+        /// @name Dynamic texture coordinate generation
+        /// @{
         /** Generic method for setting up texture effects.
 
             Allows you to specify effects directly by using the #TextureEffectType enumeration. The
@@ -856,7 +861,7 @@ namespace Ogre {
             This method is used internally by Ogre but it is better generally for applications to use the
             more intuitive specialised methods such as #setEnvironmentMap and #setTextureScroll.
         */
-        void addEffect(TextureEffect& effect);
+        void addEffect(TextureEffect effect);
 
         /** Turns on/off texture coordinate effect that makes this layer an environment map.
 
@@ -953,6 +958,10 @@ namespace Ogre {
         */
         void removeEffect( const TextureEffectType type );
 
+        /// Get texture effects in a multimap paired array.
+        const EffectMap& getEffects(void) const;
+        /// @}
+
         /** Determines if this texture layer is currently blank.
         @note
             This can happen if a texture fails to load or some other non-fatal error. Worth checking after
@@ -972,8 +981,6 @@ namespace Ogre {
         */
         void retryTextureLoad() { mTextureLoadFailed = false; }
 
-        /// Get texture effects in a multimap paired array.
-        const EffectMap& getEffects(void) const;
         /// Get the animated-texture animation duration.
         Real getAnimationDuration(void) const;
 

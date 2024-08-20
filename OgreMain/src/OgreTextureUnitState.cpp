@@ -593,17 +593,12 @@ namespace Ogre {
         mAlphaBlendMode.factor = manualBlend;
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::addEffect(TextureEffect& effect)
+    void TextureUnitState::addEffect(TextureEffect effect)
     {
         // Ensure controller pointer is null
         effect.controller = 0;
 
-        if (effect.type == ET_ENVIRONMENT_MAP 
-            || effect.type == ET_UVSCROLL
-            || effect.type == ET_USCROLL
-            || effect.type == ET_VSCROLL
-            || effect.type == ET_ROTATE
-            || effect.type == ET_PROJECTIVE_TEXTURE)
+        if (effect.type != ET_TRANSFORM)
         {
             // Replace - must be unique
             // Search for existing effect of this type
@@ -678,9 +673,7 @@ namespace Ogre {
     {
         if (enable)
         {
-            TextureEffect eff;
-            eff.type = ET_ENVIRONMENT_MAP;
-
+            TextureEffect eff = {ET_ENVIRONMENT_MAP};
             eff.subtype = envMapType;
             addEffect(eff);
         }
@@ -824,34 +817,27 @@ namespace Ogre {
         removeEffect(ET_VSCROLL);
 
         // don't create an effect if the speeds are both 0
-        if(uSpeed == 0.0f && vSpeed == 0.0f) 
+        if (uSpeed == 0.0f && vSpeed == 0.0f)
         {
-          return;
+            return;
         }
 
         // Create new effect
-        TextureEffect eff;
-    if(uSpeed == vSpeed) 
-    {
-        eff.type = ET_UVSCROLL;
-        eff.arg1 = uSpeed;
-        addEffect(eff);
-    }
-    else
-    {
-        if(uSpeed)
+        if (uSpeed == vSpeed)
         {
-            eff.type = ET_USCROLL;
-        eff.arg1 = uSpeed;
-        addEffect(eff);
-    }
-        if(vSpeed)
-        {
-            eff.type = ET_VSCROLL;
-            eff.arg1 = vSpeed;
-            addEffect(eff);
+            addEffect({ET_UVSCROLL, uSpeed});
         }
-    }
+        else
+        {
+            if (uSpeed)
+            {
+                addEffect({ET_USCROLL, uSpeed});
+            }
+            if (vSpeed)
+            {
+                addEffect({ET_VSCROLL, vSpeed});
+            }
+        }
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setRotateAnimation(Real speed)
@@ -864,10 +850,7 @@ namespace Ogre {
           return;
         }
         // Create new effect
-        TextureEffect eff;
-        eff.type = ET_ROTATE;
-        eff.arg1 = speed;
-        addEffect(eff);
+        addEffect({ET_ROTATE, speed});
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTransformAnimation(TextureTransformType ttype,
@@ -892,14 +875,13 @@ namespace Ogre {
             }
         }
 
-    // don't create an effect if the given values are all 0
-    if(base == 0.0f && phase == 0.0f && frequency == 0.0f && amplitude == 0.0f) 
-    {
-      return;
-    }
+        // don't create an effect if the given values are all 0
+        if(base == 0.0f && phase == 0.0f && frequency == 0.0f && amplitude == 0.0f)
+        {
+            return;
+        }
         // Create new effect
-        TextureEffect eff;
-        eff.type = ET_TRANSFORM;
+        TextureEffect eff = {ET_TRANSFORM};
         eff.subtype = ttype;
         eff.waveType = waveType;
         eff.base = base;
@@ -1086,9 +1068,8 @@ namespace Ogre {
             effect.controller = cMgr.createTextureWaveTransformer(this, (TextureUnitState::TextureTransformType)effect.subtype, effect.waveType, effect.base,
                 effect.frequency, effect.phase, effect.amplitude);
             break;
+        case ET_PROJECTIVE_TEXTURE:
         case ET_ENVIRONMENT_MAP:
-            break;
-        default:
             break;
         }
     }
@@ -1179,8 +1160,7 @@ namespace Ogre {
     {
         if (enable)
         {
-            TextureEffect eff;
-            eff.type = ET_PROJECTIVE_TEXTURE;
+            TextureEffect eff = {ET_PROJECTIVE_TEXTURE};
             eff.frustum = projectionSettings;
             addEffect(eff);
         }
