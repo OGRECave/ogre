@@ -712,14 +712,14 @@ namespace Ogre {
         mRecalcTexMatrix = false;
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureScroll(Real u, Real v)
+    void TextureUnitState::setTextureScroll(float u, float v)
     {
         mUMod = u;
         mVMod = v;
         mRecalcTexMatrix = true;
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureScale(Real uScale, Real vScale)
+    void TextureUnitState::setTextureScale(float uScale, float vScale)
     {
         mUScale = uScale;
         mVScale = vScale;
@@ -785,31 +785,31 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureUScroll(Real value)
+    void TextureUnitState::setTextureUScroll(float value)
     {
         mUMod = value;
         mRecalcTexMatrix = true;
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureVScroll(Real value)
+    void TextureUnitState::setTextureVScroll(float value)
     {
         mVMod = value;
         mRecalcTexMatrix = true;
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureUScale(Real value)
+    void TextureUnitState::setTextureUScale(float value)
     {
         mUScale = value;
         mRecalcTexMatrix = true;
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setTextureVScale(Real value)
+    void TextureUnitState::setTextureVScale(float value)
     {
         mVScale = value;
         mRecalcTexMatrix = true;
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setScrollAnimation(Real uSpeed, Real vSpeed)
+    void TextureUnitState::setScrollAnimation(float uSpeed, float vSpeed)
     {
         // Remove existing effects
         removeEffect(ET_UVSCROLL);
@@ -840,7 +840,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setRotateAnimation(Real speed)
+    void TextureUnitState::setRotateAnimation(float speed)
     {
         // Remove existing effect
         removeEffect(ET_ROTATE);
@@ -854,7 +854,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTransformAnimation(TextureTransformType ttype,
-        WaveformType waveType, Real base, Real frequency, Real phase, Real amplitude)
+        WaveformType waveType, float base, float frequency, float phase, float amplitude)
     {
         // Remove existing effect
         // note, only remove for subtype, not entire ET_TRANSFORM
@@ -1074,25 +1074,25 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Real TextureUnitState::getTextureUScroll(void) const
+    float TextureUnitState::getTextureUScroll(void) const
     {
         return mUMod;
     }
 
     //-----------------------------------------------------------------------
-    Real TextureUnitState::getTextureVScroll(void) const
+    float TextureUnitState::getTextureVScroll(void) const
     {
         return mVMod;
     }
 
     //-----------------------------------------------------------------------
-    Real TextureUnitState::getTextureUScale(void) const
+    float TextureUnitState::getTextureUScale(void) const
     {
         return mUScale;
     }
 
     //-----------------------------------------------------------------------
-    Real TextureUnitState::getTextureVScale(void) const
+    float TextureUnitState::getTextureVScale(void) const
     {
         return mVScale;
     }
