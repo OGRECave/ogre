@@ -555,9 +555,8 @@ namespace Ogre {
             @param
                 recursive If the resource location has a concept of recursive
                 directory traversal, enabling this option will mean you can load
-                resources in subdirectories using only their unqualified name.
-                The default is to disable this so that resources in subdirectories
-                with the same name are still unique.
+                resources in subdirectories using their qualified name.
+                The default is to ignore subdirectories which results in "flat" resource names.
             @param readOnly whether the Archive is read only
             @see @ref Resource-Management
         */
