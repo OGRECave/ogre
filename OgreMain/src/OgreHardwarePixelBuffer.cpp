@@ -191,4 +191,10 @@ namespace Ogre
             mSliceTRT[zoffset] = NULL;
     }
 
+
+    String HardwarePixelBuffer::getNameForRenderTexture(const String& parentName) const
+    {
+        // we need to add the pointer value, as the parent texture can have multiple slices or faces
+        return StringUtil::format("%s:buf%p", parentName.c_str(), this);
+    }
 }

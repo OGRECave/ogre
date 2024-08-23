@@ -985,8 +985,7 @@ void D3D9HardwarePixelBuffer::updateRenderTexture(bool writeGamma, uint fsaa, co
 {
     if (mSliceTRT.empty())
     {
-        String name;
-        name = "rtt/" +Ogre::StringConverter::toString((size_t)this) + "/" + srcName;
+        String name = getNameForRenderTexture(srcName);
 
         mSliceTRT.push_back(OGRE_NEW D3D9RenderTexture(name, this, writeGamma, fsaa));
         Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[0]);
