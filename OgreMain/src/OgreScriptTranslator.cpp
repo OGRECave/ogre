@@ -4790,18 +4790,24 @@ namespace Ogre{
 
 
                         // No errors, create
-                        CompositionTechnique::TextureDefinition *def = mTechnique->createTextureDefinition(atom0->value);
-                        def->width = width;
-                        def->height = height;
-                        def->type = type;
-                        def->widthFactor = widthFactor;
-                        def->heightFactor = heightFactor;
-                        def->formatList = formats;
-                        def->fsaa = fsaa;
-                        def->hwGammaWrite = hwGammaWrite;
-                        def->depthBufferId = depthBufferId;
-                        def->pooled = pooled;
-                        def->scope = scope;
+                        try {
+                            CompositionTechnique::TextureDefinition *def = mTechnique->createTextureDefinition(atom0->value);
+                            def->width = width;
+                            def->height = height;
+                            def->type = type;
+                            def->widthFactor = widthFactor;
+                            def->heightFactor = heightFactor;
+                            def->formatList = formats;
+                            def->fsaa = fsaa;
+                            def->hwGammaWrite = hwGammaWrite;
+                            def->depthBufferId = depthBufferId;
+                            def->pooled = pooled;
+                            def->scope = scope;
+                        }
+                        catch (Exception &e)
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, e.getDescription());
+                        }
                     }
                     break;
                 case ID_TEXTURE_REF:
