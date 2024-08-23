@@ -187,11 +187,9 @@ namespace Ogre {
         void writeLayerBlendOperationEx(const LayerBlendOperationEx op);
         void writeLayerBlendSource(const LayerBlendSource lbs);
         
-        typedef std::multimap<TextureUnitState::TextureEffectType, TextureUnitState::TextureEffect> EffectMap;
-
         void writeRotationEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
         void writeTransformEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
-        void writeScrollEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
+        void writeScrollEffect(float scrollAnimU, float scrollAnimV);
         void writeEnvironmentMapEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
 
         String convertFiltering(FilterOptions fo);

@@ -1059,45 +1059,37 @@ namespace Ogre
             float scrollAnimU = 0;
             float scrollAnimV = 0;
 
-            EffectMap effMap = pTex->getEffects();
-            if (!effMap.empty())
+            for (const auto& it : pTex->getEffects())
             {
-                EffectMap::const_iterator it;
-                for (it = effMap.begin(); it != effMap.end(); ++it)
+                const TextureUnitState::TextureEffect& ef = it.second;
+                switch (ef.type)
                 {
-                    const TextureUnitState::TextureEffect& ef = it->second;
-                    switch (ef.type)
-                    {
-                    case TextureUnitState::ET_ENVIRONMENT_MAP :
-                        writeEnvironmentMapEffect(ef, pTex);
-                        break;
-                    case TextureUnitState::ET_ROTATE :
-                        writeRotationEffect(ef, pTex);
-                        break;
-                    case TextureUnitState::ET_UVSCROLL :
-                        scrollAnimU = scrollAnimV = ef.arg1;
-                        break;
-                    case TextureUnitState::ET_USCROLL :
-                        scrollAnimU = ef.arg1;
-                        break;
-                    case TextureUnitState::ET_VSCROLL :
-                        scrollAnimV = ef.arg1;
-                        break;
-                    case TextureUnitState::ET_TRANSFORM :
-                        writeTransformEffect(ef, pTex);
-                        break;
-                    default:
-                        break;
-                    }
+                case TextureUnitState::ET_ENVIRONMENT_MAP :
+                    writeEnvironmentMapEffect(ef, pTex);
+                    break;
+                case TextureUnitState::ET_ROTATE :
+                    writeRotationEffect(ef, pTex);
+                    break;
+                case TextureUnitState::ET_UVSCROLL :
+                    scrollAnimU = scrollAnimV = ef.arg1;
+                    break;
+                case TextureUnitState::ET_USCROLL :
+                    scrollAnimU = ef.arg1;
+                    break;
+                case TextureUnitState::ET_VSCROLL :
+                    scrollAnimV = ef.arg1;
+                    break;
+                case TextureUnitState::ET_TRANSFORM :
+                    writeTransformEffect(ef, pTex);
+                    break;
+                default:
+                    break;
                 }
             }
 
             // u and v scroll animation speeds merged, if present serialize scroll_anim
             if(scrollAnimU || scrollAnimV) {
-                TextureUnitState::TextureEffect texEffect;
-                texEffect.arg1 = scrollAnimU;
-                texEffect.arg2 = scrollAnimV;
-                writeScrollEffect(texEffect, pTex);
+                writeScrollEffect(scrollAnimU, scrollAnimV);
             }
 
             // Content type
@@ -1212,15 +1204,11 @@ namespace Ogre
         writeValue(StringConverter::toString(effect.amplitude));
     }
     //-----------------------------------------------------------------------
-    void MaterialSerializer::writeScrollEffect(
-        const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex)
+    void MaterialSerializer::writeScrollEffect(float scrollAnimU, float scrollAnimV)
     {
-        if (effect.arg1 || effect.arg2)
-        {
-            writeAttribute(4, "scroll_anim");
-            writeValue(StringConverter::toString(effect.arg1));
-            writeValue(StringConverter::toString(effect.arg2));
-        }
+        writeAttribute(4, "scroll_anim");
+        writeValue(StringConverter::toString(scrollAnimU));
+        writeValue(StringConverter::toString(scrollAnimV));
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeSceneBlendFactor(const SceneBlendFactor sbf)
