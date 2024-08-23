@@ -166,10 +166,10 @@ namespace Ogre {
 
         //TODO GSOC : These typedefs are duplicated from CompositorInstance. Solve?
         /// Map from name->local texture
-        typedef std::map<String,TexturePtr> GlobalTextureMap;
+        typedef std::unordered_map<String,TexturePtr> GlobalTextureMap;
         GlobalTextureMap mGlobalTextures;
         /// Store a list of MRTs we've created
-        typedef std::map<String,MultiRenderTarget*> GlobalMRTMap;
+        typedef std::unordered_map<String,MultiRenderTarget*> GlobalMRTMap;
         GlobalMRTMap mGlobalMRTs;
     };
     /** @} */

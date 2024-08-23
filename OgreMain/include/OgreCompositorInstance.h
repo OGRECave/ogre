@@ -327,10 +327,10 @@ namespace Ogre {
         /// Is this instance allocating resources?
         bool mAlive;
         /// Map from name->local texture.
-        typedef std::map<String,TexturePtr> LocalTextureMap;
+        typedef std::unordered_map<String,TexturePtr> LocalTextureMap;
         LocalTextureMap mLocalTextures;
         /// Store a list of MRTs we've created.
-        typedef std::map<String,MultiRenderTarget*> LocalMRTMap;
+        typedef std::unordered_map<String,MultiRenderTarget*> LocalMRTMap;
         LocalMRTMap mLocalMRTs;
         typedef std::map<CompositionTechnique::TextureDefinition*, TexturePtr> ReserveTextureMap;
         /** Textures that are not currently in use, but that we want to keep for now,
