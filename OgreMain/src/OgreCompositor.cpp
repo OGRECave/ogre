@@ -157,7 +157,6 @@ CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName
 //-----------------------------------------------------------------------
 void Compositor::createGlobalTextures()
 {
-    static size_t dummyCounter = 0;
     if (mSupportedTechniques.empty())
         return;
 
@@ -184,14 +183,14 @@ void Compositor::createGlobalTextures()
 
             //TODO GSOC : Heavy copy-pasting from CompositorInstance. How to we solve it?
 
+            // unique, even without dummyCounter, as these are global
+            String baseName = StringUtil::format("%s.%s", def->name.c_str(), mName.c_str());
+
             /// Make the tetxure
             RenderTarget* rendTarget;
             if (def->formatList.size() > 1)
             {
-                String MRTbaseName = "mrt/c" + StringConverter::toString(dummyCounter++) +
-                    "/" + mName + "/" + def->name;
-                MultiRenderTarget* mrt =
-                    Root::getSingleton().getRenderSystem()->createMultiRenderTarget(MRTbaseName);
+                MultiRenderTarget* mrt = Root::getSingleton().getRenderSystem()->createMultiRenderTarget(baseName);
                 mGlobalMRTs[def->name] = mrt;
 
                 // create and bind individual surfaces
@@ -200,7 +199,7 @@ void Compositor::createGlobalTextures()
                     p != def->formatList.end(); ++p, ++atch)
                 {
 
-                    String texname = MRTbaseName + "/" + StringConverter::toString(atch);
+                    String texname = StringUtil::format("mrt%zu.%s", atch, baseName.c_str());
                     TexturePtr tex;
 
                     tex = TextureManager::getSingleton().createManual(
@@ -223,8 +222,7 @@ void Compositor::createGlobalTextures()
             }
             else
             {
-                String texName =  "c" + StringConverter::toString(dummyCounter++) +
-                    "/" + mName + "/" + def->name;
+                String texName = baseName;
 
                 // space in the name mixup the cegui in the compositor demo
                 // this is an auto generated name - so no spaces can't hart us.

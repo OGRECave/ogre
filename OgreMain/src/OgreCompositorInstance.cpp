@@ -684,23 +684,24 @@ void CompositorInstance::createResources(bool forResizeOnly)
                 fsaaHint = BLANKSTRING;
             }
             hwGamma = hwGamma || def->hwGammaWrite;
-            
+
+            // need dummy counter as there may be multiple definitions with the same name in the chain
+            String baseName = StringUtil::format("%s.chain%zu.%s", def->name.c_str(), dummyCounter++,
+                                                 mChain->getViewport()->getTarget()->getName().c_str());
+
             /// Make the tetxure
             if (def->formatList.size() > 1)
             {
-                String MRTbaseName = "mrt/c" + StringConverter::toString(dummyCounter++) + 
-                "/" + def->name + "/" + mChain->getViewport()->getTarget()->getName();
-                MultiRenderTarget* mrt = 
-                Root::getSingleton().getRenderSystem()->createMultiRenderTarget(MRTbaseName);
+                MultiRenderTarget* mrt = Root::getSingleton().getRenderSystem()->createMultiRenderTarget(baseName);
                 mLocalMRTs[def->name] = mrt;
-                
+
                 // create and bind individual surfaces
                 size_t atch = 0;
                 for (PixelFormatList::iterator p = def->formatList.begin(); 
                      p != def->formatList.end(); ++p, ++atch)
                 {
                     
-                    String texname = MRTbaseName + "/" + StringConverter::toString(atch);
+                    String texname = StringUtil::format("mrt%zu.%s", atch, baseName.c_str());
                     String mrtLocalName = getMRTTexLocalName(def->name, atch);
                     TexturePtr tex;
                     if (def->pooled)
@@ -733,9 +734,8 @@ void CompositorInstance::createResources(bool forResizeOnly)
             }
             else
             {
-                String texName =  "c" + StringConverter::toString(dummyCounter++) + 
-                "/" + def->name + "/" + mChain->getViewport()->getTarget()->getName();
-                
+                String texName = baseName;
+
                 // space in the name mixup the cegui in the compositor demo
                 // this is an auto generated name - so no spaces can't hart us.
                 std::replace( texName.begin(), texName.end(), ' ', '_' ); 
@@ -882,7 +882,7 @@ void CompositorInstance::deriveTextureRenderTargetOptions(
 //---------------------------------------------------------------------
 String CompositorInstance::getMRTTexLocalName(const String& baseName, size_t attachment)
 {
-    return StringUtil::format("%s/%zu", baseName.c_str(), attachment);
+    return StringUtil::format("mrt%zu.%s", attachment, baseName.c_str());
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveTextures)
