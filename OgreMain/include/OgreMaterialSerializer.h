@@ -187,10 +187,10 @@ namespace Ogre {
         void writeLayerBlendOperationEx(const LayerBlendOperationEx op);
         void writeLayerBlendSource(const LayerBlendSource lbs);
         
-        void writeRotationEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
+        void writeRotationEffect(float speed);
         void writeTransformEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
         void writeScrollEffect(float scrollAnimU, float scrollAnimV);
-        void writeEnvironmentMapEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
+        void writeEnvironmentMapEffect(int type);
 
         String convertFiltering(FilterOptions fo);
 

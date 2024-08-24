@@ -1065,10 +1065,10 @@ namespace Ogre
                 switch (ef.type)
                 {
                 case TextureUnitState::ET_ENVIRONMENT_MAP :
-                    writeEnvironmentMapEffect(ef, pTex);
+                    writeEnvironmentMapEffect(ef.subtype);
                     break;
                 case TextureUnitState::ET_ROTATE :
-                    writeRotationEffect(ef, pTex);
+                    writeRotationEffect(ef.arg1);
                     break;
                 case TextureUnitState::ET_UVSCROLL :
                     scrollAnimU = scrollAnimV = ef.arg1;
@@ -1124,32 +1124,35 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void MaterialSerializer::writeEnvironmentMapEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex)
+    void MaterialSerializer::writeEnvironmentMapEffect(int type)
     {
         writeAttribute(4, "env_map");
-        switch (effect.subtype)
+        switch (type)
         {
-        case TextureUnitState::ENV_PLANAR:
+        case TEXCALC_ENVIRONMENT_MAP_PLANAR:
             writeValue("planar");
             break;
-        case TextureUnitState::ENV_CURVED:
+        case TEXCALC_ENVIRONMENT_MAP:
             writeValue("spherical");
             break;
-        case TextureUnitState::ENV_NORMAL:
+        case TEXCALC_ENVIRONMENT_MAP_NORMAL:
             writeValue("cubic_normal");
             break;
-        case TextureUnitState::ENV_REFLECTION:
+        case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
             writeValue("cubic_reflection");
+            break;
+        default:
+            OgreAssert(false, "Unknown environment map type");
             break;
         }
     }
     //-----------------------------------------------------------------------
-    void MaterialSerializer::writeRotationEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex)
+    void MaterialSerializer::writeRotationEffect(float speed)
     {
-        if (effect.arg1)
+        if (speed)
         {
             writeAttribute(4, "rotate_anim");
-            writeValue(StringConverter::toString(effect.arg1));
+            writeValue(StringConverter::toString(speed));
         }
     }
     //-----------------------------------------------------------------------
