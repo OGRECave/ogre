@@ -4784,7 +4784,8 @@ namespace Ogre{
                         }
                         if (!widthSet || !heightSet || !formatSet)
                         {
-                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "texture definition must specify width, height, and format");
                             return;
                         }
 
