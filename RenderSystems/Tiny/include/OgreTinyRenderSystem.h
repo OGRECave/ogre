@@ -8,6 +8,7 @@
 
 #include "OgreRenderWindow.h"
 #include "OgreRenderSystem.h"
+#include "OgreImage.h"
 
 namespace Ogre {
     /** \addtogroup RenderSystems RenderSystems

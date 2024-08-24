@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderSubRenderState.h"
+#include "OgreTextureUnitState.h"
 
 #define TAS_MAX_TEXTURES 4
 namespace Ogre {

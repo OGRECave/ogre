@@ -194,6 +194,7 @@ typedef uint8_t uint8;
 %ignore Ogre::GpuConstantType;
 %ignore Ogre::GpuProgramParameters::ElementType;
 %ignore Ogre::Capabilities;
+%ignore Ogre::TextureUnitState::EnvMapType;
 %typemap(csbase) Ogre::SceneManager::QueryTypeMask "uint";
 %csmethodmodifiers *::ToString "public override";
 // wrong "override" because of multiple inheritance

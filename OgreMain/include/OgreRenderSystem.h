@@ -31,8 +31,8 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
-#include "OgreTextureUnitState.h"
 #include "OgreCommon.h"
+#include "OgreBlendMode.h"
 
 #include "OgreRenderSystemCapabilities.h"
 #include "OgreConfigOptionMap.h"
@@ -43,6 +43,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    class Sampler;
+    class TextureUnitState;
+
     /** \addtogroup Core
     *  @{
     */
@@ -61,11 +64,13 @@ namespace Ogre
     {
         /// No calculated texture coordinates
         TEXCALC_NONE,
-        /// Environment map based on vertex normals
+        /// 2D texture coordinates using spherical reflection mapping based on vertex normals.
         TEXCALC_ENVIRONMENT_MAP,
-        /// Environment map based on vertex positions
+        /// 2D texture coordinates using view space position. Same as #TEXCALC_ENVIRONMENT_MAP on all backends.
         TEXCALC_ENVIRONMENT_MAP_PLANAR,
+        /// 3D texture coordinates using the reflection vector.
         TEXCALC_ENVIRONMENT_MAP_REFLECTION,
+        /// 3D texture coordinates using the normal vector.
         TEXCALC_ENVIRONMENT_MAP_NORMAL,
         /// Projective texture
         TEXCALC_PROJECTIVE_TEXTURE

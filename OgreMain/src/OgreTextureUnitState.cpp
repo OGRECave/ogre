@@ -669,7 +669,7 @@ namespace Ogre {
         return mAlphaBlendMode;
     }
     //-----------------------------------------------------------------------
-    void TextureUnitState::setEnvironmentMap(bool enable, EnvMapType envMapType)
+    void TextureUnitState::setEnvironmentMap(bool enable, int envMapType)
     {
         if (enable)
         {
@@ -1226,22 +1226,7 @@ namespace Ogre {
             switch (effi.second.type)
             {
             case ET_ENVIRONMENT_MAP:
-                if (effi.second.subtype == ENV_CURVED)
-                {
-                    texCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP;
-                }
-                else if (effi.second.subtype == ENV_PLANAR)
-                {
-                    texCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP_PLANAR;
-                }
-                else if (effi.second.subtype == ENV_REFLECTION)
-                {
-                    texCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP_REFLECTION;
-                }
-                else if (effi.second.subtype == ENV_NORMAL)
-                {
-                    texCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP_NORMAL;
-                }
+                texCoordCalcMethod = (TexCoordCalcMethod)effi.second.subtype;
                 break;
             case ET_UVSCROLL:
             case ET_USCROLL:
