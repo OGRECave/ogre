@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreHardwareBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreTexture.h"
 
 namespace Ogre 
 {

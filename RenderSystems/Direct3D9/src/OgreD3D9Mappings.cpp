@@ -85,13 +85,13 @@ namespace Ogre
     {
         switch( tam )
         {
-        case TextureUnitState::TAM_WRAP:
+        case TAM_WRAP:
             return D3DTADDRESS_WRAP;
-        case TextureUnitState::TAM_MIRROR:
+        case TAM_MIRROR:
             return D3DTADDRESS_MIRROR;
-        case TextureUnitState::TAM_CLAMP:
+        case TAM_CLAMP:
             return D3DTADDRESS_CLAMP;
-        case TextureUnitState::TAM_BORDER:
+        case TAM_BORDER:
             if (devCaps.TextureAddressCaps & D3DPTADDRESSCAPS_BORDER)
                 return D3DTADDRESS_BORDER;
             else

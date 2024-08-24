@@ -1209,12 +1209,15 @@ Format: alpha\_op\_ex &lt;op&gt; &lt;source1&gt; &lt;source2&gt; \[&lt;manualBle
 @par
 Format: env\_map &lt;off|spherical|planar|cubic\_reflection|cubic\_normal&gt;
 
+@par
+Default: env\_map off
+
 Environment maps make an object look reflective by using automatic texture coordinate generation depending on the relationship between the objects vertices or normals and the eye.
 
 <dl compact="compact">
 <dt>spherical</dt> <dd>
 
-@copybrief Ogre::TextureUnitState::ENV_CURVED
+@copybrief Ogre::TEXCALC_ENVIRONMENT_MAP
 Requires a single texture which is either a fish-eye lens view of the reflected scene, or some other texture which looks good as a spherical map (a texture of glossy highlights is popular especially in car sims). This effect is based on the relationship between the eye direction and the vertex normals of the object, so works best when there are a lot of gradually changing normals, i.e. curved objects.
 
 </dd> <dt>planar</dt> <dd>
@@ -1225,16 +1228,15 @@ The effect is based on the position of the vertices in the viewport rather than 
 
 </dd> <dt>cubic\_reflection</dt> <dd>
 
-@copybrief Ogre::TextureUnitState::ENV_REFLECTION
+@copybrief Ogre::TEXCALC_ENVIRONMENT_MAP_REFLECTION
 Uses a group of 6 textures making up the inside of a cube, each of which is a view if the scene down each axis. Works extremely well in all cases but has a higher technical requirement from the card than spherical mapping. Requires that you bind a [cubic texture](#texture) to this unit.
 
 </dd> <dt>cubic\_normal</dt> <dd>
-@copybrief Ogre::TextureUnitState::ENV_NORMAL
+@copybrief Ogre::TEXCALC_ENVIRONMENT_MAP_NORMAL
 Generates 3D texture coordinates containing the camera space normal vector from the normal information held in the vertex data. Again, use of this feature requires a [cubic texture](#texture).
 
-</dd> </dl> <br>
-@par
-Default: env\_map off<br>
+</dd> </dl>
+
 
 <a name="scroll"></a><a name="scroll-1"></a>
 
