@@ -74,6 +74,9 @@ static void APIENTRY GLDebugCallback(GLenum source,
                                      const GLchar* message,
                                      const GLvoid* userParam)
 {
+    if(source == GL_DEBUG_SOURCE_THIRD_PARTY && id == 0643)
+        return; // ignore our own messages
+
     const char *debSource = "", *debType = "", *debSev = "";
 
     auto lml = Ogre::LML_NORMAL;
@@ -1646,7 +1649,7 @@ namespace Ogre {
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
         if (getCapabilities()->hasCapability(RSC_DEBUG))
-            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, -1, eventName.c_str()));
+            OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0643, -1, eventName.c_str()));
     }
 
 
