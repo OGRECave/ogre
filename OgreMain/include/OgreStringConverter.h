@@ -336,8 +336,8 @@ namespace Ogre {
 
         /// @deprecated use StringUtil::split
         OGRE_DEPRECATED static StringVector parseStringVector(const String& val) { return StringUtil::split(val); }
-        /** Checks the String is a valid number value. */
-        static bool isNumber(const String& val);
+        /// @deprecated use @ref parse()
+        OGRE_DEPRECATED static bool isNumber(const String& val);
 
 		static locale_t _numLocale;
     private:
