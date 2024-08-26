@@ -678,11 +678,14 @@ void CompositorInstance::createResources(bool forResizeOnly)
             }
             
             // determine options as a combination of selected options and possible options
-            if (!def->fsaa)
+            if (def->fsaa == 0)
             {
                 fsaa = 0;
                 fsaaHint = BLANKSTRING;
             }
+            else if(def->fsaa > 1)
+                fsaa = def->fsaa;
+
             hwGamma = hwGamma || def->hwGammaWrite;
 
             // need dummy counter as there may be multiple definitions with the same name in the chain

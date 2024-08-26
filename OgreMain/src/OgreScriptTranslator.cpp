@@ -4608,7 +4608,7 @@ namespace Ogre{
                         bool widthSet = false, heightSet = false, formatSet = false;
                         bool pooled = false;
                         bool hwGammaWrite = false;
-                        bool fsaa = true;
+                        uint32 fsaa = 1;
                         auto type = TEX_TYPE_2D;
                         uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
                         CompositionTechnique::TextureScope scope = CompositionTechnique::TS_LOCAL;
@@ -4684,7 +4684,16 @@ namespace Ogre{
                                 hwGammaWrite = true;
                                 break;
                             case ID_NO_FSAA:
-                                fsaa = false;
+                                fsaa = 0;
+                                break;
+                            case ID_FSAA:
+                                // advance to next to get the value
+                                it = getNodeAt(prop->values, atomIndex++);
+                                if(prop->values.end() == it || !getValue(*it, fsaa))
+                                {
+                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                    return;
+                                }
                                 break;
                             case ID_DEPTH_POOL:
                                 {

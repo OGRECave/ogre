@@ -327,7 +327,7 @@ Techniques can have the following nested elements:
 
 This declares a render texture for use in subsequent @ref Compositor-Target-Passes.
 @par
-Format: texture &lt;name&gt; &lt;width&gt; &lt;height&gt; &lt;PixelFormat&gt; \[&lt;MRT Pixel_Format2&gt;\] \[&lt;MRT Pixel_FormatN&gt;\] \[pooled\] \[gamma\] \[no\_fsaa\] \[depth\_pool &lt;poolId&gt;\] \[&lt;scope&gt;\] \[&lt;cubic&gt;\]
+Format: texture &lt;name&gt; &lt;width&gt; &lt;height&gt; &lt;PixelFormat&gt; \[&lt;MRT Pixel_Format2&gt;\] \[&lt;MRT Pixel_FormatN&gt;\] \[pooled\] \[gamma\] \[no\_fsaa\] [fsaa &lt;level&gt;] \[depth\_pool &lt;poolId&gt;\] \[&lt;scope&gt;\] \[&lt;cubic&gt;\]
 
 @param name
 A name to give the render texture, which must be unique within this compositor. This name is used to reference the texture in @ref Compositor-Target-Passes, when the texture is rendered to, and in @ref Compositor-Passes, when the texture is used as input to a material rendering a fullscreen quad.
@@ -352,14 +352,20 @@ If you use a depth format here, the texture will be used as the depth attachment
 If present, this directive makes this texture ’pooled’ among compositor instances, which can save some memory.
 
 @param gamma
-If present, this directive means that sRGB gamma correction will be enabled on writes to this texture. You should remember to include the opposite sRGB conversion when you read this texture back in another material, such as a quad. This option will automatically enabled if you use a render\_scene pass on this texture and the viewport on which the compositor is based has sRGB write support enabled.
+If present, this directive means that sRGB gamma correction will be enabled on writes to this texture. You should remember to include the opposite sRGB conversion when you read this texture back in another material, such as a quad. This option will automatically enabled if you use a `render_scene` pass on this texture and the viewport on which the compositor is based has sRGB write support enabled.
 
 @param no\_fsaa
-If present, this directive disables the use of anti-aliasing on this texture. FSAA is only used if this texture is subject to a render\_scene pass and FSAA was enabled on the original viewport on which this compositor is based; this option allows you to override it and disable the FSAA if you wish.
+@param fsaa
+If present, this directive controls the use of anti-aliasing on this texture. FSAA is only used if this texture is subject to a `render_scene` pass.
+- `fsaa 1` (the default) will match the FSAA level of the viewport
+- `fsaa 0` will turn off FSAA for this texture. `fsaa 0` and `no_fsaa` have the same effect.
+- `fsaa N` will set FSAA to level N.
 
 @param depth\_pool
-When present, this directive has to be followed by an integer. This directive is unrelated to the "pooled" directive. This one sets from which Depth buffer pool the depth buffer will be chosen from. All RTs from all compositors (including render windows if the render system API allows it) with the same pool ID share the same depth buffers (following the rules of the current render system APIs, (check RenderSystemCapabilities flags to find the rules). When the pool ID is 0, no depth buffer is used. This can be helpful for passes that don’t require a Depth buffer at all, potentially saving performance and memory. Default value is 1.
-Ignored with depth pixel formats.
+When present, this directive has to be followed by an integer. This directive is unrelated to the "pooled" directive. This directive determines from which Depth buffer pool the depth buffer will be selected. All RTs from all compositors (including render windows if the render system API allows it) with the same pool ID share the same depth buffers.
+- `depth_pool 0` means no depth buffer is used, which can save memory for passes that do not need a Depth buffer.
+- Default is `depth_pool 1`.
+- Ignored with depth pixel formats.
 
 @param scope
 If present, this directive sets the scope for the texture for being accessed by other compositors using the [texture\_ref](#compositor_005ftexture_005fref) directive. There are three options : 
