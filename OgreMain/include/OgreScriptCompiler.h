@@ -837,6 +837,7 @@ namespace Ogre
         ID_MESH_PROGRAM_REF,
         ID_TASK_PROGRAM,
         ID_TASK_PROGRAM_REF,
+        ID_FSAA,
         ID_END_BUILTIN_IDS
     };
     /** @} */

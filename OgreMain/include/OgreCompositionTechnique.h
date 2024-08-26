@@ -73,14 +73,14 @@ namespace Ogre {
             float widthFactor;  // multiple of target width to use (if width = 0)
             float heightFactor; // multiple of target height to use (if height = 0)
             PixelFormatList formatList; // more than one means MRT
-            bool fsaa;          // FSAA enabled; true = determine from main target (if render_scene), false = disable
+            uint8 fsaa;         // FSAA level; 1 = determine from main target (if render_scene), 0 = disable
             bool hwGammaWrite;  // Do sRGB gamma correction on write (only 8-bit per channel formats) 
             uint16 depthBufferId;//Depth Buffer's pool ID. (unrelated to "pool" variable below)
             bool pooled;        // whether to use pooled textures for this one
             TextureScope scope; // Which scope has access to this texture
 
             TextureDefinition() :width(0), height(0), type(TEX_TYPE_2D), widthFactor(1.0f), heightFactor(1.0f),
-                fsaa(true), hwGammaWrite(false), depthBufferId(1), pooled(false), scope(TS_LOCAL) {}
+                fsaa(1), hwGammaWrite(false), depthBufferId(1), pooled(false), scope(TS_LOCAL) {}
         };
         /// Typedefs for several iterators
         typedef std::vector<CompositionTargetPass *> TargetPasses;

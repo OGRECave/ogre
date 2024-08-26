@@ -15,6 +15,8 @@ All builtin Factory classes were made private. Replace `DefaultSceneManagerFacto
 
 Since 14.1, `ACT_MATERIAL_LOD_INDEX` is available to implement multiple material LOD levels in a single shader.
 
+Since 14.3, textures defined in compositor scripts can explicitly set the FSAA level, e.g. `texture myTex fsaa 4`.
+
 ### OgreUnifiedShader.h
 
 Sampler definitions now implicitly include the `uniform` keyword to support Vulkan; i.e. this will generate an error:
