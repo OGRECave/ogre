@@ -17,6 +17,8 @@ Since 14.1, `ACT_MATERIAL_LOD_INDEX` is available to implement multiple material
 
 Since 14.3, textures defined in compositor scripts can explicitly set the FSAA level, e.g. `texture myTex fsaa 4`.
 
+Since 14.3, `float16` vertex elements are supported via the `VET_HALFx` types. Note, that `VET_HALF3` is not supported on D3D11 and D3D9 and is padded to `VET_HALF4` on loading there.
+
 ### OgreUnifiedShader.h
 
 Sampler definitions now implicitly include the `uniform` keyword to support Vulkan; i.e. this will generate an error:
@@ -86,6 +88,10 @@ The second argument of `RenderQueueListener::renderQueueStarted` now contains th
 ### Rectangular Area Lights (since 14.1)
 
 A new spot light type `LT_RECTLIGHT` has been introduced along with the `setSourceSize` method, enabling the rendering of rectangular area lights. In order to process this light type in your shader, verify that the `spotlight_params.w` autoparam is equal to 2. Then, `spotlight_params.xyz` contains the light width in the view space, and `light_attenuation.xyz` contains the light height.
+
+### Mesh & Task Shaders (since 14.3)
+
+The shader types `GPT_MESH_PROGRAM` and `GPT_TASK_PROGRAM` are now available, with support indicated by the `RSC_MESH_PROGRAM` capability. This functionality is provided in GL3Plus through the `GL_NV_mesh_shader` extension and in Vulkan via the `VK_NV_mesh_shader` extension.
 
 ## Python
 
@@ -166,3 +172,7 @@ Transform feedback outputs are now consistently named `xfb_position`, `xfb_uv0` 
 Shader updates are required.
 
 On OSX, `texture2D` etc. functions are no longer implicitly upgraded to version 150 equivalents, explicitly `#include <GLSL_GL3Support.glsl>` to get them.
+
+## Wayland support (since 14.3)
+
+Ogre can now run on Wayland in Linux if compiled with `OGRE_USE_WAYLAND=TRUE`. This is supported across all GL and Vulkan render systems, as well as the OgreBites SDL2 integration.
