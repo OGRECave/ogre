@@ -32,21 +32,3 @@ material Examples/Rockwall
 		}
 	}
 }
-
-material PSSM/shadow_caster
-{
-	technique
-	{
-		// all this will do is write depth
-		pass
-		{
-			fog_override true none
-			depth_bias -1 -1
-
-			rtshader_system
-			{
-				lighting_stage gbuffer depth
-			}
-		}
-	}
-}

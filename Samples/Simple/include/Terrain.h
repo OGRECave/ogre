@@ -595,9 +595,6 @@ protected:
                 subRenderState->setParameter("split_points",
                                              static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints());
                 schemRenderState->addTemplateSubRenderState(subRenderState);
-
-                mSceneMgr->setShadowTextureCasterMaterial(
-                    MaterialManager::getSingleton().getByName("PSSM/shadow_caster"));
             }
             else
             {
@@ -607,7 +604,6 @@ protected:
                 mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_X8B8G8R8);
                 mSceneMgr->setShadowTextureSelfShadow(false);
                 mSceneMgr->setShadowCasterRenderBackFaces(false);
-                mSceneMgr->setShadowTextureCasterMaterial(MaterialPtr());
             }
 
             matProfile->setReceiveDynamicShadowsPSSM(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get()));
