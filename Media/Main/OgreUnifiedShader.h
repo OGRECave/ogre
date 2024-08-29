@@ -50,6 +50,8 @@ vec4 textureCubeLod(samplerCube s, vec3 v, float lod) { return texCUBElod(s, vec
 #define mix lerp
 #define fract frac
 #define inversesqrt rsqrt
+#define dFdx ddx
+#define dFdy ddy
 
 float mod(float _a, float _b) { return _a - _b * floor(_a / _b); }
 vec2  mod(vec2  _a, vec2  _b) { return _a - _b * floor(_a / _b); }
