@@ -160,10 +160,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
       message(STATUS "Building Assimp")
       file(DOWNLOAD
-              https://github.com/assimp/assimp/archive/refs/tags/v5.4.2.tar.gz
-          ${PROJECT_BINARY_DIR}/v5.4.2.tar.gz)
+              https://github.com/assimp/assimp/archive/refs/tags/v5.4.3.tar.gz
+          ${PROJECT_BINARY_DIR}/v5.4.3.tar.gz)
       execute_process(COMMAND ${CMAKE_COMMAND}
-          -E tar xf v5.4.2.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+          -E tar xf v5.4.3.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
       execute_process(COMMAND ${BUILD_COMMAND_COMMON}
           -DZLIB_ROOT=${OGREDEPS_PATH}
           -DBUILD_SHARED_LIBS=OFF
@@ -171,10 +171,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           -DASSIMP_NO_EXPORT=TRUE
           -DASSIMP_BUILD_OGRE_IMPORTER=OFF
           -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-          ${PROJECT_BINARY_DIR}/assimp-5.4.2
-          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.4.2)
+          ${PROJECT_BINARY_DIR}/assimp-5.4.3
+          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-5.4.3)
       execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/assimp-5.4.2 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/assimp-5.4.3 ${BUILD_COMMAND_OPTS})
     endif()
 
     message(STATUS "Building Bullet")
