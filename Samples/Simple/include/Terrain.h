@@ -550,6 +550,7 @@ protected:
     {
         auto matProfile = static_cast<TerrainMaterialGeneratorA::SM2Profile*>(
             mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
+        matProfile->setReceiveDynamicShadowsEnabled(false); // force regen if colour/ depth shadows change
         matProfile->setReceiveDynamicShadowsEnabled(enabled);
         matProfile->setReceiveDynamicShadowsLowLod(SHADOWS_IN_LOW_LOD_MATERIAL);
 
