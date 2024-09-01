@@ -238,8 +238,11 @@ void Compositor::createGlobalTextures()
                 mGlobalTextures[def->name] = tex;
             }
 
+            rendTarget->setAutoUpdated( false );
+
             //Set DepthBuffer pool for sharing
-            rendTarget->setDepthBufferPool( def->depthBufferId );
+            if(rendTarget->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH)
+                rendTarget->setDepthBufferPool( def->depthBufferId );
         }
     }
 
