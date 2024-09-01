@@ -32,8 +32,6 @@ THE SOFTWARE.
 //  being aware of the 3D API. However there are a few
 //  simple functions which can have a base implementation
 
-#include "OgreRenderTarget.h"
-#include "OgreDepthBuffer.h"
 #include "OgreHardwareOcclusionQuery.h"
 #include "OgreComponents.h"
 
