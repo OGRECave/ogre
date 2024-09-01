@@ -34,10 +34,6 @@ THE SOFTWARE.
 #include "OgreCustomCompositionPass.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreCompositorLogic.h"
-#include "OgreRenderTarget.h"
-#include "OgreRenderTexture.h"
-#include "OgreRectangle2D.h"
-#include "OgreDepthBuffer.h"
 
 namespace Ogre {
 CompositorInstance::CompositorInstance(CompositionTechnique *technique,

@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreScriptCompiler.h"
 #include "OgreStableHeaders.h"
 #include "OgreBuiltinScriptTranslators.h"
 #include "OgreGpuProgramManager.h"
@@ -42,7 +41,6 @@ THE SOFTWARE.
 #include "OgreExternalTextureSourceManager.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
-#include "OgreDepthBuffer.h"
 #include "OgreParticleSystem.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreGpuProgramUsage.h"

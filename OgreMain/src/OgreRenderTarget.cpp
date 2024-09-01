@@ -26,11 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreRenderTarget.h"
 
 #include "OgreViewport.h"
 #include "OgreRenderTargetListener.h"
-#include "OgreDepthBuffer.h"
 #include "OgreTimer.h"
 
 namespace Ogre {
