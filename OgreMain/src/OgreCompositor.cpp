@@ -152,6 +152,14 @@ CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName
     return 0;
 
 }
+
+static TexturePtr createTexture(const String& name, const CompositionTechnique::TextureDefinition* def, PixelFormat pf)
+{
+    bool hwGamma = def->hwGammaWrite && !PixelUtil::isFloatingPoint(pf);
+    return TextureManager::getSingleton().createManual(name, RGN_INTERNAL, def->type, def->width, def->height, 0, pf,
+                                                       TU_RENDERTARGET, 0, hwGamma, def->fsaa);
+}
+
 //-----------------------------------------------------------------------
 void Compositor::createGlobalTextures()
 {
@@ -192,19 +200,12 @@ void Compositor::createGlobalTextures()
                 mGlobalMRTs[def->name] = mrt;
 
                 // create and bind individual surfaces
-                size_t atch = 0;
-                for (PixelFormatList::iterator p = def->formatList.begin();
-                    p != def->formatList.end(); ++p, ++atch)
+                uint8 atch = 0;
+                for (auto p : def->formatList)
                 {
 
-                    String texname = StringUtil::format("mrt%zu.%s", atch, baseName.c_str());
-                    TexturePtr tex;
-
-                    tex = TextureManager::getSingleton().createManual(
-                            texname,
-                            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D,
-                            (uint)def->width, (uint)def->height, 0, *p, TU_RENDERTARGET, 0,
-                            def->hwGammaWrite && !PixelUtil::isFloatingPoint(*p), def->fsaa);
+                    String texname = StringUtil::format("mrt%d.%s", atch, baseName.c_str());
+                    TexturePtr tex = createTexture(texname, def, p);
 
                     RenderTexture* rt = tex->getBuffer()->getRenderTarget();
                     rt->setAutoUpdated(false);
@@ -213,7 +214,7 @@ void Compositor::createGlobalTextures()
                     // Also add to local textures so we can look up
                     String mrtLocalName = CompositorInstance::getMRTTexLocalName(def->name, atch);
                     mGlobalTextures[mrtLocalName] = tex;
-
+                    atch++;
                 }
 
                 rendTarget = mrt;
@@ -226,14 +227,7 @@ void Compositor::createGlobalTextures()
                 // this is an auto generated name - so no spaces can't hart us.
                 std::replace( texName.begin(), texName.end(), ' ', '_' );
 
-                TexturePtr tex;
-                tex = TextureManager::getSingleton().createManual(
-                    texName,
-                    ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D,
-                    (uint)def->width, (uint)def->height, 0, def->formatList[0], TU_RENDERTARGET, 0,
-                    def->hwGammaWrite && !PixelUtil::isFloatingPoint(def->formatList[0]), def->fsaa);
-
-
+                TexturePtr tex = createTexture(texName, def, def->formatList[0]);
                 rendTarget = tex->getBuffer()->getRenderTarget();
                 mGlobalTextures[def->name] = tex;
             }
