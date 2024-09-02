@@ -277,9 +277,17 @@ namespace Ogre {
         return Codec::getCodec(formatextension)->encode(this);
     }
     //-----------------------------------------------------------------------------
-    Image & Image::load(const DataStreamPtr& stream, const String& type )
+    Image & Image::load(const DataStreamPtr& stream, String type )
     {
         freeMemory();
+
+        if (type.empty())
+        {
+            String base, ext;
+            StringUtil::splitBaseFilename(stream->getName(), base, ext);
+            if (!ext.empty())
+                type = ext;
+        }
 
         Codec * pCodec = 0;
         if (!type.empty())

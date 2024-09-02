@@ -252,7 +252,7 @@ namespace Ogre {
             @see
                 Image::load( const String& filename )
         */
-        Image & load(const DataStreamPtr& stream, const String& type = BLANKSTRING );
+        Image & load(const DataStreamPtr& stream, String type = BLANKSTRING );
 
         /** Utility method to combine 2 separate images into this one, with the first
         image source supplying the RGB channels, and the second image supplying the 
