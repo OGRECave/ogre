@@ -256,6 +256,102 @@ install(FILES
    ${PROJECT_BINARY_DIR}/cmake/OGREConfigVersion.cmake
    DESTINATION ${OGRE_CMAKE_DIR}
 )
+
 install(EXPORT OgreTargetsRelease CONFIGURATIONS Release MinSizeRel None "" DESTINATION ${OGRE_CMAKE_DIR} FILE OgreTargets.cmake)
 install(EXPORT OgreTargetsRelWithDebInfo CONFIGURATIONS RelWithDebInfo DESTINATION ${OGRE_CMAKE_DIR} FILE OgreTargets.cmake)
 install(EXPORT OgreTargetsDebug CONFIGURATIONS Debug DESTINATION ${OGRE_CMAKE_DIR} FILE OgreTargets.cmake)
+
+
+# Create the pkg-config package files on Unix systems
+if (UNIX OR MINGW)
+  if (MINGW)
+    set(OGRE_PLUGIN_EXT ".dll")
+  else()
+    set(OGRE_PLUGIN_EXT ".so")
+  endif()
+  set(OGRE_PAGING_ADDITIONAL_PACKAGES "")
+  if (OGRE_STATIC)
+    set(OGRE_PLUGIN_EXT ".a")
+  endif ()
+
+  set(OGRE_ADDITIONAL_LIBS "")
+
+  set(OGRE_CFLAGS "")
+  set(OGRE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
+  if (OGRE_CONFIG_THREADS GREATER 0)
+    set(OGRE_CFLAGS "-pthread")
+    set(OGRE_ADDITIONAL_LIBS "${OGRE_ADDITIONAL_LIBS} -lpthread")
+  endif ()
+  if (OGRE_STATIC)
+    if (OGRE_CONFIG_THREADS AND OGRE_CONFIG_THREAD_PROVIDER STREQUAL "boost")
+      if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(OGRE_ADDITIONAL_LIBS "${OGRE_ADDITIONAL_LIBS} ${Boost_THREAD_LIBRARY_DEBUG}")
+      else()
+        set(OGRE_ADDITIONAL_LIBS "${OGRE_ADDITIONAL_LIBS} ${Boost_THREAD_LIBRARY_RELEASE}")
+      endif()
+    endif ()
+    # there is no pkgconfig file for freeimage, so we need to add that lib manually
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+      set(OGRE_ADDITIONAL_LIBS "${OGRE_ADDITIONAL_LIBS} ${FreeImage_LIBRARY_DBG}")
+    else()
+      set(OGRE_ADDITIONAL_LIBS "${OGRE_ADDITIONAL_LIBS} ${FreeImage_LIBRARY_REL}")
+    endif()
+    configure_file(${OGRE_TEMPLATES_DIR}/OGREStatic.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE.pc @ONLY)
+  else ()
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE.pc @ONLY)
+  endif ()
+  install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+
+  # configure additional packages
+
+  if (OGRE_BUILD_PLUGIN_PCZ)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-PCZ.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-PCZ.pc @ONLY)
+    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-PCZ.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+
+  if (OGRE_BUILD_COMPONENT_PAGING)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Paging.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Paging.pc @ONLY)
+    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Paging.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+
+  if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-MeshLodGenerator.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-MeshLodGenerator.pc @ONLY)
+    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-MeshLodGenerator.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+
+  if (OGRE_BUILD_COMPONENT_TERRAIN)
+    if (OGRE_BUILD_COMPONENT_PAGING)
+      set(OGRE_PAGING_ADDITIONAL_PACKAGES ", OGRE-Paging = ${OGRE_VERSION}")
+    endif ()
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Terrain.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Terrain.pc @ONLY)
+    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Terrain.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+
+  if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-RTShaderSystem.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-RTShaderSystem.pc @ONLY)
+    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-RTShaderSystem.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+
+  if (OGRE_BUILD_COMPONENT_PROPERTY)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Property.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Property.pc @ONLY)
+    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Property.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+
+  if (OGRE_BUILD_COMPONENT_OVERLAY)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Overlay.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Overlay.pc @ONLY)
+    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Overlay.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+
+  if (OGRE_BUILD_COMPONENT_VOLUME)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Volume.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Volume.pc @ONLY)
+    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Volume.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+
+  if (OGRE_BUILD_COMPONENT_BITES)
+    if (SDL2_FOUND)
+      set(OGRE_BITES_ADDITIONAL_PACKAGES ", sdl2")
+    endif ()
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Bites.pc.in ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Bites.pc @ONLY)
+    install(FILES ${PROJECT_BINARY_DIR}/pkgconfig/OGRE-Bites.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+endif ()
