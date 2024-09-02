@@ -768,6 +768,8 @@ namespace Ogre
                         deviceExtensions.push_back( VK_EXT_MESH_SHADER_EXTENSION_NAME );
                         deviceExtensions.push_back( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
                         mRealCapabilities->setCapability(RSC_MESH_PROGRAM);
+
+                        mDescriptorSetBindings[0].stageFlags |= VK_SHADER_STAGE_MESH_BIT_NV;
                     }
 #endif
                 }
@@ -1102,12 +1104,14 @@ namespace Ogre
     {
         mActiveParameters[gptype] = params;
 
+        int dstUBO = gptype % GPT_PIPELINE_COUNT;
+
         auto sizeBytes = params->getConstantList().size();
-        if(sizeBytes && gptype <= GPT_FRAGMENT_PROGRAM)
+        if(sizeBytes && dstUBO < 2)
         {
             auto step =
                 alignToNextMultiple(sizeBytes, mDevice->mDeviceProperties.limits.minUniformBufferOffsetAlignment);
-            mUBOInfo[gptype].range = sizeBytes;
+            mUBOInfo[dstUBO].range = sizeBytes;
 
             if (std::accumulate(mAutoParamsBufferUsage.begin(), mAutoParamsBufferUsage.end(), 0) + step >=
                 mAutoParamsBuffer->getSizeInBytes())
@@ -1119,7 +1123,7 @@ namespace Ogre
             if((mAutoParamsBufferPos + sizeBytes) >= mAutoParamsBuffer->getSizeInBytes())
                 mAutoParamsBufferPos = 0;
 
-            mUBODynOffsets[gptype] = mAutoParamsBufferPos;
+            mUBODynOffsets[dstUBO] = mAutoParamsBufferPos;
 
             mAutoParamsBuffer->writeData(mAutoParamsBufferPos, sizeBytes, params->getConstantList().data());
             mAutoParamsBufferPos += step;
