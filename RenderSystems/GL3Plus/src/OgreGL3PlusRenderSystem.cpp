@@ -1003,6 +1003,16 @@ namespace Ogre {
             LogManager::getSingleton().logError("Failed to create shader program.");
         }
 
+        bool hasMeshShader = mCurrentShader[GPT_MESH_PROGRAM] != 0;
+        if(hasMeshShader)
+        {
+            for(auto it : op.vertexData->vertexBufferBinding->getBindings())
+            {
+                auto buf = it.second->_getImpl<GL3PlusHardwareBuffer>();
+                buf->setGLBufferBinding(it.first, GL_SHADER_STORAGE_BUFFER);
+            }
+        }
+
         GLVertexArrayObject* vao =
             static_cast<GLVertexArrayObject*>(op.vertexData->vertexDeclaration);
         // Bind VAO (set of per-vertex attributes: position, normal, etc.).
@@ -1110,7 +1120,7 @@ namespace Ogre {
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
             }
         }
-        else if (mCurrentShader[GPT_MESH_PROGRAM])
+        else if (hasMeshShader)
         {
             OgreAssert(op.indexData, "indexData required for mesh shader");
 

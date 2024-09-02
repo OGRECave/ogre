@@ -200,11 +200,11 @@ namespace Ogre {
                                          : (usage == HBU_GPU_ONLY) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
     }
 
-    void GL3PlusHardwareBuffer::setGLBufferBinding(GLint binding)
+    void GL3PlusHardwareBuffer::setGLBufferBinding(GLint binding, GLenum target)
     {
         mBindingPoint = binding;
 
         // Attach the buffer to the binding index.
-        OGRE_CHECK_GL_ERROR(glBindBufferBase(mTarget, mBindingPoint, mBufferId));
+        OGRE_CHECK_GL_ERROR(glBindBufferBase( target ? target : mTarget, mBindingPoint, mBufferId));
     }
 }
