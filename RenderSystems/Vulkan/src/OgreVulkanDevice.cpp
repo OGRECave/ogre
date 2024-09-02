@@ -250,6 +250,7 @@ namespace Ogre
         extensions.push_back( VK_KHR_SWAPCHAIN_EXTENSION_NAME );
 
         VkPhysicalDeviceFeatures2 features2 = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+        features2.features = mDeviceFeatures;
 
 #ifdef VK_EXT_mesh_shader
         VkPhysicalDeviceMeshShaderFeaturesEXT meshShaderFeatures = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT};
