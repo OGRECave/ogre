@@ -66,7 +66,7 @@ namespace Ogre {
 
         GLenum getTarget() const { return mTarget; }
 
-        void setGLBufferBinding(GLint binding);
+        void setGLBufferBinding(GLint binding, GLenum target = 0);
         GLint getGLBufferBinding(void) const { return mBindingPoint; }
         void bind() { setGLBufferBinding(mBindingPoint); }
     };
