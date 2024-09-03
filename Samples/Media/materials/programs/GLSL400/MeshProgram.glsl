@@ -17,6 +17,41 @@ layout(location=0) out PerVertexData
     vec3 color;
 } v_out[];
 
+#ifdef VULKAN
+layout(binding=0, row_major) uniform OgreUniforms
+{
+    mat4 MVP;
+    float t;
+};
+
+// SSBOs cannot be used with Vulkan yet
+float data[] = {
+    -100, -100, 0,  // pos
+    0,0,1,          // normal
+    0,1,            // texcoord
+    100, -100, 0,
+    0,0,1,
+    1,1,
+    100,  100, 0,
+    0,0,1,
+    1,0,
+    -100,  100, 0 ,
+    0,0,1,
+    0,0
+};
+#else
+// UBOs cannot be used with gl_spirv yet
+layout(location=0) uniform mat4 MVP;
+layout(location=4) uniform float t;
+
+//![vertexbuffer]
+// buffer at index 0, which is expected to contain float data
+layout(binding = 0) buffer VertexDataIn
+{
+    float data[];
+};
+//![vertexbuffer]
+#endif
 
 void main()
 {
@@ -24,28 +59,24 @@ void main()
 
     float frac = gl_WorkGroupID.x / 6.0;
 
-    float xmin = -1.0 + frac * 2.0;
-    float xmax = xmin + 2.0 / (7.0);
+    for (int i = 0; i < 4; i++)
+    {
+        vec4 pos = vec4(data[i * 8 + 0], data[i * 8 + 1], data[i * 8 + 2], 1);
+        pos.x = pos.x + 250.0 * gl_WorkGroupID.x - 625.0;
 
-    gl_MeshVerticesEXT[0].gl_Position = vec4(xmin, -0.5, 0.0, 1.0); // Upper Left
-    gl_MeshVerticesEXT[1].gl_Position = vec4(xmax, -0.5, 0.0, 1.0); // Upper Right
-    gl_MeshVerticesEXT[2].gl_Position = vec4(xmin,  0.5, 0.0, 1.0); // Bottom Left
-    gl_MeshVerticesEXT[3].gl_Position = vec4(xmax,  0.5, 0.0, 1.0); // Bottom Right
-
-    v_out[0].color = vec3(1.0, 0.0, 0.0);
-    v_out[1].color = vec3(0.0, 1.0, 0.0);
-    v_out[2].color = vec3(0.0, 0.0, 1.0);
-    v_out[3].color = vec3(1.0, 1.0, 0.0);
+        gl_MeshVerticesEXT[i].gl_Position = MVP * pos;
+        v_out[i].color = vec3(data[i * 8 + 6], data[i * 8 + 7], sin(mod((t + frac) * 3.14, 3.14)));
+    }
 
 #ifdef VULKAN
     gl_PrimitiveTriangleIndicesEXT[0] = uvec3(0, 1, 2);
-    gl_PrimitiveTriangleIndicesEXT[1] = uvec3(2, 1, 3);
+    gl_PrimitiveTriangleIndicesEXT[1] = uvec3(0, 2, 3);
 #else
     gl_PrimitiveIndicesNV[0] = 0;
     gl_PrimitiveIndicesNV[1] = 1;
     gl_PrimitiveIndicesNV[2] = 2;
-    gl_PrimitiveIndicesNV[3] = 2;
-    gl_PrimitiveIndicesNV[4] = 1;
+    gl_PrimitiveIndicesNV[3] = 0;
+    gl_PrimitiveIndicesNV[4] = 2;
     gl_PrimitiveIndicesNV[5] = 3;
 #endif
 }

@@ -36,6 +36,12 @@ fragment_program Ogre/MeshShaderFp glslang
 mesh_program Ogre/MeshShader glslang
 {
 	source MeshProgram.glsl
+
+    default_params
+    {
+        param_named_auto MVP worldviewproj_matrix
+        param_named_auto t time_0_1 1.5
+    }
 }
 
 material Example/MeshShader
