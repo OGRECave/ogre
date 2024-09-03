@@ -245,33 +245,4 @@ namespace Ogre {
         // Supported
         return format;
     }
-
-    // void GL3PlusTextureManager::registerImage(TexturePtr texture)
-    // {
-    //     mImages.push_back(texture);
-    // }
-
-    //FIXME Should this become a standard Texture class feature?
-    // void GL3PlusTextureManager::bindImages()
-    // {
-    //     //FIXME currently produces a GL_INVALID_OPERATION, so temporarily run once
-    //     // static bool images_bound = false;
-
-    //     TexturePtrList::iterator texture = mImages.begin();
-    //     TexturePtrList::iterator end = mImages.end();
-
-    //     // if (!images_bound && !mImages.empty()) {
-    //         for (; texture != end; texture++)
-    //         {
-    //             //std::cout << "IMAGE LOAD/STORE" << std::endl;
-    //             GL3PlusTexturePtr tex = texture->staticCast<GL3PlusTexture>();
-    //             //TODO This needs to be redone so that:
-    //             // * binding point (first parameter) and possibly other parameters come from shader
-    //             // * simple conversion of shader format to GLenum format
-    //             // * material scripts can create images
-    //             //OGRE_CHECK_GL_ERROR(glBindImageTexture(0, tex->getGLID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8));
-    //         }
-    //         // images_bound = true;
-    //     // }
-    // }
 }
