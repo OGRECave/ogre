@@ -61,8 +61,6 @@ namespace Ogre {
         /// @copydoc TextureManager::getNativeFormat
         PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage) override;
 
-        // void bindImages();
-
         /* TexturePtr createManual(const String & name, const String& group, */
         /*                         TextureType texType, uint width, uint height, uint depth, int numMipmaps, */
         /*                         PixelFormat format, int usage, ManualResourceLoader* loader, bool hwGamma,  */

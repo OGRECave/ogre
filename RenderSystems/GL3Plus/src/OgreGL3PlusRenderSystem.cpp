@@ -1650,10 +1650,6 @@ namespace Ogre {
 
         // Pass on parameters from params to program object uniforms.
         program->updateUniforms(params, mask, gptype);
-
-        // FIXME This needs to be moved somewhere texture specific.
-        // Update image bindings for image load/store
-        // static_cast<GL3PlusTextureManager*>(mTextureManager)->bindImages();
     }
 
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
