@@ -226,14 +226,14 @@ namespace Ogre {
         mClosed = false;
     }
 
-    int EmscriptenEGLWindow::contextLostCallback(int eventType, const void *reserved, void *userData)
+    EM_BOOL EmscriptenEGLWindow::contextLostCallback(int eventType, const void *reserved, void *userData)
     {
         Ogre::EmscriptenEGLWindow* thiz = static_cast<Ogre::EmscriptenEGLWindow*>(userData);
         thiz->_notifySurfaceDestroyed();
         return 0;
     }
     
-    int EmscriptenEGLWindow::contextRestoredCallback(int eventType, const void *reserved, void *userData)
+    EM_BOOL EmscriptenEGLWindow::contextRestoredCallback(int eventType, const void *reserved, void *userData)
     {
         Ogre::EmscriptenEGLWindow* thiz = static_cast<Ogre::EmscriptenEGLWindow*>(userData);
         thiz->_notifySurfaceCreated(&thiz->mWindow);
