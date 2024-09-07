@@ -77,7 +77,8 @@ namespace Ogre {
         unsigned long thisFrameNumber = Root::getSingleton().getNextFrameNumber();
         if (thisFrameNumber != mLastFrameNumber)
         {
-            for (auto *ci : mControllers)
+            auto controllersCopy = mControllers;
+            for (auto *ci : controllersCopy)
             {
                 ci->update();
             }
