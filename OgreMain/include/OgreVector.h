@@ -65,7 +65,7 @@ namespace Ogre
         T* ptr() { return data; }
         const T* ptr() const { return data; }
         /** to help make VectorBase enum-like */
-        template<std::size_t N> T get() { 
+        template<std::size_t N> T get() {
             static_assert(N < dims);
             return data[N];
         }
@@ -142,7 +142,7 @@ namespace Ogre
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
         template<std::size_t N> Real get() {
-            static_assert(N < 3); 
+            static_assert(N < 3);
             return (&x)[N];
         }
 
@@ -906,9 +906,9 @@ namespace Ogre
 //define the required std features to make VectorBase tuple-like
 //thus allowing structured bindings for Vector.
 namespace std {
-    template<int dims, class T> 
+    template<int dims, class T>
     struct tuple_size<Ogre::VectorBase<dims, T>> : std::integral_constant<std::size_t, dims> {};
-    template<int dims, class T> 
+    template<int dims, class T>
     struct tuple_size<Ogre::Vector<dims, T>> : std::integral_constant<std::size_t, dims> {};
 
     template<int dims, class T, std::size_t N>
