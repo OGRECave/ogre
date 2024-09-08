@@ -64,6 +64,11 @@ namespace Ogre
         T data[dims];
         T* ptr() { return data; }
         const T* ptr() const { return data; }
+        /** to help make VectorBase enum-like */
+        template<std::size_t N> T get() { 
+            static_assert(N < dims);
+            return data[N];
+        }
     };
     template <> struct _OgreExport VectorBase<2, Real>
     {
@@ -72,6 +77,10 @@ namespace Ogre
         Real x, y;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
+        template<std::size_t N> Real get() {
+            static_assert(N < 2);
+            return (&x)[N];
+        }
 
         /** Returns a vector at a point half way between this and the passed
             in vector.
@@ -132,6 +141,10 @@ namespace Ogre
         Real x, y, z;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
+        template<std::size_t N> Real get() {
+            static_assert(N < 3); 
+            return (&x)[N];
+        }
 
         /** Calculates the cross-product of 2 vectors, i.e. the vector that
             lies perpendicular to them both.
@@ -261,6 +274,10 @@ namespace Ogre
         Real x, y, z, w;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
+        template<std::size_t N> Real get() {
+            static_assert(N < 4);
+            return (&x)[N];
+        }
 
         // special points
         static const Vector4 ZERO;
@@ -885,4 +902,24 @@ namespace Ogre
     /** @} */
 
 }
+
+//define the required std features to make VectorBase tuple-like
+//thus allowing structured bindings for Vector.
+namespace std {
+    template<int dims, class T> 
+    struct tuple_size<Ogre::VectorBase<dims, T>> : std::integral_constant<std::size_t, dims> {};
+    template<int dims, class T> 
+    struct tuple_size<Ogre::Vector<dims, T>> : std::integral_constant<std::size_t, dims> {};
+
+    template<int dims, class T, std::size_t N>
+    struct tuple_element<N, Ogre::Vector<dims, T>> {
+        using type = T;
+    };
+
+    template<int dims, class T, std::size_t N>
+    struct tuple_element<N, Ogre::VectorBase<dims, T>> {
+        using type = T;
+    };
+}
+
 #endif
