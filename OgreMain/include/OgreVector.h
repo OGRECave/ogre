@@ -65,7 +65,11 @@ namespace Ogre
         T* ptr() { return data; }
         const T* ptr() const { return data; }
         /** to help make VectorBase enum-like */
-        template<std::size_t N> T get() {
+        template<std::size_t N> T& get() {
+            static_assert(N < dims, "invalid index");
+            return data[N];
+        }
+        template<std::size_t N> const T& get() const {
             static_assert(N < dims, "invalid index");
             return data[N];
         }
@@ -77,7 +81,11 @@ namespace Ogre
         Real x, y;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
-        template<std::size_t N> Real get() {
+        template<std::size_t N> Real& get() {
+            static_assert(N < 2, "invalid index");
+            return (&x)[N];
+        }
+        template<std::size_t N> const Real& get() const {
             static_assert(N < 2, "invalid index");
             return (&x)[N];
         }
@@ -141,7 +149,11 @@ namespace Ogre
         Real x, y, z;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
-        template<std::size_t N> Real get() {
+        template<std::size_t N> Real& get() {
+            static_assert(N < 3, "invalid index");
+            return (&x)[N];
+        }
+        template<std::size_t N> const Real& get() const {
             static_assert(N < 3, "invalid index");
             return (&x)[N];
         }
@@ -274,7 +286,11 @@ namespace Ogre
         Real x, y, z, w;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
-        template<std::size_t N> Real get() {
+        template<std::size_t N> Real& get() {
+            static_assert(N < 4, "invalid index");
+            return (&x)[N];
+        }
+        template<std::size_t N> const Real& get() const {
             static_assert(N < 4, "invalid index");
             return (&x)[N];
         }
