@@ -524,8 +524,8 @@ namespace Ogre {
             // increment physical buffer location
 
             convertGLUniformtoOgreType(values[1], def);
-            // GL doesn't pad
-            def.elementSize = GpuConstantDefinition::getElementSize(def.constType, false);
+            bool doPadding = block > -1;
+            def.elementSize = GpuConstantDefinition::getElementSize(def.constType, doPadding);
 
             // also allow index based referencing
             GpuLogicalIndexUse use;
