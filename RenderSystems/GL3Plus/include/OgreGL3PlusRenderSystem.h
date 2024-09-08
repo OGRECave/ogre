@@ -102,8 +102,6 @@ namespace Ogre {
 
         std::array<GLSLShader*, GPT_COUNT> mCurrentShader;
 
-        HardwareBufferPtr mUniformBuffer[GPT_COUNT];
-
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
         void bindVertexElementToGpu(const VertexElement& elem,

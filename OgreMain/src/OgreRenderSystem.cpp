@@ -136,6 +136,18 @@ namespace Ogre {
         mFixedFunctionParams->setAutoConstant(light_offset + 5, GpuProgramParameters::ACT_SPOTLIGHT_PARAMS, index);
     }
 
+    const HardwareBufferPtr& RenderSystem::updateDefaultUniformBuffer(GpuProgramType gptype, const ConstantList& params)
+    {
+        auto& ubo = mUniformBuffer[gptype];
+        if (!ubo || ubo->getSizeInBytes() < params.size())
+        {
+            ubo = HardwareBufferManager::getSingleton().createUniformBuffer(params.size());
+        }
+
+        ubo->writeData(0, params.size(), params.data(), true);
+
+        return ubo;
+    }
     //-----------------------------------------------------------------------
     RenderSystem::~RenderSystem()
     {

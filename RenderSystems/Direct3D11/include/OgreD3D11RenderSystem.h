@@ -136,8 +136,6 @@ namespace Ogre
         ID3D11ShaderResourceView * mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
         size_t mBoundTexturesCount;
 
-        HardwareBufferPtr mConstantBuffer[GPT_COUNT]; // for $Globals OR $Params
-
         // List of class instances per shader stage
         ID3D11ClassInstance* mClassInstances[6][8];
 

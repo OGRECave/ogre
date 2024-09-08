@@ -2272,16 +2272,9 @@ namespace Ogre
 
         std::vector<ID3D11Buffer*> buffers = {NULL};
 
-        auto paramsSize = params->getConstantList().size();
-        if(paramsSize)
+        if(params->getConstantList().size())
         {
-            auto& cbuffer = mConstantBuffer[gptype];
-
-            if(!cbuffer || cbuffer->getSizeInBytes() < paramsSize)
-                cbuffer = mHardwareBufferManager->createUniformBuffer(paramsSize);
-
-            cbuffer->writeData(0, paramsSize, params->getConstantList().data(), true);
-
+            auto& cbuffer = updateDefaultUniformBuffer(gptype, params->getConstantList());
             buffers[0] = static_cast<D3D11HardwareBuffer*>(cbuffer.get())->getD3DBuffer();
         }
 
