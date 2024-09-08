@@ -196,6 +196,18 @@ param_named skewMatrix float4 0.5 0 -0.5 1.0
 This means that `mat[0]` is the first column in GLSL, but the first row in HLSL and %Ogre. %Ogre takes care of transposing square matrices before uploading them with GLSL, so matrix-vector multiplication `M*v` just works and `mat[0]` will return the same data.
 However, with non-square matrices transposing would change their GLSL type from e.g. `mat2x4` (two columns, four rows) to `mat4x2` (two rows, four columns) and consequently what `mat[0]` would return. Therefore %Ogre just passes such matrices unchanged and you have to handle this case (notably in skinning) yourself by either transposing the matrix in the shader or column-wise access.
 
+## Uniform Buffers {#Uniform-Buffers}
+
+If supported by the RenderSystem, you can opt-in to use uniform buffers for parameter storage.
+This is done by declaring the parameters in a uniform block named @c OgreUniforms
+
+```cpp
+layout(std140, row_major) uniform OgreUniforms
+{
+    mat4 worldTransform;
+}
+```
+
 ## Transform Feedback Varyings {#Transform-Feedback-Varyings}
 
 Similarly to vertex attributes, the transform feedback varyings are bound by name.
