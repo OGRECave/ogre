@@ -566,7 +566,7 @@ namespace Ogre {
         }
     }
 
-    void GLSLShader::extractBufferBlocks(GLenum type) const
+    void GLSLShader::extractBufferBlocks(GLenum type)
     {
         GLint numBlocks = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(mGLProgramHandle, type, GL_ACTIVE_RESOURCES, &numBlocks));
@@ -589,15 +589,14 @@ namespace Ogre {
             if (name == "OgreUniforms") // default buffer
             {
                 extractUniforms(blockIdx);
-                int binding = mType == GPT_COMPUTE_PROGRAM ? 0 : int(mType);
+                int binding = mType == GPT_COMPUTE_PROGRAM ? 0 : (int(mType) % GPT_PIPELINE_COUNT);
                 if (binding > 1)
                     LogManager::getSingleton().logWarning(
                         getResourceLogName() +
                         " - using 'OgreUniforms' in this shader type does alias with shared_params");
 
-                mDefaultBuffer = hbm.createUniformBuffer(values[2]);
-                static_cast<GL3PlusHardwareBuffer*>(mDefaultBuffer.get())->setGLBufferBinding(binding);
                 OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, blockIdx, binding));
+                mLogicalToPhysical.reset();
                 continue;
             }
 

@@ -52,8 +52,6 @@ namespace Ogre {
         void setSamplerBinding(bool enable) { mHasSamplerBinding = enable; }
         bool getSamplerBinding() const { return mHasSamplerBinding; }
 
-        const HardwareBufferPtr& getDefaultBuffer() const { return mDefaultBuffer; }
-
         /// Overridden from GpuProgram
         const String& getLanguage(void) const override;
     protected:
@@ -68,9 +66,8 @@ namespace Ogre {
 
         /// @param block uniform block to consider. -1 for non-UBO uniforms
         void extractUniforms(int block = -1) const;
-        void extractBufferBlocks(GLenum type) const;
+        void extractBufferBlocks(GLenum type);
 
-        mutable HardwareBufferPtr mDefaultBuffer;
         bool mHasSamplerBinding;
     };
 

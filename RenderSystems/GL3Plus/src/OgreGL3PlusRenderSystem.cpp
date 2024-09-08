@@ -1648,6 +1648,22 @@ namespace Ogre {
             params->_updateSharedParams();
         }
 
+        auto paramsSize = params->getConstantList().size();
+        if (paramsSize && getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+            !params->hasLogicalIndexedParameters())
+        {
+            auto& ubo = mUniformBuffer[gptype];
+            if(!ubo || ubo->getSizeInBytes() < paramsSize)
+            {
+                ubo = mHardwareBufferManager->createUniformBuffer(paramsSize);
+            }
+
+            ubo->writeData(0, ubo->getSizeInBytes(), params->getConstantList().data(), true);
+
+            int binding = gptype == GPT_COMPUTE_PROGRAM ? 0 : (int(gptype) % GPT_PIPELINE_COUNT);
+            static_cast<GL3PlusHardwareBuffer*>(ubo.get())->setGLBufferBinding(binding);
+        }
+
         // Pass on parameters from params to program object uniforms.
         program->updateUniforms(params, mask, gptype);
     }
