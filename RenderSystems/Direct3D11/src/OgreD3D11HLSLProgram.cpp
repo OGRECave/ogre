@@ -809,6 +809,8 @@ namespace Ogre {
     {
         getConstantDefinitions();
 
+        bool hasDefaultBuffer = false;
+
         for(UINT b = 0; b < mConstantBufferNr; b++)
         {           
             switch (mD3d11ShaderBufferDescs[b].Type)
@@ -819,12 +821,9 @@ namespace Ogre {
                     String cb_name = mD3d11ShaderBufferDescs[b].Name;
                     if(cb_name == "$Globals" || cb_name == "$Params" || cb_name == "OgreUniforms")
                     {
-                        if(mDefaultBuffer)
+                        if(hasDefaultBuffer)
                             LogManager::getSingleton().logError(mName+" - default cbuffer already exists. Ignoring "+cb_name);
-                        else
-                        {
-                            mDefaultBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size);
-                        }
+                        hasDefaultBuffer = true;
                     }
                     else
                     {
@@ -904,7 +903,6 @@ namespace Ogre {
         mDomainShader.Reset();
         mHullShader.Reset();
         mComputeShader.Reset();
-        mDefaultBuffer.reset();
 
         unprepareImpl();
     }
@@ -1512,39 +1510,6 @@ namespace Ogre {
         }
 
         return it->second;
-    }
-    //-----------------------------------------------------------------------------
-    std::vector<ID3D11Buffer*> D3D11HLSLProgram::getConstantBuffers(const GpuProgramParametersPtr& params)
-    {
-        std::vector<ID3D11Buffer*> buffers;
-        if(mDefaultBuffer)
-        {
-            OgreAssert(mDefaultBuffer->getSizeInBytes() == params->getConstantList().size(), "unexpected buffer size");
-            mDefaultBuffer->writeData(0, mDefaultBuffer->getSizeInBytes(), params->getConstantList().data(), true);
-
-            buffers.push_back(static_cast<D3D11HardwareBuffer*>(mDefaultBuffer.get())->getD3DBuffer());
-        }
-        else
-        {
-            buffers.push_back(NULL);
-        }
-
-        for (const auto& usage : params->getSharedParameters())
-        {
-            if(const auto& buf = usage.getSharedParams()->_getHardwareBuffer())
-            {
-                // hardware baked cbuffer
-                auto it = mBufferInfoMap.find(usage.getName());
-                if(it == mBufferInfoMap.end())
-                    continue; // TODO: error?
-
-                size_t slot = it->second;
-                buffers.resize(std::max(slot + 1, buffers.size()));
-                buffers[slot] = static_cast<D3D11HardwareBuffer*>(buf.get())->getD3DBuffer();
-            }
-        }
-
-        return buffers;
     }
     //-----------------------------------------------------------------------------
     ID3D11VertexShader* D3D11HLSLProgram::getVertexShader(void) const 

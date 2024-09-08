@@ -72,6 +72,7 @@ namespace Ogre {
         };
 
         typedef std::vector<D3D11_SIGNATURE_PARAMETER_DESC> D3d11ShaderParameters;
+        typedef std::map<String, int> BufferInfoMap;
     protected:
 
         static CmdTarget msCmdTarget;
@@ -102,11 +103,8 @@ namespace Ogre {
         ComPtr<ID3D11DomainShader> mDomainShader;
         ComPtr<ID3D11HullShader> mHullShader;
         ComPtr<ID3D11ComputeShader> mComputeShader;
-        
-        HardwareBufferPtr mDefaultBuffer; // for $Globals OR $Params
 
         // Make sure that objects have index and name, or some search will fail
-        typedef std::map<String, int> BufferInfoMap;
         BufferInfoMap mBufferInfoMap;
 
         // Map to store interface slot position. 
@@ -182,7 +180,7 @@ namespace Ogre {
         ID3D11ComputeShader* getComputeShader(void) const;
         const MicroCode &  getMicroCode(void) const;  
 
-        std::vector<ID3D11Buffer*> getConstantBuffers(const GpuProgramParametersPtr& params);
+        const BufferInfoMap& getBufferInfoMap() const { return mBufferInfoMap; }
 
         // Get slot for a specific interface
         unsigned int getSubroutineSlot(const String& subroutineSlotName) const;
