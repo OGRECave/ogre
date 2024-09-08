@@ -1201,6 +1201,8 @@ namespace Ogre
         void setFFPLightParams(uint32 index, bool enabled);
         bool flipFrontFace() const;
         static CompareFunction reverseCompareFunction(CompareFunction func);
+
+        const HardwareBufferPtr& updateDefaultUniformBuffer(GpuProgramType type, const ConstantList& params);
     private:
         StencilState mStencilState;
 
@@ -1208,6 +1210,8 @@ namespace Ogre
         HardwareVertexBufferSharedPtr mGlobalInstanceVertexBuffer;
         /// a vertex declaration for the global vertex buffer for the global instancing
         VertexDeclaration* mGlobalInstanceVertexDeclaration;
+        /// buffers for default uniform blocks
+        HardwareBufferPtr mUniformBuffer[GPT_COUNT];
         /// the number of global instances (this number will be multiply by the render op instance number)
         uint32 mGlobalNumberOfInstances;
     };
