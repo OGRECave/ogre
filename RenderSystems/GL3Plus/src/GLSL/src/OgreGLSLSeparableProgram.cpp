@@ -120,14 +120,7 @@ namespace Ogre
         GLuint progID = mShaders[fromProgType]->getGLProgramHandle();
         GLUniformCache* uniformCache = mShaders[fromProgType]->getUniformCache();
 
-        bool usesUBO = false;
-        if(const auto& ubo = static_cast<GLSLShader*>(mShaders[fromProgType])->getDefaultBuffer())
-        {
-            // we ignore ma
-            ubo->writeData(0, ubo->getSizeInBytes(), params->getConstantList().data(), true);
-            static_cast<GL3PlusHardwareBuffer*>(ubo.get())->bind();
-            usesUBO = true;
-        }
+        bool usesUBO = !params->hasLogicalIndexedParameters();
 
         // Iterate through uniform reference list and update uniform values
         for (const auto& it : params->getConstantDefinitions().map)
