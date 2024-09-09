@@ -1009,7 +1009,7 @@ namespace Ogre {
             for(auto it : op.vertexData->vertexBufferBinding->getBindings())
             {
                 auto buf = it.second->_getImpl<GL3PlusHardwareBuffer>();
-                buf->setGLBufferBinding(it.first, GL_SHADER_STORAGE_BUFFER);
+                buf->setGLBufferBinding(it.first + 3, GL_SHADER_STORAGE_BUFFER);
             }
         }
 

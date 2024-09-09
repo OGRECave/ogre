@@ -131,7 +131,7 @@ refer to the following table for the location indices and names to use:
 
 ## Buffers in Mesh Shaders {#GLSL-Mesh-Shaders}
 
-With mesh shaders the input assembly stage is skipped and hence the vertex attributes are not available. Instead, %Ogre will bind the vertex buffers as SSBOs to a binding point defined by the Ogre::VertexBufferBinding index.
+With mesh shaders the input assembly stage is skipped and hence the vertex attributes are not available. Instead, %Ogre will bind the vertex buffers as SSBOs to a binding point defined by the Ogre::VertexBufferBinding index, offset by 3.
 
 In the shader you can access the buffer as follows:
 

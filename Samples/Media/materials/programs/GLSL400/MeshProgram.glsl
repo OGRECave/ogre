@@ -17,13 +17,13 @@ layout(location=0) out PerVertexData
     vec3 color;
 } v_out[];
 
-#ifdef VULKAN
 layout(binding=0, row_major) uniform OgreUniforms
 {
     mat4 MVP;
     float t;
 };
 
+#ifdef VULKAN
 // SSBOs cannot be used with Vulkan yet
 float data[] = {
     -100, -100, 0,  // pos
@@ -40,13 +40,9 @@ float data[] = {
     0,0
 };
 #else
-// UBOs cannot be used with gl_spirv yet
-layout(location=0) uniform mat4 MVP;
-layout(location=4) uniform float t;
-
 //![vertexbuffer]
 // buffer at index 0, which is expected to contain float data
-layout(binding = 0) buffer VertexDataIn
+layout(binding = 3) readonly buffer VertexDataIn
 {
     float data[];
 };
