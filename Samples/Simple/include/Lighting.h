@@ -201,7 +201,7 @@ protected:
             mLight1BBQueryArea = mSceneMgr->createBillboardSet(1);
             mLight1BBQueryArea->setDefaultDimensions(10,10);
             mLight1BBQueryArea->createBillboard(Vector3::ZERO);
-            mLight1BBQueryArea->setMaterialName("QueryArea");
+            mLight1BBQueryArea->setMaterial(matQueryArea);
             mLight1BBQueryArea->setRenderQueueGroup(cPriorityQuery);
             node->attachObject(mLight1BBQueryArea);
 
@@ -209,7 +209,7 @@ protected:
             mLight1BBQueryVisible = mSceneMgr->createBillboardSet(1);
             mLight1BBQueryVisible->setDefaultDimensions(10,10);
             mLight1BBQueryVisible->createBillboard(Vector3::ZERO);
-            mLight1BBQueryVisible->setMaterialName("QueryVisible");
+            mLight1BBQueryVisible->setMaterial(matQueryVisible);
             mLight1BBQueryVisible->setRenderQueueGroup(cPriorityQuery);
             node->attachObject(mLight1BBQueryVisible);
         }
@@ -260,7 +260,7 @@ protected:
             mLight2BBQueryArea = mSceneMgr->createBillboardSet(1);
             mLight2BBQueryArea->setDefaultDimensions(10,10);
             mLight2BBQueryArea->createBillboard(Vector3::ZERO);
-            mLight2BBQueryArea->setMaterialName("QueryArea");
+            mLight2BBQueryArea->setMaterial(matQueryArea);
             mLight2BBQueryArea->setRenderQueueGroup(cPriorityQuery);
             node->attachObject(mLight2BBQueryArea);
 
@@ -268,7 +268,7 @@ protected:
             mLight2BBQueryVisible = mSceneMgr->createBillboardSet(1);
             mLight2BBQueryVisible->setDefaultDimensions(10,10);
             mLight2BBQueryVisible->createBillboard(Vector3::ZERO);
-            mLight2BBQueryVisible->setMaterialName("QueryVisible");
+            mLight2BBQueryVisible->setMaterial(matQueryVisible);
             mLight2BBQueryVisible->setRenderQueueGroup(cPriorityQuery);
             node->attachObject(mLight2BBQueryVisible);
         }
