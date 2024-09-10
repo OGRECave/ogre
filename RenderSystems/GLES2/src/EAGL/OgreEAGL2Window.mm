@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
-#include "OgreViewport.h"
 #include "OgreLogManager.h"
 #include <iomanip>
 
@@ -129,16 +128,10 @@ namespace Ogre {
         EAGLContextGuard ctx_guard(mContext->getContext());
         
         mContext->destroyFramebuffer();
-        
-        mWidth = widthPx;
-        mHeight = heightPx;
+
+        RenderWindow::resize(widthPx, heightPx);
         
         mContext->createFramebuffer();
-
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-        {
-            (*it).second->_updateDimensions();
-        }
 	}
     
 	void EAGL2Window::windowMovedOrResized()
@@ -155,17 +148,12 @@ namespace Ogre {
         EAGLContextGuard ctx_guard(mContext->getContext());
         mContext->destroyFramebuffer();
 
-        mWidth  = width;
-        mHeight = height;
         mLeft   = left;
         mTop    = top;
 
-        mContext->createFramebuffer();
+        RenderWindow::resize(width, height);
 
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-        {
-            (*it).second->_updateDimensions();
-        }
+        mContext->createFramebuffer();
 	}
 
     void EAGL2Window::createNativeWindow(uint widthPt, uint heightPt, const NameValuePairList *miscParams)

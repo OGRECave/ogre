@@ -31,8 +31,6 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 
-#include "OgreViewport.h"
-
 #include "OgreWin32EGLSupport.h"
 #include "OgreWin32EGLWindow.h"
 
@@ -265,13 +263,7 @@ namespace Ogre {
 		// Case window resized.
 		if (width != mWidth || height != mHeight)
 		{
-			mWidth  = rc.right - rc.left;
-			mHeight = rc.bottom - rc.top;
-
-			// Notify viewports of resize
-			ViewportList::iterator it = mViewportList.begin();
-			while( it != mViewportList.end() )
-				(*it++).second->_updateDimensions();
+			RenderWindow::resize(width, height);
 		}
     }
 

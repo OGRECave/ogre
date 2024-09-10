@@ -37,7 +37,6 @@ THE SOFTWARE.
 #include "OgrePixelFormat.h"
 #include "OgreVulkanTextureGpuManager.h"
 #include "OgreHardwarePixelBuffer.h"
-#include "OgreViewport.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android/native_window.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -315,16 +314,12 @@ namespace Ogre
 
         if (width != 0 && height != 0)
         {
-            mWidth = width;
-            mHeight = height;
+            RenderWindow::resize(width, height);
 
             // recreate swapchain
             mDevice->stall();
             destroySwapchain();
             createSwapchain();
-
-            for (auto it : mViewportList)
-                it.second->_updateDimensions();
         }
     }
 

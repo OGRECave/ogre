@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreViewport.h"
 
 #include "OgreX11EGLSupport.h"
 #include "OgreX11EGLWindow.h"
@@ -187,11 +186,7 @@ namespace Ogre {
                 XFlush(mGLSupport->getNativeDisplay());
             }
 
-            mWidth = width;
-            mHeight = height;
-
-            for (auto & it : mViewportList)
-                it.second->_updateDimensions();
+            RenderWindow::resize(width, height);
         }
     }
 

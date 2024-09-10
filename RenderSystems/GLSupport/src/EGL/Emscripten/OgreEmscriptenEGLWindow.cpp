@@ -35,7 +35,6 @@ THE SOFTWARE.
 
 #include "OgreEmscriptenEGLSupport.h"
 #include "OgreEmscriptenEGLWindow.h"
-#include "OgreViewport.h"
 
 #include <iostream>
 #include <algorithm>
@@ -68,9 +67,7 @@ namespace Ogre {
 
     void EmscriptenEGLWindow::resize(uint width, uint height)
     {
-        mWidth = width;
-        mHeight = height;
-        
+        RenderWindow::resize(width, height);
 
         EMSCRIPTEN_RESULT result = emscripten_set_canvas_element_size(mCanvasSelector.c_str(), width, height);
         // This is a workaroud for issue: https://github.com/emscripten-core/emscripten/issues/3283.
@@ -86,11 +83,6 @@ namespace Ogre {
         
         
         LogManager::getSingleton().logMessage("EmscriptenEGLWindow::resize "+mCanvasSelector+" w:" + Ogre::StringConverter::toString(mWidth) + " h:" + Ogre::StringConverter::toString(mHeight));
-        
-        // Notify viewports of resize
-        ViewportList::iterator it = mViewportList.begin();
-        while( it != mViewportList.end() )
-            (*it++).second->_updateDimensions();
     }
 
     void EmscriptenEGLWindow::windowMovedOrResized()
@@ -99,13 +91,8 @@ namespace Ogre {
 
         int w, h;
         emscripten_get_canvas_element_size(mCanvasSelector.c_str(), &w, &h);
-        mWidth = w;
-        mHeight = h;
 
-        // Notify viewports of resize
-        ViewportList::iterator it = mViewportList.begin();
-        while( it != mViewportList.end() )
-            (*it++).second->_updateDimensions();
+        RenderWindow::resize(w, h);
     }
     
     void EmscriptenEGLWindow::switchFullScreen(bool fullscreen)

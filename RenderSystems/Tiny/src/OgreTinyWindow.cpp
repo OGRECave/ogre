@@ -37,9 +37,8 @@ void TinyWindow::create(const String& name, uint width, uint height,
 
 void TinyWindow::resize(uint width, uint height)
 {
-    mWidth = width;
-    mHeight = height;
     mBuffer.create(PF_BYTE_RGB, width, height);
+    RenderWindow::resize(width, height);
 }
 
 void TinyWindow::swapBuffers()

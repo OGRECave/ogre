@@ -66,8 +66,6 @@ namespace Ogre {
             void create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                         const NameValuePairList* miscParams) override;
 
-            void resize(unsigned int width, unsigned int height) override {}
-
             void setFullscreen (bool fullscreen, uint width, uint height) override;
             void destroy(void) override;
             void swapBuffers() override;
