@@ -63,12 +63,12 @@ namespace Ogre {
     
     void GL3PlusHardwareOcclusionQuery::beginOcclusionQuery()
     {
-        OGRE_CHECK_GL_ERROR(glBeginQuery(GL_ANY_SAMPLES_PASSED, mQueryID));
+        OGRE_CHECK_GL_ERROR(glBeginQuery(GL_SAMPLES_PASSED, mQueryID));
     }
     
     void GL3PlusHardwareOcclusionQuery::endOcclusionQuery()
     {
-        OGRE_CHECK_GL_ERROR(glEndQuery(GL_ANY_SAMPLES_PASSED));
+        OGRE_CHECK_GL_ERROR(glEndQuery(GL_SAMPLES_PASSED));
     }
     
     bool GL3PlusHardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragments )
