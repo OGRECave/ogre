@@ -31,10 +31,8 @@ THE SOFTWARE.
 #endif
 #include "OgreWin32Window.h"
 #include "OgreRoot.h"
-#include "OgreViewport.h"
 #include "OgreLogManager.h"
 #include "OgreRenderSystem.h"
-#include "OgreImageCodec.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
 #include "OgreWin32GLSupport.h"
@@ -751,16 +749,9 @@ namespace Ogre {
         unsigned int width = rc.right - rc.left;
         unsigned int height = rc.bottom - rc.top;
 
-        // Case window resized.
         if (width != mWidth || height != mHeight)
         {
-            mWidth  = rc.right - rc.left;
-            mHeight = rc.bottom - rc.top;
-
-            // Notify viewports of resize
-            ViewportList::iterator it = mViewportList.begin();
-            while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();            
+            RenderWindow::resize(rc.right - rc.left, rc.bottom - rc.top);
         }
     }
 

@@ -37,7 +37,6 @@ THE SOFTWARE.
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
-#import "OgreViewport.h"
 #import <iomanip>
 
 @implementation OgreGLWindow
@@ -531,8 +530,7 @@ namespace Ogre {
         if(mWidth == widthPx && mHeight == heightPx)
             return;
 
-        mWidth = widthPx;
-        mHeight = heightPx;
+        RenderWindow::resize(widthPx, heightPx);
 
         if(mIsExternal)
         {
@@ -563,10 +561,6 @@ namespace Ogre {
         }
         //make sure the context is current
         NSOpenGLContextGuard ctx_guard(mGLContext);
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-        {
-            (*it).second->_updateDimensions();
-        }
 		[mGLContext update];
     }
 
@@ -592,15 +586,12 @@ namespace Ogre {
         mLeft = _getPixelFromPoint((int)leftPt);
         mTop = _getPixelFromPoint((int)topPt);
 
+        RenderWindow::resize(mWidth, mHeight);
+
         mWindowOriginPt = NSMakePoint(leftPt, topPt);
 
         //make sure the context is current
         NSOpenGLContextGuard ctx_guard(mGLContext);
-
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-        {
-            (*it).second->_updateDimensions();
-        }
 		[mGLContext update];
     }
 

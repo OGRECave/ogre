@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11Texture.h"
-#include "OgreViewport.h"
 #include "OgreLogManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
@@ -221,14 +220,6 @@ namespace Ogre
 
 		RenderWindow::updateImpl();
 	}
-    //---------------------------------------------------------------------
-    void D3D11RenderWindowBase::_updateViewportsDimensions()
-    {
-        // Notify viewports of resize
-        ViewportList::iterator it = mViewportList.begin();
-        while( it != mViewportList.end() )
-            (*it++).second->_updateDimensions();            
-    }
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::_queryDxgiDeviceImpl(IDXGIDeviceN** dxgiDevice)
     {
@@ -478,9 +469,7 @@ namespace Ogre
         }
 
         _createSizeDependedD3DResources();
-
-        // Notify viewports of resize
-        _updateViewportsDimensions();
+        rsys->_setViewport(NULL); // force reset viewport settings
         rsys->fireDeviceEvent(&mDevice,"RenderWindowResized",this);
     }
     //---------------------------------------------------------------------
@@ -522,7 +511,7 @@ namespace Ogre
         _createSizeDependedD3DResources();
 
         // Notify viewports of resize
-        _updateViewportsDimensions();
+        RenderWindow::resize(mWidth, mHeight);
         rsys->fireDeviceEvent(&mDevice,"RenderWindowResized",this);
     }
 
@@ -1063,7 +1052,7 @@ namespace Ogre
             if ((oldFullscreen && fullScreen) || mIsExternal)
             {
                 // Notify viewports of resize
-                _updateViewportsDimensions();
+                RenderWindow::resize(mWidth, mHeight);
             }
         }
     } 
@@ -1716,13 +1705,9 @@ namespace Ogre
 
         _destroySizeDependedD3DResources();
 
-        mWidth = width;
-        mHeight = height;
+        RenderWindow::resize(width, height);
 
         _createSizeDependedD3DResources();
-
-        // Notify viewports of resize
-        _updateViewportsDimensions();
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowImageSource::getCustomAttribute( const String& name, void* pData )

@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreMetalRenderWindow.h"
 #include "OgreMetalMappings.h"
 #include "OgreMetalRenderSystem.h"
-#include "OgreViewport.h"
 
 namespace Ogre
 {
@@ -113,8 +112,7 @@ namespace Ogre
         if( mWidth != mMetalLayer.drawableSize.width ||
             mHeight != mMetalLayer.drawableSize.height )
         {
-            mWidth  = mMetalLayer.drawableSize.width;
-            mHeight = mMetalLayer.drawableSize.height;
+            RenderWindow::resize(mMetalLayer.drawableSize.width, mMetalLayer.drawableSize.height);
 
             if( mFSAA > 1 && mWidth > 0 && mHeight > 0 )
             {
@@ -133,14 +131,6 @@ namespace Ogre
             }
 
             detachDepthBuffer();
-
-            ViewportList::iterator itor = mViewportList.begin();
-            ViewportList::iterator end  = mViewportList.end();
-            while( itor != end )
-            {
-                (*itor).second->_updateDimensions();
-                ++itor;
-            }
         }
     }
 

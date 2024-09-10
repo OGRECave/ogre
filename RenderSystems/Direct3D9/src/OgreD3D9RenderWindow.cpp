@@ -27,12 +27,10 @@ THE SOFTWARE.
 */
 #include "OgreD3D9RenderWindow.h"
 #include "OgreLogManager.h"
-#include "OgreViewport.h"
 #include "OgreException.h"
 #include "OgreD3D9RenderSystem.h"
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
-#include "OgreImageCodec.h"
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 #include "OgreD3D9DeviceManager.h"
@@ -434,10 +432,8 @@ namespace Ogre
             // NB don't use windowMovedOrResized since Win32 doesn't know
             // about the size change yet                
             mDevice->invalidate(this);
-            // Notify viewports of resize
-            ViewportList::iterator it = mViewportList.begin();
-            while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();    
+
+            RenderWindow::resize(mWidth, mHeight);
         }
     } 
 
@@ -918,18 +914,10 @@ namespace Ogre
         unsigned int width = rc.right - rc.left;
         unsigned int height = rc.bottom - rc.top;
 
-        // Case window resized.
         if (width != mWidth || height != mHeight)
         {
-            mWidth  = rc.right - rc.left;
-            mHeight = rc.bottom - rc.top;
-
-            // Notify viewports of resize
-            ViewportList::iterator it = mViewportList.begin();
-            while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();            
-        }   
-
+            RenderWindow::resize(rc.right - rc.left, rc.bottom - rc.top);
+        }
     }
     //-----------------------------------------------------------------------------
     void D3D9RenderWindow::updateStats( void )

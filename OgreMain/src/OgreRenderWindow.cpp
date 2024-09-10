@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreRenderWindow.h"
+#include "OgreViewport.h"
 
 namespace Ogre {
 
@@ -34,6 +35,16 @@ namespace Ogre {
         : RenderTarget(), mIsFullScreen(false), mIsPrimary(false), mClosed(false), mLeft(0), mTop(0), mVSyncInterval(1)
     {
         mAutoDeactivatedOnFocusChange = true;
+    }
+
+    void RenderWindow::resize(unsigned int widthPt, unsigned int heightPt)
+    {
+        mWidth = widthPt;
+        mHeight = heightPt;
+
+        // Notify viewports of resize
+        for (auto it : mViewportList)
+            it.second->_updateDimensions();
     }
 
     //-----------------------------------------------------------------------

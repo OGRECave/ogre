@@ -7,7 +7,6 @@
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 #include "OgreStringConverter.h"
-#include "OgreViewport.h"
 
 #include "OgreWaylandEGLSupport.h"
 #include "OgreWaylandEGLWindow.h"
@@ -92,11 +91,8 @@ void WaylandEGLWindow::resize(uint width, uint height)
         if (mWindow)
         {
             wl_egl_window_resize(mWindow, width, height, 0, 0);
-            mWidth = width;
-            mHeight = height;
 
-            for (auto& it : mViewportList)
-                it.second->_updateDimensions();
+            RenderWindow::resize(width, height);
 
             wl_surface_damage(mWlSurface, 0, 0, mWidth, mHeight);
             wl_surface_commit(mWlSurface);

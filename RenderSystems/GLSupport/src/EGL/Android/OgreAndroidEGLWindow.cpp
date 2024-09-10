@@ -35,7 +35,6 @@ THE SOFTWARE.
 
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
-#include "OgreViewport.h"
 
 #include <android/native_window.h>
 
@@ -65,13 +64,7 @@ namespace Ogre {
         if (!mActive || (mWidth == width && mHeight == height))
             return;
 
-        mWidth = width;
-        mHeight = height;
-
-        // Notify viewports of resize
-        ViewportList::iterator it = mViewportList.begin();
-        while (it != mViewportList.end())
-            (*it++).second->_updateDimensions();
+        RenderWindow::resize(width, height);
 
         EGLint format;
         eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);

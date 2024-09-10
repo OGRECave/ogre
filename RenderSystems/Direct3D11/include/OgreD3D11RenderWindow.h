@@ -90,8 +90,6 @@ namespace Ogre
         ComPtr<IDXGIDeviceN> _queryDxgiDevice()                 { ComPtr<IDXGIDeviceN> res; _queryDxgiDeviceImpl(res.GetAddressOf()); return res; }
         void _queryDxgiDeviceImpl(IDXGIDeviceN** dxgiDevice);   // release after use
 
-        void _updateViewportsDimensions();
-
     protected:
         D3D11Device & mDevice;          // D3D11 driver
         bool    mIsExternal;            // window not created by Ogre

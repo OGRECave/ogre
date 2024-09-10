@@ -33,7 +33,6 @@
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreViewport.h"
 
 #include "OgreGLXContext.h"
 #include "OgreGLXGLSupport.h"
@@ -465,11 +464,7 @@ namespace Ogre
                 XFlush(mGLSupport->getXDisplay());
             }
 
-            mWidth = width;
-            mHeight = height;
-
-            for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-                (*it).second->_updateDimensions();
+            RenderWindow::resize(width, height);
         }
     }
 
