@@ -43,35 +43,33 @@ For manually building the dependencies, please refer to the list below and get a
 
 On linux you additionally need the following system headers to build the GL, GL3+, GLES2 & Vulkan RenderSystems:
 
-* Ubuntu
+@par Ubuntu
 
-    sudo apt-get install libgles2-mesa-dev libvulkan-dev glslang-dev
+```py
+sudo apt-get install libgles2-mesa-dev libvulkan-dev glslang-dev
+# with OGRE_USE_WAYLAND=OFF
+sudo apt-get install libxrandr-dev
+# with OGRE_USE_WAYLAND=ON
+sudo apt-get install libwayland-dev libwayland-egl1 libegl-dev
 
-    * **X11**: `sudo apt-get install libxrandr-dev`
-    * **Wayland**: `sudo apt-get install pkg-config libwayland-dev libwayland-egl1 libegl-dev`
+# Optional dependencies
+sudo apt-get install libsdl2-dev doxygen
+```
 
-* Fedora
+@par Fedora
 
-    sudo dnf install mesa-libGL-devel mesa-libEGL-devel mesa-vulkan-devel glslang-devel
+```py
+sudo dnf install mesa-libGL-devel mesa-libEGL-devel mesa-vulkan-devel glslang-devel
+# with OGRE_USE_WAYLAND=OFF
+sudo dnf install libXrandr-devel
+# with OGRE_USE_WAYLAND=ON
+sudo dnf install pkgconfig wayland-devel egl-wayland
 
-    * **X11**: `sudo dnf install libXrandr-devel`
-    * **Wayland**: `sudo dnv install pkgconfig wayland-devel egl-wayland`
+# Optional dependencies
+sudo dnf install SDL2-devel doxygen
+```
 
-Furthermore, we recommend installing the following optional packages
-
-* Ubuntu
-
-    sudo apt-get install libsdl2-dev doxygen
-
-    * **X11**: `sudo apt-get install libxt-dev libxaw7-dev`
-
-* Fedora
-
-    sudo dnf install SDL2-devel doxygen
-
-    * **X11**: `sudo dnf install libXt-devel libXaw-devel`
-
-These will enable input handling in the SampleBrowser, the X11 ConfigDialog and allow building the documentation.
+The optional dependencies will enable input handling and allow building the documentation.
 
 ### Recommended dependencies
 
