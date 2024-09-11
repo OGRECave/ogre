@@ -76,7 +76,6 @@ namespace Ogre {
         void beginOcclusionQuery(); 
         void endOcclusionQuery();
         bool pullOcclusionQuery( unsigned int* NumOfFragments);
-        unsigned int getLastQuerysPixelcount();
         bool isStillOutstanding(void);
     
         // Called immediately after the Direct3D device has been created.
