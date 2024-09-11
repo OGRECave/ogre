@@ -68,7 +68,6 @@ namespace Ogre {
     {           
         mDevice.GetImmediateContext()->Begin(mQuery.Get());//Issue(D3DISSUE_BEGIN); 
         mIsQueryResultStillOutstanding = true;
-        mPixelCount = 0;
     }
 
     void D3D11HardwareOcclusionQuery::endOcclusionQuery() 

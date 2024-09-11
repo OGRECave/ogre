@@ -86,7 +86,6 @@ namespace Ogre {
         {
             pOccQuery->Issue(D3DISSUE_BEGIN); 
             mIsQueryResultStillOutstanding = true;
-            mPixelCount = 0;
         }       
     }
 
@@ -141,7 +140,6 @@ namespace Ogre {
                 if (hr == D3DERR_DEVICELOST)
                 {
                     *NumOfFragments = 0;
-                    mPixelCount = 0;
                     SAFE_RELEASE(it->second);
                     break;
                 }
@@ -154,12 +152,6 @@ namespace Ogre {
             *NumOfFragments = mPixelCount;
         }       
         return true;
-    }
-
-    //------------------------------------------------------------------
-    unsigned int D3D9HardwareOcclusionQuery::getLastQuerysPixelcount()
-    {
-        return mPixelCount;
     }
 
     //------------------------------------------------------------------
