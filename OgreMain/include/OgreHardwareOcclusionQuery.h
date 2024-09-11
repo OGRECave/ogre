@@ -42,85 +42,64 @@ namespace Ogre {
     *  @{
     */
 /**
-  * This is a abstract class that that provides the interface for the query class for 
-  * hardware occlusion.
+  * Query how many pixels have passed the per-fragment tests.
   *
-  * @author Lee Sandberg
-  * Updated on 13/8/2005 by Tuan Kuranes email: tuan.kuranes@free.fr
+  * Create one OcclusionQuery per outstanding query or one per tested object
+  *
+  * Then, in the rendering loop:
+  * 1. Draw all occluders
+  * 2. @ref begin()
+  * 3. Draw the polygons to be tested
+  * 4. @ref end()
+  *
+  * Results must be pulled using @ref waitForResult()
   */
-    class _OgreExport HardwareOcclusionQuery : public RenderSysAlloc
+class _OgreExport HardwareOcclusionQuery : public RenderSysAlloc
 {
-//----------------------------------------------------------------------
-// Public methods
-//--
 public:
-    /**
-      * Object public member functions
-      */
-
-    /**
-      * Default object constructor
-      * 
-      */
     HardwareOcclusionQuery();
 
-    /**
-      * Object destructor
-      */
     virtual ~HardwareOcclusionQuery();
 
     /**
       * Starts the hardware occlusion query
-      * @remarks    Simple usage: Create one or more OcclusionQuery object one per outstanding query or one per tested object 
-      *             OcclusionQuery* mOcclusionQuery;
-      *             createOcclusionQuery( &mOcclusionQuery );
-      *             In the rendering loop:
-      *             Draw all occluders
-      *             mOcclusionQuery->startOcclusionQuery();
-      *             Draw the polygons to be tested
-      *             mOcclusionQuery->endOcclusionQuery();
-      *
-      *             Results must be pulled using:
-      *             UINT    mNumberOfPixelsVisable;
-      *             pullOcclusionQuery( &mNumberOfPixelsVisable );
-      *         
       */
+    void begin() { beginOcclusionQuery(); }
     virtual void beginOcclusionQuery() = 0;
 
     /**
       * Ends the hardware occlusion test
       */
+    void end() { endOcclusionQuery(); }
     virtual void endOcclusionQuery() = 0;
 
     /**
-      * Pulls the hardware occlusion query.
-      * @note Waits until the query result is available; use isStillOutstanding
-      *     if just want to test if the result is available.
-      * @retval NumOfFragments will get the resulting number of fragments.
+      * Waits until the query result is available.
+      * use @ref resultReady() if just want to test if the result is available.
+      * @retval result will get the resulting number of fragments.
       * @return True if success or false if not.
       */
-    virtual bool pullOcclusionQuery(unsigned int* NumOfFragments) = 0;
+    bool waitForResult(unsigned int* result) { return pullOcclusionQuery(result); }
+    virtual bool pullOcclusionQuery(unsigned int* result) = 0;
 
     /**
-      * Let's you get the last pixel count with out doing the hardware occlusion test
+      * Let's you get the last pixel count with out doing the hardware occlusion test.
+      * This function won't give you new values, just the old value.
       * @return The last fragment count from the last test.
-      * Remarks This function won't give you new values, just the old value.
       */
-    unsigned int getLastQuerysPixelcount() const { return mPixelCount; }
+    uint32 getLastResult() const { return mPixelCount; }
+    OGRE_DEPRECATED uint32 getLastQuerysPixelcount() const { return getLastResult(); }
 
     /**
       * Lets you know when query is done, or still be processed by the Hardware
-      * @return true if query isn't finished.
+      * @return true if query is finished.
       */
-     virtual bool isStillOutstanding(void) = 0; 
+    bool resultReady() { return !isStillOutstanding(); }
+    virtual bool isStillOutstanding(void) = 0;
 
-
-    //----------------------------------------------------------------------
-    // protected members
-    //--
-    protected :
+    protected:
         /// Number of visible pixels determined by last query
-        unsigned int mPixelCount;
+        uint32 mPixelCount;
         /// Has the query returned a result yet?
         bool         mIsQueryResultStillOutstanding;
 };
