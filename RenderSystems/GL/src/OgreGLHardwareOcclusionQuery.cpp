@@ -62,6 +62,7 @@ GLHardwareOcclusionQuery::~GLHardwareOcclusionQuery()
 void GLHardwareOcclusionQuery::beginOcclusionQuery() 
 { 
     glBeginQueryARB(GL_SAMPLES_PASSED_ARB, mQueryID);
+    mIsQueryResultStillOutstanding = true;
 }
 //------------------------------------------------------------------
 void GLHardwareOcclusionQuery::endOcclusionQuery() 
@@ -71,16 +72,31 @@ void GLHardwareOcclusionQuery::endOcclusionQuery()
 //------------------------------------------------------------------
 bool GLHardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragments ) 
 {
+    if (!mIsQueryResultStillOutstanding)
+    {
+        *NumOfFragments = mPixelCount;
+        return true;
+    }
+
     glGetQueryObjectuivARB(mQueryID, GL_QUERY_RESULT_ARB, (GLuint*)NumOfFragments);
     mPixelCount = *NumOfFragments;
+
+    mIsQueryResultStillOutstanding = false;
+
     return true;
 }
 //------------------------------------------------------------------
 bool GLHardwareOcclusionQuery::isStillOutstanding(void)
 {    
+    if (!mIsQueryResultStillOutstanding)
+        return false;
+
     GLuint available = GL_FALSE;
 
     glGetQueryObjectuivARB(mQueryID, GL_QUERY_RESULT_AVAILABLE_ARB, &available);
+
+    if(available == GL_TRUE)
+        pullOcclusionQuery(&mPixelCount);
 
     // GL_TRUE means a wait would occur
     return !(available == GL_TRUE);  

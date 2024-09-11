@@ -78,6 +78,7 @@ void GLES2HardwareOcclusionQuery::notifyOnContextReset()
 void GLES2HardwareOcclusionQuery::beginOcclusionQuery() 
 {
     OGRE_CHECK_GL_ERROR(glBeginQueryEXT(GL_ANY_SAMPLES_PASSED_EXT, mQueryID));
+    mIsQueryResultStillOutstanding = true;
 }
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::endOcclusionQuery() 
@@ -87,16 +88,31 @@ void GLES2HardwareOcclusionQuery::endOcclusionQuery()
 //------------------------------------------------------------------
 bool GLES2HardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragments ) 
 {
+    if (!mIsQueryResultStillOutstanding)
+    {
+        *NumOfFragments = mPixelCount;
+        return true;
+    }
+
     OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_EXT, (GLuint*)NumOfFragments));
     mPixelCount = *NumOfFragments;
+
+    mIsQueryResultStillOutstanding = false;
+
     return true;
 }
 //------------------------------------------------------------------
 bool GLES2HardwareOcclusionQuery::isStillOutstanding(void)
 {    
+    if (!mIsQueryResultStillOutstanding)
+        return false;
+
     GLuint available = GL_FALSE;
 
     OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_AVAILABLE_EXT, &available));
+
+    if(available == GL_TRUE)
+        pullOcclusionQuery(&mPixelCount);
 
     // GL_TRUE means a wait would occur
     return !(available == GL_TRUE);
