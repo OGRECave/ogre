@@ -64,6 +64,7 @@ namespace Ogre {
     void GL3PlusHardwareOcclusionQuery::beginOcclusionQuery()
     {
         OGRE_CHECK_GL_ERROR(glBeginQuery(GL_SAMPLES_PASSED, mQueryID));
+        mIsQueryResultStillOutstanding = true;
     }
     
     void GL3PlusHardwareOcclusionQuery::endOcclusionQuery()
@@ -73,16 +74,31 @@ namespace Ogre {
     
     bool GL3PlusHardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragments )
     {
+        if (!mIsQueryResultStillOutstanding)
+        {
+            *NumOfFragments = mPixelCount;
+            return true;
+        }
+
         OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mQueryID, GL_QUERY_RESULT, (GLuint*)NumOfFragments));
         mPixelCount = *NumOfFragments;
+
+        mIsQueryResultStillOutstanding = false;
+
         return true;
     }
     
     bool GL3PlusHardwareOcclusionQuery::isStillOutstanding(void)
     {
+        if (!mIsQueryResultStillOutstanding)
+            return false;
+
         GLuint available = GL_FALSE;
 
         OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mQueryID, GL_QUERY_RESULT_AVAILABLE, &available));
+
+        if(available == GL_TRUE)
+            pullOcclusionQuery(&mPixelCount);
 
         // GL_TRUE means a wait would occur
         return !(available == GL_TRUE);
