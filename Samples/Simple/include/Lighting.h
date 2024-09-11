@@ -7,7 +7,48 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-class _OgreSampleClassExport Sample_Lighting : public SdkSample, public RenderObjectListener
+struct OcclusionQueryActivator : public RenderObjectListener
+{
+    HardwareOcclusionQuery* mActiveQuery = NULL;
+
+    std::map<Renderable*, HardwareOcclusionQuery*> mQueryMap;
+
+    // Event raised when render single object started.
+    void notifyRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
+            const LightList* pLightList, bool suppressRenderStateChanges) override
+    {
+        //
+        // The following code activates and deactivates the occlusion queries
+        // so that the queries only include the rendering of their intended targets
+        //
+
+        // Close the last occlusion query
+        // Each occlusion query should only last a single rendering
+        if (mActiveQuery)
+        {
+            mActiveQuery->end();
+            mActiveQuery = NULL;
+        }
+
+        // Open a new occlusion query
+
+        // Check if a the object being rendered needs
+        // to be occlusion queried, and by which query instance.
+        auto it = mQueryMap.find(rend);
+        if(it == mQueryMap.end())
+            return;
+
+        // Stop occlusion query until we get the information
+        // (may not happen on the same frame they are requested in)
+        if(!it->second->resultReady())
+            return;
+
+        mActiveQuery = it->second;
+        mActiveQuery->begin();
+    }
+};
+
+class _OgreSampleClassExport Sample_Lighting : public SdkSample
 {
     static const uint8 cPriorityMain = 50;
     static const uint8 cPriorityQuery = 51;
@@ -25,11 +66,7 @@ public:
         mLight1QueryArea(NULL),
         mLight1QueryVisible(NULL),
         mLight2QueryArea(NULL),
-        mLight2QueryVisible(NULL),
-        mActiveQuery(NULL),
-        mUseOcclusionQuery(false),
-        mDoOcclusionQuery(false)
-        
+        mLight2QueryVisible(NULL)
     {
         mInfo["Title"] = "Lighting";
         mInfo["Description"] = "Shows OGRE's lighting support. Also demonstrates "
@@ -41,39 +78,23 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt) override
     {
-        // Modulate the light flare according to performed occlusion queries
-        if (mUseOcclusionQuery)
+        if (mLight1QueryArea)
         {
-            // Stop occlusion queries until we get their information
-            // (may not happen on the same frame they are requested in)
-            mDoOcclusionQuery = false;
+            // Modulate the lights according to the query data
+            unsigned int lightAreaCount;
+            unsigned int lightVisibleCount;
+            float ratio;
             
-            // Check if all query information available
-            if ((mLight1QueryArea->isStillOutstanding() == false) &&
-                (mLight1QueryVisible->isStillOutstanding() == false) &&
-                (mLight2QueryArea->isStillOutstanding() == false) &&
-                (mLight2QueryVisible->isStillOutstanding() == false))
-            {
-                // Modulate the lights according to the query data
-                unsigned int lightAreaCount;
-                unsigned int lightVisibleCount;
-                float ratio;
-                
-                mLight1QueryArea->pullOcclusionQuery(&lightAreaCount);
-                mLight1QueryVisible->pullOcclusionQuery(&lightVisibleCount);
-                ratio = float(lightVisibleCount) / float(lightAreaCount);
-                mLight1BBFlare->setColour(mTrail->getInitialColour(0) * ratio);
-                
-                mLight2QueryArea->pullOcclusionQuery(&lightAreaCount);
-                mLight2QueryVisible->pullOcclusionQuery(&lightVisibleCount);
-                ratio = float(lightVisibleCount) / float(lightAreaCount);
-                mLight2BBFlare->setColour(mTrail->getInitialColour(1) * ratio);
+            lightAreaCount = mLight1QueryArea->getLastResult();
+            lightVisibleCount = mLight1QueryVisible->getLastResult();
+            ratio = float(lightVisibleCount) / float(lightAreaCount);
+            mLight1BBFlare->setColour(mTrail->getInitialColour(0) * ratio);
 
-                // Request new query data
-                mDoOcclusionQuery = true;
-            }
+            lightAreaCount = mLight2QueryArea->getLastResult();
+            lightVisibleCount = mLight2QueryVisible->getLastResult();
+            ratio = float(lightVisibleCount) / float(lightAreaCount);
+            mLight2BBFlare->setColour(mTrail->getInitialColour(1) * ratio);
         }
-
 
         return SdkSample::frameRenderingQueued(evt);   // don't forget the parent class updates!
     }
@@ -112,26 +133,15 @@ protected:
         mTrail->setRenderQueueGroup(cPriorityLights);
         
         // Create the occlusion queries to be used in this sample
-        try {
-            RenderSystem* renderSystem = Ogre::Root::getSingleton().getRenderSystem();
-            mLight1QueryArea = renderSystem->createHardwareOcclusionQuery();
-            mLight1QueryVisible = renderSystem->createHardwareOcclusionQuery();
-            mLight2QueryArea = renderSystem->createHardwareOcclusionQuery();
-            mLight2QueryVisible = renderSystem->createHardwareOcclusionQuery();
+        RenderSystem* renderSystem = Ogre::Root::getSingleton().getRenderSystem();
+        mLight1QueryArea = renderSystem->createHardwareOcclusionQuery();
+        mLight1QueryVisible = renderSystem->createHardwareOcclusionQuery();
+        mLight2QueryArea = renderSystem->createHardwareOcclusionQuery();
+        mLight2QueryVisible = renderSystem->createHardwareOcclusionQuery();
 
-            mUseOcclusionQuery = (mLight1QueryArea != NULL) &&
-                (mLight1QueryVisible != NULL) &&
-                (mLight2QueryArea != NULL) &&
-                (mLight2QueryVisible != NULL);
-        }
-        catch (Exception& e)
+        if (!mLight1QueryArea)
         {
-            mUseOcclusionQuery = false;
-        }
-
-        if (mUseOcclusionQuery == false)
-        {
-            LogManager::getSingleton().logError("Sample_Lighting - failed to create hardware occlusion query");
+            LogManager::getSingleton().logWarning("Sample_Lighting - hardware occlusion query not available");
         }
         
         // Create the materials to be used by the objects used fo the occlusion query
@@ -195,7 +205,7 @@ protected:
         bbs->setRenderQueueGroup(cPriorityLights);
         node->attachObject(bbs);
 
-        if (mUseOcclusionQuery)
+        if (mLight1QueryArea)
         {
             // Attach a billboard which will be used to get a relative area occupied by the light
             mLight1BBQueryArea = mSceneMgr->createBillboardSet(1);
@@ -254,7 +264,7 @@ protected:
         bbs->setRenderQueueGroup(cPriorityLights);
         node->attachObject(bbs);
         
-        if (mUseOcclusionQuery)
+        if (mLight1QueryArea)
         {
             // Attach a billboard which will be used to get a relative area occupied by the light
             mLight2BBQueryArea = mSceneMgr->createBillboardSet(1);
@@ -271,65 +281,23 @@ protected:
             mLight2BBQueryVisible->setMaterial(matQueryVisible);
             mLight2BBQueryVisible->setRenderQueueGroup(cPriorityQuery);
             node->attachObject(mLight2BBQueryVisible);
-        }
 
-        // Setup the listener for the occlusion query
-        if (mUseOcclusionQuery)
-        {
-            mSceneMgr->addRenderObjectListener(this);
-            mDoOcclusionQuery = true;
-        }
-    }
-
-    // Event raised when render single object started.
-    void notifyRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
-            const LightList* pLightList, bool suppressRenderStateChanges) override
-    {
-        //
-        // The following code activates and deactivates the occlusion queries
-        // so that the queries only include the rendering of their intended targets
-        //
-
-        // Close the last occlusion query
-        // Each occlusion query should only last a single rendering
-        if (mActiveQuery != NULL)
-        {
-            mActiveQuery->endOcclusionQuery();
-            mActiveQuery = NULL;
-        }
-
-        // Open a new occlusion query
-        if (mDoOcclusionQuery == true)
-        {
-            // Check if a the object being rendered needs
-            // to be occlusion queried, and by which query instance.
-            if (rend == mLight1BBQueryArea) 
-                mActiveQuery = mLight1QueryArea;
-            else if (rend == mLight1BBQueryVisible) 
-                mActiveQuery = mLight1QueryVisible;
-            else if (rend == mLight2BBQueryArea) 
-                mActiveQuery = mLight2QueryArea;
-            else if (rend == mLight2BBQueryVisible) 
-                mActiveQuery = mLight2QueryVisible;
-            
-            if (mActiveQuery != NULL)
-            {
-                mActiveQuery->beginOcclusionQuery();
-            }
+            mOcclusionQueryActivator.mQueryMap[mLight2BBQueryArea] = mLight2QueryArea;
+            mOcclusionQueryActivator.mQueryMap[mLight2BBQueryVisible] = mLight2QueryVisible;
+            mOcclusionQueryActivator.mQueryMap[mLight1BBQueryArea] = mLight1QueryArea;
+            mOcclusionQueryActivator.mQueryMap[mLight1BBQueryVisible] = mLight1QueryVisible;
+            // Setup the listener for the occlusion query
+            mSceneMgr->addRenderObjectListener(&mOcclusionQueryActivator);
         }
     }
 
     void cleanupContent() override
     {
         RenderSystem* renderSystem = Ogre::Root::getSingleton().getRenderSystem();
-        if (mLight1QueryArea != NULL)
-            renderSystem->destroyHardwareOcclusionQuery(mLight1QueryArea);
-        if (mLight1QueryVisible != NULL)
-            renderSystem->destroyHardwareOcclusionQuery(mLight1QueryVisible);
-        if (mLight2QueryArea != NULL)
-            renderSystem->destroyHardwareOcclusionQuery(mLight2QueryArea);
-        if (mLight2QueryVisible != NULL)
-            renderSystem->destroyHardwareOcclusionQuery(mLight2QueryVisible);
+        for (const auto& it : mOcclusionQueryActivator.mQueryMap)
+        {
+            renderSystem->destroyHardwareOcclusionQuery(it.second);
+        }
     }
 
     RibbonTrail* mTrail;
@@ -345,10 +313,10 @@ protected:
     HardwareOcclusionQuery* mLight1QueryVisible;
     HardwareOcclusionQuery* mLight2QueryArea;
     HardwareOcclusionQuery* mLight2QueryVisible;
-    HardwareOcclusionQuery* mActiveQuery;
+
+    OcclusionQueryActivator mOcclusionQueryActivator;
 
     bool mUseOcclusionQuery;
-    bool mDoOcclusionQuery;
 };
 
 #endif
