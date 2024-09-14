@@ -564,6 +564,7 @@ SHARED_PTR(GpuProgramParameters);
 %include "OgreBillboard.h"
 %ignore Ogre::Particle::hasOwnDimensions ; // deprecated
 %include "OgreParticle.h"
+%apply unsigned int* OUTPUT { unsigned int* result };
 %include "OgreHardwareOcclusionQuery.h"
 SHARED_PTR(HardwareBuffer);
 %include "OgreHardwareBuffer.h"
