@@ -924,12 +924,38 @@ SHARED_PTR(Mesh);
 %ignore Ogre::Root::createSceneManager(uint16);
 %ignore Ogre::Root::createSceneManager(uint16, const String&);
 %ignore Ogre::Root::getMovableObjectFactoryIterator;
+#ifdef SWIGPYTHON
+%{
+class ThreadAllowFrameListener : public Ogre::FrameListener {
+    PyThreadState* _save = 0;
+public:
+    bool frameRenderingQueued(const Ogre::FrameEvent& evt)
+    {
+        if(!_save)
+            _save = PyEval_SaveThread();
+        return true;
+    }
+    bool frameEnded(const Ogre::FrameEvent& evt)
+    {
+        if(_save) {
+            PyEval_RestoreThread(_save);
+            _save = 0;
+        }
+        return true;
+    }
+};
+%}
+%extend Ogre::Root {
+    void allowPyThread()
+    {
+        static ThreadAllowFrameListener listener;
+        $self->addFrameListener(&listener);
+    }
+}
+#endif
 %include "OgreRoot.h"
-// dont wrap: platform specific
-// %include "OgreWindowEventUtilities.h"
-// %include "OgreTimer.h"
 // dont wrap: not useful in high level languages
-// %include "OgreRadixSort.h"
+// %include "OgreTimer.h"
 // %include "OgreString.h"
 // %include "OgreStringConverter.h"
 // %include "OgreProfiler.h"

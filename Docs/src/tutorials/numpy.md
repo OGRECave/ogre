@@ -43,3 +43,22 @@ Now we can store the image to disk using pyplot.
 @note There is also Ogre::RenderTarget::writeContentsToFile if you do not need the pixel data in Python.
 
 ![](numpy_final.png)
+
+## Background Threads {#python-background-threads}
+
+By default, the Python bindings do not release the GIL (Global Interpreter Lock) during rendering, which means that no other Python code can run in parallel.
+This is usually not a problem and constantly re-acquiring the GIL would reduce performance. However, this means that the following code will not work:
+
+```py
+import threading
+
+def printer():
+    for _ in range(15):
+        print("Thread")
+
+threading.Thread(target=printer).start()
+root.startRendering()
+```
+
+The "printer" Thread will be blocked until the rendering is finished.
+To allow background threads to run, you can use `root.allowPyThread()`, which will release the GIL during swapping, while rendering is waiting for vsync.
