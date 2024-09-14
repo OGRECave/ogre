@@ -32,7 +32,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     Animation::InterpolationMode Animation::msDefaultInterpolationMode = Animation::IM_LINEAR;
-    Animation::RotationInterpolationMode 
+    Animation::RotationInterpolationMode
         Animation::msDefaultRotationInterpolationMode = Animation::RIM_LINEAR;
     //---------------------------------------------------------------------
     Animation::Animation(const String& name, Real length)
@@ -67,7 +67,7 @@ namespace Ogre {
     {
         if (hasNodeTrack(handle))
         {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
                 "Node track with the specified handle " +
                 StringConverter::toString(handle) + " already exists",
                 "Animation::createNodeTrack");
@@ -104,7 +104,7 @@ namespace Ogre {
 
         if (i == mNodeTrackList.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
                 "Cannot find node track with the specified handle " +
                 StringConverter::toString(handle),
                 "Animation::getNodeTrack");
@@ -140,7 +140,7 @@ namespace Ogre {
     {
         if (hasNumericTrack(handle))
         {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
                 "Numeric track with the specified handle " +
                 StringConverter::toString(handle) + " already exists",
                 "Animation::createNumericTrack");
@@ -168,7 +168,7 @@ namespace Ogre {
 
         if (i == mNumericTrackList.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
                 "Cannot find numeric track with the specified handle " +
                 StringConverter::toString(handle),
                 "Animation::getNumericTrack");
@@ -200,12 +200,12 @@ namespace Ogre {
         _keyFrameListChanged();
     }
     //---------------------------------------------------------------------
-    VertexAnimationTrack* Animation::createVertexTrack(unsigned short handle, 
+    VertexAnimationTrack* Animation::createVertexTrack(unsigned short handle,
         VertexAnimationType animType)
     {
         if (hasVertexTrack(handle))
         {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
                 "Vertex track with the specified handle " +
                 StringConverter::toString(handle) + " already exists",
                 "Animation::createVertexTrack");
@@ -218,7 +218,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    VertexAnimationTrack* Animation::createVertexTrack(unsigned short handle, 
+    VertexAnimationTrack* Animation::createVertexTrack(unsigned short handle,
         VertexData* data, VertexAnimationType animType)
     {
         VertexAnimationTrack* ret = createVertexTrack(handle, animType);
@@ -244,7 +244,7 @@ namespace Ogre {
 
         if (i == mVertexTrackList.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
                 "Cannot find vertex track with the specified handle " +
                 StringConverter::toString(handle),
                 "Animation::getVertexTrack");
@@ -268,10 +268,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Animation::destroyAllVertexTracks(void)
     {
-        VertexTrackList::iterator i;
-        for (i = mVertexTrackList.begin(); i != mVertexTrackList.end(); ++i)
+        for (auto& v : mVertexTrackList)
         {
-            OGRE_DELETE  i->second;
+            OGRE_DELETE  v.second;
         }
         mVertexTrackList.clear();
         _keyFrameListChanged();
@@ -323,7 +322,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void Animation::apply(Skeleton* skel, Real timePos, Real weight, 
+    void Animation::apply(Skeleton* skel, Real timePos, Real weight,
         Real scale)
     {
         _applyBaseKeyFrame();
@@ -333,7 +332,7 @@ namespace Ogre {
 
         for (auto& t : mNodeTrackList)
         {
-            // get bone to apply to 
+            // get bone to apply to
             Bone* b = skel->getBone(t.first);
             t.second->applyToNode(b, timeIndex, weight, scale);
         }
@@ -356,7 +355,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void Animation::apply(Entity* entity, Real timePos, Real weight, 
+    void Animation::apply(Entity* entity, Real timePos, Real weight,
         bool software, bool hardware)
     {
         _applyBaseKeyFrame();
@@ -394,13 +393,13 @@ namespace Ogre {
             if (software)
             {
                 track->setTargetMode(VertexAnimationTrack::TM_SOFTWARE);
-                track->applyToVertexData(swVertexData, timeIndex, weight, 
+                track->applyToVertexData(swVertexData, timeIndex, weight,
                     &(entity->getMesh()->getPoseList()));
             }
             if (hardware)
             {
                 track->setTargetMode(VertexAnimationTrack::TM_HARDWARE);
-                track->applyToVertexData(hwVertexData, timeIndex, weight, 
+                track->applyToVertexData(hwVertexData, timeIndex, weight,
                     &(entity->getMesh()->getPoseList()));
             }
         }
@@ -423,7 +422,7 @@ namespace Ogre {
     void Animation::applyToVertexData(VertexData* data, Real timePos, float weight)
     {
         _applyBaseKeyFrame();
-        
+
         // Calculate time index for fast keyframe search
         TimeIndex timeIndex = _getTimeIndex(timePos);
 
@@ -493,7 +492,7 @@ namespace Ogre {
     {
         optimiseNodeTracks(discardIdentityNodeTracks);
         optimiseVertexTracks();
-        
+
     }
     //-----------------------------------------------------------------------
     void Animation::_collectIdentityNodeTracks(TrackHandleList& tracks) const
@@ -571,7 +570,7 @@ namespace Ogre {
         Animation* newAnim = OGRE_NEW Animation(newName, mLength);
         newAnim->mInterpolationMode = mInterpolationMode;
         newAnim->mRotationInterpolationMode = mRotationInterpolationMode;
-        
+
         // Clone all tracks
         for (auto i : mNodeTrackList)
         {
@@ -684,28 +683,28 @@ namespace Ogre {
             Animation* baseAnim = this;
             if (!mBaseKeyFrameAnimationName.empty() && mContainer)
                 baseAnim = mContainer->getAnimation(mBaseKeyFrameAnimationName);
-            
+
             if (baseAnim)
             {
                 for (auto& i : mNodeTrackList)
                 {
                     NodeAnimationTrack* track = i.second;
-                    
+
                     NodeAnimationTrack* baseTrack;
                     if (baseAnim == this)
                         baseTrack = track;
                     else
                         baseTrack = baseAnim->getNodeTrack(track->getHandle());
-                    
+
                     TransformKeyFrame kf(baseTrack, mBaseKeyFrameTime);
                     baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);
                     track->_applyBaseKeyFrame(&kf);
                 }
-                
+
                 for (auto& i : mVertexTrackList)
                 {
                     VertexAnimationTrack* track = i.second;
-                    
+
                     if (track->getAnimationType() == VAT_POSE)
                     {
                         VertexAnimationTrack* baseTrack;
@@ -713,20 +712,20 @@ namespace Ogre {
                             baseTrack = track;
                         else
                             baseTrack = baseAnim->getVertexTrack(track->getHandle());
-                        
+
                         VertexPoseKeyFrame kf(baseTrack, mBaseKeyFrameTime);
                         baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);
                         track->_applyBaseKeyFrame(&kf);
-                        
+
                     }
                 }
-                
+
             }
-            
+
             // Re-base has been done, this is a one-way translation
             mUseBaseKeyFrame = false;
         }
-        
+
     }
     //-----------------------------------------------------------------------
     void Animation::_notifyContainer(AnimationContainer* c)
