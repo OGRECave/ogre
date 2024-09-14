@@ -59,7 +59,7 @@ swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
 ogre_python_module(Ogre)
 
 # always install pure python modules
-install(FILES __init__.py Numpy.py DESTINATION ${PYTHON_SITE_PACKAGES})
+install(FILES __init__.py Numpy.py HighPy.py DESTINATION ${PYTHON_SITE_PACKAGES})
 
 if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     set_source_files_properties(../RTShaderSystem/include/OgreRTShader.i PROPERTIES CPLUSPLUS ON)
