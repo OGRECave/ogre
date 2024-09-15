@@ -1,0 +1,21 @@
+@startuml
+'left to right direction
+hide members
+hide methods
+
+SceneManager --|> AnimationContainer
+Skeleton --|> AnimationContainer
+Mesh --|> AnimationContainer
+
+AnimationContainer --> Animation : createAnimation()
+
+Animation --> AnimationTrack : create{TYPE}Track()
+AnimationTrack -right-> KeyFrame : createKeyFrame()
+
+
+AnimationState .right.> Animation: apply(timePos)
+
+Light --|> AnimableObject
+AnimableObject --> AnimableValue: createAnimableValue()
+
+@enduml

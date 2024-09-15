@@ -762,7 +762,7 @@ Despite their power, additive lighting techniques have an additional limitation;
 
 @page Animation Animation
 
-OGRE supports a pretty flexible animation system that allows you to script animation for several different purposes:
+OGRE supports a pretty flexible keyframe based animation system that allows you to script animation for several different purposes:
 
 <dl compact="compact">
 <dt>@ref SceneNode-Animation</dt> <dd>
@@ -777,6 +777,10 @@ Using OGRE’s extensible class structure to animate any value.
 </dd> </dl>
 
 @tableofcontents
+
+The diagram below shows the relationship between the different animation classes in OGRE:
+
+![](AnimationSystem.svg)
 
 # Animation State {#Animation-State}
 
