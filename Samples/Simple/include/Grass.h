@@ -60,7 +60,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
  {
  public:
 
-     LightPulse(Light* light, Billboard* billboard, const ColourValue& maxColour, Real maxSize)
+     LightPulse(Light* light, Billboard* billboard, const ColourValue& maxColour, float maxSize)
      {
          mLight = light;
          mBillboard = billboard;
@@ -92,8 +92,8 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      Light* mLight;
      Billboard* mBillboard;
      ColourValue mMaxColour;
-     Real mMaxSize;
-     Real mIntensity;
+     float mMaxSize;
+     float mIntensity;
  };
 
  void setupContent() override
@@ -220,8 +220,8 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      Billboard* bb = bbs->createBillboard(0, 0, 0, lightColour);
 
      // create a controller for the light intensity, using our LightPulsator class
-     ControllerFunctionRealPtr func(OGRE_NEW WaveformControllerFunction(Ogre::WFT_SINE, 0.5, 0.5, 0, 0.5));
-     ControllerValueRealPtr dest(OGRE_NEW LightPulse(light, bb, lightColour, 15));
+     auto func = WaveformControllerFunction::create(WFT_SINE, 0.5, 0.5, 0, 0.5);
+     auto dest = std::make_shared<LightPulse>(light, bb, lightColour, 15.0f);
      ControllerManager& cm = ControllerManager::getSingleton();
      mLightController = cm.createController(cm.getFrameTimeSource(), dest, func);
 
