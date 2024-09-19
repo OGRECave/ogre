@@ -38,6 +38,8 @@ if(DOXYGEN_FOUND)
 
     set(CMAKE_DOXYGEN_INPUT_LIST
         ${PROJECT_SOURCE_DIR}/OgreMain/include
+        ${PROJECT_SOURCE_DIR}/Components/Python/Numpy.py
+        ${PROJECT_SOURCE_DIR}/Components/Python/HighPy.py
         ${COMPONENTS}
         ${PLUGINS}
         ${PROJECT_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md
