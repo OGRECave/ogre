@@ -680,6 +680,8 @@ INPUT                  = OgreMain/include \
                             Components/RTShaderSystem/include \
                             Components/Terrain/include \
                             Components/Volume/include \
+                            Components/Python/Numpy.py \
+                            Components/Python/HighPy.py \
                             PlugIns \
                             PlugIns/PCZSceneManager/docs/readme.md \
                             PlugIns/DotScene/README.md \

@@ -11,6 +11,8 @@ import Ogre.Bites
 import Ogre.RTShader
 import Ogre.Overlay
 
+## \cond PRIVATE
+
 class _InputListener(Ogre.Bites.InputListener):
     def __init__(self, window_data):
         Ogre.Bites.InputListener.__init__(self)
@@ -133,18 +135,28 @@ def _init_window(window_data, flags):
 
     window_data.listen_to_input()
 
-## window create flags
+## \endcond
+
+## \addtogroup Optional
+# @{
+# \addtogroup Python
+# @{
+
+
+## %Ogre & OpenGL coordinate system
 AXES_ZBACKWARD_YUP  = 0
+## OpenCV & colmap coordinate system
 AXES_ZFORWARD_YDOWN = 1
 
-# set this to override the default resource location "."
+## add paths here to override the default resource location @c "."
 user_resource_locations = set()
 
 def window_create(window_name: str, window_size, flags: int = AXES_ZBACKWARD_YUP):
-    """
+    """!
     create a window
     @param window_name: name of the window
     @param window_size: size of the window in pixels
+    @param flags: window create options
     """
     if _ctx is None:
         _init_ogre(window_name, window_size)
@@ -154,10 +166,10 @@ def window_create(window_name: str, window_size, flags: int = AXES_ZBACKWARD_YUP
     _init_window(_ctx.windows[window_name], flags)
 
 def window_draw(window_name: str) -> int:
-    """
+    """!
     draw the window
     @param window_name: name of the window
-    @return: last key pressed inside the window
+    @return last key pressed inside the window
     """
     assert _ctx is not None, "call window_create first"
     assert window_name in _ctx.windows, f"no window named: {window_name}"
@@ -170,7 +182,7 @@ def window_draw(window_name: str) -> int:
     return ret
 
 def window_use_imgui(window_name: str, callback):
-    """
+    """!
     enable imgui for the window
     @param window_name: name of the window
     @param callback: function to call for imgui rendering
@@ -189,7 +201,7 @@ def window_use_imgui(window_name: str, callback):
     _ctx.addInputListener(_ctx.getImGuiInputListener())
 
 def window_compositor(window_name: str, compositor_name: str):
-    """
+    """!
     set a compositor for the window
     @param window_name: name of the window
     @param compositor_name: name of the compositor
@@ -206,14 +218,14 @@ def window_compositor(window_name: str, compositor_name: str):
     cm.setCompositorEnabled(vp, compositor_name, True)
 
 def window_pixel_data(window_name: str, compositor_name: str | None = None, texture_name: str | None = None, mrt_index: int = 0):
-    """
+    """!
     get the pixel data from the window or the active compositor
     @param window_name: name of the window
     @param compositor_name: name of the compositor
     @param texture_name: name of the texture
     @param mrt_index: index of the MRT
     @retval 0: bytearray holding the pixel data
-    @retval 1: tuple (bytes per pixel, height, width, channels)
+    @retval 1: tuple `(bytes per pixel, height, width, channels)`
     """
     assert _ctx is not None, "call window_create first"
     assert window_name in _ctx.windows, f"no window named: {window_name}"
@@ -252,7 +264,7 @@ def window_pixel_data(window_name: str, compositor_name: str | None = None, text
     return ret, shape
 
 def imshow(window_name: str, img_path: str | os.PathLike):
-    """
+    """!
     show an image in the window
     @param window_name: name of the window
     @param img_path: path to the image file
@@ -270,7 +282,7 @@ def imshow(window_name: str, img_path: str | os.PathLike):
     window_data.background.loadImage(img)
 
 def camera_intrinsics(window_name: str, K, imsize):
-    """
+    """!
     set camera intrinsics
     @param window_name: name of the window
     @param K: 3x3 camera matrix
@@ -294,7 +306,7 @@ def camera_intrinsics(window_name: str, K, imsize):
     cam.setFOVy(fovy)
 
 def mesh_show(window_name: str, mesh_path: str | os.PathLike, rot_mat = None, position = (0, 0, 0), material_name: str | None = None):
-    """
+    """!
     show a mesh in the window
     @param window_name: name of the window
     @param mesh_path: path to the mesh file
@@ -333,7 +345,7 @@ def mesh_show(window_name: str, mesh_path: str | os.PathLike, rot_mat = None, po
     scn_node.setPosition(position)
 
 def mesh_hide(window_name: str, mesh_path: str | os.PathLike):
-    """
+    """!
     hide a mesh in the window
     @param window_name: name of the window
     @param mesh_path: path to the mesh file
@@ -349,7 +361,7 @@ def mesh_hide(window_name: str, mesh_path: str | os.PathLike):
         ent.setVisible(False)
 
 def point_light(window_name: str, position = (0, 0, 0)):
-    """
+    """!
     create a point light in the window
     @param window_name: name of the window
     @param position: position of the light in world coordinates
@@ -366,3 +378,6 @@ def point_light(window_name: str, position = (0, 0, 0)):
         light_node.attachObject(light)
 
     light_node.setPosition(*position)
+
+## @}
+## @}

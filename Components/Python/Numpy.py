@@ -9,8 +9,14 @@ import ctypes
 import numpy.ctypeslib as npc
 import numpy as np
 
+## \addtogroup Optional
+# @{
+# \defgroup Python Python
+# Convenience functions for python
+# @{
+
 def AsDataStream(arr):
-    """
+    """!
     copy numpy array to Ogre.MemoryDataStream that can be used in Ogre
     @param arr: some numpy array
     """
@@ -23,18 +29,22 @@ def AsDataStream(arr):
     return ret
 
 def view(o):
-    """
+    """!
     writable numpy view to the ogre data types
     
     take care that the ogre type does not get released while the view is used.
     e.g. this is invalid
     
+    ```py
     v = Ogre.Vector3()
-    return OgreNumpy.view(v)
-    
+    return Ogre.Numpy.view(v)
+    ```
+
     instead do
-    return OgreNumpy.view(v).copy()
-    
+    ```py
+    return Ogre.Numpy.view(v).copy()
+    ```
+
     to pass numpy arrays into Ogre use AsDataStream()
     """
     tp = ctypes.POINTER(ctypes.c_float)
@@ -65,3 +75,6 @@ def view(o):
         raise TypeError("do not know how to map '{}'".format(type(o).__name__))
          
     return npc.as_array(ctypes.cast(int(ptr), tp), shape)
+
+## @}
+## @}
