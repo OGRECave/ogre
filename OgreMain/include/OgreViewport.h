@@ -40,7 +40,7 @@ namespace Ogre {
     /** \addtogroup RenderSystem
     *  @{
     */
-    /** An abstraction of a viewport, i.e. a rendering region on a render
+    /** An abstraction of a viewport, i.e., a rendering region on a render
         target.
 
         A viewport is the meeting of a camera and a rendering surface -
@@ -109,10 +109,10 @@ namespace Ogre {
         /** Instructs the viewport to clear itself, without performing an update.
 
             You would not normally call this method when updating the viewport, 
-            since the viewport usually clears itself when updating anyway (@see 
-            Viewport::setClearEveryFrame). However, if you wish you have the
+            since the viewport usually clears itself when updating anyway. However, if you wish you have the
             option of manually clearing the frame buffer (or elements of it)
             using this method.
+            @see Viewport::setClearEveryFrame
          @param buffers Bitmask identifying which buffer elements to clear
          @param colour The colour value to clear to, if FBT_COLOUR is included
          @param depth The depth value to clear to, if FBT_DEPTH is included
@@ -276,7 +276,7 @@ namespace Ogre {
         /** Tells this viewport whether it should display Overlay objects.
 
             Overlay objects are layers which appear on top of the scene. They are created via
-            SceneManager::createOverlay and every viewport displays these by default.
+            @ref OverlayManager::create and every viewport displays these by default.
             However, you probably don't want this if you're using multiple viewports,
             because one of them is probably a picture-in-picture which is not supposed to
             have overlays of it's own. In this case you can turn off overlays on this viewport
@@ -285,7 +285,7 @@ namespace Ogre {
         */
         void setOverlaysEnabled(bool enabled) { mShowOverlays = enabled; }
 
-        /** Returns whether or not Overlay objects (created in the SceneManager) are displayed in this
+        /** Returns whether or not Overlay objects (created with the OverlayManager) are displayed in this
             viewport. */
         bool getOverlaysEnabled(void) const { return mShowOverlays; }
 
@@ -324,9 +324,9 @@ namespace Ogre {
 
             The visibility mask is a way to exclude objects from rendering for
             a given viewport. For each object in the frustum, a check is made
-            between this mask and the objects visibility flags 
-            (@see MovableObject::setVisibilityFlags), and if a binary 'and'
+            between this mask and the objects visibility flags, and if a binary 'and'
             returns zero, the object will not be rendered.
+            @see MovableObject::setVisibilityFlags
         */
         void setVisibilityMask(uint32 mask) { mVisibilityMask = mask; }
 
