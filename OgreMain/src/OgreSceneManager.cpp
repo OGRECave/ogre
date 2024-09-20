@@ -50,6 +50,7 @@ THE SOFTWARE.
 #include <memory>
 
 namespace Ogre {
+bool SceneManager::msPerRenderableLights = true;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
 mName(name),
@@ -1647,11 +1648,19 @@ void SceneManager::renderInstancedObject(const RenderableList& rends, const Pass
 
     // collect lights of all renderables, thus cannot handle start-light without re-sorting
     std::set<Light*> batchLights;
-    for (auto r : rends)
+    if(!msPerRenderableLights)
     {
-        const LightList& rendLightList = r->getLights();
-        batchLights.insert(rendLightList.begin(), rendLightList.end());
+        batchLights.insert(mLightsAffectingFrustum.begin(), mLightsAffectingFrustum.end());
     }
+    else
+    {
+        for (auto r : rends)
+        {
+            const LightList& rendLightList = r->getLights();
+            batchLights.insert(rendLightList.begin(), rendLightList.end());
+        }
+    }
+
     LightList lightListToUse;
 
     if(pass->getLightMask() == 0xFFFFFFFF)
@@ -1793,7 +1802,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     // Note that we may do this once per light, therefore it's in a loop
     // and the light parameters are updated once per traversal through the
     // loop
-    const LightList& rendLightList = rend->getLights();
+    const LightList& rendLightList = msPerRenderableLights ? rend->getLights() : mLightsAffectingFrustum;
 
     bool iteratePerLight = pass->getIteratePerLight();
 
