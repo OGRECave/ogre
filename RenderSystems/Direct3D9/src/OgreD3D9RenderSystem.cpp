@@ -109,11 +109,6 @@ namespace Ogre
         // Create the resource manager.
         mResourceManager = OGRE_NEW D3D9ResourceManager();
 
-        
-        // init lights
-        for(int i = 0; i < MAX_LIGHTS; i++ )
-            mLights[i] = 0;
-
         // Create our Direct3D object
         if( NULL == (mD3D = Direct3DCreate9(D3D_SDK_VERSION)) )
             OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Failed to create Direct3D9 object", "D3D9RenderSystem::D3D9RenderSystem" );
