@@ -47,6 +47,9 @@ namespace Ogre
     * Implementation of Vulkan as a rendering system.
     *  @{
     */
+
+    #define USE_VALIDATION_LAYERS 0
+
     class _OgreVulkanExport VulkanRenderSystem : public RenderSystem
     {
         friend class VulkanSampler;

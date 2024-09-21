@@ -52,8 +52,6 @@ THE SOFTWARE.
 #include "OgreVulkanWindow.h"
 #include "OgrePixelFormat.h"
 
-#define USE_VALIDATION_LAYERS 0
-
 namespace Ogre
 {
     static const uint32 VERTEX_ATTRIBUTE_INDEX[VES_COUNT] =
