@@ -44,7 +44,6 @@ namespace Ogre
     * Implementation of DirectX9 as a rendering system.
     *  @{
     */
-#define MAX_LIGHTS 8
 
     class D3D9DriverList;
     class D3D9Driver;
@@ -112,9 +111,6 @@ namespace Ogre
         /// Saved manual colour blends
         ColourValue mManualBlendColours[OGRE_MAX_TEXTURE_LAYERS][2];
 
-        // Array of up to 8 lights, indexed as per API
-        // Note that a null value indicates a free slot
-        Light* mLights[MAX_LIGHTS];     
         D3D9DriverList* getDirect3DDrivers();
         void refreshD3DSettings();
         void refreshFSAAOptions();
