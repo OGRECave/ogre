@@ -35,6 +35,7 @@ if(DOXYGEN_FOUND)
     file(GLOB BASIC_TUTORIALS ${PROJECT_SOURCE_DIR}/Docs/src/tutorials/basictutorials/*.md)
     file(GLOB COMPONENTS ${PROJECT_SOURCE_DIR}/Components/*/include)
     file(GLOB PLUGINS ${PROJECT_SOURCE_DIR}/PlugIns/*/include)
+    file(GLOB RENDERSYSTEMS ${PROJECT_SOURCE_DIR}/RenderSystems/*/include/Ogre*RenderSystem.h)
 
     set(CMAKE_DOXYGEN_INPUT_LIST
         ${PROJECT_SOURCE_DIR}/OgreMain/include
@@ -44,7 +45,8 @@ if(DOXYGEN_FOUND)
         ${PLUGINS}
         ${PROJECT_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md
         ${PROJECT_SOURCE_DIR}/PlugIns/DotScene/README.md
-        ${PROJECT_SOURCE_DIR}/RenderSystems
+        ${RENDERSYSTEMS}
+        ${PROJECT_SOURCE_DIR}/RenderSystems/Direct3D9/include/OgreD3D9ResourceManager.h
         ${BASIC_TUTORIALS}
         ${PROJECT_SOURCE_DIR}/Docs/src/apimainpage.md
         ${PROJECT_SOURCE_DIR}/Docs/src/manual.md
