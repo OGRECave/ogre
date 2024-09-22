@@ -87,9 +87,10 @@ class _Application(Ogre.Bites.ApplicationContext):
             rgm.addResourceLocation(loc, "FileSystem", Ogre.RGN_DEFAULT)
 
     def oneTimeConfig(self):
+        self.getRoot().restoreConfig()
         rs = self.getRoot().getRenderSystemByName("OpenGL 3+ Rendering Subsystem")
-        #rs.setConfigOption("Debug Layer", "On")
         self.getRoot().setRenderSystem(rs)
+        self.getRoot().saveConfig()
         return True
 
 def _create_image_background(scn_mgr, name):
