@@ -19,7 +19,7 @@ namespace OgreBites {
         mInfo["Title"] = "Compute";
         mInfo["Description"] = "A basic example of the compute shader.";
         mInfo["Thumbnail"] = "thumb_compute.png";
-        mInfo["Category"] = "Tests";
+        mInfo["Category"] = "ShaderFeatures";
         mInfo["Help"] = "The shader is executed in groups of 16x16 workers\n"
                 "in total there are 16x16 groups forming a grid of 256x256\n"
                 "each worker writes the color based on the local id\n"

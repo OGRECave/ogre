@@ -16,7 +16,7 @@ public:
         mInfo["Title"] = "Texture Array";
         mInfo["Description"] = "Demonstrates texture array support.";
         mInfo["Thumbnail"] = "thumb_texarray.png";
-        mInfo["Category"] = "Unsorted";
+        mInfo["Category"] = "ShaderFeatures";
         mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
     }
 

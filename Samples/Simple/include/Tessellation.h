@@ -16,7 +16,7 @@ class _OgreSampleClassExport Sample_Tessellation : public SdkSample
         mInfo["Title"] = "Tessellation";
         mInfo["Description"] = "Sample for tessellation support (Hull, Domain shaders)";
         mInfo["Thumbnail"] = "thumb_tessellation.png";
-        mInfo["Category"] = "Unsorted";
+        mInfo["Category"] = "ShaderFeatures";
         mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
     }
 

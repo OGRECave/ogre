@@ -63,6 +63,7 @@
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 #   include "MeshLod.h"
 #endif
+#include "MeshShaders.h"
 #include "NewInstancing.h"
 #include "OceanDemo.h"
 #include "ParticleFX.h"
@@ -134,6 +135,7 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
     addSample(new Sample_MeshLod);
 #endif
+    addSample(new Sample_MeshShaders);
     addSample(new Sample_ParticleFX);
 #ifdef HAVE_PCZ_PLUGIN
     addSample(new Sample_PCZTest);

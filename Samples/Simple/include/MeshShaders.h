@@ -13,44 +13,37 @@ same license as the rest of the engine.
 */
 #include "SdkSample.h"
 #include "SamplePlugin.h"
-#include "OgreRectangle2D.h"
 
 using namespace Ogre;
 using namespace OgreBites;
 
-class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
+class _OgreSampleClassExport Sample_MeshShaders : public SdkSample
 {
  public:
-    Sample_AtomicCounters()
+    Sample_MeshShaders()
     {
-        mInfo["Title"] = "Atomic Counters";
-        mInfo["Description"] = "An example of using atomic counters to visualise GPU rasterization order";
+        mInfo["Title"] = "Mesh Shaders";
+        mInfo["Description"] = "An example of using mesh shaders";
         mInfo["Thumbnail"] = "thumb_atomicc.png";
         mInfo["Category"] = "ShaderFeatures";
     }
 
     void testCapabilities(const RenderSystemCapabilities* caps) override
     {
-        requireMaterial("Example/RasterizationOrder");
-    }
-
-    bool frameEnded(const FrameEvent& evt) override
-    {
-        GpuProgramManager::getSingleton().getSharedParameters("CounterBuffer")->setNamedConstant("ac", 0);
-        return true;
+        requireMaterial("Example/MeshShader");
     }
 
     void setupContent() override
     {
         mViewport->setBackgroundColour(ColourValue(0.3, 0.3, 0.3));
 
-        float w = 480.0 / mWindow->getWidth();
-        float h = 480.0 / mWindow->getHeight();
+        mCameraMan->setStyle(CS_ORBIT);
+        mCameraMan->setYawPitchDist(Degree(0), Degree(0), 1000);
 
-        auto rect = mSceneMgr->createScreenSpaceRect();
-        rect->setCorners(-w, h, w, -h, false);
+        auto rect = mSceneMgr->createEntity(SceneManager::PT_PLANE);
+        rect->getMesh()->_setBounds(AxisAlignedBox::BOX_INFINITE);
 
-        MaterialPtr mat = MaterialManager::getSingleton().getByName("Example/RasterizationOrder");
+        MaterialPtr mat = MaterialManager::getSingleton().getByName("Example/MeshShader");
         rect->setMaterial(mat);
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(rect);
     }
