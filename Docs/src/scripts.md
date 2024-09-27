@@ -279,7 +279,7 @@ As Target, but this is the single final result of all operations. The size and p
 
 </dd> <dt>Target Section</dt> <dd>
 
-A Target may be rendered to many times in the course of a composition effect. In particular if you ’ping pong’ a convolution between a couple of textures, you will have more than one Target Sections per Target. Target Sections are declared in the script using a [target or target\_output line](#Compositor-Target-Passes), the latter being the final output of which there can be only one.
+A Target may be rendered to many times in the course of a composition effect. In particular if you ’ping pong’ a convolution between a couple of textures, you will have more than one Target Sections per Target. Target Sections are declared in the script using a [target or target_output line](#Compositor-Target-Passes), the latter being the final output of which there can be only one.
 @note Internally this is referred to as Ogre::CompositionTargetPass
 
 </dd> <dt>Pass</dt> <dd>
@@ -315,11 +315,11 @@ Format: technique { }
 Techniques can have the following nested elements:
 
 -   [texture](#compositor-texture)
--   [texture\_ref](#compositor_005ftexture_005fref)
+-   [texture_ref](#compositor_005ftexture_005fref)
 -   [scheme](#compositor_005fscheme)
--   [compositor\_logic](#compositor_005flogic)
+-   [compositor_logic](#compositor_005flogic)
 -   [target](#Compositor-Target-Passes)
--   [target\_output](#Compositor-Target-Passes)
+-   [target_output](#Compositor-Target-Passes)
 
 <a name="compositor_005ftexture"></a><a name="texture-2"></a>
 
@@ -368,7 +368,7 @@ When present, this directive has to be followed by an integer. This directive is
 - Ignored with depth pixel formats.
 
 @param scope
-If present, this directive sets the scope for the texture for being accessed by other compositors using the [texture\_ref](#compositor_005ftexture_005fref) directive. There are three options : 
+If present, this directive sets the scope for the texture for being accessed by other compositors using the [texture_ref](#compositor_005ftexture_005fref) directive. There are three options:
 1. @c local_scope (which is also the default) means that only the compositor defining the texture can access it. 
 2. @c chain_scope means that the compositors after this compositor in the chain can reference its textures, and 
 3. @c global_scope means that the entire application can access the texture. This directive also affects the creation of the textures (global textures are created once and thus can’t be used with the pooled directive, and can’t rely on viewport size).
@@ -451,9 +451,9 @@ Note, the target entry can refer to @ref Cube-map-textures. Therefore, it takes 
 Here are the attributes you can use in a ’target’ or ’target\_output’ section of a .compositor script:
 
 -   [input](#compositor_005ftarget_005finput)
--   [only\_initial](#only_005finitial)
--   [visibility\_mask](#visibility_005fmask)
--   [lod\_bias](#compositor_005flod_005fbias)
+-   [only_initial](#only_005finitial)
+-   [visibility_mask](#visibility_005fmask)
+-   [lod_bias](#compositor_005flod_005fbias)
 -   [material_scheme](#material_005fscheme)
 -   [shadows](#compositor_005fshadows)
 
@@ -546,7 +546,7 @@ This kind of pass configures stencil operations for the subsequent passes. It ca
 
 </dd> <dt>render\_scene</dt> <dd>
 
-This kind of pass performs a regular rendering of the scene. It will use the [visibility\_mask](#visibility_005fmask), [lod\_bias](#compositor_005flod_005fbias), and [material\_scheme](#material_005fscheme) from the parent target pass.
+This kind of pass performs a regular rendering of the scene. It will use the [visibility_mask](#visibility_005fmask), [lod_bias](#compositor_005flod_005fbias), and [material_scheme](#material_005fscheme) from the parent target pass.
 
 </dd> <dt>render\_quad</dt> <dd>
 
@@ -641,9 +641,9 @@ Format: thread_groups &lt;groups_x&gt; &lt;groups_y&gt; &lt;groups_z&gt;
 
 Here are the attributes you can use in a @c render_scene section of a .compositor script:
 
--   [first\_render\_queue](#first_005frender_005fqueue)
--   [last\_render\_queue](#last_005frender_005fqueue)
--   [material\_scheme](#compositor_005fpass_005fmaterial_005fscheme)
+-   [first_render_queue](#first_005frender_005fqueue)
+-   [last_render_queue](#last_005frender_005fqueue)
+-   [material_scheme](#compositor_005fpass_005fmaterial_005fscheme)
 -   [camera](#camera)
 
 <a name="first_005frender_005fqueue"></a><a name="first_005frender_005fqueue-1"></a>
@@ -699,9 +699,9 @@ Format: pass clear { }
 Here are the attributes you can use in a ’clear’ section of a .compositor script:
 
 -   [buffers](#compositor_005fclear_005fbuffers)
--   [colour\_value](#compositor_005fclear_005fcolour_005fvalue)
--   [depth\_value](#compositor_005fclear_005fdepth_005fvalue)
--   [stencil\_value](#compositor_005fclear_005fstencil_005fvalue) <a name="compositor_005fclear_005fbuffers"></a><a name="buffers"></a>
+-   [colour_value](#compositor_005fclear_005fcolour_005fvalue)
+-   [depth_value](#compositor_005fclear_005fdepth_005fvalue)
+-   [stencil_value](#compositor_005fclear_005fstencil_005fvalue) <a name="compositor_005fclear_005fbuffers"></a><a name="buffers"></a>
 
     ### buffers
 
@@ -756,13 +756,13 @@ Format: pass stencil { }
 Here are the attributes you can use in a ’stencil’ section of a .compositor script:
 
 -   [check](#compositor_005fstencil_005fcheck)
--   [comp\_func](#compositor_005fstencil_005fcomp_005ffunc)
--   [ref\_value](#compositor_005fstencil_005fref_005fvalue)
+-   [comp_func](#compositor_005fstencil_005fcomp_005ffunc)
+-   [ref_value](#compositor_005fstencil_005fref_005fvalue)
 -   [mask](#compositor_005fstencil_005fmask)
--   [fail\_op](#compositor_005fstencil_005ffail_005fop)
--   [depth\_fail\_op](#compositor_005fstencil_005fdepth_005ffail_005fop)
--   [pass\_op](#compositor_005fstencil_005fpass_005fop)
--   [two\_sided](#compositor_005fstencil_005ftwo_005fsided) <a name="compositor_005fstencil_005fcheck"></a><a name="check"></a>
+-   [fail_op](#compositor_005fstencil_005ffail_005fop)
+-   [depth_fail_op](#compositor_005fstencil_005fdepth_005ffail_005fop)
+-   [pass_op](#compositor_005fstencil_005fpass_005fop)
+-   [two_sided](#compositor_005fstencil_005ftwo_005fsided) <a name="compositor_005fstencil_005fcheck"></a><a name="check"></a>
 
     ### check
 
@@ -967,9 +967,9 @@ Must be a name unique among all other elements / containers by which to identify
 
 The properties which can be included within the braces depend on the custom type. However the following are always valid:
 
--   [metrics\_mode](#metrics_005fmode)
--   [horz\_align](#horz_005falign)
--   [vert\_align](#vert_005falign)
+-   [metrics_mode](#metrics_005fmode)
+-   [horz_align](#horz_005falign)
+-   [vert_align](#vert_005falign)
 -   [left](#left)
 -   [top](#overlaytopelement)
 -   [width](#width)
