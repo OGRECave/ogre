@@ -259,6 +259,25 @@ geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
 
 With GL3+ these values are specified using the `layout` modifier.
 
+### Multi module shaders
+
+The `attach` keyword allows creating GLSL shaders from multiple shader modules of the same type. The referencing shader has to forward-declare the functions it intends to use
+
+@deprecated The @c attach keyword for multi-module shaders is not supported on OpenGL ES and therefore deprecated in favor of the @c \#include directive
+
+```cpp
+vertex_program myExternalGLSLFunction glsl
+{
+    source myExternalGLSLfunction.vert
+}
+
+vertex_program myGLSLVertexProgram glsl
+{
+    source myGLSLfunction.vert
+    attach myExternalGLSLFunction
+}
+```
+
 # Cg programs {#Cg}
 
 In order to define Cg programs, you have to have to load @c Plugin_CgProgramManager at startup, either through plugins.cfg or through your own plugin loading code. They are very easy to define:
@@ -309,25 +328,6 @@ The default for this option is ’true’ so that OGRE passes matrices auto-boun
 Set the optimisation level, which can be one of ’default’, ’none’, ’0’, ’1’, ’2’, or ’3’. This corresponds to the /O parameter of fxc.exe, except that in ’default’ mode, optimisation is disabled in debug mode and set to 1 in release mode (fxc.exe uses 1 all the time). Unsurprisingly the default value is ’default’. You may want to change this if you want to tweak the optimisation, for example if your shader gets so complex that it will not longer compile without some minimum level of optimisation.
 
 </dd> </dl>
-
-### Multi module shaders
-
-The `attach` keyword allows creating GLSL shaders from multiple shader modules of the same type. The referencing shader has to forward-declare the functions it intends to use
-
-@deprecated The @c attach keyword for multi-module shaders is not supported on OpenGL ES and therefore deprecated in favor of the @c \#include directive
-
-```cpp
-vertex_program myExternalGLSLFunction glsl
-{
-    source myExternalGLSLfunction.vert
-}
-
-vertex_program myGLSLVertexProgram glsl
-{
-    source myGLSLfunction.vert
-    attach myExternalGLSLFunction
-}
-```
 
 # Assembler Shaders
 
