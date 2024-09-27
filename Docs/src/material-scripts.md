@@ -409,7 +409,7 @@ Equivalent to ’scene_blend src_alpha one_minus_src_alpha’</dd>
 @par
 Format2: scene\_blend &lt;sourceFactor&gt; &lt;destFactor&gt;
 
-@copydetails Ogre::Pass::setSceneBlending(const SceneBlendFactor, const SceneBlendFactor)
+@copydetails Ogre::Pass::setSceneBlending(const Ogre::SceneBlendFactor, const Ogre::SceneBlendFactor)
 
 Valid values for both parameters are one of Ogre::SceneBlendFactor without the `SBF_` prefix. E.g. `SBF_DEST_COLOUR` becomes `dest_colour`.
 
@@ -719,7 +719,7 @@ Format 2: colour\_write &lt;on|off&gt; &lt;on|off&gt; &lt;on|off&gt; &lt;on|off&
 @par
 Default: colour\_write on<br>
 
-<a name="colour_005fmask"></a><a name="colour_005fmask-1"></a>
+<a name="start_005flight"></a>
 
 ## start\_light
 
@@ -876,7 +876,7 @@ material Fur
 }
 ```
 
-@note use gpu program auto parameters [pass\_number](#pass_005fnumber) and [pass\_iteration\_number](#pass_005fiteration_005fnumber) to tell the vertex, geometry or fragment program the pass number and iteration number.
+@note use gpu program auto parameters @c pass_number and @c pass_iteration_number to tell the vertex, geometry or fragment program the pass number and iteration number.
 
 <a name="point_005fsize"></a><a name="point_005fsize-1"></a>
 
@@ -1475,7 +1475,7 @@ Default: filtering linear linear point
 
 Each parameter can be one of Ogre::FilterOptions without the `FO_` prefix. E.g. `FO_LINEAR` becomes `linear`.
 
-@copydetails Ogre::Sampler::setFiltering(FilterOptions,FilterOptions,FilterOptions)
+@copydetails Ogre::Sampler::setFiltering(Ogre::FilterOptions,Ogre::FilterOptions,Ogre::FilterOptions)
 
 <a name="max_005fanisotropy"></a><a name="max_005fanisotropy-1"></a>
 
