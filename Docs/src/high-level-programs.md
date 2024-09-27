@@ -227,7 +227,7 @@ The available varyings are:
 The following features are only available when using the legacy OpenGL profile. Notably they are not available with GL3+ or GLES2.
 
 ### OpenGL state
-GLSL can access most of the GL states directly so you do not need to pass these states through [param\_named\_auto](#param_005fnamed_005fauto) in the material script. This includes lights, material state, and all the matrices used in the openGL state i.e. model view matrix, worldview projection matrix etc.
+GLSL can access most of the GL states directly so you do not need to pass these states through [param_named_auto](#param_005fnamed_005fauto) in the material script. This includes lights, material state, and all the matrices used in the openGL state i.e. model view matrix, worldview projection matrix etc.
 
 ### Built-in attributes
 GLSL natively supports automatic binding of the most common incoming per-vertex attributes (e.g. `gl_Vertex`, `gl_Normal`, `gl_MultiTexCoord0` etc)
@@ -557,11 +557,11 @@ At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatical
 
 Parameters can be specified using one of 4 commands as shown below. The same syntax is used whether you are defining a parameter just for this particular use of the program, or when specifying the @ref Default-Program-Parameters. Parameters set in the specific use of the program override the defaults.
 
--   [param\_indexed](#param_005findexed)
--   [param\_indexed\_auto](#param_005findexed_005fauto)
--   [param\_named](#param_005fnamed)
--   [param\_named\_auto](#param_005fnamed_005fauto)
--   [shared\_params\_ref](#shared_005fparams_005fref)
+-   [param_indexed](#param_005findexed)
+-   [param_indexed_auto](#param_005findexed_005fauto)
+-   [param_named](#param_005fnamed)
+-   [param_named_auto](#param_005fnamed_005fauto)
+-   [shared_params_ref](#shared_005fparams_005fref)
 
 <a name="param_005findexed"></a><a name="param_005findexed-1"></a>
 
@@ -595,7 +595,7 @@ Format: param\_indexed\_auto &lt;index&gt; &lt;autoConstType&gt; &lt;extraInfo&g
 Example: param\_indexed\_auto 0 worldviewproj\_matrix
 
 @param index
-has the same meaning as [param\_indexed](#param_005findexed); note this time you do not have to specify the size of the parameter because the engine knows this already. In the example, the world/view/projection matrix is being used so this is implicitly a matrix4x4.
+has the same meaning as [param_indexed](#param_005findexed); note this time you do not have to specify the size of the parameter because the engine knows this already. In the example, the world/view/projection matrix is being used so this is implicitly a matrix4x4.
 
 @param autoConstType, extraInfo
 is one of Ogre::GpuProgramParameters::AutoConstantType without the `ACT_` prefix. E.g. `ACT_WORLD_MATRIX` becomes `world_matrix`.
@@ -623,7 +623,7 @@ Format: param\_named\_auto &lt;name&gt; &lt;autoConstType&gt; &lt;extraInfo&gt;
 @par
 Example: param\_named\_auto worldViewProj worldviewproj\_matrix
 
-The allowed @c autoConstType and the meaning of @c extraInfo are detailed in [param\_indexed\_auto](#param_005findexed_005fauto).
+The allowed @c autoConstType and the meaning of @c extraInfo are detailed in [param_indexed_auto](#param_005findexed_005fauto).
 
 <a name="shared_005fparams_005fref"></a><a name="shared_005fparams_005fref-1"></a>
 
@@ -649,7 +649,7 @@ shared_params YourSharedParamsName
 }
 ```
 
-As you can see, you need to use the keyword ’shared\_params’ and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the [param\_named](#param_005fnamed) syntax. The definition of these lines is:
+As you can see, you need to use the keyword ’shared\_params’ and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the [param_named](#param_005fnamed) syntax. The definition of these lines is:
 @par
 Format: shared\_param\_named &lt;param\_name&gt; &lt;param\_type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
 
@@ -658,7 +658,7 @@ Format: shared\_param\_named &lt;param\_name&gt; &lt;param\_type&gt; \[&lt;\[arr
 @param array_size allows you to define arrays of param\_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param\_type with whitespace).
 @param initial_values If you wish, you can also initialise the parameters by providing a list of values.
 
-Once you have defined the shared parameters, you can reference them inside default\_params and params blocks using [shared\_params\_ref](#shared_005fparams_005fref). You can also obtain a reference to them in your code via Ogre::GpuProgramManager::getSharedParameters, and update the values for all instances using them.
+Once you have defined the shared parameters, you can reference them inside default\_params and params blocks using [shared_params_ref](#shared_005fparams_005fref). You can also obtain a reference to them in your code via Ogre::GpuProgramManager::getSharedParameters, and update the values for all instances using them.
 
 ## Hardware Support
 
