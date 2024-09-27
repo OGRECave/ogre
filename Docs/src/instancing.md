@@ -320,7 +320,7 @@ Do it sparingly and profile the optimal frequency of calling.
 @par Q: My mesh doesn't show up.
 A: Verify you're using the right material, the vertex shader is set correctly, and it matches the instancing technique being used.
 
-@par Q: My animation plays quite differently than when it is an Entity, or previewed in [Ogre Mesh Viewer](https://github.com/OGRECave/ogre-meshviewer).
+@par Q: My animation plays quite differently than when it is an Entity, or previewed in Ogre Mesh Viewer.
 A: Your rig animation must be using more than one weight per bone.
 You need to add support for it in the vertex shader, and make sure you didn't create the instance manager with the flags Ogre::IM_USEONEWEIGHT or Ogre::IM_FORCEONEWEIGHT.
 

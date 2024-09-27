@@ -754,8 +754,6 @@ So clearly, when you use additive light masking as a shadow technique, you need 
 
 Note that if you’re using texture shadows you have the additional option of using @ref Integrated-Texture-Shadows rather than being forced to use this explicit sequence - allowing you to compress the number of passes into a much smaller number at the expense of defining an upper number of shadow casting lights. In this case the ’additive’ aspect of the shadow technique just affects the colour of the shadow texture and it’s up to you to combine the shadow textures in your receivers however you like.
 
-<a name="Static-Lighting"></a>
-
 ## Static Lighting {#Static-Lighting}
 
 Despite their power, additive lighting techniques have an additional limitation; they do not combine well with pre-calculated static lighting in the scene. This is because they are based on the principle that shadow is an absence of light, but since static lighting in the scene already includes areas of light and shadow, additive lighting cannot remove light to create new shadows. Therefore, if you use the additive lighting technique you must either use it exclusively as your lighting solution (and you can combine it with per-pixel lighting to create a very impressive dynamic lighting solution), or you must use @ref Integrated-Texture-Shadows to combine the static lighting according to your chosen approach.
