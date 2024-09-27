@@ -167,7 +167,7 @@ namespace Ogre {
             This 'w' component cannot be included in the original position buffer because
             DirectX does not allow 4-component positions in the fixed-function pipeline, and the original
             position buffer must still be usable for fixed-function rendering.
-        @par    
+
             Note that we don't store any vertex declaration or vertex buffer binding here because this
             can be reused in the shadow algorithm.
         */

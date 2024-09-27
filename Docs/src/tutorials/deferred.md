@@ -129,7 +129,7 @@ Using tools like [RenderDoc](https://renderdoc.org/), we can see the texture bei
 
 Note that nothing has been written to the final output yet and that two output textures are being written to (see right hand side).
 
-# Lighting the scene {#lighting}
+# Lighting the scene
 In the GBuffer compositor, we built the G-Buffer for the current frame. It is now the time to use it to calculate the final lighting of the scene. This is what the compositor looks like :
 
 @snippet Samples/Media/DeferredShadingMedia/deferred.compositor showlit

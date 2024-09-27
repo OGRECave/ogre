@@ -166,7 +166,7 @@ namespace Ogre {
             HUD, then you would create 2 overlays, one with a 3D object attached for the
             cockpit, and one with the HUD elements attached (the zorder of the HUD 
             overlay would be higher than the cockpit to ensure it was always on top).
-        @par    
+
             A SceneNode can have any number of 3D objects attached to it. SceneNodes
             are usually created using SceneManager::createSceneNode, but in this case
             you should create a standard SceneNode instance <b>manually</b>; this is
