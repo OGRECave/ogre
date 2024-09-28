@@ -119,9 +119,12 @@ namespace Ogre {
                                 "currentGLContext was specified with no current GL context",
                                 "EGLWindow::create");
                 }
-#if defined(OGRE_BITES_HAVE_SDL) && OGRE_BITES_HAVE_SDL
-                mEglSurface = eglGetCurrentSurface(EGL_DRAW);
-#endif
+
+                if((opt = miscParams->find("currentEGLSurface")) != end)
+                {
+                    mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+                }
+
                 mEglDisplay = eglGetCurrentDisplay();
             }
 
