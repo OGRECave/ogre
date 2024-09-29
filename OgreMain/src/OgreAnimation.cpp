@@ -607,6 +607,10 @@ namespace Ogre {
         if( timePos > totalAnimationLength && totalAnimationLength > 0.0f )
             timePos = std::fmod( timePos, totalAnimationLength );
 
+        // Not best practice, but prevent from crash
+        if (mKeyFrameTimes.empty())
+            return timePos;
+
         // Search for global index
         auto it = std::lower_bound(mKeyFrameTimes.begin(), mKeyFrameTimes.end() - 1, timePos);
         return TimeIndex(timePos, static_cast<uint>(std::distance(mKeyFrameTimes.begin(), it)));
