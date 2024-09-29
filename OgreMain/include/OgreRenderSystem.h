@@ -393,6 +393,7 @@ namespace Ogre
         | externalWlDisplay | wl_display address as an integer | 0 (none) | Wayland display connection | Linux |
         | externalWlSurface | wl_surface address as an integer | 0 (none) | Wayland onscreen surface | Linux |
         | currentGLContext | true, false | false | Use an externally created GL context. (Must be current) | OpenGL |
+        | currentEGLSurface | true, false | false | Use an externally created EGL surface. | Android |
         | minColourBufferSize | Positive integer (usually 16, 32) | 16 | Min total colour buffer size. See EGL_BUFFER_SIZE | OpenGL |
         | windowProc | WNDPROC | DefWindowProc | function that processes window messages | Win 32 |
         | colourDepth | 16, 32 | Desktop depth | Colour depth of the resulting rendering window; only applies if fullScreen | Win32 |

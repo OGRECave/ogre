@@ -120,6 +120,12 @@ namespace Ogre {
                                 "EGLWindow::create");
                 }
 
+                if((opt = miscParams->find("currentEGLSurface")) != end &&
+                    StringConverter::parseBool(opt->second))
+                {
+                    mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+                }
+
                 mEglDisplay = eglGetCurrentDisplay();
             }
 
