@@ -59,6 +59,3 @@ def printer():
 threading.Thread(target=printer).start()
 root.startRendering()
 ```
-
-The "printer" Thread will be blocked until the rendering is finished.
-To allow background threads to run, you can use `root.allowPyThread()`, which will release the GIL during swapping, while rendering is waiting for vsync.

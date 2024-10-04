@@ -1,4 +1,4 @@
-%module(package="Ogre", directors="1") Bites
+%module(package="Ogre", directors="1", threads="1") Bites
 %{
 /* Includes the header in the wrapper code */
 #include "Ogre.h"
@@ -15,6 +15,7 @@
 #include "OgreImGuiInputListener.h"
 %}
 
+%feature("nothreadallow");
 %include std_vector.i
 %include std_string.i
 %include exception.i 
