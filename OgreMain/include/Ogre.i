@@ -929,9 +929,9 @@ SHARED_PTR(Mesh);
 %ignore Ogre::Root::getMovableObjectFactoryIterator;
 #ifdef SWIGPYTHON
 /* Unlocks SIG when called from python */
-%feature("nothreadallow", "0") Ogre::Root::startRendering;
-%feature("nothreadallow", "0") Ogre::Root::renderOneFrame;
-%feature("nothreadallow", "0") Ogre::Root::_updateAllRenderTargets;
+%threadallow Ogre::Root::startRendering;
+%threadallow Ogre::Root::renderOneFrame;
+%threadallow Ogre::Root::_updateAllRenderTargets;
 #endif
 %include "OgreRoot.h"
 // dont wrap: not useful in high level languages
