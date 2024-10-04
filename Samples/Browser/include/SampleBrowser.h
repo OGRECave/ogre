@@ -885,6 +885,7 @@ namespace OgreBites
 
                 if (!sp)  // this is not a SamplePlugin, so unload it
                 {
+                    Ogre::LogManager::getSingleton().logError(*i + " is not a SamplePlugin");
                     unloadedSamplePlugins.push_back(sampleDir + *i);
                     mRoot->unloadPlugin(sampleDir + *i);
                     continue;
