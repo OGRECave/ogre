@@ -49,7 +49,7 @@ RsImageCodec::RegisteredCodecList RsImageCodec::msCodecList;
 void RsImageCodec::startup(void)
 {
     // Register codecs
-    String exts = "jpeg,jpg,png,bmp,gif,tiff,tga,exr";
+    String exts = "jpeg,jpg,png,bmp,gif,tiff,tga,exr,hdr";
     StringVector extsVector = StringUtil::split(exts, ",");
     for (auto& v : extsVector)
     {
