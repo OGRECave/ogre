@@ -1379,7 +1379,7 @@ namespace Ogre
 
                 // Get the name
                 // Unless the type is in the exclusion list
-                if(iter != temp.end() && ((*iter)->type == CNT_WORD || (*iter)->type == CNT_QUOTE) &&
+                if(iter != temp.end() && ((*iter)->type == CNT_WORD || (*iter)->type == CNT_QUOTE || (*iter)->type == CNT_VARIABLE) &&
                     !mCompiler->isNameExcluded(*impl, mCurrent))
                 {
                     impl->name = (*iter)->token;
