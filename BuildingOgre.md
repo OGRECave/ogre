@@ -77,20 +77,27 @@ The optional dependencies will enable input handling and allow building the docu
 * SDL: https://www.libsdl.org/
 * zlib: http://www.zlib.net
 * freetype: http://www.freetype.org
+* googletest: https://github.com/google/googletest
 
 ### Optional dependencies
 
 * DirectX SDK: http://msdn.microsoft.com/en-us/directx/
 * Vulkan SDK: https://vulkan.lunarg.com/
-* FreeImage: http://freeimage.sourceforge.net
 * Doxygen: http://doxygen.org
-* Cg: http://developer.nvidia.com/object/cg_toolkit.html
 * Remotery: https://github.com/Celtoys/Remotery
 * SWIG: http://www.swig.org/
 * %Assimp: https://www.assimp.org/
 * Wayland: https://wayland.freedesktop.org/
+* Rust: https://www.rust-lang.org/
+* Bullet: https://pybullet.org/wordpress/
 
-Running CMake
+### Deprecated dependencies
+
+* FreeImage: http://freeimage.sourceforge.net
+* Cg: http://developer.nvidia.com/object/cg_toolkit.html
+* OpenEXR: http://www.openexr.com
+
+Running CMake {#running-cmake}
 -------------
 
 Now start the program cmake-gui by either typing the name in a console
@@ -147,7 +154,7 @@ This will freshly generate the API documentation for Ogre's classes from the hea
      make OgreDoc
 
 
-Installing
+Installing {#installing-sdk}
 ----------
 
 Once the build is complete, the libraries and headers must be copied to a clean location.
@@ -177,8 +184,8 @@ The ogre port in vcpkg is kept up to date by Microsoft team members and communit
 
 # Cross-Compiling
 
-Building on Ubuntu for Android
---------------------------------------------
+Android
+-------
 
 To build Ogre for Android, you need to specify the android cross toolchain to cmake as
 
@@ -190,8 +197,8 @@ You can now import these projects in Android Studio or manually trigger the APK 
 
     gradle assembleRelease
 
-Building for WebAssembly (using Emscripten)
------------------------------------------
+WebAssembly / Emscripten
+------------------------
 Install the Emscripten SDK (see full documentation on [www.emscripten.org](https://emscripten.org/docs/getting_started/downloads.html)), and make sure
 that the environment variables are correctly set (eg. run `source <emsdk_path>/emsdk_env.sh` before attempting to build)
 
@@ -207,8 +214,8 @@ This will not build the full SampleBrowser, but just a minimal Sample. The resul
 
 To prevent any cross-origin issues, start a local webserver as `python3 -m http.server 8000` and visit http://localhost:8000.
 
-Building on Mac OS X for iOS OS
--------------------------------
+iOS OS
+------
 
 To build Ogre for iOS, you need to specify the ios cross toolchain to cmake as
 
@@ -233,8 +240,8 @@ the Info.plist file to match the App ID of the chosen code signing identity.
 This can be done from the Target Properties panel.  It must match the bundle
 identifier of a valid developer certificate if you are building for devices.
 
-Building as Windows Store or Windows Phone application
--------------------------------------------------------------------
+WinRT / UWP
+------------------------------
 
 You need Windows 8.0 or later, Windows 10 is recommended.
 
