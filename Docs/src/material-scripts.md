@@ -90,7 +90,7 @@ Default: lod\_strategy distance_sphere
 
 ## lod\_values
 
-This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for [lod\_strategy](#lod_005fstrategy) - it is a list of distances for the @c distance_sphere strategy, and a list of pixel counts for the @c pixel_count strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. All materials automatically activate LOD index 0 for values less than the first entry, so you don't have to explicitly specify this. Additionally, if there is no technique that matches the active LOD index, a technique with a lower LOD index will be used instead. Therefore, it is important to always have at least one technique with LOD index 0.
+This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for [lod_strategy](#lod_005fstrategy) - it is a list of distances for the @c distance_sphere strategy, and a list of pixel counts for the @c pixel_count strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. All materials automatically activate LOD index 0 for values less than the first entry, so you don't have to explicitly specify this. Additionally, if there is no technique that matches the active LOD index, a technique with a lower LOD index will be used instead. Therefore, it is important to always have at least one technique with LOD index 0.
 
 @par
 Format: lod\_values &lt;value0&gt; &lt;value1&gt; &lt;value2&gt; ...
@@ -106,7 +106,7 @@ The above example would cause the material to use the best Technique at lod\_ind
 <a name="lod_005fdistances"></a>
 ## lod\_distances
 
-@deprecated This option is deprecated in favour of [lod\_values](#lod_005fvalues) now.  
+@deprecated This option is deprecated in favour of [lod_values](#lod_005fvalues) now.
 
 <a name="receive_005fshadows"></a><a name="receive_005fshadows-1"></a>
 
@@ -148,7 +148,7 @@ A "technique" section in your material script encapsulates a single method of re
 
 When a material is used for the first time, it is ’compiled’. That involves scanning the techniques which have been defined, and marking which of them are supportable using the current rendering API and graphics card. If no techniques are supportable, your material will render as blank white. The compilation examines a number of things, such as:
 
--   The number of texture\_unit entries in each pass<br> Note that if the number of texture\_unit entries exceeds the number of texture units in the current graphics card, the technique may still be supportable so long as a fragment program is not being used. In this case, Ogre will split the pass which has too many entries into multiple passes for the less capable card, and the multitexture blend will be turned into a multipass blend (See [colour\_op\_multipass\_fallback](#colour_005fop_005fmultipass_005ffallback)).
+-   The number of texture\_unit entries in each pass<br> Note that if the number of texture\_unit entries exceeds the number of texture units in the current graphics card, the technique may still be supportable so long as a fragment program is not being used. In this case, Ogre will split the pass which has too many entries into multiple passes for the less capable card, and the multitexture blend will be turned into a multipass blend (See [colour_op_multipass_fallback](#colour_005fop_005fmultipass_005ffallback)).
 -   Whether vertex, geometry or fragment programs are used, and if so which syntax they use (e.g. vs\_1\_1, ps\_2\_x, arbfp1 etc.)
 -   Other effects like cube mapping and dot3 blending
 -   Whether the vendor or device name of the current graphics card matches some user-specified rules
@@ -165,11 +165,11 @@ Format: technique name
 Techniques have only a small number of attributes of their own:
 
 -   [scheme](#scheme)
--   [lod\_index](#lod_005findex) (and also see [lod\_distances](#lod_005fdistances) in the parent material)
--   [shadow\_caster\_material](#shadow_005fcaster_005fmaterial)
--   [shadow\_receiver\_material](#shadow_005freceiver_005fmaterial)
--   [gpu\_vendor\_rule](#gpu_005fvendor_005frule)
--   [gpu\_device\_rule](#gpu_005fdevice_005frule)
+-   [lod_index](#lod_005findex) (and also see [lod_distances](#lod_005fdistances) in the parent material)
+-   [shadow_caster_material](#shadow_005fcaster_005fmaterial)
+-   [shadow_receiver_material](#shadow_005freceiver_005fmaterial)
+-   [gpu_vendor_rule](#gpu_005fvendor_005frule)
+-   [gpu_device_rule](#gpu_005fdevice_005frule)
 
 <a name="scheme"></a><a name="scheme-1"></a>
 
@@ -260,37 +260,37 @@ Here are the attributes you can use in a ’pass’ section of a .material scrip
 -   [diffuse](#diffuse)
 -   [specular](#specular)
 -   [emissive](#emissive)
--   [scene\_blend](#scene_005fblend)
--   [separate\_scene\_blend](#separate_005fscene_005fblend)
--   [scene\_blend\_op](#scene_005fblend_005fop)
--   [separate\_scene\_blend\_op](#separate_005fscene_005fblend_005fop)
--   [depth\_check](#depth_005fcheck)
--   [depth\_write](#depth_005fwrite)
--   [depth\_func](#depth_005ffunc)
--   [depth\_bias](#depth_005fbias)
--   [iteration\_depth\_bias](#iteration_005fdepth_005fbias)
--   [alpha\_rejection](#alpha_005frejection)
--   [alpha\_to\_coverage](#alpha_005fto_005fcoverage)
--   [light\_scissor](#light_005fscissor)
--   [light\_clip\_planes](#light_005fclip_005fplanes)
--   [illumination\_stage](#illumination_005fstage)
--   [transparent\_sorting](#transparent_005fsorting)
--   [cull\_hardware](#cull_005fhardware)
--   [cull\_software](#cull_005fsoftware)
+-   [scene_blend](#scene_005fblend)
+-   [separate_scene_blend](#separate_005fscene_005fblend)
+-   [scene_blend_op](#scene_005fblend_005fop)
+-   [separate_scene_blend_op](#separate_005fscene_005fblend_005fop)
+-   [depth_check](#depth_005fcheck)
+-   [depth_write](#depth_005fwrite)
+-   [depth_func](#depth_005ffunc)
+-   [depth_bias](#depth_005fbias)
+-   [iteration_depth_bias](#iteration_005fdepth_005fbias)
+-   [alpha_rejection](#alpha_005frejection)
+-   [alpha_to_coverage](#alpha_005fto_005fcoverage)
+-   [light_scissor](#light_005fscissor)
+-   [light_clip_planes](#light_005fclip_005fplanes)
+-   [illumination_stage](#illumination_005fstage)
+-   [transparent_sorting](#transparent_005fsorting)
+-   [cull_hardware](#cull_005fhardware)
+-   [cull_software](#cull_005fsoftware)
 -   [lighting](#lighting)
 -   [shading](#shading)
--   [polygon\_mode](#polygon_005fmode)
--   [polygon\_mode\_overrideable](#polygon_005fmode_005foverrideable)
--   [fog\_override](#fog_005foverride)
--   [colour\_write](#colour_005fwrite)
--   [max\_lights](#max_005flights)
--   [start\_light](#start_005flight)
+-   [polygon_mode](#polygon_005fmode)
+-   [polygon_mode_overrideable](#polygon_005fmode_005foverrideable)
+-   [fog_override](#fog_005foverride)
+-   [colour_write](#colour_005fwrite)
+-   [max_lights](#max_005flights)
+-   [start_light](#start_005flight)
 -   [iteration](#iteration)
--   [point\_size](#point_005fsize)
--   [point\_sprites](#point_005fsprites)
--   [point\_size\_attenuation](#point_005fsize_005fattenuation)
--   [point\_size\_min](#point_005fsize_005fmin)
--   [point\_size\_max](#point_005fsize_005fmax)
+-   [point_size](#point_005fsize)
+-   [point_sprites](#point_005fsprites)
+-   [point_size_attenuation](#point_005fsize_005fattenuation)
+-   [point_size_min](#point_005fsize_005fmin)
+-   [point_size_max](#point_005fsize_005fmax)
 -   [line_width](#line_width)
 
 <a name="Attribute-Descriptions"></a>
@@ -419,25 +419,25 @@ Example: scene\_blend one one\_minus\_dest\_alpha
 @par
 Default: scene\_blend one zero (opaque)  
 
-Also see [separate\_scene\_blend](#separate_005fscene_005fblend).
+Also see [separate_scene_blend](#separate_005fscene_005fblend).
 
 <a name="separate_005fscene_005fblend"></a><a name="separate_005fscene_005fblend-1"></a>
 
 ## separate\_scene\_blend
 
-This option operates in exactly the same way as [scene\_blend](#scene_005fblend), except that it allows you to specify the operations to perform between the rendered pixel and the frame buffer separately for colour and alpha components. By nature this option is only useful when rendering to targets which have an alpha channel which you’ll use for later processing, such as a render texture.
+This option operates in exactly the same way as [scene_blend](#scene_005fblend), except that it allows you to specify the operations to perform between the rendered pixel and the frame buffer separately for colour and alpha components. By nature this option is only useful when rendering to targets which have an alpha channel which you’ll use for later processing, such as a render texture.
 @par
 Format1: separate\_scene\_blend &lt;simple\_colour\_blend&gt; &lt;simple\_alpha\_blend&gt;
 @par
 Example: separate\_scene\_blend add modulate
 
-This example would add colour components but multiply alpha components. The blend modes available are as in [scene\_blend](#scene_005fblend). The more advanced form is also available:
+This example would add colour components but multiply alpha components. The blend modes available are as in [scene_blend](#scene_005fblend). The more advanced form is also available:
 @par
 Format2: separate\_scene\_blend &lt;colour\_src\_factor&gt; &lt;colour\_dest\_factor&gt; &lt;alpha\_src\_factor&gt; &lt;alpha\_dest\_factor&gt;
 @par
 Example: separate\_scene\_blend one one\_minus\_dest\_alpha one one 
 
-Again the options available in the second format are the same as those in the second format of [scene\_blend](#scene_005fblend).
+Again the options available in the second format are the same as those in the second format of [scene_blend](#scene_005fblend).
 
 <a name="scene_005fblend_005fop"></a><a name="scene_005fblend_005fop-1"></a>
 
@@ -457,7 +457,9 @@ You may change this to ’add’, ’subtract’, ’reverse_subtract’, ’min
 
 This directive is as scene\_blend\_op, except that you can set the operation for colour and alpha separately.
 @par
-Format: separate\_scene\_blend\_op &lt;colourOp&gt; &lt;alphaOp&gt; Default: separate\_scene\_blend\_op add add
+Format: separate\_scene\_blend\_op &lt;colourOp&gt; &lt;alphaOp&gt;
+@par
+Default: separate\_scene\_blend\_op add add
 
 <a name="depth_005fcheck"></a><a name="depth_005fcheck-1"></a>
 
@@ -510,13 +512,13 @@ Format: depth\_bias &lt;constantBias&gt; \[&lt;slopeScaleBias&gt;\]
 
 @copydetails Ogre::Pass::setDepthBias
 
-Also see [iteration\_depth\_bias](#iteration_005fdepth_005fbias)
+Also see [iteration_depth_bias](#iteration_005fdepth_005fbias)
 
 <a name="iteration_005fdepth_005fbias"></a><a name="iteration_005fdepth_005fbias-1"></a>
 
 ## iteration\_depth\_bias
 
-Sets an additional bias derived from the number of times a given pass has been iterated. Operates just like [depth\_bias](#depth_005fbias) except that it applies an additional bias factor to the base depth\_bias value, multiplying the provided value by the number of times this pass has been iterated before, through one of the [iteration](#iteration) variants. So the first time the pass will get the depth\_bias value, the second time it will get depth\_bias + iteration\_depth\_bias, the third time it will get depth\_bias + iteration\_depth\_bias \* 2, and so on. The default is zero. 
+Sets an additional bias derived from the number of times a given pass has been iterated. Operates just like [depth_bias](#depth_005fbias) except that it applies an additional bias factor to the base depth\_bias value, multiplying the provided value by the number of times this pass has been iterated before, through one of the [iteration](#iteration) variants. So the first time the pass will get the depth\_bias value, the second time it will get depth\_bias + iteration\_depth\_bias, the third time it will get depth\_bias + iteration\_depth\_bias \* 2, and so on. The default is zero.
 @par
 Format: iteration\_depth\_bias &lt;bias\_per\_iteration&gt;
 
@@ -670,7 +672,7 @@ Default: polygon\_mode solid
 
 ## polygon\_mode\_overrideable
 
-Sets whether or not the [polygon\_mode](#polygon_005fmode) set on this pass can be downgraded by the camera
+Sets whether or not the [polygon_mode](#polygon_005fmode) set on this pass can be downgraded by the camera
 
 @par
 Format: polygon\_mode\_overrideable &lt;override&gt;
@@ -921,7 +923,7 @@ Default: point\_size\_attenuation off
 
 ## point\_size\_min
 
-Sets the minimum point size after attenuation ([point\_size\_attenuation](#point_005fsize_005fattenuation)). For details on the size metrics, See [point\_size](#point_005fsize).
+Sets the minimum point size after attenuation ([point_size_attenuation](#point_005fsize_005fattenuation)). For details on the size metrics, See [point_size](#point_005fsize).
 @par
 Format: point\_size\_min &lt;size&gt;
 @par
@@ -931,7 +933,7 @@ Default: point\_size\_min 0
 
 ## point\_size\_max
 
-Sets the maximum point size after attenuation ([point\_size\_attenuation](#point_005fsize_005fattenuation)). For details on the size metrics, See [point\_size](#point_005fsize). A value of 0 means the maximum is set to the same as the max size reported by the current card. 
+Sets the maximum point size after attenuation ([point_size_attenuation](#point_005fsize_005fattenuation)). For details on the size metrics, See [point_size](#point_005fsize). A value of 0 means the maximum is set to the same as the max size reported by the current card.
 @par
 Format: point\_size\_max &lt;size&gt;
 @par
@@ -954,24 +956,24 @@ Here are the attributes you can use in a @c texture_unit section of a .material 
 
 ## Available Texture Unit Attributes
 
--   [texture\_alias](#texture_005falias)
+-   [texture_alias](#texture_005falias)
 -   [texture](#texture)
--   [anim\_texture](#anim_005ftexture)
--   [cubic\_texture](#cubic_005ftexture)
--   [tex\_coord\_set](#tex_005fcoord_005fset)
--   [colour\_op](#colour_005fop)
--   [colour\_op\_ex](#colour_005fop_005fex)
--   [colour\_op\_multipass\_fallback](#colour_005fop_005fmultipass_005ffallback)
--   [alpha\_op\_ex](#alpha_005fop_005fex)
--   [env\_map](#env_005fmap)
+-   [anim_texture](#anim_005ftexture)
+-   [cubic_texture](#cubic_005ftexture)
+-   [tex_coord_set](#tex_005fcoord_005fset)
+-   [colour_op](#colour_005fop)
+-   [colour_op_ex](#colour_005fop_005fex)
+-   [colour_op_multipass_fallback](#colour_005fop_005fmultipass_005ffallback)
+-   [alpha_op_ex](#alpha_005fop_005fex)
+-   [env_map](#env_005fmap)
 -   [scroll](#scroll)
--   [scroll\_anim](#scroll_005fanim)
+-   [scroll_anim](#scroll_005fanim)
 -   [rotate](#rotate)
--   [rotate\_anim](#rotate_005fanim)
+-   [rotate_anim](#rotate_005fanim)
 -   [scale](#scale)
--   [wave\_xform](#wave_005fxform)
+-   [wave_xform](#wave_005fxform)
 -   [transform](#transform)
--   [content\_type](#content_005ftype)
+-   [content_type](#content_005ftype)
 -   [sampler_ref](#sampler_ref)
 -   [unordered_access_mip](#unordered_access_mip)
 
@@ -1096,7 +1098,7 @@ This is no longer supported and behaves like combinedUVW.
 
 ## content_type
 
-Tells this texture unit where it should get its content from. The default is to get texture content from a named texture, as defined with the [texture](#texture), [cubic\_texture](#cubic_005ftexture), [anim\_texture](#anim_005ftexture) attributes. However you can also pull texture information from other automated sources.
+Tells this texture unit where it should get its content from. The default is to get texture content from a named texture, as defined with the [texture](#texture), [cubic_texture](#cubic_005ftexture), [anim_texture](#anim_005ftexture) attributes. However you can also pull texture information from other automated sources.
 
 @par
 Format: content\_type &lt;type&gt; \[&lt;compositorName&gt;\] \[&lt;textureName&gt;\] \[&lt;mrtIndex&gt;\]
@@ -1113,7 +1115,7 @@ This option allows you to pull in a shadow texture, and is only valid when you u
 
 </dd> <dt>compositor</dt> <dd>
 
-@copybrief Ogre::TextureUnitState::CONTENT_COMPOSITOR This can be either in a render\_scene directive inside a compositor script, or in a general pass in a viewport that has a compositor attached. Note that this is a reference only, meaning that it does not change the render order. You must make sure that the order is reasonable for what you are trying to achieve (for example, texture pooling might cause the referenced texture to be overwritten by something else by the time it is referenced).
+@copybrief Ogre::TextureUnitState::CONTENT_COMPOSITOR This can be either in a @c render_scene directive inside a compositor script, or in a general pass in a viewport that has a compositor attached. Note that this is a reference only, meaning that it does not change the render order. You must make sure that the order is reasonable for what you are trying to achieve (for example, texture pooling might cause the referenced texture to be overwritten by something else by the time it is referenced).
 
 </dd> </dl>
 
@@ -1399,10 +1401,10 @@ sampler mySampler
 ## Available parameters
 
 -   [filtering](#filtering)
--   [max\_anisotropy](#max_005fanisotropy)
--   [tex\_address\_mode](#tex_005faddress_005fmode)
--   [tex\_border\_colour](#tex_005fborder_005fcolour)
--   [mipmap\_bias](#mipmap_005fbias)
+-   [max_anisotropy](#max_005fanisotropy)
+-   [tex_address_mode](#tex_005faddress_005fmode)
+-   [tex_border_colour](#tex_005fborder_005fcolour)
+-   [mipmap_bias](#mipmap_005fbias)
 -   [compare_test](#compare_test)
 -   [comp_func](#comp_func)
 
@@ -1423,7 +1425,7 @@ Default: tex\_address\_mode wrap
 
 ## tex\_border\_colour
 
-Sets the border colour of border texture address mode (see [tex\_address\_mode](#tex_005faddress_005fmode)). 
+Sets the border colour of border texture address mode (see [tex_address_mode](#tex_005faddress_005fmode)).
 @par
 Format: tex\_border\_colour &lt;red&gt; &lt;green&gt; &lt;blue&gt; \[&lt;alpha&gt;\]<br> NB valid colour values are between 0.0 and 1.0.
 @par

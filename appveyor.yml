@@ -10,13 +10,13 @@ install:
  - cmd: pip install swig
  - cmd: curl -sSf -o rustup-init.exe https://win.rustup.rs/
  - cmd: rustup-init.exe -y
- - cmd: curl -LO https://sdk.lunarg.com/sdk/download/1.3.224.1/windows/VulkanSDK-1.3.224.1-Installer.exe
- - cmd: VulkanSDK-1.3.224.1-Installer.exe --accept-licenses --default-answer --confirm-command install
+ - cmd: curl -LO https://sdk.lunarg.com/sdk/download/1.3.275.0/windows/VulkanSDK-1.3.275.0-Installer.exe
+ - cmd: VulkanSDK-1.3.275.0-Installer.exe --accept-licenses --default-answer --confirm-command install
  - cmd: cd %APPVEYOR_BUILD_FOLDER%
  - cmd: git submodule update --init --recursive
 build_script:
  - set PATH=C:\Qt\6.2\msvc2019_64\bin;C:\Users\appveyor\.cargo\bin;%PATH%
- - set VULKAN_SDK=C:\VulkanSDK\1.3.224.1
+ - set VULKAN_SDK=C:\VulkanSDK\1.3.275.0
  - cmake -P ci-build.cmake
  - cmake --build build --config RelWithDebInfo --target INSTALL
 test_script:
