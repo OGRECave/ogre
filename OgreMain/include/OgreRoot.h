@@ -55,6 +55,8 @@ namespace Ogre
     /// Scene manager instances, indexed by instance name
     typedef std::map<String, SceneManager*> SceneManagerInstanceMap;
 
+    OGRE_DEBUG_NS_BEGIN
+
     /** The root class of the Ogre system.
 
         The Ogre::Root class represents a starting point for the client
@@ -925,6 +927,7 @@ namespace Ogre
         */
         Real getDefaultMinPixelSize() { return mDefaultMinPixelSize; }
     };
+    OGRE_DEBUG_NS_END
     /** @} */
     /** @} */
 } // Namespace Ogre
