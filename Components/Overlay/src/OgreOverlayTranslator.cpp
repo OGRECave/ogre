@@ -132,7 +132,7 @@ void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
     else if (prop->values.empty() || !getString(prop->values.front(), &val) ||
              !pFont->setParameter(attrib, val))
     {
-        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, attrib);
     }
 }
 

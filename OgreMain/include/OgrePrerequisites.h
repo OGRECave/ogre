@@ -32,6 +32,17 @@ THE SOFTWARE
 #include <string>
 #include <memory>
 
+// extra namespace to trigger LNK2019 on binary incompatible builds
+// instead of crashing at runtime
+#if defined(_MSC_VER) && defined(_DEBUG)
+#define OGRE_DEBUG_NS_BEGIN namespace DEBUG_BUILD_REQUIRED {
+#define OGRE_DEBUG_NS_END }
+namespace Ogre { namespace DEBUG_BUILD_REQUIRED { } using namespace DEBUG_BUILD_REQUIRED; }
+#else
+#define OGRE_DEBUG_NS_BEGIN
+#define OGRE_DEBUG_NS_END
+#endif
+
 namespace Ogre {
     #define OGRE_TOKEN_PASTE_INNER(x, y) x ## y
     #define OGRE_TOKEN_PASTE(x, y) OGRE_TOKEN_PASTE_INNER(x, y)
@@ -211,7 +222,9 @@ namespace Ogre {
     class ResourceGroupManager;
     class ResourceManager;
     class RibbonTrail;
+OGRE_DEBUG_NS_BEGIN
     class Root;
+OGRE_DEBUG_NS_END
     class SceneManager;
     class SceneNode;
     class SceneQuery;
