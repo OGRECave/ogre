@@ -53,7 +53,7 @@ jobs:
         VULKAN_SDK: C:\VulkanSDK\1.3.275.0
         SKBUILD_BUILD_OPTIONS: -j4
   macos:
-    runs-on: macos-12
+    runs-on: macos-13
     strategy:
       matrix:
         pyver: ['3.10', '3.12']
