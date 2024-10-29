@@ -51,17 +51,17 @@ namespace Ogre
         MetalDevice *mDevice;
 
         /// @copydoc ResourceManager::createImpl
-        virtual Resource* createImpl(const String& name, ResourceHandle handle,
+        Resource* createImpl(const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader,
-            const NameValuePairList* createParams);
+            const NameValuePairList* createParams) override;
 
-        SamplerPtr _createSamplerImpl();
+        SamplerPtr _createSamplerImpl() override;
     public:
         MetalTextureManager( MetalDevice *device );
         virtual ~MetalTextureManager();
 
         /// @copydoc TextureManager::getNativeFormat
-        virtual PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
+        PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage) override;
     };
 }
 

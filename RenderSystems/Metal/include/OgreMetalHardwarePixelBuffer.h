@@ -39,10 +39,10 @@ namespace Ogre {
     {
     protected:
         /// Lock a box
-        PixelBox lockImpl(const Box &lockBox, LockOptions options);
+        PixelBox lockImpl(const Box &lockBox, LockOptions options) override;
 
         /// Unlock a box
-        void unlockImpl(void);
+        void unlockImpl(void) override;
 
         // Internal buffer; either on-card or in system memory, freed/allocated on demand
         // depending on buffer usage
@@ -68,10 +68,10 @@ namespace Ogre {
                                   HardwareBuffer::Usage usage );
 
         /// @copydoc HardwarePixelBuffer::blitFromMemory
-        void blitFromMemory(const PixelBox &src, const Box &dstBox);
+        void blitFromMemory(const PixelBox &src, const Box &dstBox) override;
 
         /// @copydoc HardwarePixelBuffer::blitToMemory
-        void blitToMemory(const Box &srcBox, const PixelBox &dst);
+        void blitToMemory(const Box &srcBox, const PixelBox &dst) override;
 
         virtual ~MetalHardwarePixelBuffer();
 
@@ -94,16 +94,16 @@ namespace Ogre {
                             bool writeGamma, uint fsaa );
         virtual ~MetalTextureBuffer();
 
-        virtual void bindToFramebuffer(uint32 attachment, size_t zoffset);
+        void bindToFramebuffer(uint32 attachment, size_t zoffset) override;
 
         /// Upload a box of pixels to this buffer on the card
-        virtual void upload(const PixelBox &data, const Box &dest);
+        void upload(const PixelBox &data, const Box &dest) override;
 
         /// Download a box of pixels from the card
-        virtual void download(const PixelBox &data);
+        void download(const PixelBox &data) override;
 
         /// Hardware implementation of blitFromMemory
-        virtual void blitFromMemory(const PixelBox &src_orig, const Box &dstBox);
+        void blitFromMemory(const PixelBox &src_orig, const Box &dstBox) override;
 
         /// Lock a box
 //            PixelBox lockImpl(const Box &lockBox, LockOptions options) { return PixelBox(); }
@@ -113,7 +113,7 @@ namespace Ogre {
 
         /// @copydoc HardwarePixelBuffer::blit
         void blit( const HardwarePixelBufferSharedPtr &src,
-                   const Box &srcBox, const Box &dstBox );
+                   const Box &srcBox, const Box &dstBox ) override;
         // Blitting implementation
         void blitFromTexture( MetalTextureBuffer *src, const Box &srcBox,
                               const Box &dstBox );

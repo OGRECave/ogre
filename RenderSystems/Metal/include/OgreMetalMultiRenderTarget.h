@@ -45,12 +45,12 @@ namespace Ogre
         virtual ~MetalMultiRenderTarget();
 
         // MultiRenderTarget overloads.
-        virtual void bindSurfaceImpl( size_t attachment, RenderTexture *target );
-        virtual void unbindSurfaceImpl( size_t attachment );
+        void bindSurfaceImpl( size_t attachment, RenderTexture *target ) override;
+        void unbindSurfaceImpl( size_t attachment ) override;
 
         // RenderTarget overloads.
-        virtual bool requiresTextureFlipping() const { return false; }
-        virtual void getCustomAttribute( const String& name, void *pData );
+        bool requiresTextureFlipping() const override { return false; }
+        void getCustomAttribute( const String& name, void *pData ) override;
     };
 }
 
