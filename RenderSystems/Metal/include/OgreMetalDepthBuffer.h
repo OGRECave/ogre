@@ -53,7 +53,7 @@ namespace Ogre
         virtual ~MetalDepthBuffer();
 
         /// @copydoc DepthBuffer::isCompatible
-        virtual bool isCompatible( RenderTarget *renderTarget) const;
+        bool isCompatible( RenderTarget *renderTarget) const override;
 
         MetalDevice* getOwnerDevice(void) const     { return mDevice; }
 

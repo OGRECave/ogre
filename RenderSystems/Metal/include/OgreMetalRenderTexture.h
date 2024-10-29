@@ -48,11 +48,11 @@ namespace Ogre
                             uint32 fsaa, uint32 mip, bool hwGamma );
         virtual ~MetalRenderTexture();
 
-        virtual void swapBuffers(void);
+        void swapBuffers(void) override;
 
         // RenderTarget overloads.
-        virtual bool requiresTextureFlipping() const { return false; }
-        virtual void getCustomAttribute( const String& name, void* pData );
+        bool requiresTextureFlipping() const override { return false; }
+        void getCustomAttribute( const String& name, void* pData ) override;
     };
 }
 

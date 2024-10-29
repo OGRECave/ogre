@@ -47,13 +47,13 @@ namespace Ogre {
         void _notifyDeviceStalled(void);
 
         /// Creates a vertex buffer
-        virtual HardwareVertexBufferSharedPtr createVertexBuffer( size_t vertexSize, size_t numVerts,
+        HardwareVertexBufferSharedPtr createVertexBuffer( size_t vertexSize, size_t numVerts,
                                                                   HardwareBuffer::Usage usage,
-                                                                  bool useShadowBuffer = false );
+                                                                  bool useShadowBuffer = false ) override;
         /// Create an index buffer
-        virtual HardwareIndexBufferSharedPtr createIndexBuffer(
+        HardwareIndexBufferSharedPtr createIndexBuffer(
                 HardwareIndexBuffer::IndexType itype, size_t numIndexes,
-                HardwareBuffer::Usage usage, bool useShadowBuffer = false );
+                HardwareBuffer::Usage usage, bool useShadowBuffer = false ) override;
     };
 }
 
