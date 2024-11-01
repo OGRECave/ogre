@@ -43,17 +43,17 @@ namespace Ogre {
         virtual ~CocoaContext();
         
         /** See GLContext */
-        virtual void setCurrent();
+        void setCurrent() override;
         /**
          * This is called before another context is made current. By default,
          * nothing is done here.
          */
-        virtual void endCurrent();
+        void endCurrent() override;
         /** Create a new context based on the same window/pbuffer as this
             context - mostly useful for additional threads.
         @note The caller is responsible for deleting the returned context.
         */
-        virtual GLContext* clone() const;
+        GLContext* clone() const override;
 
         /** Grab the NSOpenGLContext if it exists */
         NSOpenGLContext* getContext();
