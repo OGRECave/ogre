@@ -69,39 +69,39 @@ namespace Ogre {
         NSView* ogreView() const { return mView; }
         NSWindow* ogreWindow() const { return mWindow; }
         NSOpenGLContext* nsopenGLContext() const { return mGLContext; }
-        GLContext* getContext() const { return mContext; }
+        GLContext* getContext() const override { return mContext; }
         void createWithView(OgreGLView *view);
 
         /** @copydoc see RenderWindow::getViewPointToPixelScale */
-        float getViewPointToPixelScale();
+        float getViewPointToPixelScale() override;
         /** Overridden - see RenderWindow */
         void create(const String& name, unsigned int widthPt, unsigned int heightPt,
-                bool fullScreen, const NameValuePairList *miscParams);
+                bool fullScreen, const NameValuePairList *miscParams) override;
         /** Overridden - see RenderWindow */
-        void destroy(void);
+        void destroy(void) override;
         /** @copydoc see RenderWindow::setHidden */
-        void setHidden(bool hidden);
+        void setHidden(bool hidden) override;
         /** @copydoc see RenderWindow::setVSyncEnabled */
-        void setVSyncEnabled(bool vsync);
+        void setVSyncEnabled(bool vsync) override;
         /** Overridden - see RenderWindow */
-        void reposition(int leftPt, int topPt);
+        void reposition(int leftPt, int topPt) override;
         /** Overridden - see RenderWindow */
-        void resize(unsigned int widthPt, unsigned int heightPt);
+        void resize(unsigned int widthPt, unsigned int heightPt) override;
         /** Overridden - see RenderWindow */
-        void swapBuffers();
+        void swapBuffers() override;
         /** Overridden - see RenderWindow */
-        virtual void setFullscreen(bool fullScreen, unsigned int widthPt, unsigned int heightPt);
+        void setFullscreen(bool fullScreen, unsigned int widthPt, unsigned int heightPt) override;
         /** Overridden - see RenderWindow */
-        virtual unsigned int getWidth(void) const;
+        unsigned int getWidth(void) const override;
         /** Overridden - see RenderWindow */
-        virtual unsigned int getHeight(void) const;
+        unsigned int getHeight(void) const override;
         /** Overridden - see RenderWindow */
-        void windowMovedOrResized(void);
+        void windowMovedOrResized(void) override;
         void windowHasResized(void);
         void createNewWindow(unsigned int width, unsigned int height, String title);
         void createWindowFromExternal(NSView *viewRef);
 
-        void getCustomAttribute( const String& name, void* pData );
+        void getCustomAttribute( const String& name, void* pData ) override;
     };
 }
 
