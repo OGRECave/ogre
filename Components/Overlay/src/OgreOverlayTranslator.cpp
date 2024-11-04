@@ -110,6 +110,25 @@ void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont, co
         pFont->setAntialiasColour(flag);
         compiler->addError(node, p.name, ScriptCompiler::CE_DEPRECATEDSYMBOL);
     }
+    else if(p.name == "merge_fonts")
+    {
+        if (p.values.empty())
+        {
+            compiler->addError(node);
+            return;
+        }
+
+        for (auto& val : p.values)
+        {
+            auto mergeFont = FontManager::getSingleton().getByName(val, pFont->getGroup());
+            if (!mergeFont)
+            {
+                compiler->addError(node, val, ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT);
+                return;
+            }
+            pFont->addMergeFont(mergeFont);
+        }
+    }
     else if (p.name == "code_points")
     {
         if (p.values.empty())

@@ -44,6 +44,8 @@ namespace Ogre
     /** \addtogroup Overlays
     *  @{
     */
+    class Font;
+    typedef SharedPtr<Font> FontPtr;
 
     /// decode UTF8 encoded bytestream to uint32 codepoints
     _OgreOverlayExport std::vector<uint32> utftoc32(String str);
@@ -124,12 +126,21 @@ namespace Ogre
         /// Range of code points to generate glyphs for (truetype only)
         CodePointRangeList mCodePointRangeList;
 
+        std::vector<FontPtr> mMergeFonts;
+
         /// Internal method for loading from ttf
         void createTextureFromFont(void);
 
         void loadImpl() override;
         void unloadImpl() override;
         size_t calculateSize(void) const override { return 0; } // permanent resource is in the texture
+
+        friend class ImGuiOverlay;
+        DataStreamPtr _getTTFData();
+
+        void* _prepareFont(void* context, uint32& glyphCount, int32& max_height, int32& max_width);
+        void _loadGlyphs(void* font, int32 max_height, Image& img, uint32& l, uint32& m);
+
     public:
 
         /** Constructor.
@@ -287,6 +298,16 @@ namespace Ogre
         {
             return mCodePointRangeList;
         }
+
+        /** Add a font to merge with this one.
+
+            This is useful when you want to use a font for most of the characters, but
+            fall back to another font for characters not present in the current font. e.g. icons.
+        */
+        void addMergeFont(const FontPtr& font) { mMergeFonts.push_back(font); }
+
+        const std::vector<FontPtr>& getMergeFontList() const { return mMergeFonts; }
+
         /** Gets the material generated for this font, as a weak reference. 
 
             This will only be valid after the Font has been loaded. 
@@ -343,8 +364,6 @@ namespace Ogre
         */
         void _setMaterial(const MaterialPtr& mat);
     };
-
-    typedef SharedPtr<Font> FontPtr;
     /** @} */
     /** @} */
 }
