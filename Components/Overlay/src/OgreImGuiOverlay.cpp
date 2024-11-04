@@ -122,9 +122,7 @@ ImFont* ImGuiOverlay::addFont(const String& name, const String& group)
                     StringUtil::format("Font '%s' not found in group '%s'", name.c_str(), group.c_str()));
 
     OgreAssert(font->getType() == FT_TRUETYPE, "font must be of FT_TRUETYPE");
-    DataStreamPtr dataStreamPtr =
-        ResourceGroupManager::getSingleton().openResource(font->getSource(), font->getGroup());
-    MemoryDataStream ttfchunk(dataStreamPtr, false); // transfer ownership to imgui
+    MemoryDataStream ttfchunk(font->_getTTFData(), false); // transfer ownership to imgui
 
     // convert codepoint ranges for imgui
     CodePointRange cprange;
@@ -148,8 +146,33 @@ ImFont* ImGuiOverlay::addFont(const String& name, const String& group)
 
     ImFontConfig cfg;
     strncpy(cfg.Name, name.c_str(), IM_ARRAYSIZE(cfg.Name) - 1);
-    return io.Fonts->AddFontFromMemoryTTF(ttfchunk.getPtr(), ttfchunk.size(), font->getTrueTypeSize() * vpScale, &cfg,
-                                          cprangePtr);
+    auto* ret = io.Fonts->AddFontFromMemoryTTF(ttfchunk.getPtr(), ttfchunk.size(), font->getTrueTypeSize() * vpScale,
+                                               &cfg, cprangePtr);
+
+    cfg.MergeMode = true;
+
+    for(const auto& mergeFont : font->getMergeFontList())
+    {
+        MemoryDataStream mergeTtfchunk(mergeFont->_getTTFData(), false); // transfer ownership to imgui
+
+        CodePointRange mergeCprange;
+        for (const auto& r : mergeFont->getCodePointRangeList())
+        {
+            mergeCprange.push_back(r.first);
+            mergeCprange.push_back(r.second);
+        }
+
+        OgreAssert(!mergeCprange.empty(), "merge font must have codepoint ranges");
+        mergeCprange.push_back(0); // terminate
+        mCodePointRanges.push_back(mergeCprange);
+        cprangePtr = mCodePointRanges.back().data();
+
+        cfg.MergeMode = true;
+        ret = io.Fonts->AddFontFromMemoryTTF(mergeTtfchunk.getPtr(), mergeTtfchunk.size(),
+                                             mergeFont->getTrueTypeSize() * vpScale, &cfg, cprangePtr);
+    }
+
+    return ret;
 }
 
 void ImGuiOverlay::ImGUIRenderable::createFontTexture()

@@ -328,78 +328,61 @@ namespace Ogre
         mTexture->load();
     }
     //---------------------------------------------------------------------
-    void Font::loadResource(Resource* res)
+    DataStreamPtr Font::_getTTFData()
     {
-        // Locate ttf file, load it pre-buffered into memory by wrapping the
-        // original DataStream in a MemoryDataStream
-        DataStreamPtr dataStreamPtr =
-            ResourceGroupManager::getSingleton().openResource(
-                mSource, mGroup, this);
-        MemoryDataStream ttfchunk(dataStreamPtr);
+        // Locate ttf file, load it pre-buffered into memory by wrapping
+        // the original DataStream in a MemoryDataStream
+        return ResourceGroupManager::getSingleton().openResource(mSource, mGroup, this);
+    }
 
-        // If codepoints not supplied, assume ASCII
-        if (mCodePointRangeList.empty())
-        {
-            mCodePointRangeList.push_back(CodePointRange(32, 126));
-        }
+    void* Font::_prepareFont(void* context, uint32& glyphCount, int32& max_height, int32& max_width)
+    {
         float vpScale = OverlayManager::getSingleton().getPixelRatio();
+        MemoryDataStream ttfchunk(_getTTFData(), false);
 #ifdef HAVE_FREETYPE
-        // ManualResourceLoader implementation - load the texture
-        FT_Library ftLibrary;
-        // Init freetype
-        if( FT_Init_FreeType( &ftLibrary ) )
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Could not init FreeType library!",
-            "Font::Font");
-
+        FT_Library ftLibrary = static_cast<FT_Library>(context);
         FT_Face face;
 
         // Load font
-        if( FT_New_Memory_Face( ftLibrary, ttfchunk.getPtr(), (FT_Long)ttfchunk.size() , 0, &face ) )
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
-            "Could not open font face!", "Font::createTextureFromFont" );
-
+        if (FT_New_Memory_Face(ftLibrary, ttfchunk.getPtr(), (FT_Long)ttfchunk.size(), 0, &face))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Could not open font face");
 
         // Convert our point size to freetype 26.6 fixed point format
         FT_F26Dot6 ftSize = (FT_F26Dot6)(mTtfSize * (1 << 6));
         if (FT_Set_Char_Size(face, ftSize, 0, mTtfResolution * vpScale, mTtfResolution * vpScale))
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Could not set char size!");
-
-        //FILE *fo_def = stdout;
-
-        FT_Pos max_height = 0, max_width = 0;
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Could not set char size");
 
         // Calculate maximum width, height and bearing
-        size_t glyphCount = 0;
         for (const CodePointRange& range : mCodePointRangeList)
         {
-            for(CodePoint cp = range.first; cp <= range.second; ++cp, ++glyphCount)
+            glyphCount += range.second - range.first + 1;
+            for(CodePoint cp = range.first; cp <= range.second; ++cp)
             {
                 FT_Load_Char( face, cp, FT_LOAD_RENDER );
 
-                max_height = std::max<FT_Pos>(2 * face->glyph->bitmap.rows - (face->glyph->metrics.horiBearingY >> 6), max_height);
+                max_height = std::max<int32>(2 * face->glyph->bitmap.rows - (face->glyph->metrics.horiBearingY >> 6), max_height);
                 mTtfMaxBearingY = std::max(int(face->glyph->metrics.horiBearingY >> 6), mTtfMaxBearingY);
-                max_width = std::max<FT_Pos>(face->glyph->bitmap.width, max_width);
+                max_width = std::max<int32>(face->glyph->bitmap.width, max_width);
             }
-
         }
-#else
-        stbtt_fontinfo font;
-        stbtt_InitFont(&font, ttfchunk.getPtr(), 0);
-        // 64 gives the same texture resolution as freetype.
-        float scale = stbtt_ScaleForPixelHeight(&font, vpScale * mTtfSize * mTtfResolution / 64);
 
-        int max_width = 0, max_height = 0;
-        // Calculate maximum width, height and bearing
-        size_t glyphCount = 0;
+        return face;
+#else
+        stbtt_fontinfo* font = static_cast<stbtt_fontinfo*>(context);
+        stbtt_InitFont(font, ttfchunk.getPtr(), 0);
+
+        // 64 gives the same texture resolution as freetype.
+        float scale = stbtt_ScaleForPixelHeight(font, vpScale * mTtfSize * mTtfResolution / 64);
         for (const CodePointRange& range : mCodePointRangeList)
         {
-            for(CodePoint cp = range.first; cp <= range.second; ++cp, ++glyphCount)
+            glyphCount += range.second - range.first + 1;
+            for(CodePoint cp = range.first; cp <= range.second; ++cp)
             {
-                int idx = stbtt_FindGlyphIndex(&font, cp);
+                int idx = stbtt_FindGlyphIndex(font, cp);
                 if (!idx)    // It is actually in the font?
                     continue;
                 TRect<int> r;
-                stbtt_GetGlyphBitmapBox(&font, idx, scale, scale, &r.left, &r.top, &r.right, &r.bottom);
+                stbtt_GetGlyphBitmapBox(font, idx, scale, scale, &r.left, &r.top, &r.right, &r.bottom);
                 max_height = std::max(r.height(), max_height);
                 mTtfMaxBearingY = std::max(-r.top, mTtfMaxBearingY);
                 max_width = std::max(r.width(), max_width);
@@ -407,33 +390,21 @@ namespace Ogre
         }
 
         max_height *= 1.125;
+        return font;
 #endif
+    }
+
+    void Font::_loadGlyphs(void* _face, int32 max_height, Image& img, uint32& l, uint32& m)
+    {
         uint char_spacer = 1;
+        float finalWidth = img.getWidth();
 
-        // Now work out how big our texture needs to be
-        size_t rawSize = (max_width + char_spacer) * (max_height + char_spacer) * glyphCount;
+#ifdef HAVE_FREETYPE
+        FT_Face face = static_cast<FT_Face>(_face);
+#else
+        stbtt_fontinfo* font = static_cast<stbtt_fontinfo*>(_face);
+#endif
 
-        uint32 tex_side = static_cast<uint32>(Math::Sqrt((Real)rawSize));
-        // Now round up to nearest power of two
-        uint32 roundUpSize = Bitwise::firstPO2From(tex_side);
-
-        // Would we benefit from using a non-square texture (2X width)
-        uint32 finalWidth, finalHeight;
-        if (roundUpSize * roundUpSize * 0.5 >= rawSize)
-        {
-            finalHeight = static_cast<uint32>(roundUpSize * 0.5);
-        }
-        else
-        {
-            finalHeight = roundUpSize;
-        }
-        finalWidth = roundUpSize;
-
-        Image img(PF_BYTE_LA, finalWidth, finalHeight);
-        // Reset content (transparent)
-        img.setTo(ColourValue::ZERO);
-
-        uint32 l = 0, m = 0;
         for (const CodePointRange& range : mCodePointRangeList)
         {
             for(CodePoint cp = range.first; cp <= range.second; ++cp )
@@ -462,7 +433,7 @@ namespace Ogre
                 FT_Pos y_bearing = mTtfMaxBearingY - (face->glyph->metrics.horiBearingY >> 6);
                 FT_Pos x_bearing = face->glyph->metrics.horiBearingX >> 6;
 #else
-                int idx = stbtt_FindGlyphIndex(&font, cp);
+                int idx = stbtt_FindGlyphIndex(font, cp);
                 if (!idx)
                 {
                     LogManager::getSingleton().logWarning(
@@ -471,20 +442,20 @@ namespace Ogre
                 }
 
                 if(cp == ' ') // should figure out how advance works for stbtt..
-                    idx = stbtt_FindGlyphIndex(&font, '0');
+                    idx = stbtt_FindGlyphIndex(font, '0');
 
                 TRect<int> r;
-                stbtt_GetGlyphBitmapBox(&font, idx, scale, scale, &r.left, &r.top, &r.right, &r.bottom);
+                stbtt_GetGlyphBitmapBox(font, idx, scale, scale, &r.left, &r.top, &r.right, &r.bottom);
 
                 uint width = r.width();
 
                 int y_bearing = mTtfMaxBearingY + r.top;
                 int xoff = 0, yoff = 0;
-                buffer = stbtt_GetCodepointBitmap(&font, scale, scale, cp, &buffer_pitch, &buffer_h, &xoff, &yoff);
+                buffer = stbtt_GetCodepointBitmap(font, scale, scale, cp, &buffer_pitch, &buffer_h, &xoff, &yoff);
 
                 int advance = xoff + width, x_bearing = xoff;
                 // should be multiplied with scale, but still does not seem to do the right thing
-                // stbtt_GetGlyphHMetrics(&font, cp, &advance, &x_bearing);
+                // stbtt_GetGlyphHMetrics(font, cp, &advance, &x_bearing);
 #endif
                 // If at end of row
                 if( finalWidth - 1 < l + width )
@@ -531,11 +502,81 @@ namespace Ogre
 #ifndef HAVE_FREETYPE
                 if (buffer != NULL)
                 {
-                    STBTT_free(buffer, font.userdata);
+                    STBTT_free(buffer, font->userdata);
                 }
 #endif
             }
         }
+    }
+
+    void Font::loadResource(Resource* res)
+    {
+        // If codepoints not supplied, assume ASCII
+        if (mCodePointRangeList.empty())
+        {
+            mCodePointRangeList.push_back(CodePointRange(32, 126));
+        }
+
+        int32 max_height = 0, max_width = 0;
+        uint32 glyphCount = 0;
+#ifdef HAVE_FREETYPE
+        // ManualResourceLoader implementation - load the texture
+        FT_Library ftLibrary;
+        // Init freetype
+        if( FT_Init_FreeType( &ftLibrary ) )
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Could not init FreeType library");
+
+
+        auto face = _prepareFont(ftLibrary, glyphCount, max_height, max_width);
+
+#ifdef MERGE_FONT_SUPPORT
+        std::vector<void*> faces;
+        for (const auto& font : mMergeFonts)
+        {
+            faces.push_back(font->_prepareFont(ftLibrary, glyphCount, max_height, max_width));
+            font->mTtfMaxBearingY = mTtfMaxBearingY = std::max(font->mTtfMaxBearingY, mTtfMaxBearingY);
+        }
+#endif
+#else
+        stbtt_fontinfo font;
+        auto face = _prepareFont(&font, glyphCount, max_height, max_width);
+#endif
+        uint char_spacer = 1;
+
+        // Now work out how big our texture needs to be
+        size_t rawSize = (max_width + char_spacer) * (max_height + char_spacer) * glyphCount;
+
+        uint32 tex_side = static_cast<uint32>(Math::Sqrt((Real)rawSize));
+        // Now round up to nearest power of two
+        uint32 roundUpSize = Bitwise::firstPO2From(tex_side);
+
+        // Would we benefit from using a non-square texture (2X width)
+        uint32 finalWidth, finalHeight;
+        if (roundUpSize * roundUpSize * 0.5 >= rawSize)
+        {
+            finalHeight = static_cast<uint32>(roundUpSize * 0.5);
+        }
+        else
+        {
+            finalHeight = roundUpSize;
+        }
+        finalWidth = roundUpSize;
+
+        Image img(PF_BYTE_LA, finalWidth, finalHeight);
+        // Reset content (transparent)
+        img.setTo(ColourValue::ZERO);
+
+        uint32 l = 0, m = 0;
+        _loadGlyphs(face, max_height, img, l, m);
+#ifdef MERGE_FONT_SUPPORT
+        int j = 1;
+        for (const auto& font : mMergeFonts)
+        {
+            font->_loadGlyphs(faces[j++], max_height, img, l, m);
+            mCodePointMap.insert(font->mCodePointMap.begin(), font->mCodePointMap.end());
+        }
+#endif
+
 #ifdef HAVE_FREETYPE
         FT_Done_FreeType(ftLibrary);
 #endif
