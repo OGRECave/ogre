@@ -31,12 +31,6 @@ THE SOFTWARE.
 
 #include "Ogre.h"
 
-#if OGRE_DOUBLE_PRECISION == 1
-#define WITH_FLOAT_SUFFIX(x) x
-#else
-#define WITH_FLOAT_SUFFIX(x) x##f
-#endif
-
 /** Some functionality for comparing images */
 
 /* Results of comparing two test images */
@@ -57,7 +51,6 @@ struct ComparisonResult
 };
 
 typedef std::vector<ComparisonResult> ComparisonResultVector;
-typedef Ogre::SharedPtr<ComparisonResultVector> ComparisonResultVectorPtr;
 
 /** Simple object for doing image comparison between two image sets */
 class ImageValidator
@@ -115,7 +108,7 @@ protected:
 
         out.incorrectPixels = 0;
         Ogre::ColourValue disparity = Ogre::ColourValue(0,0,0);
-        Ogre::Real ssim = 0.0;
+        float ssim = 0.0;
 
         int width = img1.getWidth();
         int height = img1.getHeight();
@@ -189,8 +182,7 @@ protected:
         if(out.incorrectPixels != 0)
         {
             // average and clamp to [-1,1]
-            out.ssim = std::max(WITH_FLOAT_SUFFIX(-1.0),
-                                std::min(WITH_FLOAT_SUFFIX(1.0), ssim/(width*height/WITH_FLOAT_SUFFIX(64.))));
+            out.ssim = Ogre::Math::Clamp(ssim/(width*height/64.f), -1.f, 1.f);
 
             // average the raw deviance value to get MSE
             out.mseChannels = disparity / (width*height);
