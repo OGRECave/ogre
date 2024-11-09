@@ -2518,7 +2518,7 @@ namespace Ogre
                 { 4, 0 },  // MSAA 4x
                 { 2, 0 },  // MSAA 2x
                 { 1, 0 },  // MSAA 1x
-                { NULL },
+                { 0 },
         };
 
         // Find matching AA mode
