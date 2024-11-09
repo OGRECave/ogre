@@ -257,7 +257,7 @@ namespace Ogre {
 
 
     };
-    typedef SharedPtr<BspLevel> BspLevelPtr;
+    typedef shared_ptr<BspLevel> BspLevelPtr;
     /** @} */
     /** @} */
 }

@@ -249,9 +249,9 @@ protected:
     */
     bool addFunctionInvocations(ProgramSet* programSet) override;
 
-    SharedPtr<LinearSkinning> mLinear;
-    SharedPtr<DualQuaternionSkinning> mDualQuat;
-    SharedPtr<HardwareSkinningTechnique> mActiveTechnique;
+    shared_ptr<LinearSkinning> mLinear;
+    shared_ptr<DualQuaternionSkinning> mDualQuat;
+    shared_ptr<HardwareSkinningTechnique> mActiveTechnique;
 
     ///The factory which created this sub render state
     const HardwareSkinningFactory* mCreator;

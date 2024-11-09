@@ -402,11 +402,11 @@ namespace Ogre {
             : pBuf(0), pData(0) { lock(p, offset, length, options); }
         
         template <typename T>
-        HardwareBufferLockGuard(const SharedPtr<T>& p, HardwareBuffer::LockOptions options)
+        HardwareBufferLockGuard(const shared_ptr<T>& p, HardwareBuffer::LockOptions options)
             : pBuf(0), pData(0) { lock(p.get(), options); }
         
         template <typename T>
-        HardwareBufferLockGuard(const SharedPtr<T>& p, size_t offset, size_t length, HardwareBuffer::LockOptions options)
+        HardwareBufferLockGuard(const shared_ptr<T>& p, size_t offset, size_t length, HardwareBuffer::LockOptions options)
             : pBuf(0), pData(0) { lock(p.get(), offset, length, options); }
         
         ~HardwareBufferLockGuard() { unlock(); }
@@ -438,11 +438,11 @@ namespace Ogre {
         }
         
         template <typename T>
-        void lock(const SharedPtr<T>& p, HardwareBuffer::LockOptions options)
+        void lock(const shared_ptr<T>& p, HardwareBuffer::LockOptions options)
             { lock(p.get(), options); }
         
         template <typename T>
-        void lock(const SharedPtr<T>& p, size_t offset, size_t length, HardwareBuffer::LockOptions options)
+        void lock(const shared_ptr<T>& p, size_t offset, size_t length, HardwareBuffer::LockOptions options)
             { lock(p.get(), offset, length, options); }
         
         HardwareBuffer* pBuf;
