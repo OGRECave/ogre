@@ -586,6 +586,15 @@ SHARED_PTR(StringInterface);
     %include "OgreResource.h"
         SHARED_PTR(Texture);
         %ignore Ogre::Texture::setTreatLuminanceAsAlpha;
+
+        #ifdef SWIGCSHARP
+        // correct out IntPtr for void* pData output parameter
+        %typemap(imtype, out="global::System.IntPtr") void *pData "out global::System.IntPtr"
+        %typemap(cstype, out="$csclassname") void *pData "out global::System.IntPtr"
+        %typemap(csin) void *pData "out $csinput"
+        %typecheck(SWIG_TYPECHECK_INT64_PTR) void *pData ""
+        #endif
+
         %include "OgreTexture.h"
         SHARED_PTR(GpuProgram);
         %ignore Ogre::GpuProgram::setAdjacencyInfoRequired;
