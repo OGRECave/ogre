@@ -198,9 +198,8 @@ public:
     @param content The content of this parameter.
     @param size
     */
-    Parameter(GpuConstantType type, const String& name, 
-        const Semantic& semantic, int index, 
-        const Content& content, size_t size = 0);
+    Parameter(GpuConstantType type, const String& name, const Semantic& semantic, int index, int content,
+              size_t size = 0);
 
     /** Class destructor */
     virtual ~Parameter() {};
@@ -226,7 +225,7 @@ public:
     int getIndex() const { return mIndex; } 
 
     /** Return the content of this parameter. */
-    Content getContent() const { return mContent; }
+    int getContent() const { return mContent; }
 
     /** Returns true if this instance is a ConstParameter otherwise false. */
     virtual bool isConstParameter() const { return false; }
@@ -273,7 +272,7 @@ protected:
     // Index of this parameter.
     int mIndex;
     // The content of this parameter.
-    Content mContent;
+    int mContent;
     // Number of elements in the parameter (for arrays)
     size_t mSize;
     
@@ -301,7 +300,7 @@ public:
     */
     UniformParameter(GpuConstantType type, const String& name, 
         const Semantic& semantic, int index, 
-        const Content& content,
+        int content,
         uint16 variability, size_t size);
 
     /** Class constructor.
@@ -551,7 +550,7 @@ class _OgreRTSSExport ParameterFactory
     // Interface.
 public:
 
-    static ParameterPtr createInPosition(int index, Parameter::Content content = Parameter::SPC_POSITION_OBJECT_SPACE);
+    static ParameterPtr createInPosition(int index, int content = Parameter::SPC_POSITION_OBJECT_SPACE);
     static ParameterPtr createOutPosition(int index);
 
     static ParameterPtr createInNormal(int index);
@@ -565,8 +564,8 @@ public:
     static ParameterPtr createInColor(int index);
     static ParameterPtr createOutColor(int index);
 
-    static ParameterPtr createInTexcoord(GpuConstantType type, int index, Parameter::Content content);
-    static ParameterPtr createOutTexcoord(GpuConstantType type, int index, Parameter::Content content);
+    static ParameterPtr createInTexcoord(GpuConstantType type, int index, int content);
+    static ParameterPtr createOutTexcoord(GpuConstantType type, int index, int content);
 
     static ParameterPtr createConstParam(const Vector2& val);
     static ParameterPtr createConstParam(const Vector3& val);
