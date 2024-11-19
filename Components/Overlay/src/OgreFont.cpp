@@ -429,8 +429,6 @@ namespace Ogre
         }
         finalWidth = roundUpSize;
 
-        Real textureAspect = (Real)finalWidth / (Real)finalHeight;
-
         Image img(PF_BYTE_LA, finalWidth, finalHeight);
         // Reset content (transparent)
         img.setTo(ColourValue::ZERO);
@@ -518,12 +516,13 @@ namespace Ogre
                     }
                 }
 
-                UVRect uvs((Real)l / (Real)finalWidth,                   // u1
-                           (Real)m / (Real)finalHeight,                  // v1
-                           (Real)(l + width) / (Real)finalWidth,         // u2
-                           (m + max_height) / (Real)finalHeight); // v2
-                this->setGlyphInfo({cp, uvs, float(textureAspect * uvs.width() / uvs.height()),
-                                    float(x_bearing) / max_height, float(advance) / max_height});
+                UVRect uvs((Real)l / (Real)img.getWidth(),            // u1
+                           (Real)m / (Real)img.getHeight(),           // v1
+                           (Real)(l + width) / (Real)img.getWidth(),  // u2
+                           (m + max_height) / (Real)img.getHeight()); // v2
+
+                float font_height = max_height;
+                setGlyphInfo({cp, uvs, width / font_height, x_bearing / font_height, advance / font_height});
 
                 // Advance a column
                 if(width)
