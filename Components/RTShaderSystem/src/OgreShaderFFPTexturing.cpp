@@ -132,7 +132,7 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* psMain   = psProgram->getEntryPointFunction();
-    Parameter::Content texCoordContent = Parameter::SPC_UNKNOWN;
+    int texCoordContent = Parameter::SPC_UNKNOWN;
 
     switch (textureUnitParams->mTexCoordCalcMethod)
     {
@@ -143,15 +143,14 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
                 break;
 
             if (textureUnitParams->mTextureMatrix.get() == NULL)
-                texCoordContent = Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet());
+                texCoordContent = Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet();
 
             // assume already resolved
             if(vsMain->getOutputParameter(texCoordContent, textureUnitParams->mVSInTextureCoordinateType))
                 break;
 
             textureUnitParams->mVSInputTexCoord = vsMain->resolveInputParameter(
-                Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 +
-                                   textureUnitParams->mTextureUnitState->getTextureCoordSet()),
+                Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet(),
                 textureUnitParams->mVSInTextureCoordinateType);
             break;
 

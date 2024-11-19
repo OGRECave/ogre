@@ -68,10 +68,10 @@ bool NormalMapLighting::createCpuSubPrograms(ProgramSet* programSet)
         psProgram->addPreprocessorDefines("POM_LAYER_COUNT=32");
 
     // Resolve texture coordinates.
-    auto vsInTexcoord = vsMain->resolveInputParameter(
-        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex), GCT_FLOAT2);
-    auto vsOutTexcoord = vsMain->resolveOutputParameter(
-        Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex), GCT_FLOAT2);
+    auto vsInTexcoord =
+        vsMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex, GCT_FLOAT2);
+    auto vsOutTexcoord =
+        vsMain->resolveOutputParameter(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex, GCT_FLOAT2);
     auto psInTexcoord = psMain->resolveInputParameter(vsOutTexcoord);
 
     // Resolve normal.
