@@ -160,8 +160,7 @@ JNIEnv* OgreJNIGetEnv() {
 
 %define SHARED_PTR(classname)
 // %shared_ptr(type);
-%ignore Ogre::SharedPtr<Ogre::classname >::operator const shared_ptr<Ogre::classname >&;
-%template(classname ## Ptr) Ogre::SharedPtr<Ogre::classname >;
+%template(classname ## Ptr) std::shared_ptr<Ogre::classname >;
 %enddef
 
 %ignore *::operator[];
@@ -266,13 +265,6 @@ ADD_REPR(TRect)
 
 // Basic Data Types
 %include "OgreException.h"
-%ignore Ogre::SharedPtr::useCount;
-%ignore Ogre::SharedPtr::bind;
-%ignore Ogre::SharedPtr::getPointer;
-%ignore Ogre::SharedPtr::setNull;
-%ignore Ogre::SharedPtr::isNull;
-%ignore Ogre::SharedPtr::setUseCount;
-%include "OgreSharedPtr.h"
 %ignore Ogre::Any::getType; // deprecated
 %ignore Ogre::Any::destroy; // deprecated
 %ignore Ogre::Any::isEmpty; // deprecated
@@ -284,7 +276,7 @@ ADD_REPR(Radian)
 %template(RayTestResult) std::pair<bool, float>;
 %include "OgreStringVector.h"
 %template(StringList) std::vector<Ogre::String>;  // actual vector<T>
-%template(StringListPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
+%template(StringListPtr) std::shared_ptr<std::vector<Ogre::String> >;
 %include "OgreFileSystemLayer.h"
 // Linear Algebra
 %ignore Ogre::Vector<2, Ogre::Real>::Vector(float, float, float);
@@ -607,8 +599,8 @@ SHARED_PTR(StringInterface);
 %ignore Ogre::TextureUnitState::setAnimatedTextureName( const String* const, size_t, Real = 0 );
 %include "OgreTextureUnitState.h"
 %template(ControllerFloat) Ogre::Controller<float>;
-%template(ControllerValueFloatPtr) Ogre::SharedPtr<Ogre::ControllerValue<float> >;
-%template(ControllerFunctionPtr) Ogre::SharedPtr<Ogre::ControllerFunction<float> >;
+%template(ControllerValueFloatPtr) std::shared_ptr<Ogre::ControllerValue<float> >;
+%template(ControllerFunctionPtr) std::shared_ptr<Ogre::ControllerFunction<float> >;
 %include "OgreControllerManager.h"
 %include "OgrePredefinedControllers.h"
 SHARED_PTR(Compositor);

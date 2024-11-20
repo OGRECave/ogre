@@ -527,7 +527,7 @@ namespace Ogre
 
     AbstractNodeList ScriptCompiler::locateTarget(const AbstractNodeList& nodes, const Ogre::String &target)
     {
-        SharedPtr<AbstractNode> iter = nullptr;
+        shared_ptr<AbstractNode> iter = nullptr;
     
         // Search for a top-level object node
         for(auto i : nodes)
@@ -612,7 +612,7 @@ namespace Ogre
         }
 
         // Create a vector storing each pairing of override between source and destination
-        typedef SharedPtr<ObjectAbstractNode> ObjectAbstractNodePtr;
+        typedef shared_ptr<ObjectAbstractNode> ObjectAbstractNodePtr;
         std::vector<std::pair<ObjectAbstractNodePtr,AbstractNodeList::iterator> > overrides;
         // A list of indices for each destination node tracks the minimum
         // source node they can index-match against

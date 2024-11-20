@@ -37,8 +37,6 @@ namespace Ogre {
     /** \addtogroup General
     *  @{
     */
-    using std::static_pointer_cast;
-    using std::dynamic_pointer_cast;
 
     /// @deprecated for backwards compatibility only, rather use shared_ptr directly
     template<class T> class SharedPtr : public shared_ptr<T>
@@ -64,20 +62,20 @@ namespace Ogre {
 
         /// @deprecated use Ogre::static_pointer_cast instead
         template<typename Y>
-        OGRE_DEPRECATED SharedPtr<Y> staticCast() const { return static_pointer_cast<Y>(*this); }
+        SharedPtr<Y> staticCast() const { return static_pointer_cast<Y>(*this); }
         /// @deprecated use Ogre::dynamic_pointer_cast instead
         template<typename Y>
-        OGRE_DEPRECATED SharedPtr<Y> dynamicCast() const { return dynamic_pointer_cast<Y>(*this); }
+        SharedPtr<Y> dynamicCast() const { return dynamic_pointer_cast<Y>(*this); }
         /// @deprecated this api will be dropped. use reset(T*) instead
-        OGRE_DEPRECATED void bind(T* rep) { shared_ptr<T>::reset(rep); }
+        void bind(T* rep) { shared_ptr<T>::reset(rep); }
         /// @deprecated use use_count() instead
-        OGRE_DEPRECATED unsigned int useCount() const { return shared_ptr<T>::use_count(); }
+        unsigned int useCount() const { return shared_ptr<T>::use_count(); }
         /// @deprecated use get() instead
-        OGRE_DEPRECATED T* getPointer() const { return shared_ptr<T>::get(); }
+        T* getPointer() const { return shared_ptr<T>::get(); }
         /// @deprecated use SharedPtr::operator bool instead
-        OGRE_DEPRECATED bool isNull(void) const { return !shared_ptr<T>::operator bool(); }
+        bool isNull(void) const { return !shared_ptr<T>::operator bool(); }
         /// @deprecated use reset() instead
-        OGRE_DEPRECATED void setNull() { shared_ptr<T>::reset(); }
+        void setNull() { shared_ptr<T>::reset(); }
     };
     /** @} */
     /** @} */

@@ -33,7 +33,6 @@
 #include "OgreLodPrerequisites.h"
 #include "OgreLodInputProvider.h"
 #include "OgreLodData.h"
-#include "OgreSharedPtr.h"
 #include "OgreLogManager.h"
 #include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
