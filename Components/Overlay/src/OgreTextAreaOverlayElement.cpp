@@ -315,7 +315,7 @@ namespace Ogre {
             }
 
             const auto& glyphInfo = mFont->getGlyphInfo(character);
-            Real horiz_height = glyphInfo.aspectRatio * mViewportAspectCoef ;
+            float width = glyphInfo.aspectRatio * mViewportAspectCoef * mCharHeight * 2.0f;
             const Font::UVRect& uvRect = glyphInfo.uvRect;
 
             if(uvRect.isNull())
@@ -328,33 +328,25 @@ namespace Ogre {
             }
 
             left += glyphInfo.bearing * mCharHeight * 2 * mViewportAspectCoef;
+            FloatRect pos(left, top, left + width, top - mCharHeight * 2);
 
             // each vert is (x, y, z, u, v)
             //-------------------------------------------------------------------------------------
             // First tri
-            //
-            // Upper left
-            *pVert++ = left;
-            *pVert++ = top;
+            *pVert++ = pos.left;
+            *pVert++ = pos.top;
             *pVert++ = -1.0;
             *pVert++ = uvRect.left;
             *pVert++ = uvRect.top;
 
-            top -= mCharHeight * 2.0f;
-
-            // Bottom left
-            *pVert++ = left;
-            *pVert++ = top;
+            *pVert++ = pos.left;
+            *pVert++ = pos.bottom;
             *pVert++ = -1.0;
             *pVert++ = uvRect.left;
             *pVert++ = uvRect.bottom;
 
-            top += mCharHeight * 2.0f;
-            left += horiz_height * mCharHeight * 2.0f;
-
-            // Top right
-            *pVert++ = left;
-            *pVert++ = top;
+            *pVert++ = pos.right;
+            *pVert++ = pos.top;
             *pVert++ = -1.0;
             *pVert++ = uvRect.right;
             *pVert++ = uvRect.top;
@@ -362,39 +354,26 @@ namespace Ogre {
 
             //-------------------------------------------------------------------------------------
             // Second tri
-            //
-            // Top right (again)
-            *pVert++ = left;
-            *pVert++ = top;
+            *pVert++ = pos.right;
+            *pVert++ = pos.top;
             *pVert++ = -1.0;
             *pVert++ = uvRect.right;
             *pVert++ = uvRect.top;
 
-            top -= mCharHeight * 2.0f;
-            left -= horiz_height  * mCharHeight * 2.0f;
-
-            // Bottom left (again)
-            *pVert++ = left;
-            *pVert++ = top;
+            *pVert++ = pos.left;
+            *pVert++ = pos.bottom;
             *pVert++ = -1.0;
             *pVert++ = uvRect.left;
             *pVert++ = uvRect.bottom;
 
-            left += horiz_height  * mCharHeight * 2.0f;
-
-            // Bottom right
-            *pVert++ = left;
-            *pVert++ = top;
+            *pVert++ = pos.right;
+            *pVert++ = pos.bottom;
             *pVert++ = -1.0;
             *pVert++ = uvRect.right;
             *pVert++ = uvRect.bottom;
             //-------------------------------------------------------------------------------------
 
-            // Go back up with top
-            top += mCharHeight * 2.0f;
-
             // advance
-            left -= horiz_height  * mCharHeight * 2.0f;
             left += (glyphInfo.advance  - glyphInfo.bearing) * mCharHeight * 2.0f * mViewportAspectCoef;
 
             float currentWidth = (left + 1)/2 - _getDerivedLeft();
