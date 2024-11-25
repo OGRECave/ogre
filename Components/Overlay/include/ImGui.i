@@ -49,7 +49,7 @@
 #ifdef SWIGPYTHON
 // match the signature of the by value variants
 %typemap(argout) float[4], float[3], float[2] {
-    $result = SWIG_Python_AppendOutput($result, SWIG_NewPointerObj($1, $descriptor(ImVec4*), 0));
+    $result = SWIG_AppendOutput($result, SWIG_NewPointerObj($1, $descriptor(ImVec4*), 0));
 }
 
 // for PlotHistogram, PlotLines
