@@ -96,8 +96,8 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
             vsProgram->setUseColumnMajorMatrices(false);
         }
 
-        auto wMatrix = vsEntry->resolveInputParameter(
-            Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mInstancingTexCoordIndex), GCT_MATRIX_3X4);
+        auto wMatrix = vsEntry->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0 + mInstancingTexCoordIndex,
+                                                      GCT_MATRIX_3X4);
         stage.callFunction(FFP_FUNC_TRANSFORM, wMatrix, positionIn, Out(positionIn).xyz());
 
         if(mDoLightCalculations)

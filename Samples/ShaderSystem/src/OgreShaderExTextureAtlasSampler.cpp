@@ -92,7 +92,7 @@ bool TextureAtlasSampler::resolveParameters(ProgramSet* programSet)
     //
     // Define vertex shader parameters used to find the position of the textures in the atlas
     //
-    Parameter::Content indexContent = (Parameter::Content)((int)Parameter::SPC_TEXTURE_COORDINATE0 + mAtlasTexcoordPos);
+    int indexContent = Parameter::SPC_TEXTURE_COORDINATE0 + mAtlasTexcoordPos;
     GpuConstantType indexType = GCT_FLOAT4;
 
     mVSInpTextureTableIndex = vsMain->resolveInputParameter(indexContent, indexType);
@@ -173,7 +173,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
         if (mIsAtlasTextureUnits[j] == true)
         {
             //Find the texture coordinates texel and sampler from the original FFPTexturing
-            ParameterPtr texcoord = psMain->getInputParameter((Parameter::Content)(Parameter::SPC_TEXTURE_COORDINATE0 + j), GCT_FLOAT2);
+            ParameterPtr texcoord = psMain->getInputParameter(Parameter::SPC_TEXTURE_COORDINATE0 + j, GCT_FLOAT2);
             ParameterPtr texel = psMain->getLocalParameter(c_ParamTexel + StringConverter::toString(j));
             UniformParameterPtr sampler = psProgram->getParameterByType(GCT_SAMPLER2D, j);
                 

@@ -167,7 +167,7 @@ Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), 
 //-----------------------------------------------------------------------
 Parameter::Parameter(GpuConstantType type, const String& name, 
             const Semantic& semantic, int index, 
-            const Content& content, size_t size) :
+            int content, size_t size) :
     mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size), mUsed(false), mIsHighP(false)
 {
 }
@@ -175,7 +175,7 @@ Parameter::Parameter(GpuConstantType type, const String& name,
 //-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuConstantType type, const String& name, 
                  const Semantic& semantic, int index, 
-                 const Content& content,
+                 int content,
                  uint16 variability, size_t size) : Parameter(type, name, semantic, index, content, size)
 {
     mIsAutoConstantReal     = false;    
@@ -330,7 +330,7 @@ void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInPosition(int index, Parameter::Content content)
+ParameterPtr ParameterFactory::createInPosition(int index, int content)
 {
     return std::make_shared<Parameter>(GCT_FLOAT4, "iPos_" + StringConverter::toString(index),
                                        Parameter::SPS_POSITION, index,
@@ -430,7 +430,7 @@ ParameterPtr ParameterFactory::createOutColor(int index)
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index, Parameter::Content content)
+ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index, int content)
 {
     switch (type)
     {
@@ -473,7 +473,7 @@ ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index,
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutTexcoord(GpuConstantType type, int index, Parameter::Content content)
+ParameterPtr ParameterFactory::createOutTexcoord(GpuConstantType type, int index, int content)
 {
     switch (type)
     {

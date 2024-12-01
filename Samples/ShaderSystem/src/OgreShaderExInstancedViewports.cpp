@@ -103,7 +103,7 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 
     mVSOriginalOutPositionProjectiveSpace = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_PROJECTIVE_SPACE);
 
-#define SPC_POSITION_PROJECTIVE_SPACE_AS_TEXCORD ((Parameter::Content)(Parameter::SPC_CUSTOM_CONTENT_BEGIN + 1))
+#define SPC_POSITION_PROJECTIVE_SPACE_AS_TEXCORD (Parameter::SPC_CUSTOM_CONTENT_BEGIN + 1)
 
     mVSOutPositionProjectiveSpace = vsMain->resolveOutputParameter(SPC_POSITION_PROJECTIVE_SPACE_AS_TEXCORD, GCT_FLOAT4);
 
