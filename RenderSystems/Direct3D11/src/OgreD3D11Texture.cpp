@@ -233,6 +233,11 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::_create2DTex()
     {
+		if (mSurface)
+		{
+			_createShared2DTex();
+			return;
+		}
         // we must have those defined here
         assert(mSrcWidth > 0 || mSrcHeight > 0);
 
@@ -304,6 +309,89 @@ namespace Ogre
         _create2DResourceView();
     }
     //----------------------------------------------------------------------------
+	void D3D11Texture::_createShared2DTex()
+	{
+		HRESULT hr = S_OK;
+
+		IUnknown* pUnk = (IUnknown*)mSurface;
+
+		IDXGIResource* pDXGIResource;
+		hr = pUnk->QueryInterface(__uuidof(IDXGIResource), (void**)&pDXGIResource);
+		if (FAILED(hr))
+		{
+			this->unloadImpl();
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+						   "Error creating texture\nError Description: Failed to query IDXGIResource interface from "
+						   "the provided object.",
+						   "D3D11Texture::_create2DTex");
+		}
+
+		HANDLE sharedHandle;
+		hr = pDXGIResource->GetSharedHandle(&sharedHandle);
+		if (FAILED(hr))
+		{
+			this->unloadImpl();
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+						   "Error creating texture\nError Description: Failed to retrieve the shared handle from "
+						   "IDXGIResource. Ensure the resource was "
+						   "created with the D3D11_RESOURCE_MISC_SHARED flag.",
+						   "D3D11Texture::_create2DTex");
+		}
+
+		pDXGIResource->Release();
+
+		IUnknown* tempResource11;
+		hr = mDevice->OpenSharedResource(sharedHandle, __uuidof(ID3D11Resource), (void**)(&tempResource11));
+		if (FAILED(hr))
+		{
+			this->unloadImpl();
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+						   "Error creating texture\nError Description: Failed to open shared resource using the shared "
+						   "handle. Ensure the handle is "
+						   "valid and the device supports shared resources.",
+						   "D3D11Texture::_create2DTex");
+		}
+
+		ID3D11Texture2D* pOutputResource;
+		hr = tempResource11->QueryInterface(__uuidof(ID3D11Texture2D), (void**)(&pOutputResource));
+		if (FAILED(hr))
+		{
+			this->unloadImpl();
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+						   "Error creating texture\nError Description: Failed to query ID3D11Texture2D interface from "
+						   "the shared resource. Ensure the "
+						   "resource is of the correct type.",
+						   "D3D11Texture::_create2DTex");
+		}
+		tempResource11->Release();
+
+		mp2DTex = pOutputResource;
+
+		D3D11_TEXTURE2D_DESC desc;
+		mp2DTex->GetDesc(&desc);
+
+		D3D11_RENDER_TARGET_VIEW_DESC rtDesc;
+		rtDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		rtDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		rtDesc.Texture2D.MipSlice = 0;
+
+		ComPtr<ID3D11RenderTargetView> renderTargetView;
+		hr = mDevice->CreateRenderTargetView(mp2DTex.Get(), nullptr, renderTargetView.GetAddressOf());
+		if (FAILED(hr))
+		{
+			this->unloadImpl();
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+						   "Error creating texture\nError Description: Failed to create ID3D11RenderTargetView. Verify "
+						   "that the texture is valid, "
+						   "properly initialized, and compatible with RenderTargetView creation.",
+						   "D3D11Texture::_create2DTex");
+		}
+
+		_queryInterface<ID3D11Texture2D, ID3D11Resource>(mp2DTex, &mpTex);
+
+		_create2DResourceView();
+	}
+	//----------------------------------------------------------------------------
     void D3D11Texture::_create2DResourceView()
     {
         // set final tex. attributes from tex. description
@@ -505,6 +593,8 @@ namespace Ogre
             }
         }
     }
+    //---------------------------------------------------------------------
+    void D3D11Texture ::_setD3D11Surface(void* surface) { mSurface = surface; }
     //---------------------------------------------------------------------
     // D3D11RenderTexture
     //---------------------------------------------------------------------
