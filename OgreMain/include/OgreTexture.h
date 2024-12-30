@@ -146,6 +146,12 @@ namespace Ogre {
         */
         TextureType getTextureType(void) const { return mTextureType; }
 
+        /** D3D11 only: set a shared surface to use for this texture before loading
+         *
+         * Useful for WPF interop
+         */
+        virtual void _setD3D11Surface(void* surface) {}
+
         /** Gets the number of mipmaps to be used for this texture.
         */
         uint32 getNumMipmaps(void) const {return mNumMipmaps;}
