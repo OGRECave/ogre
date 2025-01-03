@@ -329,7 +329,7 @@ Set the optimisation level, which can be one of ’default’, ’none’, ’0�
 
 </dd> </dl>
 
-# Assembler Shaders
+# Assembler Shaders {#Assembler-Shaders}
 
 The current supported syntaxes are:
 
@@ -348,19 +348,24 @@ SPIRV variant exposed by ARB_gl_spirv
 
 These is are the DirectX vertex shader assembler syntaxes.
 
+@note on D3D11 the following targets will alias to @c vs_4_0 levels so you can use them for both D3D9 and D3D11.
+- @c vs_2_0 to @c vs_4_0_level_9_1
+- @c vs_2_a to @c vs_4_0_level_9_3
+- @c vs_3_0 to @c vs_4_0
+
 </dd> <dt>arbvp1</dt> <dd>
 
 This is the OpenGL standard assembler format for vertex programs. It’s roughly equivalent to DirectX vs\_1\_1.
 
 </dd> <dt>vp*</dt> <dd>
 
-These are nVidia-specific OpenGL vertex shader syntax which is a superset of vs_1_1_, that have otherwise no equivalent in OpenGL.
+These are nVidia-specific OpenGL vertex shader syntax which is a superset of vs_1_1, that have otherwise no equivalent in OpenGL.
 
 </dd>
 <dt>ps_*</dt> <dd>
 
 DirectX pixel shader (i.e. fragment program) assembler syntax.
-@note for ATI 8500, 9000, 9100, 9200 hardware, these profiles can also be used in OpenGL. The ATI 8500 to 9200 do not support arbfp1 but do support atifs extension in OpenGL which is very similar in function to ps\_1\_4 in DirectX. Ogre has a built in ps\_1\_x to atifs compiler that is automatically invoked when ps\_1\_x is used in OpenGL on ATI hardware.
+@note for ATI 8500, 9000, 9100, 9200 hardware, these profiles can also be used in OpenGL. The ATI 8500 to 9200 do not support arbfp1 but do support atifs extension in OpenGL which is very similar in function to ps\_1\_4 in DirectX. %Ogre has a built in ps\_1\_x to atifs compiler that is automatically invoked when ps\_1\_x is used in OpenGL on ATI hardware.
 
 </dd>
 <dt>arbfp1</dt> <dd>
@@ -386,7 +391,7 @@ You can get a definitive list of the syntaxes supported by the current card by c
 
 ## Specifying Named Constants {#Specifying-Named-Constants-for-Assembler-Shaders}
 
-Assembler shaders don’t have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - GpuNamedConstants which contains the named parameter mappings has a ’save’ method which you can use to write this data to disk, where you can reference it later using the manual\_named\_constants directive inside your assembler program declaration, e.g.
+Assembler shaders don’t have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - Ogre::GpuNamedConstants which contains the named parameter mappings has a ’save’ method which you can use to write this data to disk, where you can reference it later using the @c manual_named_constants directive inside your assembler program declaration, e.g.
 
 ```cpp
 vertex_program myVertexProgram spirv
