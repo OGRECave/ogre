@@ -12,9 +12,9 @@ using namespace Ogre;
 
 void RootWithoutRenderSystemFixture::SetUp()
 {
-    mFSLayer = new FileSystemLayer(OGRE_VERSION_NAME);
-    mRoot = new Root("");
-    mHBM = new DefaultHardwareBufferManager;
+    mFSLayer.reset(new FileSystemLayer(OGRE_VERSION_NAME));
+    mRoot.reset(new Root(""));
+    mHBM.reset(new DefaultHardwareBufferManager);
 
     MaterialManager::getSingleton().initialise();
 
@@ -41,7 +41,5 @@ void RootWithoutRenderSystemFixture::SetUp()
 
 void RootWithoutRenderSystemFixture::TearDown()
 {
-    delete mRoot;
-    delete mHBM;
-    delete mFSLayer;
+
 }
