@@ -36,9 +36,9 @@ THE SOFTWARE.
 
 class RootWithoutRenderSystemFixture : public ::testing::Test {
 public:
-    Ogre::Root* mRoot;
-    Ogre::HardwareBufferManager* mHBM;
-    Ogre::FileSystemLayer* mFSLayer;
+    std::shared_ptr<Ogre::Root> mRoot;
+    std::unique_ptr<Ogre::HardwareBufferManager> mHBM;
+    std::unique_ptr<Ogre::FileSystemLayer> mFSLayer;
     void SetUp() override;
     void TearDown() override;
 };
