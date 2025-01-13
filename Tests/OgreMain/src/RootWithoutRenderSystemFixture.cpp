@@ -39,6 +39,5 @@ void RootWithoutRenderSystemFixture::SetUp()
 
 void RootWithoutRenderSystemFixture::TearDown()
 {
-    // enforce this is removed by the last
-    mRoot.reset();
+
 }
