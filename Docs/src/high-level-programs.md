@@ -331,6 +331,9 @@ Set the optimisation level, which can be one of ’default’, ’none’, ’0�
 
 # Assembler Shaders {#Assembler-Shaders}
 
+You can specify assembly shaders directly as the syntax code of the program, if you compiled them ahead of time.
+Alternatively, you can use the syntax code to specify the @c target of a high-level shader, which will be compiled on-the-fly to the specified syntax.
+
 The current supported syntaxes are:
 
 <dl compact="compact">
