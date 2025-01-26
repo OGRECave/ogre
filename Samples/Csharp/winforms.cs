@@ -35,7 +35,7 @@ public class Example : ApplicationContextBase
         getRoot().queueEndRendering();
     }
 
-    public override NativeWindowPair createWindow(string title, uint w, uint h, NameValuePairList miscParams)
+    public override NativeWindowPair createWindow(string title, uint w, uint h, NameValueMap miscParams)
     {
         miscParams["externalWindowHandle"] = form.Handle.ToString();
 
