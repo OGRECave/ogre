@@ -21,6 +21,10 @@
 %include stdint.i
 %import "Ogre.i"
 
+#ifndef SWIGPYTHON
+%import "OgreOverlay.i"
+#endif
+
 #define _OgreBitesExport
 
 %include "OgreSGTechniqueResolverListener.h"
