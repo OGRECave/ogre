@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __D3D11DRIVER_H__
 
 #include "OgreD3D11Prerequisites.h"
-#include "OgreSharedPtr.h"
 
 namespace Ogre
 {
@@ -43,7 +42,7 @@ namespace Ogre
         ComPtr<IDXGIAdapterN> mDXGIAdapter;
         DXGI_ADAPTER_DESC1 mAdapterIdentifier;
         unsigned mSameNameAdapterIndex;
-        SharedPtr<D3D11VideoModeList> mVideoModeList;
+        shared_ptr<D3D11VideoModeList> mVideoModeList;
 
     public:
         // Constructors

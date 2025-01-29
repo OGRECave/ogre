@@ -36,7 +36,6 @@
 #include "OgreLodOutputProvider.h"
 #include "OgreLodCollapseCost.h"
 #include "OgreLodCollapser.h"
-#include "OgreSharedPtr.h"
 #include "OgreSingleton.h"
 #include "OgreWorkQueue.h"
 
