@@ -67,12 +67,12 @@ namespace OgreBites
             }
         };
 
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-        Sample() : mShaderGenerator(0)
-#else
         Sample()
-#endif
         {
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+            mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+#endif
+
             mRoot = Ogre::Root::getSingletonPtr();
             mWindow = 0;
             mSceneMgr = 0;
@@ -283,11 +283,6 @@ namespace OgreBites
         bool mContentSetup;       // whether or not scene was created
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*            mShaderGenerator;           // The Shader generator instance.
-    public:
-        void setShaderGenerator(Ogre::RTShader::ShaderGenerator* shaderGenerator) 
-        { 
-            mShaderGenerator = shaderGenerator;
-        }
 #endif
     private:
         // VisualTest fields

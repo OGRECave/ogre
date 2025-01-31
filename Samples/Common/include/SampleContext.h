@@ -100,9 +100,6 @@ namespace OgreBites
 
                 // test system capabilities against sample requirements
                 s->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
-#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-                s->setShaderGenerator(mShaderGenerator);
-#endif
                 s->_setup(this);   // start new sample
             }
 
