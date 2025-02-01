@@ -394,7 +394,7 @@ namespace Ogre {
 
         for (uint32 face = 0; face < getNumFaces(); ++face)
         {
-            for (uint32 mip = 0; mip < numMips; ++mip)
+            for (uint32 mip = 0; mip <= numMips; ++mip)
             {
                 getBuffer(face, mip)->blitToMemory(destImage.getPixelBox(face, mip));
             }
