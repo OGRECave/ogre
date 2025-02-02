@@ -469,7 +469,7 @@ namespace Ogre {
                                                      mTextureID, mLevel));
             break;
         case GL_TEXTURE_CUBE_MAP:
-            OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(which, GL_COLOR_ATTACHMENT0,
+            OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(which, attachment,
                                                        mFaceTarget, mTextureID, mLevel));
             break;
         case GL_TEXTURE_3D:
