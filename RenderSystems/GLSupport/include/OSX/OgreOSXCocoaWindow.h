@@ -92,10 +92,6 @@ namespace Ogre {
         /** Overridden - see RenderWindow */
         void setFullscreen(bool fullScreen, unsigned int widthPt, unsigned int heightPt) override;
         /** Overridden - see RenderWindow */
-        unsigned int getWidth(void) const override;
-        /** Overridden - see RenderWindow */
-        unsigned int getHeight(void) const override;
-        /** Overridden - see RenderWindow */
         void windowMovedOrResized(void) override;
         void windowHasResized(void);
         void createNewWindow(unsigned int width, unsigned int height, String title);
