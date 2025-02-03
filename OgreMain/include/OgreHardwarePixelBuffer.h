@@ -180,7 +180,7 @@ namespace Ogre {
             @return A pointer to the render target. This pointer has the lifespan of this
             PixelBuffer.
         */
-        RenderTexture *getRenderTarget(size_t slice=0);
+        RenderTexture *getRenderTarget(size_t slice=0) const;
         
         /// Gets the width of this buffer
         uint32 getWidth() const { return mWidth; }
