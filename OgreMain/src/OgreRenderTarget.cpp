@@ -110,7 +110,7 @@ namespace Ogre {
         if( mDepthBuffer )
         {
             mDepthBuffer->_notifyRenderTargetDetached( this );
-            mDepthBuffer = 0;
+            _detachDepthBuffer();
         }
     }
 

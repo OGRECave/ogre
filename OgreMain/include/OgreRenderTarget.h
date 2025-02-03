@@ -114,7 +114,7 @@ namespace Ogre {
         //Returns false if couldn't attach
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
 
-        virtual void detachDepthBuffer();
+        void detachDepthBuffer();
 
         /** Detaches DepthBuffer without notifying it from the detach.
             Useful when called from the DepthBuffer while it iterates through attached

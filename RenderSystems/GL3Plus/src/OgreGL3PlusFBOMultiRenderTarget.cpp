@@ -82,12 +82,6 @@ namespace Ogre {
         return result;
     }
 
-    void GL3PlusFBOMultiRenderTarget::detachDepthBuffer()
-    {
-        fbo.detachDepthBuffer();
-        MultiRenderTarget::detachDepthBuffer();
-    }
-
     void GL3PlusFBOMultiRenderTarget::_detachDepthBuffer()
     {
         fbo.detachDepthBuffer();
