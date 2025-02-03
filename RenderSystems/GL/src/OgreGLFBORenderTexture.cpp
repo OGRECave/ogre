@@ -83,12 +83,6 @@ namespace Ogre {
         return result;
     }
     //-----------------------------------------------------------------------------
-    void GLFBORenderTexture::detachDepthBuffer()
-    {
-        mFB.detachDepthBuffer();
-        GLRenderTexture::detachDepthBuffer();
-    }
-    //-----------------------------------------------------------------------------
     void GLFBORenderTexture::_detachDepthBuffer()
     {
         mFB.detachDepthBuffer();

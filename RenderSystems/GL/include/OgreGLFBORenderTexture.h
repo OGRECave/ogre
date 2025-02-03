@@ -53,7 +53,6 @@ namespace Ogre {
 
         /// Override so we can attach the depth buffer to the FBO
         bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
-        void detachDepthBuffer() override;
         void _detachDepthBuffer() override;
 
         GLContext* getContext() const override { return mFB.getContext(); }

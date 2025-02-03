@@ -97,12 +97,6 @@ namespace Ogre {
         return result;
     }
     //-----------------------------------------------------------------------------
-    void GLES2FBORenderTexture::detachDepthBuffer()
-    {
-        mFB.detachDepthBuffer();
-        GLRenderTexture::detachDepthBuffer();
-    }
-    //-----------------------------------------------------------------------------
     void GLES2FBORenderTexture::_detachDepthBuffer()
     {
         mFB.detachDepthBuffer();
