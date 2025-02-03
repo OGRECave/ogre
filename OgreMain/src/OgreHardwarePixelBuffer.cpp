@@ -177,7 +177,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------    
     
-    RenderTexture *HardwarePixelBuffer::getRenderTarget(size_t zoffset)
+    RenderTexture *HardwarePixelBuffer::getRenderTarget(size_t zoffset) const
     {
         assert(mUsage & TU_RENDERTARGET);
         return mSliceTRT.at(zoffset);
