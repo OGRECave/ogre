@@ -76,6 +76,7 @@ SHARED_PTR(OverlayContainer);
 #endif
 %ignore Ogre::OverlayManager::getTemplateIterator;
 %ignore Ogre::OverlayManager::getOverlayIterator;
+%template(OverlayElementMap) std::map<std::string, Ogre::OverlayElement*>;
 %include "OgreOverlayManager.h"
 SHARED_PTR(OverlaySystem);
 %include "OgreOverlaySystem.h"
