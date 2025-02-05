@@ -76,6 +76,18 @@ SHARED_PTR(OverlayContainer);
 #endif
 %ignore Ogre::OverlayManager::getTemplateIterator;
 %ignore Ogre::OverlayManager::getOverlayIterator;
+#ifdef SWIGPYTHON
+%{
+    // this is a workaround for the following map
+    namespace swig {
+    template<> struct traits<Ogre::OverlayElement> {
+        typedef pointer_category category;
+        static const char* type_name() { return "Ogre::OverlayElement"; }
+    };
+    }
+%}
+#endif
+%template(OverlayElementMap) std::map<std::string, Ogre::OverlayElement*>;
 %include "OgreOverlayManager.h"
 SHARED_PTR(OverlaySystem);
 %include "OgreOverlaySystem.h"
