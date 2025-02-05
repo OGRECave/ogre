@@ -86,7 +86,7 @@ SHARED_PTR(OverlayContainer);
     };
     }
 %}
-#endif 
+#endif
 %template(OverlayElementMap) std::map<std::string, Ogre::OverlayElement*>;
 %include "OgreOverlayManager.h"
 SHARED_PTR(OverlaySystem);
