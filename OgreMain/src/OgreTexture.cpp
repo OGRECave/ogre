@@ -376,7 +376,7 @@ namespace Ogre {
             }
         }
     }
-    const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap)
+    const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap) const
     {
         OgreAssert(face < getNumFaces(), "out of range");
         OgreAssert(mipmap <= mNumMipmaps, "out of range");
