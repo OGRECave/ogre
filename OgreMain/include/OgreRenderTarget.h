@@ -170,16 +170,16 @@ namespace Ogre {
                 viewports i.e. picture-in-picture). Higher Z-orders are on top of lower ones. The actual number
                 is irrelevant, only the relative Z-order matters (you can leave gaps in the numbering)
             @param
-                left The relative position of the left of the viewport on the target, as a value between 0 and 1.
-            @param
-                top The relative position of the top of the viewport on the target, as a value between 0 and 1.
-            @param
-                width The relative width of the viewport on the target, as a value between 0 and 1.
-            @param
-                height The relative height of the viewport on the target, as a value between 0 and 1.
+                rect The relative position of the viewport on the target, as a value between 0 and 1.
         */
-        Viewport* addViewport(Camera* cam, int ZOrder = 0, float left = 0.0f, float top = 0.0f ,
-            float width = 1.0f, float height = 1.0f);
+        Viewport* addViewport(Camera* cam, int ZOrder = 0, FloatRect rect = {0.0f, 0.0f, 1.0f, 1.0f});
+
+        /// @overload
+        Viewport* addViewport(Camera* cam, int ZOrder, float left, float top = 0.0f, float width = 1.0f,
+                              float height = 1.0f)
+        {
+            return addViewport(cam, ZOrder, {left, top, left + width, top + height});
+        }
 
         /** Returns the number of viewports attached to this target.*/
         unsigned short getNumViewports(void) const { return static_cast<unsigned short>(mViewportList.size()); }

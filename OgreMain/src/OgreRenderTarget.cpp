@@ -169,8 +169,7 @@ namespace Ogre {
         fireViewportPostUpdate(viewport);
     }
 
-    Viewport* RenderTarget::addViewport(Camera* cam, int ZOrder, float left, float top ,
-        float width , float height)
+    Viewport* RenderTarget::addViewport(Camera* cam, int ZOrder, FloatRect rect)
     {       
         // Check no existing viewport with this Z-order
         ViewportList::iterator it = mViewportList.find(ZOrder);
@@ -185,7 +184,7 @@ namespace Ogre {
         }
         // Add viewport to list
         // Order based on Z-order
-        Viewport* vp = OGRE_NEW Viewport(cam, this, left, top, width, height, ZOrder);
+        Viewport* vp = OGRE_NEW Viewport(cam, this, rect, ZOrder);
 
         mViewportList.emplace(ZOrder, vp);
 
