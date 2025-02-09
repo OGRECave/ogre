@@ -62,9 +62,7 @@ namespace Ogre
             if( mWidth != target->getWidth() && mHeight != target->getHeight() &&
                 mFSAA != target->getFSAA() )
             {
-                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                             "MultiRenderTarget surfaces are not of same size",
-                             "MetalMultiRenderTarget::bindSurface" );
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "MultiRenderTarget surfaces are not of same size");
             }
         }
 
