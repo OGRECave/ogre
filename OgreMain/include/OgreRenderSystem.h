@@ -716,13 +716,13 @@ namespace Ogre
         virtual void _setDepthClamp(bool enable) {}
 
         /** The RenderSystem will keep a count of tris rendered, this resets the count. */
-        virtual void _beginGeometryCount(void);
+        void _beginGeometryCount(void);
         /** Reports the number of tris rendered since the last _beginGeometryCount call. */
-        virtual unsigned int _getFaceCount(void) const;
+        unsigned int _getFaceCount(void) const { return static_cast<unsigned int>(mFaceCount); }
         /** Reports the number of batches rendered since the last _beginGeometryCount call. */
-        virtual unsigned int _getBatchCount(void) const;
+        unsigned int _getBatchCount(void) const { return static_cast<unsigned int>(mBatchCount); }
         /** Reports the number of vertices passed to the renderer since the last _beginGeometryCount call. */
-        virtual unsigned int _getVertexCount(void) const;
+        unsigned int _getVertexCount(void) const { return static_cast<unsigned int>(mVertexCount); }
 
         /// @deprecated use ColourValue::getAsBYTE()
         OGRE_DEPRECATED static void convertColourValue(const ColourValue& colour, uint32* pDest)
