@@ -606,22 +606,6 @@ namespace Ogre {
     void RenderSystem::_beginGeometryCount(void)
     {
         mBatchCount = mFaceCount = mVertexCount = 0;
-
-    }
-    //-----------------------------------------------------------------------
-    unsigned int RenderSystem::_getFaceCount(void) const
-    {
-        return static_cast< unsigned int >( mFaceCount );
-    }
-    //-----------------------------------------------------------------------
-    unsigned int RenderSystem::_getBatchCount(void) const
-    {
-        return static_cast< unsigned int >( mBatchCount );
-    }
-    //-----------------------------------------------------------------------
-    unsigned int RenderSystem::_getVertexCount(void) const
-    {
-        return static_cast< unsigned int >( mVertexCount );
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_render(const RenderOperation& op)
