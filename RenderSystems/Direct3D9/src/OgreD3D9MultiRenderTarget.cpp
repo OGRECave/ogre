@@ -70,21 +70,15 @@ namespace Ogre
             if (mRenderTargets[y]->getWidth() != buffer->getWidth() ||
                 mRenderTargets[y]->getHeight() != buffer->getHeight())
             {
-                OGRE_EXCEPT(
-                    Exception::ERR_INVALIDPARAMS, 
-                    "MultiRenderTarget surfaces are not of same size", 
-                    "D3D9MultiRenderTarget::bindSurface");
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "MultiRenderTarget surfaces are not of same size");
             }
 
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_MRT_SAME_BIT_DEPTHS)
                 && (PixelUtil::getNumElemBits(mRenderTargets[y]->getFormat()) != 
                     PixelUtil::getNumElemBits(buffer->getFormat())))
             {
-                OGRE_EXCEPT(
-                    Exception::ERR_INVALIDPARAMS, 
-                    "MultiRenderTarget surfaces are not of same bit depth and hardware requires it", 
-                    "D3D9MultiRenderTarget::bindSurface"
-                );
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "MultiRenderTarget surfaces are not of same bit depth and hardware requires it");
             }
         }
 
