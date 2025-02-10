@@ -5,7 +5,7 @@
 
 ![](Other/ogre_header.svg)
 
-## OGRE - scene-oriented, flexible 3D engine
+## OGRE - scene-oriented, flexible 3D engine. COOL!!!
 
 **OGRE** (Object-Oriented Graphics Rendering Engine) is a
 scene-oriented, flexible 3D engine written in C++ designed to make it
