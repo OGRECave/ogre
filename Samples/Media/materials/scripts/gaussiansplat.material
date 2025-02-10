@@ -12,7 +12,7 @@ vertex_program gsplatting_vp glsl glsles glslang
 	}
 }
 
-fragment_program gsplatting_fp glsl150 glsles glslang
+fragment_program gsplatting_fp glsl glsles glslang
 {
 	source gsplat.frag
 }

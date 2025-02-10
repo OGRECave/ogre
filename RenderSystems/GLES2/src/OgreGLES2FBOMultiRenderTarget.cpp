@@ -82,12 +82,6 @@ namespace Ogre {
         return result;
     }
     //-----------------------------------------------------------------------------
-    void GLES2FBOMultiRenderTarget::detachDepthBuffer()
-    {
-        fbo.detachDepthBuffer();
-        MultiRenderTarget::detachDepthBuffer();
-    }
-    //-----------------------------------------------------------------------------
     void GLES2FBOMultiRenderTarget::_detachDepthBuffer()
     {
         fbo.detachDepthBuffer();

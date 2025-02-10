@@ -305,14 +305,12 @@ namespace Ogre {
             of << "Render System=" << std::endl;
         }
 
-        for (auto *rs : getAvailableRenderers())
+        for (const auto& r : getAvailableRenderers())
         {
             of << std::endl;
-            of << "[" << rs->getName() << "]" << std::endl;
-            const ConfigOptionMap& opts = rs->getConfigOptions();
-            for (ConfigOptionMap::const_iterator pOpt = opts.begin(); pOpt != opts.end(); ++pOpt)
-            {
-                of << pOpt->first << "=" << pOpt->second.currentValue << std::endl;
+            of << "[" << r->getName() << "]" << std::endl;
+            for (const auto& o : r->getConfigOptions()) {
+                of << o.first << "=" << o.second.currentValue << std::endl;
             }
         }
 

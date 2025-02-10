@@ -80,8 +80,7 @@ namespace Ogre
             - Not all bound surfaces have the same size
             - Not all bound surfaces have the same internal format 
         */
-
-        virtual void bindSurface(size_t attachment, RenderTexture *target);
+        void bindSurface(size_t attachment, RenderTexture *target);
 
         /** Unbind attachment.
         */

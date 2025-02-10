@@ -223,6 +223,5 @@ void Context::setup() {
     addInputListener(this);
 
     mCurrentSample = new Sample_Character();
-    mCurrentSample->setShaderGenerator(mShaderGenerator);
     mCurrentSample->_setup(this);
 }

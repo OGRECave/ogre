@@ -12,9 +12,9 @@ using namespace Ogre;
 
 void RootWithoutRenderSystemFixture::SetUp()
 {
-    mFSLayer = new FileSystemLayer(OGRE_VERSION_NAME);
-    mRoot = new Root("");
-    mHBM = new DefaultHardwareBufferManager;
+    mRoot.reset(new Root(""));
+    mFSLayer.reset(new FileSystemLayer(OGRE_VERSION_NAME));
+    mHBM.reset(new DefaultHardwareBufferManager);
 
     MaterialManager::getSingleton().initialise();
 
@@ -25,15 +25,13 @@ void RootWithoutRenderSystemFixture::SetUp()
     cf.load(resourcesPath);
     // Go through all sections & settings in the file
     String secName, typeName, archName;
-    ConfigFile::SettingsBySection_::const_iterator seci;
-    for(seci = cf.getSettingsBySection().begin(); seci != cf.getSettingsBySection().end(); ++seci) {
-        secName = seci->first;
-        const ConfigFile::SettingsMultiMap& settings = seci->second;
-        ConfigFile::SettingsMultiMap::const_iterator i;
-        for (i = settings.begin(); i != settings.end(); ++i)
+    for(const auto& e : cf.getSettingsBySection()) {
+        secName = e.first;
+        const ConfigFile::SettingsMultiMap& settings = e.second;
+        for (const auto& s : settings)
         {
-            typeName = i->first;
-            archName = i->second;
+            typeName = s.first;
+            archName = s.second;
             ResourceGroupManager::getSingleton().addResourceLocation(archName, typeName, secName);
         }
     }
@@ -41,7 +39,5 @@ void RootWithoutRenderSystemFixture::SetUp()
 
 void RootWithoutRenderSystemFixture::TearDown()
 {
-    delete mRoot;
-    delete mHBM;
-    delete mFSLayer;
+
 }

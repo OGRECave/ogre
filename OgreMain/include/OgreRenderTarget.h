@@ -90,13 +90,13 @@ namespace Ogre {
         virtual ~RenderTarget();
 
         /// Retrieve target's name.
-        virtual const String& getName(void) const;
+        const String& getName(void) const { return mName; }
 
         /// Retrieve information about the render target.
         void getMetrics(unsigned int& width, unsigned int& height);
 
-        virtual uint32 getWidth(void) const;
-        virtual uint32 getHeight(void) const;
+        uint32 getWidth(void) const { return mWidth; }
+        uint32 getHeight(void) const { return mHeight; }
 
         /**
          * Sets the pool ID this RenderTarget should query from. Default value is POOL_DEFAULT.
@@ -107,20 +107,20 @@ namespace Ogre {
         void setDepthBufferPool( uint16 poolId );
 
         //Returns the pool ID this RenderTarget should query from. @see DepthBuffer
-        uint16 getDepthBufferPool() const;
+        uint16 getDepthBufferPool() const { return mDepthBufferPoolId; }
 
-        DepthBuffer* getDepthBuffer() const;
+        DepthBuffer* getDepthBuffer() const { return mDepthBuffer; }
 
         //Returns false if couldn't attach
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
 
-        virtual void detachDepthBuffer();
+        void detachDepthBuffer();
 
         /** Detaches DepthBuffer without notifying it from the detach.
             Useful when called from the DepthBuffer while it iterates through attached
             RenderTargets (@see DepthBuffer::_setPoolId())
         */
-        virtual void _detachDepthBuffer();
+        virtual void _detachDepthBuffer() { mDepthBuffer = 0; }
 
         /** Tells the target to update it's contents.
 
@@ -144,7 +144,7 @@ namespace Ogre {
                 queued commands complete. Or, you might do this if you want custom
                 control over your windows, such as for externally created windows.
         */
-        virtual void update(bool swapBuffers = true);
+        void update(bool swapBuffers = true);
         /** Swaps the frame buffers to display the next frame.
 
             For targets that are double-buffered so that no
@@ -170,38 +170,38 @@ namespace Ogre {
                 viewports i.e. picture-in-picture). Higher Z-orders are on top of lower ones. The actual number
                 is irrelevant, only the relative Z-order matters (you can leave gaps in the numbering)
             @param
-                left The relative position of the left of the viewport on the target, as a value between 0 and 1.
-            @param
-                top The relative position of the top of the viewport on the target, as a value between 0 and 1.
-            @param
-                width The relative width of the viewport on the target, as a value between 0 and 1.
-            @param
-                height The relative height of the viewport on the target, as a value between 0 and 1.
+                rect The relative position of the viewport on the target, as a value between 0 and 1.
         */
-        virtual Viewport* addViewport(Camera* cam, int ZOrder = 0, float left = 0.0f, float top = 0.0f ,
-            float width = 1.0f, float height = 1.0f);
+        Viewport* addViewport(Camera* cam, int ZOrder = 0, FloatRect rect = {0.0f, 0.0f, 1.0f, 1.0f});
+
+        /// @overload
+        Viewport* addViewport(Camera* cam, int ZOrder, float left, float top = 0.0f, float width = 1.0f,
+                              float height = 1.0f)
+        {
+            return addViewport(cam, ZOrder, {left, top, left + width, top + height});
+        }
 
         /** Returns the number of viewports attached to this target.*/
-        virtual unsigned short getNumViewports(void) const;
+        unsigned short getNumViewports(void) const { return static_cast<unsigned short>(mViewportList.size()); }
 
         /** Retrieves a pointer to the viewport with the given index. */
-        virtual Viewport* getViewport(unsigned short index);
+        Viewport* getViewport(unsigned short index);
 
         /** Retrieves a pointer to the viewport with the given Z-order. 
             @remarks throws if not found.
         */
-        virtual Viewport* getViewportByZOrder(int ZOrder);
+        Viewport* getViewportByZOrder(int ZOrder);
 
         /** Returns true if and only if a viewport exists at the given Z-order. */
-        virtual bool hasViewportWithZOrder(int ZOrder);
+        bool hasViewportWithZOrder(int ZOrder);
 
         /** Removes a viewport at a given Z-order.
         */
-        virtual void removeViewport(int ZOrder);
+        void removeViewport(int ZOrder);
 
         /** Removes all viewports on this target.
         */
-        virtual void removeAllViewports(void);
+        void removeAllViewports(void);
 
         /** Retrieves details of current rendering performance. */
         const FrameStats& getStatistics(void) const {
@@ -256,13 +256,13 @@ namespace Ogre {
             'normal' system rendering.
         @par NB this should not be used for frame-based scene updates, use Root::addFrameListener for that.
         */
-        virtual void addListener(RenderTargetListener* listener);
+        void addListener(RenderTargetListener* listener);
         /** same as addListener, but force the position in the vector, so we can control the call order */
-        virtual void insertListener(RenderTargetListener* listener, const unsigned int pos = 0);
+        void insertListener(RenderTargetListener* listener, const unsigned int pos = 0);
         /** Removes a RenderTargetListener previously registered using addListener. */
-        virtual void removeListener(RenderTargetListener* listener);
+        void removeListener(RenderTargetListener* listener);
         /** Removes all listeners from this instance. */
-        virtual void removeAllListeners(void);
+        void removeAllListeners(void);
 
         /** Sets the priority of this render target in relation to the others. 
 
@@ -271,17 +271,17 @@ namespace Ogre {
             at the time the render target is attached to the render system, changes
             afterwards will not affect the ordering.
         */
-        virtual void setPriority( uchar priority ) { mPriority = priority; }
+        void setPriority( uchar priority ) { mPriority = priority; }
         /** Gets the priority of a render target. */
-        virtual uchar getPriority() const { return mPriority; }
+        uchar getPriority() const { return mPriority; }
 
         /** Used to retrieve or set the active state of the render target.
         */
-        virtual bool isActive() const;
+        virtual bool isActive() const { return mActive; }
 
         /** Used to set the active state of the render target.
         */
-        virtual void setActive( bool state );
+        void setActive( bool state ) { mActive = state; }
 
         /** Sets whether this target should be automatically updated if Ogre's rendering
             loop or Root::_updateAllRenderTargets is being used.
@@ -294,11 +294,11 @@ namespace Ogre {
             loop or when Root::_updateAllRenderTargets is called. If false, the 
             target is only updated when its update() method is called explicitly.
         */
-        virtual void setAutoUpdated(bool autoupdate);
+        void setAutoUpdated(bool autoupdate) { mAutoUpdate = autoupdate; }
         /** Gets whether this target is automatically updated if Ogre's rendering
             loop or Root::_updateAllRenderTargets is being used.
         */
-        virtual bool isAutoUpdated(void) const;
+        bool isAutoUpdated(void) const { return mAutoUpdate; }
 
         /** Copies the current contents of the render target to a pixelbox. 
         @remarks See suggestPixelFormat for a tip as to the best pixel format to
@@ -326,14 +326,14 @@ namespace Ogre {
 
         /** Writes the current contents of the render target to the (PREFIX)(time-stamp)(SUFFIX) file.
             @return the name of the file used.*/
-        virtual String writeContentsToTimestampedFile(const String& filenamePrefix, const String& filenameSuffix);
+        String writeContentsToTimestampedFile(const String& filenamePrefix, const String& filenameSuffix);
 
         virtual bool requiresTextureFlipping() const = 0;
 
         /** Utility method to notify a render target that a camera has been removed,
         in case it was referring to it as a viewer.
         */
-        virtual void _notifyCameraRemoved(const Camera* cam);
+        void _notifyCameraRemoved(const Camera* cam);
 
         /** Indicates whether this target is the primary window. The
             primary window is special in that it is destroyed when
@@ -341,10 +341,10 @@ namespace Ogre {
             This is the case because it holds the context for vertex,
             index buffers and textures.
         */
-        virtual bool isPrimary(void) const;
+        virtual bool isPrimary(void) const { return false; }
 
 		/** Indicates whether stereo is currently enabled for this target. Default is false. */
-		virtual bool isStereoEnabled(void) const;
+		virtual bool isStereoEnabled(void) const { return mStereoEnabled; }
 		
         /** Indicates whether on rendering, linear colour space is converted to 
             sRGB gamma colour space. This is the exact opposite conversion of
@@ -353,14 +353,14 @@ namespace Ogre {
             enabled through the 'gamma' creation misc parameter. For textures, 
             it is enabled through the hwGamma parameter to the create call.
         */
-        virtual bool isHardwareGammaEnabled() const { return mHwGamma; }
+        bool isHardwareGammaEnabled() const { return mHwGamma; }
 
         /** Indicates whether multisampling is performed on rendering and at what level.
         */
-        virtual uint getFSAA() const { return mFSAA; }
+        uint getFSAA() const { return mFSAA; }
 
         /// RenderSystem specific FSAA option. See @ref RenderSystem::_createRenderWindow for details.
-        virtual const String& getFSAAHint() const { return mFSAAHint; }
+        const String& getFSAAHint() const { return mFSAAHint; }
 
         /** Set the level of multisample AA to be used if hardware support it.
             This option will be ignored if the hardware does not support it 
@@ -404,7 +404,10 @@ namespace Ogre {
         @param zorder The zorder of the viewport to update.
         @param updateStatistics Whether you want to update statistics or not.
         */
-        virtual void _updateViewport(int zorder, bool updateStatistics = true);
+        void _updateViewport(int zorder, bool updateStatistics = true)
+        {
+            _updateViewport(getViewportByZOrder(zorder), updateStatistics);
+        }
 
         /** Method for manual management of rendering - renders the given viewport (even if it is not autoupdated)
 
@@ -424,7 +427,7 @@ namespace Ogre {
         @param updateStatistics Whether you want to update statistics or not.
         @see _beginUpdate()
         */
-        virtual void _updateAutoUpdatedViewports(bool updateStatistics = true);
+        void _updateAutoUpdatedViewports(bool updateStatistics = true);
         
         /** Method for manual management of rendering - finishes statistics calculation 
             and fires 'postRenderTargetUpdate'.

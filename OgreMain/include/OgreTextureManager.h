@@ -435,7 +435,7 @@ namespace Ogre {
                 : Texture(creator, name, handle, group)
             {
             }
-            const HardwarePixelBufferSharedPtr& getBuffer(size_t, size_t) override
+            const HardwarePixelBufferSharedPtr& getBuffer(size_t, size_t) const override
             {
                 static HardwarePixelBufferSharedPtr nullBuffer;
                 return nullBuffer;

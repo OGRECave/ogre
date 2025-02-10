@@ -57,23 +57,23 @@ namespace Ogre
         MetalRenderWindow( MetalDevice *ownerDevice, MetalRenderSystem *renderSystem );
         virtual ~MetalRenderWindow();
 
-        virtual void swapBuffers(void);
-        virtual void windowMovedOrResized(void);
+        void swapBuffers(void) override;
+        void windowMovedOrResized(void) override;
 
-        virtual bool nextDrawable(void);
+        bool nextDrawable(void) override;
 
-        virtual void create( const String& name, unsigned int width, unsigned int height,
-                             bool fullScreen, const NameValuePairList *miscParams );
-        virtual void destroy(void);
+        void create( const String& name, unsigned int width, unsigned int height,
+                             bool fullScreen, const NameValuePairList *miscParams ) override;
+        void destroy(void) override;
 
-        virtual void resize( unsigned int width, unsigned int height );
-        virtual void reposition( int left, int top );
+        void resize( unsigned int width, unsigned int height ) override;
+        void reposition( int left, int top ) override;
 
         // RenderTarget overloads.
-        virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer) {}
-        virtual bool requiresTextureFlipping() const { return false; }
+        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer) override {}
+        bool requiresTextureFlipping() const override { return false; }
 
-        virtual void getCustomAttribute( const String& name, void* pData );
+        void getCustomAttribute( const String& name, void* pData ) override;
 
         PixelFormat suggestPixelFormat() const override { return mFormat; }
 

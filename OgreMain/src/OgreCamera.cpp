@@ -541,28 +541,6 @@ namespace Ogre {
         return o;
     }
     //-----------------------------------------------------------------------
-    void Camera::_notifyRenderedFaces(unsigned int numfaces)
-    {
-        mVisFacesLastRender = numfaces;
-    }
-
-    //-----------------------------------------------------------------------
-    void Camera::_notifyRenderedBatches(unsigned int numbatches)
-    {
-        mVisBatchesLastRender = numbatches;
-    }
-
-    //-----------------------------------------------------------------------
-    unsigned int Camera::_getNumRenderedFaces(void) const
-    {
-        return mVisFacesLastRender;
-    }
-    //-----------------------------------------------------------------------
-    unsigned int Camera::_getNumRenderedBatches(void) const
-    {
-        return mVisBatchesLastRender;
-    }
-    //-----------------------------------------------------------------------
     const Quaternion& Camera::getDerivedOrientation(void) const
     {
         updateView();

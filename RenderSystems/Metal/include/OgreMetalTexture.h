@@ -51,8 +51,8 @@ namespace Ogre
         void createMetalTexResource(void);
         void createSurfaceList(void);
 
-        virtual void createInternalResourcesImpl(void);
-        virtual void freeInternalResourcesImpl(void);
+        void createInternalResourcesImpl(void) override;
+        void freeInternalResourcesImpl(void) override;
 
     public:
         MetalTexture( ResourceManager* creator, const String& name, ResourceHandle handle,

@@ -231,7 +231,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
     for (auto& p : mShadowTextureParamsList)
     {
         p.mWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX, lightIndex);
-        p.mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex));
+        p.mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex);
         p.mPSInLightPosition = psMain->resolveInputParameter(p.mVSOutLightPosition);
         auto stype = mUseTextureCompare ? GCT_SAMPLER2DSHADOW : GCT_SAMPLER2D;
         p.mTextureSampler = psProgram->resolveParameter(stype, "shadow_map", p.mTextureSamplerIndex);

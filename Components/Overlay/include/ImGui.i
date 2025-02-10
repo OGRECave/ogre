@@ -20,10 +20,13 @@
 %ignore ImGui::TreeNodeExV;
 %ignore ImGui::SetTooltipV;
 %ignore ImGui::SetItemTooltipV;
-%ignore ImGuiTextBuffer::appendfv;
 %ignore ImGui::DebugLogV;
 %ignore ImGuiSelectionBasicStorage;
 
+// not needed in high level languages
+%ignore ImGuiTextBuffer;
+
+#ifdef SWIGPYTHON
 %typemap(in) ImTextureID {
     size_t argp;
     int res = SWIG_AsVal_size_t($input, &argp);
@@ -46,10 +49,9 @@
     }
 }
 
-#ifdef SWIGPYTHON
 // match the signature of the by value variants
 %typemap(argout) float[4], float[3], float[2] {
-    $result = SWIG_Python_AppendOutput($result, SWIG_NewPointerObj($1, $descriptor(ImVec4*), 0));
+    $result = SWIG_AppendOutput($result, SWIG_NewPointerObj($1, $descriptor(ImVec4*), 0));
 }
 
 // for PlotHistogram, PlotLines
@@ -73,18 +75,16 @@
 %typecheck(SWIG_TYPECHECK_STRING) (const float* values, int values_count) {
     $1 = true; // actual check in the typemap
 }
-#endif
 
 %typecheck(SWIG_TYPECHECK_STRING) float[4], float[3], float[2] {
     $1 = true; // actual check in the typemap
 }
 
-#ifdef SWIGPYTHON
 %rename("__version__") "IMGUI_VERSION";
-#endif
 
 // strip duplicate namespace for ImGuiSomething_FlagName flags
 %rename("%(strip:[ImGui])s", regextarget=1) "^ImGui.+_.+";
+#endif
 
 %apply bool* INOUT { bool* p_open };
 %apply bool* INOUT { bool* v };

@@ -41,26 +41,26 @@ public:
     OSXGLSupport(int profile) : GLNativeSupport(profile) {}
     ~OSXGLSupport() {}
 
-    ConfigOptionMap getConfigOptions();
+    ConfigOptionMap getConfigOptions() override;
     
     /// @copydoc RenderSystem::createRenderWindow
-    virtual RenderWindow* newWindow( const String &name, unsigned int width, unsigned int height, 
-        bool fullScreen, const NameValuePairList *miscParams = 0 );
+    RenderWindow* newWindow( const String &name, unsigned int width, unsigned int height,
+        bool fullScreen, const NameValuePairList *miscParams = 0 ) override;
     
     /**
     * Start anything special
     */
-    void start();
+    void start() override;
 
     /**
     * Stop anything special
     */
-    void stop();
+    void stop() override;
 
     /**
     * Get the address of a function
     */
-    void* getProcAddress( const char *name ) const;
+    void* getProcAddress( const char *name ) const override;
     
     // Core Foundation Array callback function for sorting, must be static for the function ptr
     static CFComparisonResult _compareModes (const void *val1, const void *val2, void *context);

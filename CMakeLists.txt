@@ -63,7 +63,7 @@ if (APPLE AND NOT ANDROID AND NOT EMSCRIPTEN AND NOT ANDROID_PLATFORM)
   add_definitions(-D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=0)
 endif ()
 
-project(OGRE VERSION 14.3.1)
+project(OGRE VERSION 14.4.0)
 
 # extra version info
 set(OGRE_VERSION_SUFFIX "")
@@ -182,10 +182,6 @@ if (MINGW)
     # the atomic primitives
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=i686")
   endif ()
-  # disable this optimisation because it breaks release builds (reason unknown)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-tree-slp-vectorize")
-  # Ignore some really annoying warnings which also happen in dependencies
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=cast-qual -Wno-unused-local-typedefs")
 endif ()
 
 include(GenerateExportHeader)
@@ -372,7 +368,7 @@ cmake_dependent_option(OGRE_CONFIG_FILESYSTEM_UNICODE "paths expected to be in U
 cmake_dependent_option(OGRE_INSTALL_SAMPLES "Install Ogre demos." TRUE "OGRE_BUILD_SAMPLES" FALSE)
 option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." TRUE)
-cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" TRUE "MSVC" FALSE)
+cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" TRUE "MSVC;NOT OGRE_STATIC" FALSE)
 option(OGRE_PROFILING "Enable internal instrumentation." FALSE)
 set(OGRE_PROFILING_REMOTERY_PATH "" CACHE PATH "set this to Remotery/lib to use Remotery instead of the buildin profiler")
 cmake_dependent_option(OGRE_CONFIG_STATIC_LINK_CRT "Statically link the MS CRT dlls (msvcrt)" FALSE "MSVC" FALSE)

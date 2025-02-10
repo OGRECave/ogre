@@ -376,7 +376,7 @@ namespace Ogre {
             }
         }
     }
-    const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap)
+    const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap) const
     {
         OgreAssert(face < getNumFaces(), "out of range");
         OgreAssert(mipmap <= mNumMipmaps, "out of range");
@@ -394,7 +394,7 @@ namespace Ogre {
 
         for (uint32 face = 0; face < getNumFaces(); ++face)
         {
-            for (uint32 mip = 0; mip < numMips; ++mip)
+            for (uint32 mip = 0; mip <= numMips; ++mip)
             {
                 getBuffer(face, mip)->blitToMemory(destImage.getPixelBox(face, mip));
             }

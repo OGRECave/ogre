@@ -812,7 +812,7 @@ namespace Ogre
 
         _createSwapChain();
         _createSizeDependedD3DResources();
-        mDevice.GetDXGIFactory()->MakeWindowAssociation(mHWnd, NULL);
+        mDevice.GetDXGIFactory()->MakeWindowAssociation(mHWnd, 0);
         setHidden(mHidden);
 
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
@@ -834,7 +834,7 @@ namespace Ogre
     void D3D11RenderWindowHwnd::notifyDeviceRestored(D3D11Device* device)
     {
         D3D11RenderWindowSwapChainBased::notifyDeviceRestored(device);
-        mDevice.GetDXGIFactory()->MakeWindowAssociation(mHWnd, NULL);
+        mDevice.GetDXGIFactory()->MakeWindowAssociation(mHWnd, 0);
     }
     //---------------------------------------------------------------------
 	HRESULT D3D11RenderWindowHwnd::_createSwapChainImpl(IDXGIDeviceN* pDXGIDevice)

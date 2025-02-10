@@ -66,10 +66,7 @@ namespace Ogre
             if(mRenderTargets[y]->getWidth() != target->getWidth() ||
                 mRenderTargets[y]->getHeight() != target->getHeight())
             {
-				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                    "MultiRenderTarget surfaces are not of same size", 
-                    "D3D11MultiRenderTarget::bindSurface"
-                    );
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "MultiRenderTarget surfaces are not of same size");
             }
         }
 

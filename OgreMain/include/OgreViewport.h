@@ -87,7 +87,13 @@ namespace Ogre {
                 Relative Z-order on the target. Lower = further to
                 the front.
         */
-        Viewport(Camera* camera, RenderTarget* target, float left, float top, float width, float height, int ZOrder);
+        Viewport(Camera* camera, RenderTarget* target, float left, float top, float width, float height, int ZOrder)
+            : Viewport(camera, target, {left, top, left + width, top + height}, ZOrder)
+        {
+        }
+
+        /// @overload
+        Viewport(Camera* camera, RenderTarget* target, FloatRect relRect, int ZOrder);
 
         /** Default destructor.
         */
@@ -134,43 +140,17 @@ namespace Ogre {
 
         /** Gets the Z-Order of this viewport. */
         int getZOrder(void) const { return mZOrder; }
-        /** Gets one of the relative dimensions of the viewport,
-            a value between 0.0 and 1.0.
-        */
+
+        /// @name Relative dimensions
+        /// These methods return the relative dimensions of the viewport, which are
+        /// expressed as a value between 0.0 and 1.0.
+        /// @{
         float getLeft(void) const { return mRelRect.left; }
-
-        /** Gets one of the relative dimensions of the viewport, a value
-            between 0.0 and 1.0.
-        */
         float getTop(void) const { return mRelRect.top; }
-
-        /** Gets one of the relative dimensions of the viewport, a value
-            between 0.0 and 1.0.
-        */
         float getWidth(void) const { return mRelRect.width(); }
-        /** Gets one of the relative dimensions of the viewport, a value
-            between 0.0 and 1.0.
-        */
         float getHeight(void) const { return mRelRect.height(); }
-        /** Gets one of the actual dimensions of the viewport, a value in
-            pixels.
-        */
-
-        int getActualLeft(void) const { return mActRect.left; }
-        /** Gets one of the actual dimensions of the viewport, a value in
-            pixels.
-        */
-
-        int getActualTop(void) const { return mActRect.top; }
-        /** Gets one of the actual dimensions of the viewport, a value in
-            pixels.
-        */
-        int getActualWidth(void) const { return mActRect.width(); }
-        /** Gets one of the actual dimensions of the viewport, a value in
-            pixels.
-        */
-
-        int getActualHeight(void) const { return mActRect.height(); }
+        FloatRect getDimensions(void) const { return mRelRect; }
+        /// @}
 
         /** Sets the dimensions (after creation).
             @param
@@ -186,6 +166,16 @@ namespace Ogre {
                 target area is 0, 0, 1, 1.
         */
         void setDimensions(float left, float top, float width, float height);
+
+        /// @name Actual dimensions
+        /// These methods return the actual dimensions of the viewport in pixels.
+        /// @{
+        int getActualLeft(void) const { return mActRect.left; }
+        int getActualTop(void) const { return mActRect.top; }
+        int getActualWidth(void) const { return mActRect.width(); }
+        int getActualHeight(void) const { return mActRect.height(); }
+        Rect getActualDimensions() const { return mActRect; }
+        /// @}
 
         /** Sets the initial background colour of the viewport (before
             rendering).
@@ -254,10 +244,6 @@ namespace Ogre {
         */
         const String& getMaterialScheme(void) const
         { return mMaterialSchemeName; }
-
-        /** Access to actual dimensions (based on target size).
-        */
-        Rect getActualDimensions() const { return mActRect; }
 
         /// @deprecated
         OGRE_DEPRECATED void getActualDimensions(int& left, int& top, int& width, int& height) const;

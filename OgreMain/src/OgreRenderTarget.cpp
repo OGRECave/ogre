@@ -76,25 +76,10 @@ namespace Ogre {
 
     }
 
-    const String& RenderTarget::getName(void) const
-    {
-        return mName;
-    }
-
-
     void RenderTarget::getMetrics(unsigned int& width, unsigned int& height)
     {
         width = mWidth;
         height = mHeight;
-    }
-
-    unsigned int RenderTarget::getWidth(void) const
-    {
-        return mWidth;
-    }
-    unsigned int RenderTarget::getHeight(void) const
-    {
-        return mHeight;
     }
     //-----------------------------------------------------------------------
     void RenderTarget::setDepthBufferPool( uint16 poolId )
@@ -104,16 +89,6 @@ namespace Ogre {
             mDepthBufferPoolId = poolId;
             detachDepthBuffer();
         }
-    }
-    //-----------------------------------------------------------------------
-    uint16 RenderTarget::getDepthBufferPool() const
-    {
-        return mDepthBufferPoolId;
-    }
-    //-----------------------------------------------------------------------
-    DepthBuffer* RenderTarget::getDepthBuffer() const
-    {
-        return mDepthBuffer;
     }
     //-----------------------------------------------------------------------
     bool RenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
@@ -135,13 +110,8 @@ namespace Ogre {
         if( mDepthBuffer )
         {
             mDepthBuffer->_notifyRenderTargetDetached( this );
-            mDepthBuffer = 0;
+            _detachDepthBuffer();
         }
-    }
-    //-----------------------------------------------------------------------
-    void RenderTarget::_detachDepthBuffer()
-    {
-        mDepthBuffer = 0;
     }
 
     void RenderTarget::updateImpl(void)
@@ -199,22 +169,7 @@ namespace Ogre {
         fireViewportPostUpdate(viewport);
     }
 
-    void RenderTarget::_updateViewport(int zorder, bool updateStatistics)
-    {
-        ViewportList::iterator it = mViewportList.find(zorder);
-        if (it != mViewportList.end())
-        {
-            _updateViewport((*it).second,updateStatistics);
-        }
-        else
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,"No viewport with given zorder : "
-                + StringConverter::toString(zorder), "RenderTarget::_updateViewport");
-        }
-    }
-
-    Viewport* RenderTarget::addViewport(Camera* cam, int ZOrder, float left, float top ,
-        float width , float height)
+    Viewport* RenderTarget::addViewport(Camera* cam, int ZOrder, FloatRect rect)
     {       
         // Check no existing viewport with this Z-order
         ViewportList::iterator it = mViewportList.find(ZOrder);
@@ -229,7 +184,7 @@ namespace Ogre {
         }
         // Add viewport to list
         // Order based on Z-order
-        Viewport* vp = OGRE_NEW Viewport(cam, this, left, top, width, height, ZOrder);
+        Viewport* vp = OGRE_NEW Viewport(cam, this, rect, ZOrder);
 
         mViewportList.emplace(ZOrder, vp);
 
@@ -371,12 +326,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    unsigned short RenderTarget::getNumViewports(void) const
-    {
-        return (unsigned short)mViewportList.size();
-
-    }
-    //-----------------------------------------------------------------------
     Viewport* RenderTarget::getViewport(unsigned short index)
     {
         assert (index < mViewportList.size() && "Index out of bounds");
@@ -402,16 +351,6 @@ namespace Ogre {
     {
         ViewportList::iterator i = mViewportList.find(ZOrder);
         return i != mViewportList.end();
-    }
-    //-----------------------------------------------------------------------
-    bool RenderTarget::isActive() const
-    {
-        return mActive;
-    }
-    //-----------------------------------------------------------------------
-    void RenderTarget::setActive( bool state )
-    {
-        mActive = state;
     }
     //-----------------------------------------------------------------------
     void RenderTarget::fireViewportPreUpdate(Viewport* vp)
@@ -502,27 +441,6 @@ namespace Ogre {
                 v->setCamera(0);
             }
         }
-    }
-    //-----------------------------------------------------------------------
-    void RenderTarget::setAutoUpdated(bool autoup)
-    {
-        mAutoUpdate = autoup;
-    }
-    //-----------------------------------------------------------------------
-    bool RenderTarget::isAutoUpdated(void) const
-    {
-        return mAutoUpdate;
-    }
-    //-----------------------------------------------------------------------
-    bool RenderTarget::isPrimary(void) const
-    {
-        // RenderWindow will override and return true for the primary window
-        return false;
-    }  
-	//-----------------------------------------------------------------------
-    bool RenderTarget::isStereoEnabled(void) const
-    {
-        return mStereoEnabled;
     }
     //-----------------------------------------------------------------------
     void RenderTarget::update(bool swap)

@@ -90,31 +90,31 @@ namespace Ogre
         std::unique_ptr<MetalHardwareBufferCommon> mAutoParamsBuffer;
     public:
         const GpuProgramParametersPtr& getFixedFunctionParams(TrackVertexColourType tracking,
-                                                                      FogMode fog);
-        void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 mask);
+                                                                      FogMode fog) override;
+        void applyFixedFunctionParams(const GpuProgramParametersPtr& params, uint16 mask) override;
 
         MetalRenderSystem();
         virtual ~MetalRenderSystem();
 
-        virtual void shutdown(void);
+        void shutdown(void) override;
 
-        virtual const String& getName(void) const;
-        virtual void setConfigOption(const String &name, const String &value) {}
+        const String& getName(void) const override;
+        void setConfigOption(const String &name, const String &value) override {}
 
-        virtual HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
+        HardwareOcclusionQuery* createHardwareOcclusionQuery(void) override;
 
-        virtual RenderSystemCapabilities* createRenderSystemCapabilities(void) const;
+        RenderSystemCapabilities* createRenderSystemCapabilities(void) const override;
 
-        virtual RenderWindow* _createRenderWindow( const String &name,
+        RenderWindow* _createRenderWindow( const String &name,
                                                    unsigned int width, unsigned int height,
                                                    bool fullScreen,
-                                                   const NameValuePairList *miscParams = 0);
+                                                   const NameValuePairList *miscParams = 0) override;
 
-        virtual MultiRenderTarget* createMultiRenderTarget(const String & name);
+        MultiRenderTarget* createMultiRenderTarget(const String & name) override;
 
-        virtual void _setTexture(size_t unit, bool enabled,  const TexturePtr& texPtr);
+        void _setTexture(size_t unit, bool enabled,  const TexturePtr& texPtr) override;
 
-        virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget);
+        DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget) override;
 
         void setStencilState(const StencilState& state) override;
 
@@ -122,51 +122,51 @@ namespace Ogre
         virtual void _waitForTailFrameToFinish(void);
         virtual bool _willTailFrameStall(void);
 
-        virtual void _beginFrame(void);
-        virtual void _endFrame(void);
+        void _beginFrame(void) override;
+        void _endFrame(void) override;
 
-        void setScissorTest(bool enabled, const Rect& rect);
+        void setScissorTest(bool enabled, const Rect& rect) override;
 
-        virtual void _setViewport(Viewport *vp);
+        void _setViewport(Viewport *vp) override;
 
-        void setColourBlendState(const ColourBlendState& state);
+        void setColourBlendState(const ColourBlendState& state) override;
 
-        void _setSampler( size_t texUnit, Sampler& s);
-        void _setDepthClamp(bool enable);
-        void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL);
+        void _setSampler( size_t texUnit, Sampler& s) override;
+        void _setDepthClamp(bool enable) override;
+        void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL) override;
 
-        void _setCullingMode(CullingMode mode);
-        void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f);
+        void _setCullingMode(CullingMode mode) override;
+        void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) override;
 
-        virtual void _convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
-                                               bool forGpuProgram = false);
-        void _setPolygonMode(PolygonMode level);
-        void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage);
-        virtual void _render( const RenderOperation &op );
+        void _convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
+                                               bool forGpuProgram = false) override;
+        void _setPolygonMode(PolygonMode level) override;
+        void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage) override;
+        void _render( const RenderOperation &op ) override;
 
-        void bindGpuProgram(GpuProgram* prg);
-        virtual void bindGpuProgramParameters(GpuProgramType gptype,
-            const GpuProgramParametersPtr& params, uint16 variabilityMask);
-        virtual void clearFrameBuffer(unsigned int buffers,
+        void bindGpuProgram(GpuProgram* prg) override;
+        void bindGpuProgramParameters(GpuProgramType gptype,
+            const GpuProgramParametersPtr& params, uint16 variabilityMask) override;
+        void clearFrameBuffer(unsigned int buffers,
             const ColourValue& colour = ColourValue::Black,
-            float depth = 1.0f, unsigned short stencil = 0);
+            float depth = 1.0f, unsigned short stencil = 0) override;
 
-        virtual Real getMinimumDepthInputValue(void);
-        virtual Real getMaximumDepthInputValue(void);
+        Real getMinimumDepthInputValue(void) override;
+        Real getMaximumDepthInputValue(void) override;
 
-        virtual void _setRenderTarget(RenderTarget *target);
+        void _setRenderTarget(RenderTarget *target) override;
 
-        virtual void beginProfileEvent( const String &eventName );
-        virtual void endProfileEvent( void );
-        virtual void markProfileEvent( const String &event );
+        void beginProfileEvent( const String &eventName ) override;
+        void endProfileEvent( void ) override;
+        void markProfileEvent( const String &event ) override;
 
         virtual void initGPUProfiling(void);
         virtual void deinitGPUProfiling(void);
         virtual void beginGPUSampleProfile( const String &name, uint32 *hashCache );
         virtual void endGPUSampleProfile( const String &name );
 
-        virtual void initialiseFromRenderSystemCapabilities( RenderSystemCapabilities* caps,
-                                                             RenderTarget* primary );
+        void initialiseFromRenderSystemCapabilities( RenderSystemCapabilities* caps,
+                                                             RenderTarget* primary ) override;
 
         MetalDevice* getActiveDevice(void)                      { return mActiveDevice; }
 

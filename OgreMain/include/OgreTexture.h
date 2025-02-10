@@ -146,6 +146,12 @@ namespace Ogre {
         */
         TextureType getTextureType(void) const { return mTextureType; }
 
+        /** D3D11 only: set a shared surface to use for this texture before loading
+         *
+         * Useful for WPF interop
+         */
+        virtual void _setD3D11Surface(void* surface) {}
+
         /** Gets the number of mipmaps to be used for this texture.
         */
         uint32 getNumMipmaps(void) const {return mNumMipmaps;}
@@ -394,7 +400,7 @@ namespace Ogre {
             @remarks The buffer is invalidated when the resource is unloaded or destroyed.
             Do not use it after the lifetime of the containing texture.
         */
-        virtual const HardwarePixelBufferSharedPtr& getBuffer(size_t face=0, size_t mipmap=0);
+        virtual const HardwarePixelBufferSharedPtr& getBuffer(size_t face=0, size_t mipmap=0) const;
 
 
         /** Populate an Image with the contents of this texture. 

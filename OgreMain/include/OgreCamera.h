@@ -397,19 +397,19 @@ namespace Ogre {
 
         /** Internal method to notify camera of the visible faces in the last render.
         */
-        void _notifyRenderedFaces(unsigned int numfaces);
+        void _notifyRenderedFaces(unsigned int numfaces) { mVisFacesLastRender = numfaces; }
 
         /** Internal method to notify camera of the visible batches in the last render.
         */
-        void _notifyRenderedBatches(unsigned int numbatches);
+        void _notifyRenderedBatches(unsigned int numbatches) { mVisBatchesLastRender = numbatches; }
 
         /** Internal method to retrieve the number of visible faces in the last render.
         */
-        unsigned int _getNumRenderedFaces(void) const;
+        unsigned int _getNumRenderedFaces(void) const { return mVisFacesLastRender; }
 
         /** Internal method to retrieve the number of visible batches in the last render.
         */
-        unsigned int _getNumRenderedBatches(void) const;
+        unsigned int _getNumRenderedBatches(void) const { return mVisBatchesLastRender; }
 
         /** Gets the derived orientation of the camera, including any
             rotation inherited from a node attachment and reflection matrix. */

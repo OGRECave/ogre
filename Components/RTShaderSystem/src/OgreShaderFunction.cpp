@@ -30,7 +30,7 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
-static GpuConstantType typeFromContent(Parameter::Content content)
+static GpuConstantType typeFromContent(int content)
 {
     switch (content)
     {
@@ -72,7 +72,7 @@ static GpuConstantType typeFromContent(Parameter::Content content)
     }
 }
 
-static Parameter::Semantic semanticFromContent(Parameter::Content content, bool isVSOut = false)
+static Parameter::Semantic semanticFromContent(int content, bool isVSOut = false)
 {
     switch (content)
     {
@@ -109,7 +109,7 @@ static Parameter::Semantic semanticFromContent(Parameter::Content content, bool 
 }
 
 /// fixed index for texcoords, next free semantic slot else
-static int indexFromContent(Parameter::Content content)
+static int indexFromContent(int content)
 {
     int c = int(content);
     if(c < Parameter::SPC_TEXTURE_COORDINATE0 || c > Parameter::SPC_TEXTURE_COORDINATE7)
@@ -225,7 +225,7 @@ static String getParameterName(const char* prefix, Parameter::Semantic semantic,
 //-----------------------------------------------------------------------------
 ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
                                         int index,
-                                        const Parameter::Content content,
+                                        int content,
                                         GpuConstantType type)
 {
     if(type == GCT_UNKNOWN)
@@ -286,7 +286,7 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
 //-----------------------------------------------------------------------------
 ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
                                             int index,
-                                            Parameter::Content content,
+                                            int content,
                                             GpuConstantType type)
 {
     if(type == GCT_UNKNOWN)
@@ -400,7 +400,7 @@ ParameterPtr Function::resolveLocalStructParameter(const String& type, const Str
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::resolveLocalParameter(const Parameter::Content content, GpuConstantType type)
+ParameterPtr Function::resolveLocalParameter(int content, GpuConstantType type)
 {
     ParameterPtr param;
 
@@ -534,7 +534,7 @@ ParameterPtr Function::_getParameterBySemantic(const ShaderParameterList& parame
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Function::_getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
+ParameterPtr Function::_getParameterByContent(const ShaderParameterList& parameterList, int content, GpuConstantType type)
 {
     if(type == GCT_UNKNOWN)
         type = typeFromContent(content);
