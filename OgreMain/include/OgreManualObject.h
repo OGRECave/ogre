@@ -556,8 +556,6 @@ namespace Ogre
         {
         protected:
             ManualObject* mParent;
-            String mMaterialName;
-            String mGroupName;
             mutable MaterialPtr mMaterial;
             RenderOperation mRenderOperation;
             bool m32BitIndices;
@@ -575,9 +573,9 @@ namespace Ogre
             /// Retrieve render operation for manipulation
             RenderOperation* getRenderOperation(void);
             /// Retrieve the material name in use
-            const String& getMaterialName(void) const { return mMaterialName; }
+            const String& getMaterialName(void) const { return mMaterial ? mMaterial->getName() : BLANKSTRING; }
             /// Retrieve the material group in use
-            const String& getMaterialGroup(void) const { return mGroupName; }
+            const String& getMaterialGroup(void) const { return mMaterial ? mMaterial->getGroup() : BLANKSTRING; }
             /// update the material name in use
             void setMaterialName(const String& name,
                 const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
