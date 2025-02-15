@@ -362,8 +362,6 @@ namespace Ogre {
     //---------------------------------------------------------------------------------------------
     void RenderSystem::attachRenderTarget( RenderTarget &target )
     {
-        assert( target.getPriority() < OGRE_NUM_RENDERTARGET_GROUPS );
-
         mRenderTargets.emplace(target.getName(), &target);
         mPrioritisedRenderTargets.emplace(target.getPriority(), &target);
     }
