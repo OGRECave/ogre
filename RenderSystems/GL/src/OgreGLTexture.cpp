@@ -226,7 +226,7 @@ namespace Ogre {
                     depth = depth/2;
             }
         }
-        _createSurfaceList();
+        createSurfaceList();
         // Get final internal format
         mFormat = getBuffer(0,0)->getFormat();
     }
@@ -243,31 +243,9 @@ namespace Ogre {
     }
     
     //---------------------------------------------------------------------------------------------
-    void GLTexture::_createSurfaceList()
+    HardwarePixelBufferPtr GLTexture::createSurface(uint32 face, uint32 mip, uint32 width, uint32 height, uint32 depth)
     {
-        mSurfaceList.clear();
-        
-        uint32 depth = mDepth;
-
-        // For all faces and mipmaps, store surfaces as HardwarePixelBufferSharedPtr
-        for(GLint face=0; face<static_cast<GLint>(getNumFaces()); face++)
-        {
-            uint32 width = mWidth;
-            uint32 height = mHeight;
-
-            for(uint32 mip=0; mip<=getNumMipmaps(); mip++)
-            {
-                auto buf = std::make_shared<GLTextureBuffer>(mRenderSystem, this, face, mip, width, height, depth);
-                mSurfaceList.push_back(buf);
-                
-                if (width > 1)
-                    width = width / 2;
-                if (height > 1)
-                    height = height / 2;
-                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
-                    depth = depth / 2;
-            }
-        }
+        return std::make_shared<GLTextureBuffer>(mRenderSystem, this, face, mip, width, height, depth);
     }
 }
 

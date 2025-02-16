@@ -495,6 +495,15 @@ namespace Ogre {
         */
         virtual void freeInternalResourcesImpl(void) = 0;
 
+        virtual HardwarePixelBufferPtr createSurface(uint32 face, uint32 mip, uint32 width, uint32 height, uint32 depth)
+        {
+            return nullptr;
+        }
+
+        /// internal method, create HardwarePixelBuffers for every face and
+        /// mipmap level. This method must be called after the texture object was created
+        void createSurfaceList(void);
+
         /** Default implementation of unload which calls freeInternalResources */
         void unloadImpl(void) override;
 

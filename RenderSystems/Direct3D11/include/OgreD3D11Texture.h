@@ -106,14 +106,13 @@ namespace Ogre {
         /// internal method, set Texture class final texture protected attributes
         void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format, UINT miscflags);
 
-        /// internal method, create D3D11HardwarePixelBuffers for every face and
-        /// mipmap level. This method must be called after the D3D texture object was created
-        void _createSurfaceList(void);
-
         void _setD3D11Surface(void* surface) override;
 
         void notifyDeviceLost(D3D11Device* device);
         void notifyDeviceRestored(D3D11Device* device);
+
+        HardwarePixelBufferPtr createSurface(uint32 face, uint32 mip, uint32 width, uint32 height,
+                                             uint32 depth) override;
 
     protected:
         D3D11Device&	mDevice;
