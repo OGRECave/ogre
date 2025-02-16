@@ -67,7 +67,6 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
     mInstancedViewportsEnable = false;
     mInstancedViewportsSubRenderState = NULL;
     mInstancedViewportsFactory = NULL;
-    mBbsFlare = NULL;
     mAddedLotsOfModels = false;
     mNumberOfModelsAdded = 0;
     mCurrentBlendMode = NUM_BLEND_MODES - 1;
@@ -667,14 +666,6 @@ void Sample_ShaderSystem::createDirectionalLight()
     // create pivot node
     mDirectionalLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     mDirectionalLightNode->setDirection(dir);
-
-    // Create billboard set.
-    mBbsFlare = mSceneMgr->createBillboardSet();
-    mBbsFlare->setMaterialName("Examples/Flare3");
-    mBbsFlare->createBillboard(-dir * 500.0)->setColour(light->getDiffuseColour());
-    mBbsFlare->setCastShadows(false);
-    
-    mDirectionalLightNode->attachObject(mBbsFlare);
     mDirectionalLightNode->attachObject(light);
 }
 
@@ -781,14 +772,10 @@ void Sample_ShaderSystem::updateInstancedViewports(bool enabled)
         if (mInstancedViewportsEnable)
         {
             mCamera->setCullingFrustum(&mInfiniteFrustum);
-
-            // having problems with bb...
-            mDirectionalLightNode->detachObject(mBbsFlare);
         }
         else
         {
             mCamera->setCullingFrustum(NULL);
-            mDirectionalLightNode->attachObject(mBbsFlare);
         }
 
 
