@@ -257,6 +257,9 @@ ManualObject::ManualObject(const String& name)
             rop->vertexData->vertexDeclaration->getElements();
         for (const auto & elem : elemList)
         {
+            if(elem.getSource() != 0)
+                continue; // not our buffer (e.g. auto instancing injection)
+
             float* pFloat = 0;
             RGBA* pRGBA = 0;
             switch(elem.getType())
