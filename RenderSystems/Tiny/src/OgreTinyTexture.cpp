@@ -27,6 +27,12 @@ namespace Ogre {
     }
 
     // Creation / loading methods
+    HardwarePixelBufferPtr TinyTexture::createSurface(uint32 face, uint32 mipmap, uint32 width, uint32 height,
+                                                      uint32 depth)
+    {
+        return std::make_shared<TinyHardwarePixelBuffer>(mBuffer.getPixelBox(face, mipmap), mUsage);
+    }
+
     void TinyTexture::createInternalResourcesImpl(void)
     {
         // set HardwareBuffer::Usage for TU_RENDERTARGET if nothing else specified
@@ -40,17 +46,7 @@ namespace Ogre {
 
         mBuffer.create(mFormat, mWidth, mHeight, mDepth, getNumFaces(), mNumMipmaps);
 
-        mSurfaceList.clear();
-
-        for (uint8 face = 0; face < getNumFaces(); face++)
-        {
-            for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
-            {
-                TinyHardwarePixelBuffer* buf =
-                    new TinyHardwarePixelBuffer(mBuffer.getPixelBox(face, mip), mUsage);
-                mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
-            }
-        }
+        createSurfaceList();
 
         // Generate mipmaps after all texture levels have been loaded
         // This is required for compressed formats such as DXT

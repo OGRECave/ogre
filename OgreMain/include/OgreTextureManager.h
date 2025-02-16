@@ -435,14 +435,8 @@ namespace Ogre {
                 : Texture(creator, name, handle, group)
             {
             }
-            const HardwarePixelBufferSharedPtr& getBuffer(size_t, size_t) override
-            {
-                static HardwarePixelBufferSharedPtr nullBuffer;
-                return nullBuffer;
-            }
-
         protected:
-            void createInternalResourcesImpl() override {}
+            void createInternalResourcesImpl() override { createSurfaceList(); }
             void freeInternalResourcesImpl() override {}
             void loadImpl() override {}
         };

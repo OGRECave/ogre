@@ -356,6 +356,32 @@ namespace Ogre {
             }
         }
     }
+
+    void Texture::createSurfaceList(void)
+    {
+        mSurfaceList.clear();
+
+        uint32 depth = mDepth;
+        for (uint8 face = 0; face < getNumFaces(); face++)
+        {
+            uint32 width = mWidth;
+            uint32 height = mHeight;
+
+            for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
+            {
+                auto buf = createSurface(face, mip, width, height, depth);
+                mSurfaceList.push_back(buf);
+
+                if (width > 1)
+                    width = width / 2;
+                if (height > 1)
+                    height = height / 2;
+                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    depth = depth / 2;
+            }
+        }
+    }
+
     //-----------------------------------------------------------------------------
     void Texture::unloadImpl(void)
     {

@@ -197,6 +197,11 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     VulkanTextureGpu::~VulkanTextureGpu() { unload(); }
     //-----------------------------------------------------------------------------------
+    HardwarePixelBufferPtr VulkanTextureGpu::createSurface(uint32 face, uint32 mipmap, uint32 width, uint32 height,
+                                                           uint32 depth)
+    {
+        return std::make_shared<VulkanHardwarePixelBuffer>(this, width, height, depth, face, mipmap);
+    }
     void VulkanTextureGpu::createInternalResourcesImpl( void )
     {
         if( mFormat == PF_UNKNOWN )
@@ -279,24 +284,7 @@ namespace Ogre
         mNextLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         // create
-        uint32 depth = mDepth;
-        for (uint8 face = 0; face < getNumFaces(); face++)
-        {
-            uint32 width = mWidth;
-            uint32 height = mHeight;
-
-            for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
-            {
-                auto buf = std::make_shared<VulkanHardwarePixelBuffer>(this, width, height, depth, face, mip);
-                mSurfaceList.push_back(buf);
-                if (width > 1)
-                    width = width / 2;
-                if (height > 1)
-                    height = height / 2;
-                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
-                    depth = depth / 2;
-            }
-        }
+        createSurfaceList();
 
         mDefaultDisplaySrv = _createView(0, 0, 0, getNumLayers());
 

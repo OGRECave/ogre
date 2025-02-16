@@ -556,42 +556,16 @@ namespace Ogre
         }
 
         // Create list of subsurfaces for getBuffer()
-        _createSurfaceList();
+        createSurfaceList();
     }
     //---------------------------------------------------------------------
-    void D3D11Texture::_createSurfaceList(void)
+    HardwarePixelBufferPtr D3D11Texture::createSurface(uint32 face, uint32 mip, uint32 width, uint32 height,
+                                                       uint32 depth)
     {
-        // Create new list of surfaces
-        mSurfaceList.clear();
-        size_t depth = mDepth;
-
-        for(size_t face=0; face<getNumFaces(); ++face)
-        {
-            size_t width = mWidth;
-            size_t height = mHeight;
-            for(size_t mip=0; mip<=mNumMipmaps; ++mip)
-            { 
-
-                D3D11HardwarePixelBuffer *buffer;
-                buffer = new D3D11HardwarePixelBuffer(
-                    this, // parentTexture
-                    mDevice, // device
-                    mip, 
-                    width, 
-                    height, 
-                    depth,
-                    face,
-                    mFormat,
-                    (HardwareBuffer::Usage)mUsage
-                    ); 
-
-                mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buffer));
-
-                if(width > 1) width /= 2;
-                if(height > 1) height /= 2;
-                if(depth > 1 && getTextureType() != TEX_TYPE_2D_ARRAY) depth /= 2;
-            }
-        }
+        return std::make_shared<D3D11HardwarePixelBuffer>(this,    // parentTexture
+                                                          mDevice, // device
+                                                          mip, width, height, depth, face, mFormat,
+                                                          (HardwareBuffer::Usage)mUsage);
     }
     //---------------------------------------------------------------------
     void D3D11Texture ::_setD3D11Surface(void* surface) { mSurface = surface; }

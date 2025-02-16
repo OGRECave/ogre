@@ -150,10 +150,9 @@ namespace Ogre
         mTexture = 0;
     }
     //-----------------------------------------------------------------------------------
-    void MetalTexture::createSurfaceList(void)
+    HardwarePixelBufferPtr MetalTexture::createSurface(uint32 face, uint32 mipmap, uint32 width, uint32 height,
+                                                       uint32 depth)
     {
-        mSurfaceList.clear();
-
         __unsafe_unretained id<MTLTexture> renderTexture = mTexture;
         __unsafe_unretained id<MTLTexture> resolveTexture = 0;
 
@@ -163,24 +162,9 @@ namespace Ogre
             resolveTexture  = mTexture;
         }
 
-        for (size_t face = 0; face < getNumFaces(); face++)
-        {
-            uint32 width = mWidth;
-            uint32 height = mHeight;
-            uint32 depth = mDepth;
-
-            for (uint8 mip = 0; mip <= getNumMipmaps(); mip++)
-            {
-                MetalHardwarePixelBuffer *buf = OGRE_NEW MetalTextureBuffer(
-                            renderTexture, resolveTexture, mDevice, mName,
-                            getMetalTextureTarget(), width, height, depth, mFormat,
-                            static_cast<int32>(face), mip,
-                            static_cast<HardwareBuffer::Usage>(mUsage),
-                            mHwGamma, mFSAA );
-
-                mSurfaceList.push_back( HardwarePixelBufferSharedPtr(buf) );
-            }
-        }
+        return std::make_shared<MetalTextureBuffer>(renderTexture, resolveTexture, mDevice, mName,
+                                                    getMetalTextureTarget(), width, height, depth, mFormat, face,
+                                                    mipmap, mUsage, mHwGamma, mFSAA);
     }
     //-----------------------------------------------------------------------------------
     void MetalTexture::_autogenerateMipmaps(void)
