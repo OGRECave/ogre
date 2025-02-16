@@ -489,7 +489,6 @@ namespace Ogre {
         {
             op.operationType = RenderOperation::OT_POINT_LIST;
             op.useIndexes = false;
-            op.useGlobalInstancing = false;
             op.indexData = 0;
             op.vertexData->vertexCount = mNumVisibleBillboards;
         }

@@ -58,8 +58,7 @@ namespace Ogre {
         mRenderOp.vertexData->vertexCount = 4; 
         mRenderOp.vertexData->vertexStart = 0; 
         mRenderOp.operationType = RenderOperation::OT_TRIANGLE_STRIP; 
-        mRenderOp.useIndexes = false; 
-        mRenderOp.useGlobalInstancing = false;
+        mRenderOp.useIndexes = false;
 
         VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;
         VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;

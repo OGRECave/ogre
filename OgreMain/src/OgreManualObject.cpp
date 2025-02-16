@@ -641,7 +641,6 @@ ManualObject::ManualObject(const String& name)
         assert(mMaterial);
         mRenderOperation.operationType = opType;
         mRenderOperation.useIndexes = false;
-        mRenderOperation.useGlobalInstancing = false;
         mRenderOperation.vertexData = OGRE_NEW VertexData();
         mRenderOperation.vertexData->vertexCount = 0;
     }
