@@ -244,7 +244,11 @@ namespace Ogre
         // determine total number of mipmaps including main one (d3d11 convention)
         UINT numMips = (mNumMipmaps == MIP_UNLIMITED || (1U << mNumMipmaps) > std::max(mSrcWidth, mSrcHeight)) ? 0 : mNumMipmaps + 1;
         if(D3D11Mappings::_isBinaryCompressedFormat(mD3DFormat) && numMips > 1)
-            numMips = std::max(1U, numMips - 2);
+        {
+            // Compressed texture can't have mipmaps beyond size 4x4, so remove the last two (2x2, 1x1)
+            UINT nMaxMips = getMaxMipmaps() + 1;
+            numMips = std::max(1U, std::min(numMips, nMaxMips - 2));
+        }
 
         D3D11_TEXTURE2D_DESC desc;
         desc.Width          = static_cast<UINT>(mSrcWidth);
