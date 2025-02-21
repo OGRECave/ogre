@@ -44,6 +44,23 @@ namespace Ogre {
     struct DXTExplicitAlphaBlock;
     struct DXTInterpolatedAlphaBlock;
 
+    /** Force the DXT stream decompression.
+
+        The DDSCodec keeps the DXT format if the hardware supports it.
+        However this stack object can enforce the DXT decompression into RGB(A) format.
+    */
+    class _OgreExport DDSDecodeEnforcer
+    {
+    public:
+        DDSDecodeEnforcer();
+        ~DDSDecodeEnforcer();
+
+        static bool isEnabled();
+
+    private:
+        static int mCount;
+    };
+
     /** Codec specialized in loading DDS (Direct Draw Surface) images.
 
         We implement our own codec here since we need to be able to keep DXT
@@ -72,6 +89,7 @@ namespace Ogre {
         DDSCodec();
         virtual ~DDSCodec() { }
 
+        DataStreamPtr encode(const Any& input) const override;
         void encodeToFile(const Any& input, const String& outFileName) const override;
         void decode(const DataStreamPtr& input, const Any& output) const override;
         String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
