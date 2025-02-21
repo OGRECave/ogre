@@ -160,6 +160,27 @@ namespace {
 }
 
     //---------------------------------------------------------------------
+    // Force the DXT stream decompression
+    //---------------------------------------------------------------------
+    int DDSDecodeEnforcer::mCount = 0;
+
+    DDSDecodeEnforcer::DDSDecodeEnforcer()
+    {
+        ++mCount;
+    }
+
+    DDSDecodeEnforcer::~DDSDecodeEnforcer()
+    {
+        --mCount;
+        assert(mCount >= 0);
+    }
+
+    bool DDSDecodeEnforcer::isEnabled()
+    {
+        return mCount > 0;
+    }
+
+    //---------------------------------------------------------------------
     DDSCodec* DDSCodec::msInstance = 0;
     //---------------------------------------------------------------------
     void DDSCodec::startup(void)
@@ -193,7 +214,7 @@ namespace {
     { 
     }
     //---------------------------------------------------------------------
-    void DDSCodec::encodeToFile(const Any& input, const String& outFileName) const
+    DataStreamPtr DDSCodec::encode(const Any& input) const
     {
         Image* image = any_cast<Image*>(input);
 
@@ -402,21 +423,42 @@ namespace {
                 dataPtr = tmpData;
             }
 
-            try
-            {
-                // Write the file
-                std::ofstream of;
-                of.open(outFileName.c_str(), std::ios_base::binary|std::ios_base::out);
-                of.write((const char *)&ddsMagic, sizeof(uint32));
-                of.write((const char *)&ddsHeader, DDS_HEADER_SIZE);
-                // XXX flipEndian on each pixel chunk written unless isFloat32r ?
-                of.write(dataPtr, image->getSize());
-                of.close();
-            }
-            catch(...)
-            {
-            }
+            size_t totalSize = sizeof(uint32) + DDS_HEADER_SIZE + image->getSize();
+            auto pMemStream = OGRE_NEW Ogre::MemoryDataStream(totalSize);
+
+            pMemStream->write(&ddsMagic, sizeof(uint32));
+            pMemStream->write(&ddsHeader, DDS_HEADER_SIZE);
+            pMemStream->write(dataPtr, image->getSize());
+            pMemStream->seek(0);
+
             delete [] tmpData;
+
+            return Ogre::DataStreamPtr(pMemStream);
+        }
+    }
+    //---------------------------------------------------------------------
+    void DDSCodec::encodeToFile(const Any& input, const String& outFileName) const
+    {
+        DataStreamPtr strm = encode(input);
+
+        try
+        {
+            // Write the file
+            std::ofstream of;
+            of.open(outFileName.c_str(), std::ios_base::binary | std::ios_base::out);
+
+            const size_t buffSize = 4096;
+            char buffer[buffSize];
+
+            while (!strm->eof()) {
+                size_t bytesRead = strm->read(buffer, buffSize);
+                of.write(buffer, bytesRead);
+            }
+
+            of.close();
+        }
+        catch(...)
+        {
         }
     }
     //---------------------------------------------------------------------
@@ -824,7 +866,8 @@ namespace {
         if (PixelUtil::isCompressed(sourceFormat))
         {
             if (Root::getSingleton().getRenderSystem() == NULL ||
-                !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT))
+                !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) ||
+                DDSDecodeEnforcer::isEnabled())
             {
                 // We'll need to decompress
                 decompressDXT = true;
