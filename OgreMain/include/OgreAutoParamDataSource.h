@@ -163,8 +163,10 @@ namespace Ogre {
         size_t getBoneMatrixCount(void) const;
         OGRE_DEPRECATED size_t getWorldMatrixCount(void) const { return getBoneMatrixCount(); }
         const Affine3& getViewMatrix(void) const;
+        Affine3 getViewMatrix(const Camera* cam) const;
         const Matrix4& getViewProjectionMatrix(void) const;
         const Matrix4& getProjectionMatrix(void) const;
+        Matrix4 getProjectionMatrix(const Camera* cam) const;
         const Matrix4& getWorldViewProjMatrix(void) const;
         const Affine3& getWorldViewMatrix(void) const;
         const Affine3& getInverseWorldMatrix(void) const;
