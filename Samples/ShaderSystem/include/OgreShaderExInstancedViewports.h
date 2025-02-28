@@ -82,66 +82,22 @@ public:
 
     /** Set the monitors count. */
     void                    setMonitorsCount        (const Vector2 monitorsCount);
-    
-    /** Return the monitors count. */
-    Vector2                 getMonitorsCount        () const { return mMonitorsCount; }
+
+    void setParameter(const String& name, const Any& value) override;
 
     static String Type;
 
 // Protected methods.
 protected:
-    
+    bool createCpuSubPrograms(ProgramSet* programSet) override;
 
-    /** 
-    @see SubRenderState::resolveParameters.
-    */
-    bool            resolveParameters       (ProgramSet* programSet) override;
+    UniformParameterPtr     mPSInMonitorsCount;
+    UniformParameterPtr     mVSInMatrixArray;
 
-    /** 
-    @see SubRenderState::resolveDependencies.
-    */
-    bool            resolveDependencies     (ProgramSet* programSet) override;
-
-    /** 
-    @see SubRenderState::addFunctionInvocations.
-    */
-    bool            addFunctionInvocations  (ProgramSet* programSet) override;
-
-    /** 
-    Internal method that adds related vertex shader functions invocations.
-    */
-    bool            addVSInvocations                (Function* vsMain, const int groupOrder);
-
-
-    /** 
-    Internal method that adds related pixel shader functions invocations.
-    */
-    bool            addPSInvocations                (Function* psMain, const int groupOrder);
-
-
-// Attributes.
-protected:  
-    ParameterPtr            mVSInPosition;      // Vertex shader original input position in projective space.
-    ParameterPtr            mVSOriginalOutPositionProjectiveSpace;      // Vertex shader original output position in projective space.
-    ParameterPtr            mVSOutPositionProjectiveSpace;      // Vertex shader output texcord position in projective space.
-    ParameterPtr            mPSInPositionProjectiveSpace;       // Pixel shader input position in projective space.
-    UniformParameterPtr     mVSInMonitorsCount;                 // Vertex shader uniform monitors count.        
-    UniformParameterPtr     mPSInMonitorsCount;                 // Pixel shader uniform monitors count.     
-    ParameterPtr            mVSInMonitorIndex;                  // Vertex shader uniform monitor index.     
-    ParameterPtr            mVSOutMonitorIndex;                 // Vertex shader output monitor index.      
-    ParameterPtr            mPSInMonitorIndex;                  // Pixel shader input monitor index.    
-
-    ParameterPtr            mVSInViewportOffsetMatrixR0;    
-    ParameterPtr            mVSInViewportOffsetMatrixR1;    
-    ParameterPtr            mVSInViewportOffsetMatrixR2;    
-    ParameterPtr            mVSInViewportOffsetMatrixR3;    
-
-    UniformParameterPtr     mWorldViewMatrix;                       // world & view parameter.
-    UniformParameterPtr     mProjectionMatrix;                      // projection parameter.
-
-    Vector2                 mMonitorsCount;
+    Vector2                 mViewportGrid;
     bool                    mMonitorsCountChanged;
 
+    std::vector<Camera*>    mCameras;
 };
 
 

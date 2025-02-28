@@ -29,36 +29,22 @@ furnished to do so, subject to the following conditions:
 // Transform the output position to the current "monitor"
 //-----------------------------------------------------------------------------
 
+#ifdef OGRE_VERTEX_SHADER
 void SGX_InstancedViewportsTransform(
     in vec4 i_position,
-    in mat4 i_worldViewMatrix,
-    in mat4 i_projectionMatrix,
-    in vec4 i_viewportOffsetMatrixR0,
-    in vec4 i_viewportOffsetMatrixR1,
-    in vec4 i_viewportOffsetMatrixR2,
-    in vec4 i_viewportOffsetMatrixR3,
-    in vec2 i_monitorsCount,
+    in mat4 viewportOffsetArray[NUM_MONITORS],
     in vec4 i_monitorIndex,
     out vec4 o_position)
 {
-    o_position = mul(i_worldViewMatrix, i_position);
-    mat4 viewportOffset = mtxFromRows(i_viewportOffsetMatrixR0,
-                                      i_viewportOffsetMatrixR1,
-                                      i_viewportOffsetMatrixR2,
-                                      i_viewportOffsetMatrixR3);
-
-    o_position = mul(viewportOffset, o_position);
-    o_position = mul(i_projectionMatrix, o_position);
-
-    vec2 monitorIndexNorm = i_monitorIndex.xy - ((i_monitorsCount - 1.0)/2.0);
-    o_position.xy =
-        (o_position.xy + (o_position.w * monitorIndexNorm)*2.0) / i_monitorsCount;
+    mat4 viewportOffset = viewportOffsetArray[int(i_monitorIndex.z)];
+    o_position = mul(viewportOffset, i_position);
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Discard any pixel that is outside the bounds of the current "monitor"
 //-----------------------------------------------------------------------------
-
+#ifdef OGRE_FRAGMENT_SHADER
 void SGX_InstancedViewportsDiscardOutOfBounds(
     in vec2 i_monitorsCount,
     in vec4 i_monitorIndex,
@@ -72,8 +58,8 @@ void SGX_InstancedViewportsDiscardOutOfBounds(
     float maxM = max(boxedXY.x,boxedXY.y);
     if (maxM >= 0.5)
     {
-#ifdef OGRE_FRAGMENT_SHADER
+
         discard;
-#endif
     }
 }
+#endif
