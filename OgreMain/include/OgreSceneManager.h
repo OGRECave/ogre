@@ -761,34 +761,22 @@ namespace Ogre {
 
         void _destroySceneNode(SceneNodeList::iterator it);
 
-        struct _OgreExport ShadowRenderer
+        struct TextureShadowRenderer
         {
             typedef std::vector<Camera*> CameraList;
             typedef std::map< const Camera*, const Light* > ShadowCamLightMapping;
 
-            ShadowRenderer(SceneManager* owner);
-            ~ShadowRenderer();
+            TextureShadowRenderer(SceneManager* owner);
+            ~TextureShadowRenderer();
 
             SceneManager* mSceneManager;
             RenderSystem* mDestRenderSystem;
-
-            ShadowTechnique mShadowTechnique;
-            ColourValue mShadowColour;
+            // common members end
 
             /// A pass designed to let us render shadow colour on white for texture shadows
             Pass* mShadowCasterPlainBlackPass;
             /// A pass designed to let us render shadow receivers for texture shadows
             Pass* mShadowReceiverPass;
-
-            Pass* mShadowModulativePass;
-
-            Pass* mShadowDebugPass;
-            Pass* mShadowStencilPass;
-            HardwareIndexBufferSharedPtr mShadowIndexBuffer;
-            size_t mShadowIndexBufferSize;
-            size_t mShadowIndexBufferUsedSize;
-            static GpuProgramParametersSharedPtr msInfiniteExtrusionParams;
-            static GpuProgramParametersSharedPtr msFiniteExtrusionParams;
 
             Pass* mShadowTextureCustomCasterPass;
             Pass* mShadowTextureCustomReceiverPass;
@@ -804,15 +792,7 @@ namespace Ogre {
             // Array defining shadow texture index in light list.
             std::vector<size_t> mShadowTextureIndexLightList;
 
-            Rectangle2D* mFullScreenQuad;
-
             ShadowTextureList mShadowTextures;
-
-            bool mShadowAdditiveLightClip;
-            bool mDebugShadows;
-            bool mShadowMaterialInitDone;
-            bool mShadowUseInfiniteFarPlane;
-            Real mShadowDirLightExtrudeDist;
 
             Real mDefaultShadowFarDist;
             Real mDefaultShadowFarDistSquared;
@@ -834,12 +814,6 @@ namespace Ogre {
             ShadowCameraSetupPtr mCullCameraSetup;
 
             void setShadowTechnique(ShadowTechnique technique);
-
-            /// Internal method for creating shadow textures (texture-based shadows)
-            void ensureShadowTexturesCreated();
-            void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList);
-            /// Internal method for destroying shadow textures (texture-based shadows)
-            void destroyShadowTextures(void);
 
             /** Internal method for turning a regular pass into a shadow caster pass.
 
@@ -863,19 +837,17 @@ namespace Ogre {
 
             const Pass* deriveTextureShadowPass(const Pass* pass);
 
-            void initShadowVolumeMaterials();
             void setShadowTextureCasterMaterial(const MaterialPtr& mat);
             void setShadowTextureReceiverMaterial(const MaterialPtr& mat);
-            void setShadowColour(const ColourValue& colour);
-            void updateSplitOptions(RenderQueue* queue);
+
             void render(RenderQueueGroup* group, QueuedRenderableCollection::OrganisationMode om);
 
-            /** Render a group with the added complexity of additive stencil shadows. */
-            void renderAdditiveStencilShadowedQueueGroupObjects(RenderQueueGroup* group,
-                QueuedRenderableCollection::OrganisationMode om);
-            /** Render a group with the added complexity of modulative stencil shadows. */
-            void renderModulativeStencilShadowedQueueGroupObjects(RenderQueueGroup* group,
-                QueuedRenderableCollection::OrganisationMode om);
+            /// Internal method for creating shadow textures (texture-based shadows)
+            void ensureShadowTexturesCreated();
+            void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList);
+            /// Internal method for destroying shadow textures (texture-based shadows)
+            void destroyShadowTextures(void);
+
             /** Render a group rendering only shadow casters. */
             void renderTextureShadowCasterQueueGroupObjects(RenderQueueGroup* group,
                 QueuedRenderableCollection::OrganisationMode om);
@@ -892,6 +864,77 @@ namespace Ogre {
 
             /**  Returns the shadow caster AAB for a specific light-camera combination */
             const VisibleObjectsBoundsInfo& getShadowCasterBoundsInfo(const Light* light, size_t iteration) const;
+
+            const TexturePtr& getShadowTexture(size_t shadowIndex);
+
+            size_t getShadowTexIndex(size_t lightIndex);
+
+            void resolveShadowTexture(TextureUnitState* tu, size_t shadowIndex, size_t shadowTexUnitIndex) const;
+
+            void setShadowTextureSettings(uint16 size, uint16 count, PixelFormat fmt, uint16 fsaa,
+                                            uint16 depthBufferPoolId);
+            void setShadowTextureSize(unsigned short size);
+            void setShadowTextureCount(size_t count);
+            void setShadowTexturePixelFormat(PixelFormat fmt);
+            void setShadowTextureFSAA(unsigned short fsaa);
+            void setShadowTextureConfig(size_t shadowIndex, const ShadowTextureConfig& config);
+            void setShadowTextureConfig(size_t shadowIndex, uint16 width, uint16 height, PixelFormat format,
+                                        uint16 fsaa, uint16 depthBufferPoolId);
+
+            typedef std::vector<ShadowTextureListener*> ListenerList;
+            ListenerList mListeners;
+
+            /// Internal method for firing the texture shadows updated event
+            void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
+            /// Internal method for firing the pre caster texture shadows event
+            void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
+            /// Internal method for firing the pre receiver texture shadows event
+            void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
+            void sortLightsAffectingFrustum(LightList& lightList) const;
+        } mTextureShadowRenderer;
+
+        struct ShadowRenderer
+        {
+            ShadowRenderer(SceneManager* owner);
+            ~ShadowRenderer();
+
+            SceneManager* mSceneManager;
+            RenderSystem* mDestRenderSystem;
+
+            ShadowTechnique mShadowTechnique;
+            ColourValue mShadowColour;
+
+            Pass* mShadowModulativePass;
+
+            Pass* mShadowDebugPass;
+            Pass* mShadowStencilPass;
+            HardwareIndexBufferSharedPtr mShadowIndexBuffer;
+            size_t mShadowIndexBufferSize;
+            size_t mShadowIndexBufferUsedSize;
+            static GpuProgramParametersSharedPtr msInfiniteExtrusionParams;
+            static GpuProgramParametersSharedPtr msFiniteExtrusionParams;
+
+            Rectangle2D* mFullScreenQuad;
+
+            bool mShadowAdditiveLightClip;
+            bool mDebugShadows;
+            bool mShadowMaterialInitDone;
+            bool mShadowUseInfiniteFarPlane;
+            Real mShadowDirLightExtrudeDist;
+
+            void setShadowTechnique(ShadowTechnique technique);
+
+            void initShadowVolumeMaterials();
+            void setShadowColour(const ColourValue& colour);
+            void updateSplitOptions(RenderQueue* queue);
+            void render(RenderQueueGroup* group, QueuedRenderableCollection::OrganisationMode om);
+
+            /** Render a group with the added complexity of additive stencil shadows. */
+            void renderAdditiveStencilShadowedQueueGroupObjects(RenderQueueGroup* group,
+                QueuedRenderableCollection::OrganisationMode om);
+            /** Render a group with the added complexity of modulative stencil shadows. */
+            void renderModulativeStencilShadowedQueueGroupObjects(RenderQueueGroup* group,
+                QueuedRenderableCollection::OrganisationMode om);
 
             /** Internal method for rendering all the objects for a given light into the
                 stencil buffer.
@@ -914,44 +957,18 @@ namespace Ogre {
                 Pass* pass, const LightList *manualLightList, unsigned long flags,
                 bool secondpass, bool zfail, bool twosided);
 
-            size_t getShadowTexIndex(size_t lightIndex);
-
             void setShadowIndexBufferSize(size_t size);
-
-            const TexturePtr& getShadowTexture(size_t shadowIndex);
-
-            void resolveShadowTexture(TextureUnitState* tu, size_t shadowIndex, size_t shadowTexUnitIndex) const;
-
-            void setShadowTextureSettings(uint16 size, uint16 count, PixelFormat fmt, uint16 fsaa,
-                                          uint16 depthBufferPoolId);
-            void setShadowTextureSize(unsigned short size);
-            void setShadowTextureCount(size_t count);
-            void setShadowTexturePixelFormat(PixelFormat fmt);
-            void setShadowTextureFSAA(unsigned short fsaa);
-            void setShadowTextureConfig(size_t shadowIndex, const ShadowTextureConfig& config);
-            void setShadowTextureConfig(size_t shadowIndex, uint16 width, uint16 height, PixelFormat format,
-                                        uint16 fsaa, uint16 depthBufferPoolId);
 
             typedef std::vector<ShadowCaster*> ShadowCasterList;
             ShadowCasterList mShadowCasterList;
             std::unique_ptr<SphereSceneQuery> mShadowCasterSphereQuery;
             std::unique_ptr<AxisAlignedBoxSceneQuery> mShadowCasterAABBQuery;
-
-            typedef std::vector<ShadowTextureListener*> ListenerList;
-            ListenerList mListeners;
             std::unique_ptr<ShadowCasterSceneQueryListener> mShadowCasterQueryListener;
 
             /** Internal method for locating a list of shadow casters which
                 could be affecting the frustum for a given light.
             */
             const ShadowCasterList& findShadowCastersForLight(const Light* light, const Camera* camera);
-            /// Internal method for firing the texture shadows updated event
-            void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
-            /// Internal method for firing the pre caster texture shadows event
-            void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
-            /// Internal method for firing the pre receiver texture shadows event
-            void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
-            void sortLightsAffectingFrustum(LightList& lightList) const;
         } mShadowRenderer;
 
         /// Struct for caching light clipping information for re-use in a frame
@@ -2607,9 +2624,9 @@ namespace Ogre {
         will be visible.
         */
         Real getShadowFarDistance(void) const
-        { return mShadowRenderer.mDefaultShadowFarDist; }
+        { return mTextureShadowRenderer.mDefaultShadowFarDist; }
         Real getShadowFarDistanceSquared(void) const
-        { return mShadowRenderer.mDefaultShadowFarDistSquared; }
+        { return mTextureShadowRenderer.mDefaultShadowFarDistSquared; }
 
         /** Sets the maximum size of the index buffer used to render shadow
             primitives.
@@ -2728,7 +2745,7 @@ namespace Ogre {
         @note This is the simple form, see setShadowTextureConfig for the more 
             complex form.
         */
-        void setShadowTextureSize(unsigned short size) { mShadowRenderer.setShadowTextureSize(size); }
+        void setShadowTextureSize(unsigned short size) { mTextureShadowRenderer.setShadowTextureSize(size); }
 
         /** Set the detailed configuration for a shadow texture.
         @param shadowIndex The index of the texture to configure, must be < the
@@ -2742,7 +2759,7 @@ namespace Ogre {
         void setShadowTextureConfig(size_t shadowIndex, uint16 width, uint16 height, PixelFormat format,
                                     uint16 fsaa = 0, uint16 depthBufferPoolId = 1)
         {
-            mShadowRenderer.setShadowTextureConfig(shadowIndex, width, height, format, fsaa, depthBufferPoolId);
+            mTextureShadowRenderer.setShadowTextureConfig(shadowIndex, width, height, format, fsaa, depthBufferPoolId);
         }
         /** Set the detailed configuration for a shadow texture.
         @param shadowIndex The index of the texture to configure, must be < the
@@ -2751,11 +2768,11 @@ namespace Ogre {
         */
         void setShadowTextureConfig(size_t shadowIndex, const ShadowTextureConfig& config)
         {
-            mShadowRenderer.setShadowTextureConfig(shadowIndex, config);
+            mTextureShadowRenderer.setShadowTextureConfig(shadowIndex, config);
         }
 
         /** Get the current shadow texture settings. */
-        const ShadowTextureConfigList& getShadowTextureConfigList() const { return mShadowRenderer.mShadowTextureConfigList; }
+        const ShadowTextureConfigList& getShadowTextureConfigList() const { return mTextureShadowRenderer.mShadowTextureConfigList; }
 
         /// @deprecated use getShadowTextureConfigList
         OGRE_DEPRECATED ConstShadowTextureConfigIterator getShadowTextureConfigIterator() const;
@@ -2773,7 +2790,7 @@ namespace Ogre {
         */
         void setShadowTexturePixelFormat(PixelFormat fmt)
         {
-            mShadowRenderer.setShadowTexturePixelFormat(fmt);
+            mTextureShadowRenderer.setShadowTexturePixelFormat(fmt);
         }
         /** Set the level of multisample AA of the textures used for texture-based shadows.
 
@@ -2781,7 +2798,7 @@ namespace Ogre {
         @note This is the simple form, see setShadowTextureConfig for the more 
             complex form.
         */
-        void setShadowTextureFSAA(unsigned short fsaa) { mShadowRenderer.setShadowTextureFSAA(fsaa); }
+        void setShadowTextureFSAA(unsigned short fsaa) { mTextureShadowRenderer.setShadowTextureFSAA(fsaa); }
 
         /** Set the number of textures allocated for texture-based shadows.
 
@@ -2790,10 +2807,10 @@ namespace Ogre {
             shadows at the same time. You can increase this number in order to 
             make this more flexible, but be aware of the texture memory it will use.
         */
-        void setShadowTextureCount(size_t count) { mShadowRenderer.setShadowTextureCount(count); }
+        void setShadowTextureCount(size_t count) { mTextureShadowRenderer.setShadowTextureCount(count); }
 
         /// @deprecated use getShadowTextureConfigList
-        OGRE_DEPRECATED size_t getShadowTextureCount(void) const {return mShadowRenderer.mShadowTextureConfigList.size(); }
+        OGRE_DEPRECATED size_t getShadowTextureCount(void) const {return mTextureShadowRenderer.mShadowTextureConfigList.size(); }
 
         /** Set the number of shadow textures a light type uses.
 
@@ -2805,10 +2822,10 @@ namespace Ogre {
             appropriately (e.g. via setShadowTextureCount)!!
         */
         void setShadowTextureCountPerLightType(Light::LightTypes type, size_t count)
-        { mShadowRenderer.mShadowTextureCountPerType[type] = count; }
+        { mTextureShadowRenderer.mShadowTextureCountPerType[type] = count; }
         /// Get the number of shadow textures is assigned for the given light type.
         size_t getShadowTextureCountPerLightType(Light::LightTypes type) const
-        {return mShadowRenderer.mShadowTextureCountPerType[type]; }
+        {return mTextureShadowRenderer.mShadowTextureCountPerType[type]; }
 
         /** Sets the size and count of textures used in texture-based shadows. 
         @see setShadowTextureSize and setShadowTextureCount for details, this
@@ -2820,7 +2837,7 @@ namespace Ogre {
         void setShadowTextureSettings(uint16 size, uint16 count, PixelFormat fmt = PF_BYTE_RGBA,
                                       uint16 fsaa = 0, uint16 depthBufferPoolId = 1)
         {
-            mShadowRenderer.setShadowTextureSettings(size, count, fmt, fsaa, depthBufferPoolId);
+            mTextureShadowRenderer.setShadowTextureSettings(size, count, fmt, fsaa, depthBufferPoolId);
         }
 
         /** Get a reference to the shadow texture currently in use at the given index.
@@ -2831,7 +2848,7 @@ namespace Ogre {
         */
         const TexturePtr& getShadowTexture(size_t shadowIndex)
         {
-            return mShadowRenderer.getShadowTexture(shadowIndex);
+            return mTextureShadowRenderer.getShadowTexture(shadowIndex);
         }
 
         /** Sets the proportional distance which a texture shadow which is generated from a
@@ -2848,11 +2865,11 @@ namespace Ogre {
             to the camera. The value is represented as a proportion of the shadow
             far distance, and the default is 0.6.
         */
-        void setShadowDirLightTextureOffset(Real offset) { mShadowRenderer.mShadowTextureOffset = offset;}
+        void setShadowDirLightTextureOffset(Real offset) { mTextureShadowRenderer.mShadowTextureOffset = offset;}
         /** Gets the proportional distance which a texture shadow which is generated from a
         directional light will be offset into the camera view to make best use of texture space.
         */
-        Real getShadowDirLightTextureOffset(void)  const { return mShadowRenderer.mShadowTextureOffset; }
+        Real getShadowDirLightTextureOffset(void)  const { return mTextureShadowRenderer.mShadowTextureOffset; }
         /** Sets the proportional distance at which texture shadows begin to fade out.
 
             To hide the edges where texture shadows end (in directional lights)
@@ -2861,7 +2878,7 @@ namespace Ogre {
             begins to fade out. The default is 0.7
         */
         void setShadowTextureFadeStart(Real fadeStart)
-        { mShadowRenderer.mShadowTextureFadeStart = fadeStart; }
+        { mTextureShadowRenderer.mShadowTextureFadeStart = fadeStart; }
         /** Sets the proportional distance at which texture shadows finish to fading out.
 
         To hide the edges where texture shadows end (in directional lights)
@@ -2870,7 +2887,7 @@ namespace Ogre {
         is completely invisible. The default is 0.9.
         */
         void setShadowTextureFadeEnd(Real fadeEnd)
-        { mShadowRenderer.mShadowTextureFadeEnd = fadeEnd; }
+        { mTextureShadowRenderer.mShadowTextureFadeEnd = fadeEnd; }
 
         /** Sets whether or not texture shadows should attempt to self-shadow.
 
@@ -2888,7 +2905,7 @@ namespace Ogre {
 
         /// Gets whether or not texture shadows attempt to self-shadow.
         bool getShadowTextureSelfShadow(void) const
-        { return mShadowRenderer.mShadowTextureSelfShadow; }
+        { return mTextureShadowRenderer.mShadowTextureSelfShadow; }
         /** Sets the default material to use for rendering shadow casters.
 
             By default shadow casters are rendered into the shadow texture using
@@ -2909,7 +2926,7 @@ namespace Ogre {
             techniques may be used for hardware fallback.
         */
         void setShadowTextureCasterMaterial(const MaterialPtr& mat)
-        { mShadowRenderer.setShadowTextureCasterMaterial(mat); }
+        { mTextureShadowRenderer.setShadowTextureCasterMaterial(mat); }
 
         /** Sets the default material to use for rendering shadow receivers.
 
@@ -2932,7 +2949,7 @@ namespace Ogre {
             techniques may be used for hardware fallback.
         */
         void setShadowTextureReceiverMaterial(const MaterialPtr& mat)
-        { mShadowRenderer.setShadowTextureReceiverMaterial(mat); }
+        { mTextureShadowRenderer.setShadowTextureReceiverMaterial(mat); }
 
         /** Sets whether or not shadow casters should be rendered into shadow
             textures using their back faces rather than their front faces. 
@@ -2944,12 +2961,12 @@ namespace Ogre {
             if you have objects with holes you may want to turn this option off.
             The default is to enable this option.
         */
-        void setShadowCasterRenderBackFaces(bool bf) { mShadowRenderer.mShadowCasterRenderBackFaces = bf; }
+        void setShadowCasterRenderBackFaces(bool bf) { mTextureShadowRenderer.mShadowCasterRenderBackFaces = bf; }
 
         /** Gets whether or not shadow casters should be rendered into shadow
             textures using their back faces rather than their front faces. 
         */
-        bool getShadowCasterRenderBackFaces() const { return mShadowRenderer.mShadowCasterRenderBackFaces; }
+        bool getShadowCasterRenderBackFaces() const { return mTextureShadowRenderer.mShadowCasterRenderBackFaces; }
 
         /** Set the shadow camera setup to use for all lights which don't have
             their own shadow camera setup.
