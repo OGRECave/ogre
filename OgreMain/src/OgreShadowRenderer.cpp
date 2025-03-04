@@ -73,25 +73,12 @@ public:
     bool queryResult(MovableObject* object) override;
 };
 
-SceneManager::ShadowRenderer::ShadowRenderer(SceneManager* owner) :
+SceneManager::TextureShadowRenderer::TextureShadowRenderer(SceneManager* owner) :
 mSceneManager(owner),
-mShadowTechnique(SHADOWTYPE_NONE),
-mShadowColour(ColourValue(0.25, 0.25, 0.25)),
 mShadowCasterPlainBlackPass(0),
 mShadowReceiverPass(0),
-mShadowModulativePass(0),
-mShadowDebugPass(0),
-mShadowStencilPass(0),
-mShadowIndexBufferSize(51200),
-mShadowIndexBufferUsedSize(0),
 mShadowTextureCustomCasterPass(0),
 mShadowTextureCustomReceiverPass(0),
-mFullScreenQuad(0),
-mShadowAdditiveLightClip(false),
-mDebugShadows(false),
-mShadowMaterialInitDone(false),
-mShadowUseInfiniteFarPlane(true),
-mShadowDirLightExtrudeDist(10000),
 mDefaultShadowFarDist(0),
 mDefaultShadowFarDistSquared(0),
 mShadowTextureOffset(0.6),
@@ -101,8 +88,6 @@ mShadowTextureSelfShadow(false),
 mShadowTextureConfigDirty(true),
 mShadowCasterRenderBackFaces(true)
 {
-    mShadowCasterQueryListener = std::make_unique<ShadowCasterSceneQueryListener>(mSceneManager);
-
     // set up default shadow camera setup
     mDefaultShadowCameraSetup = DefaultShadowCameraSetup::create();
 
@@ -112,6 +97,27 @@ mShadowCasterRenderBackFaces(true)
     mShadowTextureCountPerType[Light::LT_POINT] = 1;
     mShadowTextureCountPerType[Light::LT_DIRECTIONAL] = 1;
     mShadowTextureCountPerType[Light::LT_SPOTLIGHT] = 1;
+}
+
+SceneManager::TextureShadowRenderer::~TextureShadowRenderer() {}
+
+SceneManager::ShadowRenderer::ShadowRenderer(SceneManager* owner) :
+mSceneManager(owner),
+mShadowTechnique(SHADOWTYPE_NONE),
+mShadowColour(ColourValue(0.25, 0.25, 0.25)),
+mShadowModulativePass(0),
+mShadowDebugPass(0),
+mShadowStencilPass(0),
+mShadowIndexBufferSize(51200),
+mShadowIndexBufferUsedSize(0),
+mFullScreenQuad(0),
+mShadowAdditiveLightClip(false),
+mDebugShadows(false),
+mShadowMaterialInitDone(false),
+mShadowUseInfiniteFarPlane(true),
+mShadowDirLightExtrudeDist(10000)
+{
+    mShadowCasterQueryListener = std::make_unique<ShadowCasterSceneQueryListener>(mSceneManager);
 }
 
 SceneManager::ShadowRenderer::~ShadowRenderer() {}
@@ -131,7 +137,7 @@ void SceneManager::ShadowRenderer::updateSplitOptions(RenderQueue* queue)
 
     // Stencil Casters can always be receivers
     queue->setShadowCastersCannotBeReceivers(!(shadowTechnique & SHADOWDETAILTYPE_STENCIL) &&
-                                             !mShadowTextureSelfShadow);
+                                             !mSceneManager->getShadowTextureSelfShadow());
 
     // Additive lighting, we need to split everything by illumination stage
     queue->setSplitPassesByLightingType((shadowTechnique & SHADOWDETAILTYPE_ADDITIVE) && notIntegrated);
@@ -143,22 +149,22 @@ void SceneManager::ShadowRenderer::updateSplitOptions(RenderQueue* queue)
 void SceneManager::ShadowRenderer::render(RenderQueueGroup* group,
                                           QueuedRenderableCollection::OrganisationMode om)
 {
-    if(mShadowTechnique & SHADOWDETAILTYPE_STENCIL)
+    if(mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE)
     {
-        if(mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE)
-        {
-            // Additive stencil shadows in use
-            renderAdditiveStencilShadowedQueueGroupObjects(group, om);
-            return;
-        }
-
-        // Modulative stencil shadows in use
-        renderModulativeStencilShadowedQueueGroupObjects(group, om);
+        // Additive stencil shadows in use
+        renderAdditiveStencilShadowedQueueGroupObjects(group, om);
         return;
     }
 
+    // Modulative stencil shadows in use
+    renderModulativeStencilShadowedQueueGroupObjects(group, om);
+}
+
+void SceneManager::TextureShadowRenderer::render(RenderQueueGroup* group,
+                                          QueuedRenderableCollection::OrganisationMode om)
+{
     // Receiver pass(es)
-    if (mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE)
+    if (mSceneManager->isShadowTechniqueAdditive())
     {
         // Auto-additive
         renderAdditiveTextureShadowedQueueGroupObjects(group, om);
@@ -168,7 +174,8 @@ void SceneManager::ShadowRenderer::render(RenderQueueGroup* group,
     // Modulative
     renderModulativeTextureShadowedQueueGroupObjects(group, om);
 }
-size_t SceneManager::ShadowRenderer::getShadowTexIndex(size_t startLightIndex)
+
+size_t SceneManager::TextureShadowRenderer::getShadowTexIndex(size_t startLightIndex)
 {
     size_t shadowTexIndex = mShadowTextures.size();
     if (mShadowTextureIndexLightList.size() > startLightIndex)
@@ -317,7 +324,7 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
     }
 }
 //-----------------------------------------------------------------------
-void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
+void SceneManager::TextureShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
@@ -330,7 +337,7 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
 
     // Override auto param ambient to force vertex programs and fixed function to
     ColourValue currAmbient = mSceneManager->getAmbientLight();
-    if (mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE)
+    if (mSceneManager->isShadowTechniqueAdditive())
     {
         // Use simple black / white mask if additive
         mSceneManager->setAmbientLight(ColourValue::Black);
@@ -338,7 +345,7 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
     else
     {
         // Use shadow colour as caster colour if modulative
-        mSceneManager->setAmbientLight(mShadowColour);
+        mSceneManager->setAmbientLight(mSceneManager->getShadowColour());
     }
 
     auto visitor = mSceneManager->getQueuedRenderableVisitor();
@@ -364,7 +371,7 @@ void SceneManager::ShadowRenderer::renderTextureShadowCasterQueueGroupObjects(
     mSceneManager->setAmbientLight(currAmbient);
 }
 //-----------------------------------------------------------------------
-void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObjects(
+void SceneManager::TextureShadowRenderer::renderModulativeTextureShadowedQueueGroupObjects(
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
@@ -493,7 +500,7 @@ void SceneManager::ShadowRenderer::renderModulativeTextureShadowedQueueGroupObje
     }
 }
 //-----------------------------------------------------------------------
-void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObjects(
+void SceneManager::TextureShadowRenderer::renderAdditiveTextureShadowedQueueGroupObjects(
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
@@ -569,7 +576,7 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
                 // set up light scissoring, always useful in additive modes
                 ClipResult scissored = mSceneManager->buildAndSetScissor(lightList, mSceneManager->mCameraInProgress);
                 ClipResult clipped = CLIPPED_NONE;
-                if(mShadowAdditiveLightClip)
+                if(mSceneManager->getShadowUseLightClipPlanes())
                     clipped = mSceneManager->buildAndSetLightClip(lightList);
                 // skip if entirely clipped
                 if(scissored == CLIPPED_ALL || clipped == CLIPPED_ALL)
@@ -599,7 +606,7 @@ void SceneManager::ShadowRenderer::renderAdditiveTextureShadowedQueueGroupObject
     }
 }
 //-----------------------------------------------------------------------
-void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
+void SceneManager::TextureShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
@@ -625,7 +632,7 @@ void SceneManager::ShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
     mSceneManager->setAmbientLight(currAmbient);
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
+void SceneManager::TextureShadowRenderer::ensureShadowTexturesCreated()
 {
     if(!mBorderSampler)
     {
@@ -707,7 +714,7 @@ void SceneManager::ShadowRenderer::ensureShadowTexturesCreated()
 
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::destroyShadowTextures(void)
+void SceneManager::TextureShadowRenderer::destroyShadowTextures(void)
 {
     for (auto cam : mShadowTextureCameras)
     {
@@ -731,7 +738,7 @@ void SceneManager::ShadowRenderer::destroyShadowTextures(void)
     mShadowTextureConfigDirty = true;
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
+void SceneManager::TextureShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
     // create shadow textures if needed
     ensureShadowTexturesCreated();
@@ -749,7 +756,7 @@ void SceneManager::ShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* 
     Real fadeStart = shadowEnd * mShadowTextureFadeStart;
     Real fadeEnd = shadowEnd * mShadowTextureFadeEnd;
     // Additive lighting should not use fogging, since it will overbrighten; use border clamp
-    if ((mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE) == 0)
+    if (!mSceneManager->isShadowTechniqueAdditive())
     {
         // set fogging to hide the shadow edge
         mShadowReceiverPass->setFog(true, FOG_LINEAR, ColourValue::White, 0, fadeStart, fadeEnd);
@@ -1198,7 +1205,7 @@ void SceneManager::ShadowRenderer::setShadowVolumeStencilState(bool secondpass, 
     mDestRenderSystem->_setCullingMode(mSceneManager->mPassCullingMode);
 
 }
-void SceneManager::ShadowRenderer::setShadowTextureCasterMaterial(const MaterialPtr& mat)
+void SceneManager::TextureShadowRenderer::setShadowTextureCasterMaterial(const MaterialPtr& mat)
 {
     if(!mat) {
         mShadowTextureCustomCasterPass = 0;
@@ -1218,7 +1225,7 @@ void SceneManager::ShadowRenderer::setShadowTextureCasterMaterial(const Material
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::setShadowTextureReceiverMaterial(const MaterialPtr& mat)
+void SceneManager::TextureShadowRenderer::setShadowTextureReceiverMaterial(const MaterialPtr& mat)
 {
     if(!mat) {
         mShadowTextureCustomReceiverPass = 0;
@@ -1238,6 +1245,56 @@ void SceneManager::ShadowRenderer::setShadowTextureReceiverMaterial(const Materi
     }
 }
 //---------------------------------------------------------------------
+void SceneManager::TextureShadowRenderer::setShadowTechnique(ShadowTechnique technique)
+{
+    if (mSceneManager->getShadowTechnique() == SHADOWTYPE_TEXTURE_MODULATIVE && !mSpotFadeTexture)
+        mSpotFadeTexture = TextureManager::getSingleton().load("spot_shadow_fade.dds", RGN_INTERNAL);
+
+    if (!mSceneManager->isShadowTechniqueTextureBased())
+    {
+        // Destroy shadow textures to optimise resource usage
+        destroyShadowTextures();
+        mSpotFadeTexture.reset();
+    }
+    else
+    {
+        // assure no custom shadow matrix is used accidentally in case we switch
+        // from a custom shadow mapping type to a non-custom (uniform shadow mapping)
+        for ( Camera* texCam : mShadowTextureCameras)
+        {
+            texCam->setCustomViewMatrix(false);
+            texCam->setCustomProjectionMatrix(false);
+        }
+    }
+
+    if(!mSceneManager->getShadowTechnique())
+        return;
+
+    // init shadow caster material for texture shadows
+    if (!mShadowCasterPlainBlackPass)
+    {
+        MaterialPtr matPlainBlack = MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster");
+        matPlainBlack->load();
+        mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
+    }
+
+    if (!mShadowReceiverPass)
+    {
+        MaterialPtr matShadRec = MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver", RGN_INTERNAL);
+        if (!matShadRec)
+        {
+            matShadRec = MaterialManager::getSingleton().create("Ogre/TextureShadowReceiver", RGN_INTERNAL);
+            mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
+            // Don't set lighting and blending modes here, depends on additive / modulative
+            TextureUnitState* t = mShadowReceiverPass->createTextureUnitState();
+            t->setProjectiveTexturing(true, NULL); // will be set later, but the RTSS needs to know about this
+        }
+        else
+        {
+            mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
+        }
+    }
+}
 void SceneManager::ShadowRenderer::setShadowTechnique(ShadowTechnique technique)
 {
     mShadowTechnique = technique;
@@ -1262,26 +1319,6 @@ void SceneManager::ShadowRenderer::setShadowTechnique(ShadowTechnique technique)
                 false);
             // tell all meshes to prepare shadow volumes
             MeshManager::getSingleton().setPrepareAllMeshesForShadowVolumes(true);
-        }
-    }
-
-    if (mShadowTechnique == SHADOWTYPE_TEXTURE_MODULATIVE && !mSpotFadeTexture)
-        mSpotFadeTexture = TextureManager::getSingleton().load("spot_shadow_fade.dds", RGN_INTERNAL);
-
-    if ((mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) == 0)
-    {
-        // Destroy shadow textures to optimise resource usage
-        destroyShadowTextures();
-        mSpotFadeTexture.reset();
-    }
-    else
-    {
-        // assure no custom shadow matrix is used accidentally in case we switch
-        // from a custom shadow mapping type to a non-custom (uniform shadow mapping)
-        for ( Camera* texCam : mShadowTextureCameras)
-        {
-            texCam->setCustomViewMatrix(false);
-            texCam->setCustomProjectionMatrix(false);
         }
     }
 
@@ -1328,34 +1365,9 @@ void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
         mFullScreenQuad = mSceneManager->createScreenSpaceRect();
     }
 
-    // Also init shadow caster material for texture shadows
-    if (!mShadowCasterPlainBlackPass)
-    {
-        MaterialPtr matPlainBlack = MaterialManager::getSingleton().getByName("Ogre/TextureShadowCaster");
-        matPlainBlack->load();
-        mShadowCasterPlainBlackPass = matPlainBlack->getTechnique(0)->getPass(0);
-    }
-
-    if (!mShadowReceiverPass)
-    {
-        MaterialPtr matShadRec = MaterialManager::getSingleton().getByName("Ogre/TextureShadowReceiver", RGN_INTERNAL);
-        if (!matShadRec)
-        {
-            matShadRec = MaterialManager::getSingleton().create("Ogre/TextureShadowReceiver", RGN_INTERNAL);
-            mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
-            // Don't set lighting and blending modes here, depends on additive / modulative
-            TextureUnitState* t = mShadowReceiverPass->createTextureUnitState();
-            t->setProjectiveTexturing(true, NULL); // will be set later, but the RTSS needs to know about this
-        }
-        else
-        {
-            mShadowReceiverPass = matShadRec->getTechnique(0)->getPass(0);
-        }
-    }
-
     mShadowMaterialInitDone = true;
 }
-const Pass* SceneManager::ShadowRenderer::deriveShadowCasterPass(const Pass* pass)
+const Pass* SceneManager::TextureShadowRenderer::deriveShadowCasterPass(const Pass* pass)
 {
     Pass* retPass;
     if (pass->getParent()->getShadowCasterMaterial())
@@ -1397,8 +1409,7 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowCasterPass(const Pass* pas
             (*tex) = *(pass->getTextureUnitState(t));
             // override colour function
             tex->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT,
-                    mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE ? ColourValue::Black : mShadowColour);
-
+                                      mSceneManager->isShadowTechniqueAdditive() ? ColourValue::Black : mSceneManager->getShadowColour());
         }
         // Remove any extras
         while (retPass->getNumTextureUnitStates() > origPassTUCount)
@@ -1434,7 +1445,7 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowCasterPass(const Pass* pas
     return retPass;
 }
 //---------------------------------------------------------------------
-const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* pass)
+const Pass* SceneManager::TextureShadowRenderer::deriveShadowReceiverPass(const Pass* pass)
 {
     if (pass->getParent()->getShadowReceiverMaterial())
     {
@@ -1445,7 +1456,7 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
 
     unsigned short keepTUCount;
     // If additive, need lighting parameters & standard programs
-    if (mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE)
+    if (mSceneManager->isShadowTechniqueAdditive())
     {
         retPass->setLightingEnabled(true);
         retPass->setAmbient(pass->getAmbient());
@@ -1508,9 +1519,9 @@ const Pass* SceneManager::ShadowRenderer::deriveShadowReceiverPass(const Pass* p
     return retPass;
 }
 
-const Pass* SceneManager::ShadowRenderer::deriveTextureShadowPass(const Pass* pass)
+const Pass* SceneManager::TextureShadowRenderer::deriveTextureShadowPass(const Pass* pass)
 {
-    if((mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) == 0)
+    if(!mSceneManager->isShadowTechniqueTextureBased())
         return pass;
 
     if (mSceneManager->_getCurrentRenderStage() == IRS_RENDER_TO_TEXTURE)
@@ -1529,7 +1540,7 @@ const Pass* SceneManager::ShadowRenderer::deriveTextureShadowPass(const Pass* pa
 
 //---------------------------------------------------------------------
 const VisibleObjectsBoundsInfo&
-SceneManager::ShadowRenderer::getShadowCasterBoundsInfo( const Light* light, size_t iteration ) const
+SceneManager::TextureShadowRenderer::getShadowCasterBoundsInfo( const Light* light, size_t iteration ) const
 {
     static VisibleObjectsBoundsInfo nullBox;
 
@@ -1580,7 +1591,7 @@ void SceneManager::ShadowRenderer::setShadowIndexBufferSize(size_t size)
     mShadowIndexBufferUsedSize = 0;
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::setShadowTextureConfig(size_t shadowIndex, unsigned short width,
+void SceneManager::TextureShadowRenderer::setShadowTextureConfig(size_t shadowIndex, unsigned short width,
     unsigned short height, PixelFormat format, unsigned short fsaa, uint16 depthBufferPoolId )
 {
     ShadowTextureConfig conf;
@@ -1595,7 +1606,7 @@ void SceneManager::ShadowRenderer::setShadowTextureConfig(size_t shadowIndex, un
 
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::setShadowTextureConfig(size_t shadowIndex,
+void SceneManager::TextureShadowRenderer::setShadowTextureConfig(size_t shadowIndex,
     const ShadowTextureConfig& config)
 {
     if (shadowIndex >= mShadowTextureConfigList.size())
@@ -1609,7 +1620,7 @@ void SceneManager::ShadowRenderer::setShadowTextureConfig(size_t shadowIndex,
     mShadowTextureConfigDirty = true;
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::setShadowTextureSize(unsigned short size)
+void SceneManager::TextureShadowRenderer::setShadowTextureSize(unsigned short size)
 {
     // default all current
     for (auto & i : mShadowTextureConfigList)
@@ -1623,7 +1634,7 @@ void SceneManager::ShadowRenderer::setShadowTextureSize(unsigned short size)
 
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::setShadowTextureCount(size_t count)
+void SceneManager::TextureShadowRenderer::setShadowTextureCount(size_t count)
 {
     // Change size, any new items will need defaults
     if (count != mShadowTextureConfigList.size())
@@ -1642,7 +1653,7 @@ void SceneManager::ShadowRenderer::setShadowTextureCount(size_t count)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::setShadowTexturePixelFormat(PixelFormat fmt)
+void SceneManager::TextureShadowRenderer::setShadowTexturePixelFormat(PixelFormat fmt)
 {
     for (auto & i : mShadowTextureConfigList)
     {
@@ -1653,7 +1664,7 @@ void SceneManager::ShadowRenderer::setShadowTexturePixelFormat(PixelFormat fmt)
         }
     }
 }
-void SceneManager::ShadowRenderer::setShadowTextureFSAA(unsigned short fsaa)
+void SceneManager::TextureShadowRenderer::setShadowTextureFSAA(unsigned short fsaa)
 {
     for (auto & i : mShadowTextureConfigList)
     {
@@ -1665,7 +1676,7 @@ void SceneManager::ShadowRenderer::setShadowTextureFSAA(unsigned short fsaa)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::setShadowTextureSettings(unsigned short size,
+void SceneManager::TextureShadowRenderer::setShadowTextureSettings(unsigned short size,
     unsigned short count, PixelFormat fmt, unsigned short fsaa, uint16 depthBufferPoolId)
 {
     setShadowTextureCount(count);
@@ -1682,7 +1693,7 @@ void SceneManager::ShadowRenderer::setShadowTextureSettings(unsigned short size,
     }
 }
 //---------------------------------------------------------------------
-const TexturePtr& SceneManager::ShadowRenderer::getShadowTexture(size_t shadowIndex)
+const TexturePtr& SceneManager::TextureShadowRenderer::getShadowTexture(size_t shadowIndex)
 {
     if (shadowIndex >= mShadowTextureConfigList.size())
     {
@@ -1695,7 +1706,7 @@ const TexturePtr& SceneManager::ShadowRenderer::getShadowTexture(size_t shadowIn
     return mShadowTextures[shadowIndex];
 }
 
-void SceneManager::ShadowRenderer::resolveShadowTexture(TextureUnitState* tu, size_t shadowIndex, size_t shadowTexUnitIndex) const
+void SceneManager::TextureShadowRenderer::resolveShadowTexture(TextureUnitState* tu, size_t shadowIndex, size_t shadowTexUnitIndex) const
 {
     Camera* cam = NULL;
     TexturePtr shadowTex;
@@ -1845,7 +1856,7 @@ SceneManager::ShadowRenderer::findShadowCastersForLight(const Light* light, cons
     return mShadowCasterList;
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
+void SceneManager::TextureShadowRenderer::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
 {
     ListenerList listenersCopy = mListeners;
 
@@ -1855,7 +1866,7 @@ void SceneManager::ShadowRenderer::fireShadowTexturesUpdated(size_t numberOfShad
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
+void SceneManager::TextureShadowRenderer::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
 {
     auto listenersCopy = mListeners;
     for (auto l : listenersCopy)
@@ -1864,7 +1875,7 @@ void SceneManager::ShadowRenderer::fireShadowTexturesPreCaster(Light* light, Cam
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
+void SceneManager::TextureShadowRenderer::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
 {
     ListenerList listenersCopy = mListeners;
     for (auto *l : listenersCopy)
@@ -1902,9 +1913,9 @@ struct lightsForShadowTextureLess
 };
 } // namespace
 
-void SceneManager::ShadowRenderer::sortLightsAffectingFrustum(LightList& lightList) const
+void SceneManager::TextureShadowRenderer::sortLightsAffectingFrustum(LightList& lightList) const
 {
-    if ((mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) == 0)
+    if (!mSceneManager->isShadowTechniqueTextureBased())
         return;
     // Sort the lights if using texture shadows, since the first 'n' will be
     // used to generate shadow textures and we should pick the most appropriate
