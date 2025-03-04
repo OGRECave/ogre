@@ -3325,8 +3325,8 @@ namespace Ogre {
         /** Returns a visibility boundary box for a specific camera. */
         const VisibleObjectsBoundsInfo& getVisibleObjectsBoundsInfo(const Camera* cam) const;
 
-        /**  Returns the shadow caster AAB for a specific light-camera combination */
-        const VisibleObjectsBoundsInfo& getShadowCasterBoundsInfo(const Light* light, size_t iteration = 0) const;
+        /// @deprecated do not use
+        OGRE_DEPRECATED const VisibleObjectsBoundsInfo& getShadowCasterBoundsInfo(const Light* light, size_t iteration = 0) const;
 
         /** Add a level of detail listener. */
         void addLodListener(LodListener *listener);
