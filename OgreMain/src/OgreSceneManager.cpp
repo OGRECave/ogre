@@ -74,6 +74,7 @@ mShowBoundingBoxes(false),
 mActiveCompositorChain(0),
 mLateMaterialResolving(false),
 mIlluminationStage(IRS_NONE),
+mShadowTechnique(SHADOWTYPE_NONE),
 mTextureShadowRenderer(this),
 mShadowRenderer(this),
 mLightClippingInfoMapFrameNumber(999),
@@ -653,7 +654,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
         //Should we warn or throw an exception if an illegal state was achieved?
     }
 
-    if (shadowDerivation)
+    if (shadowDerivation && isShadowTechniqueTextureBased())
     {
         pass = mTextureShadowRenderer.deriveTextureShadowPass(pass);
     }
@@ -2479,7 +2480,23 @@ void SceneManager::_notifyAutotrackingSceneNode(SceneNode* node, bool autoTrack)
 }
 void SceneManager::setShadowTechnique(ShadowTechnique technique)
 {
-    mShadowRenderer.setShadowTechnique(technique);
+    mShadowTechnique = technique;
+    if(isShadowTechniqueStencilBased())
+    {
+        // Firstly check that we  have a stencil
+        // Otherwise forget it
+        if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_HWSTENCIL))
+        {
+            mShadowRenderer.setShadowTechnique(technique);
+        }
+        else
+        {
+            LogManager::getSingleton().logWarning("Stencil shadows were requested, but this device does not "
+                                                  "have a hardware stencil. Shadows disabled.");
+            mShadowTechnique = SHADOWTYPE_NONE;
+        }
+    }
+
     mTextureShadowRenderer.setShadowTechnique(technique);
 }
 //-----------------------------------------------------------------------
@@ -2506,7 +2523,8 @@ void SceneManager::updateCachedLightInfos(const Camera* camera)
             }
         }
 
-        mTextureShadowRenderer.sortLightsAffectingFrustum(mLightsAffectingFrustum);
+        if(isShadowTechniqueTextureBased())
+            mTextureShadowRenderer.sortLightsAffectingFrustum(mLightsAffectingFrustum);
         // Use swap instead of copy operator for efficiently
         mCachedLightInfos.swap(mTestLightInfos);
 
