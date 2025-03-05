@@ -902,8 +902,6 @@ namespace Ogre {
             SceneManager* mSceneManager;
             RenderSystem* mDestRenderSystem;
 
-            ColourValue mShadowColour;
-
             Pass* mShadowModulativePass;
 
             Pass* mShadowDebugPass;
@@ -925,7 +923,6 @@ namespace Ogre {
             void setShadowTechnique(ShadowTechnique technique);
 
             void initShadowVolumeMaterials();
-            void setShadowColour(const ColourValue& colour);
             void updateSplitOptions(RenderQueue* queue);
             void render(RenderQueueGroup* group, QueuedRenderableCollection::OrganisationMode om);
 
@@ -2580,7 +2577,7 @@ namespace Ogre {
             This colour provided is used as a modulative value to darken the
             areas.
         */
-        void setShadowColour(const ColourValue& colour) { mShadowRenderer.setShadowColour(colour); }
+        void setShadowColour(const ColourValue& colour);
         /** Get the colour used to modulate areas in shadow. 
         This is only applicable for shadow techniques which involve
         darkening the area in shadow, as opposed to masking out the light. 
