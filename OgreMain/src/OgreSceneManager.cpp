@@ -2820,9 +2820,13 @@ void SceneManager::resetLightClip()
     mDestRenderSystem->setClipPlanes(PlaneList());
 }
 //---------------------------------------------------------------------
+void SceneManager::setShadowColour(const ColourValue& colour)
+{
+    mAutoParamDataSource->setShadowColour(colour);
+}
 const ColourValue& SceneManager::getShadowColour(void) const
 {
-    return mShadowRenderer.mShadowColour;
+    return mAutoParamDataSource->getShadowColour();
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowFarDistance(Real distance)

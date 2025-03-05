@@ -105,6 +105,7 @@ namespace Ogre {
         mutable bool mShadowCamDepthRangesDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         ColourValue mAmbientLight;
         ColourValue mFogColour;
+        ColourValue mShadowColour;
         Vector4f mFogParams;
         Vector4f mPointParams;
         int mPassNumber;
@@ -223,6 +224,7 @@ namespace Ogre {
         Real getShadowExtrusionDistance(void) const;
         const Vector4& getSceneDepthRange() const;
         const Vector4& getShadowSceneDepthRange(size_t index) const;
+        void setShadowColour(const ColourValue& colour);
         const ColourValue& getShadowColour() const;
         Matrix4 getInverseViewProjMatrix(void) const;
         Matrix4 getInverseTransposeViewProjMatrix() const;

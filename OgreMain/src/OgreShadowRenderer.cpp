@@ -103,7 +103,6 @@ SceneManager::TextureShadowRenderer::~TextureShadowRenderer() {}
 
 SceneManager::ShadowRenderer::ShadowRenderer(SceneManager* owner) :
 mSceneManager(owner),
-mShadowColour(ColourValue(0.25, 0.25, 0.25)),
 mShadowModulativePass(0),
 mShadowDebugPass(0),
 mShadowStencilPass(0),
@@ -120,11 +119,6 @@ mShadowDirLightExtrudeDist(10000)
 }
 
 SceneManager::ShadowRenderer::~ShadowRenderer() {}
-
-void SceneManager::ShadowRenderer::setShadowColour(const ColourValue& colour)
-{
-    mShadowColour = colour;
-}
 
 void SceneManager::ShadowRenderer::updateSplitOptions(RenderQueue* queue)
 {
@@ -284,7 +278,7 @@ void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObje
 
     // Override auto param ambient to force vertex programs to use shadow colour
     ColourValue currAmbient = mSceneManager->getAmbientLight();
-    mSceneManager->setAmbientLight(mShadowColour);
+    mSceneManager->setAmbientLight(mSceneManager->getShadowColour());
 
     // Iterate over lights, render all volumes to stencil
     for (Light* l : mSceneManager->_getLightsAffectingFrustum())
@@ -1057,14 +1051,14 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
             // reset stencil & colour ops
             mDestRenderSystem->setStencilState(StencilState());
 
-            auto shadowColour = mShadowColour;
-            mShadowColour = zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2);
+            auto shadowColour = mSceneManager->getShadowColour();
+            mSceneManager->setShadowColour(zfailAlgo ? ColourValue(0.7, 0.0, 0.2) : ColourValue(0.0, 0.7, 0.2));
             mSceneManager->_setPass(mShadowDebugPass);
             renderShadowVolumeObjects(shadowRenderables, mShadowDebugPass, &lightList, flags,
                 true, false, false);
             mDestRenderSystem->setColourBlendState(disabled);
             mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
-            mShadowColour = shadowColour;
+            mSceneManager->setShadowColour(shadowColour);
         }
     }
 
