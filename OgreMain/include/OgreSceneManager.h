@@ -761,6 +761,7 @@ namespace Ogre {
 
         void _destroySceneNode(SceneNodeList::iterator it);
 
+        ShadowTechnique mShadowTechnique;
         struct TextureShadowRenderer
         {
             typedef std::vector<Camera*> CameraList;
@@ -901,7 +902,6 @@ namespace Ogre {
             SceneManager* mSceneManager;
             RenderSystem* mDestRenderSystem;
 
-            ShadowTechnique mShadowTechnique;
             ColourValue mShadowColour;
 
             Pass* mShadowModulativePass;
@@ -2567,7 +2567,7 @@ namespace Ogre {
         void setShadowTechnique(ShadowTechnique technique);
         
         /** Gets the current shadow technique. */
-        ShadowTechnique getShadowTechnique(void) const { return mShadowRenderer.mShadowTechnique; }
+        ShadowTechnique getShadowTechnique(void) const { return mShadowTechnique; }
 
         /** Enables / disables the rendering of debug information for shadows. */
         void setShowDebugShadows(bool debug) { mShadowRenderer.mDebugShadows = debug; }
@@ -2703,22 +2703,22 @@ namespace Ogre {
 
         /** Is there a stencil shadow based shadowing technique in use? */
         bool isShadowTechniqueStencilBased(void) const
-        { return (mShadowRenderer.mShadowTechnique & SHADOWDETAILTYPE_STENCIL) != 0; }
+        { return (mShadowTechnique & SHADOWDETAILTYPE_STENCIL) != 0; }
         /** Is there a texture shadow based shadowing technique in use? */
         bool isShadowTechniqueTextureBased(void) const
-        { return (mShadowRenderer.mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) != 0; }
+        { return (mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) != 0; }
         /** Is there a modulative shadowing technique in use? */
         bool isShadowTechniqueModulative(void) const
-        { return (mShadowRenderer.mShadowTechnique & SHADOWDETAILTYPE_MODULATIVE) != 0; }
+        { return (mShadowTechnique & SHADOWDETAILTYPE_MODULATIVE) != 0; }
         /** Is there an additive shadowing technique in use? */
         bool isShadowTechniqueAdditive(void) const
-        { return (mShadowRenderer.mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE) != 0; }
+        { return (mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE) != 0; }
         /** Is the shadow technique integrated into primary materials? */
         bool isShadowTechniqueIntegrated(void) const
-        { return (mShadowRenderer.mShadowTechnique & SHADOWDETAILTYPE_INTEGRATED) != 0; }
+        { return (mShadowTechnique & SHADOWDETAILTYPE_INTEGRATED) != 0; }
         /** Is there any shadowing technique in use? */
         bool isShadowTechniqueInUse(void) const
-        { return mShadowRenderer.mShadowTechnique != SHADOWTYPE_NONE; }
+        { return mShadowTechnique != SHADOWTYPE_NONE; }
         /** Sets whether when using a built-in additive shadow mode, user clip
             planes should be used to restrict light rendering.
         */

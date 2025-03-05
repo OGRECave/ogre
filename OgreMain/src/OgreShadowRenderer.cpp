@@ -103,7 +103,6 @@ SceneManager::TextureShadowRenderer::~TextureShadowRenderer() {}
 
 SceneManager::ShadowRenderer::ShadowRenderer(SceneManager* owner) :
 mSceneManager(owner),
-mShadowTechnique(SHADOWTYPE_NONE),
 mShadowColour(ColourValue(0.25, 0.25, 0.25)),
 mShadowModulativePass(0),
 mShadowDebugPass(0),
@@ -129,7 +128,7 @@ void SceneManager::ShadowRenderer::setShadowColour(const ColourValue& colour)
 
 void SceneManager::ShadowRenderer::updateSplitOptions(RenderQueue* queue)
 {
-    int shadowTechnique = mShadowTechnique;
+    int shadowTechnique = mSceneManager->getShadowTechnique();
     if(!mSceneManager->getCurrentViewport()->getShadowsEnabled())
         shadowTechnique = SHADOWTYPE_NONE;
 
@@ -149,7 +148,7 @@ void SceneManager::ShadowRenderer::updateSplitOptions(RenderQueue* queue)
 void SceneManager::ShadowRenderer::render(RenderQueueGroup* group,
                                           QueuedRenderableCollection::OrganisationMode om)
 {
-    if(mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE)
+    if(mSceneManager->isShadowTechniqueAdditive())
     {
         // Additive stencil shadows in use
         renderAdditiveStencilShadowedQueueGroupObjects(group, om);
@@ -1018,7 +1017,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
             //    can peek through the end and shadow objects behind incorrectly
             if ((flags & SRF_EXTRUDE_TO_INFINITY) &&
                 light->getType() != Light::LT_DIRECTIONAL &&
-                (mShadowTechnique & SHADOWDETAILTYPE_MODULATIVE) &&
+                mSceneManager->isShadowTechniqueModulative() &&
                 camera->isVisible(caster->getDarkCapBounds(*light, darkCapExtrudeDist)))
             {
                 flags |= SRF_INCLUDE_DARK_CAP;
@@ -1297,33 +1296,19 @@ void SceneManager::TextureShadowRenderer::setShadowTechnique(ShadowTechnique tec
 }
 void SceneManager::ShadowRenderer::setShadowTechnique(ShadowTechnique technique)
 {
-    mShadowTechnique = technique;
-    if (mShadowTechnique & SHADOWDETAILTYPE_STENCIL)
+    if (!mShadowIndexBuffer)
     {
-        // Firstly check that we  have a stencil
-        // Otherwise forget it
-        if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_HWSTENCIL))
-        {
-            LogManager::getSingleton().logWarning(
-                "Stencil shadows were requested, but this device does not "
-                "have a hardware stencil. Shadows disabled.");
-            mShadowTechnique = SHADOWTYPE_NONE;
-        }
-        else if (!mShadowIndexBuffer)
-        {
-            // Create an estimated sized shadow index buffer
-            mShadowIndexBuffer = HardwareBufferManager::getSingleton().
-                createIndexBuffer(HardwareIndexBuffer::IT_16BIT,
-                mShadowIndexBufferSize,
-                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                false);
-            // tell all meshes to prepare shadow volumes
-            MeshManager::getSingleton().setPrepareAllMeshesForShadowVolumes(true);
-        }
+        // Create an estimated sized shadow index buffer
+        mShadowIndexBuffer = HardwareBufferManager::getSingleton().
+            createIndexBuffer(HardwareIndexBuffer::IT_16BIT,
+            mShadowIndexBufferSize,
+            HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+            false);
+        // tell all meshes to prepare shadow volumes
+        MeshManager::getSingleton().setPrepareAllMeshesForShadowVolumes(true);
     }
 
-    if(mShadowTechnique)
-        initShadowVolumeMaterials();
+    initShadowVolumeMaterials();
 }
 //---------------------------------------------------------------------
 void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
@@ -1521,9 +1506,6 @@ const Pass* SceneManager::TextureShadowRenderer::deriveShadowReceiverPass(const 
 
 const Pass* SceneManager::TextureShadowRenderer::deriveTextureShadowPass(const Pass* pass)
 {
-    if(!mSceneManager->isShadowTechniqueTextureBased())
-        return pass;
-
     if (mSceneManager->_getCurrentRenderStage() == IRS_RENDER_TO_TEXTURE)
     {
         // Derive a special shadow caster pass from this one
@@ -1915,8 +1897,6 @@ struct lightsForShadowTextureLess
 
 void SceneManager::TextureShadowRenderer::sortLightsAffectingFrustum(LightList& lightList) const
 {
-    if (!mSceneManager->isShadowTechniqueTextureBased())
-        return;
     // Sort the lights if using texture shadows, since the first 'n' will be
     // used to generate shadow textures and we should pick the most appropriate
 
