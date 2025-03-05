@@ -1840,7 +1840,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             localLightList.resize(pass->getLightCountPerIteration());
 
             LightList::iterator destit = localLightList.begin();
-            unsigned short numShadowTextureLights = 0;
             for (; destit != localLightList.end() && lightIndex < rendLightList.size();
                  ++lightIndex, --lightsLeft)
             {
@@ -1868,6 +1867,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 // potentially need to update content_type shadow texunit
                 // corresponding to this light
                 size_t textureCountPerLight = mTextureShadowRenderer.mShadowTextureCountPerType[currLight->getType()];
+                unsigned short numShadowTextureLights = 0;
                 for (size_t j = 0; j < textureCountPerLight && shadowTexIndex < mTextureShadowRenderer.mShadowTextures.size(); ++j)
                 {
                     // link the numShadowTextureLights'th shadow texture unit
@@ -1876,11 +1876,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                     if (tuindex > pass->getNumTextureUnitStates()) break;
 
                     TextureUnitState* tu = pass->getTextureUnitState(tuindex);
-                    const TexturePtr& shadowTex = mTextureShadowRenderer.mShadowTextures[shadowTexIndex];
-                    tu->_setTexturePtr(shadowTex);
-                    Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-                    tu->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
-                    mAutoParamDataSource->setTextureProjector(cam, numShadowTextureLights);
+                    mTextureShadowRenderer.resolveShadowTexture(tu, shadowTexIndex, numShadowTextureLights);
                     ++numShadowTextureLights;
                     ++shadowTexIndex;
                     // Have to set TU on rendersystem right now, although
