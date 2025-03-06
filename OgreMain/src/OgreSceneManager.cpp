@@ -878,6 +878,25 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
     return pass;
 }
 //-----------------------------------------------------------------------
+static void updateShadowSplitOptions(const SceneManager* sceneManager, RenderQueue* queue)
+{
+    int shadowTechnique = sceneManager->getShadowTechnique();
+    if(!sceneManager->getCurrentViewport()->getShadowsEnabled())
+        shadowTechnique = SHADOWTYPE_NONE;
+
+    bool notIntegrated = (shadowTechnique & SHADOWDETAILTYPE_INTEGRATED) == 0;
+
+    // Stencil Casters can always be receivers
+    queue->setShadowCastersCannotBeReceivers(!(shadowTechnique & SHADOWDETAILTYPE_STENCIL) &&
+                                             !sceneManager->getShadowTextureSelfShadow());
+
+    // Additive lighting, we need to split everything by illumination stage
+    queue->setSplitPassesByLightingType((shadowTechnique & SHADOWDETAILTYPE_ADDITIVE) && notIntegrated);
+
+    // Tell render queue to split off non-shadowable materials
+    queue->setSplitNoShadowPasses(shadowTechnique && notIntegrated);
+}
+
 void SceneManager::prepareRenderQueue(void)
 {
     RenderQueue* q = getRenderQueue();
@@ -892,16 +911,14 @@ void SceneManager::prepareRenderQueue(void)
 
     // Default all the queue groups that are there, new ones will be created
     // with defaults too
-    for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
+    for (auto& group : q->_getQueueGroups())
     {
-        if(!q->_getQueueGroups()[i])
-            continue;
-
-        q->_getQueueGroups()[i]->defaultOrganisationMode();
+        if (group)
+            group->defaultOrganisationMode();
     }
 
-    // Global split options
-    mShadowRenderer.updateSplitOptions(q);
+    // shadow split options
+    updateShadowSplitOptions(this, q);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverlays)

@@ -120,25 +120,6 @@ mShadowDirLightExtrudeDist(10000)
 
 SceneManager::ShadowRenderer::~ShadowRenderer() {}
 
-void SceneManager::ShadowRenderer::updateSplitOptions(RenderQueue* queue)
-{
-    int shadowTechnique = mSceneManager->getShadowTechnique();
-    if(!mSceneManager->getCurrentViewport()->getShadowsEnabled())
-        shadowTechnique = SHADOWTYPE_NONE;
-
-    bool notIntegrated = (shadowTechnique & SHADOWDETAILTYPE_INTEGRATED) == 0;
-
-    // Stencil Casters can always be receivers
-    queue->setShadowCastersCannotBeReceivers(!(shadowTechnique & SHADOWDETAILTYPE_STENCIL) &&
-                                             !mSceneManager->getShadowTextureSelfShadow());
-
-    // Additive lighting, we need to split everything by illumination stage
-    queue->setSplitPassesByLightingType((shadowTechnique & SHADOWDETAILTYPE_ADDITIVE) && notIntegrated);
-
-    // Tell render queue to split off non-shadowable materials
-    queue->setSplitNoShadowPasses(shadowTechnique && notIntegrated);
-}
-
 void SceneManager::ShadowRenderer::render(RenderQueueGroup* group,
                                           QueuedRenderableCollection::OrganisationMode om)
 {

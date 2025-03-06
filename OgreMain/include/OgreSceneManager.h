@@ -923,7 +923,6 @@ namespace Ogre {
             void setShadowTechnique(ShadowTechnique technique);
 
             void initShadowVolumeMaterials();
-            void updateSplitOptions(RenderQueue* queue);
             void render(RenderQueueGroup* group, QueuedRenderableCollection::OrganisationMode om);
 
             /** Render a group with the added complexity of additive stencil shadows. */
