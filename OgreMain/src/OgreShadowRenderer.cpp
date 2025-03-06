@@ -39,8 +39,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-GpuProgramParametersSharedPtr SceneManager::ShadowRenderer::msInfiniteExtrusionParams;
-GpuProgramParametersSharedPtr SceneManager::ShadowRenderer::msFiniteExtrusionParams;
+GpuProgramParametersSharedPtr SceneManager::StencilShadowRenderer::msInfiniteExtrusionParams;
+GpuProgramParametersSharedPtr SceneManager::StencilShadowRenderer::msFiniteExtrusionParams;
 
 typedef std::vector<ShadowCaster*> ShadowCasterList;
 
@@ -101,7 +101,7 @@ mShadowCasterRenderBackFaces(true)
 
 SceneManager::TextureShadowRenderer::~TextureShadowRenderer() {}
 
-SceneManager::ShadowRenderer::ShadowRenderer(SceneManager* owner) :
+SceneManager::StencilShadowRenderer::StencilShadowRenderer(SceneManager* owner) :
 mSceneManager(owner),
 mShadowModulativePass(0),
 mShadowDebugPass(0),
@@ -118,9 +118,9 @@ mShadowDirLightExtrudeDist(10000)
     mShadowCasterQueryListener = std::make_unique<ShadowCasterSceneQueryListener>(mSceneManager);
 }
 
-SceneManager::ShadowRenderer::~ShadowRenderer() {}
+SceneManager::StencilShadowRenderer::~StencilShadowRenderer() {}
 
-void SceneManager::ShadowRenderer::render(RenderQueueGroup* group,
+void SceneManager::StencilShadowRenderer::render(RenderQueueGroup* group,
                                           QueuedRenderableCollection::OrganisationMode om)
 {
     if(mSceneManager->isShadowTechniqueAdditive())
@@ -157,7 +157,7 @@ size_t SceneManager::TextureShadowRenderer::getShadowTexIndex(size_t startLightI
     return shadowTexIndex;
 }
 //-----------------------------------------------------------------------
-void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObjects(
+void SceneManager::StencilShadowRenderer::renderAdditiveStencilShadowedQueueGroupObjects(
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
@@ -232,7 +232,7 @@ void SceneManager::ShadowRenderer::renderAdditiveStencilShadowedQueueGroupObject
     }
 }
 //-----------------------------------------------------------------------
-void SceneManager::ShadowRenderer::renderModulativeStencilShadowedQueueGroupObjects(
+void SceneManager::StencilShadowRenderer::renderModulativeStencilShadowedQueueGroupObjects(
     RenderQueueGroup* pGroup,
     QueuedRenderableCollection::OrganisationMode om)
 {
@@ -838,7 +838,7 @@ void SceneManager::TextureShadowRenderer::prepareShadowTextures(Camera* cam, Vie
 
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* light,
+void SceneManager::StencilShadowRenderer::renderShadowVolumesToStencil(const Light* light,
     const Camera* camera, bool calcScissor)
 {
     // Get the shadow caster list
@@ -1056,7 +1056,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumesToStencil(const Light* lig
 
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::renderShadowVolumeObjects(const ShadowCaster::ShadowRenderableList& shadowRenderables,
+void SceneManager::StencilShadowRenderer::renderShadowVolumeObjects(const ShadowCaster::ShadowRenderableList& shadowRenderables,
                                              Pass* pass,
                                              const LightList *manualLightList,
                                              unsigned long flags,
@@ -1137,7 +1137,7 @@ void SceneManager::ShadowRenderer::renderShadowVolumeObjects(const ShadowCaster:
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::setShadowVolumeStencilState(bool secondpass, bool zfail, bool twosided)
+void SceneManager::StencilShadowRenderer::setShadowVolumeStencilState(bool secondpass, bool zfail, bool twosided)
 {
     // Determinate the best stencil operation
     StencilOperation incrOp, decrOp;
@@ -1269,7 +1269,7 @@ void SceneManager::TextureShadowRenderer::setShadowTechnique(ShadowTechnique tec
         }
     }
 }
-void SceneManager::ShadowRenderer::setShadowTechnique(ShadowTechnique technique)
+void SceneManager::StencilShadowRenderer::setShadowTechnique(ShadowTechnique technique)
 {
     if (!mShadowIndexBuffer)
     {
@@ -1286,7 +1286,7 @@ void SceneManager::ShadowRenderer::setShadowTechnique(ShadowTechnique technique)
     initShadowVolumeMaterials();
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::initShadowVolumeMaterials()
+void SceneManager::StencilShadowRenderer::initShadowVolumeMaterials()
 {
     /* This should have been set in the SceneManager constructor, but if you
        created the SceneManager BEFORE the Root object, you will need to call
@@ -1533,7 +1533,7 @@ SceneManager::TextureShadowRenderer::getShadowCasterBoundsInfo( const Light* lig
     return nullBox;
 }
 //---------------------------------------------------------------------
-void SceneManager::ShadowRenderer::setShadowIndexBufferSize(size_t size)
+void SceneManager::StencilShadowRenderer::setShadowIndexBufferSize(size_t size)
 {
     if (mShadowIndexBuffer && size != mShadowIndexBufferSize)
     {
@@ -1742,8 +1742,8 @@ bool ShadowCasterSceneQueryListener::queryResult(MovableObject* object)
     return true;
 }
 //---------------------------------------------------------------------
-const SceneManager::ShadowRenderer::ShadowCasterList&
-SceneManager::ShadowRenderer::findShadowCastersForLight(const Light* light, const Camera* camera)
+const SceneManager::StencilShadowRenderer::ShadowCasterList&
+SceneManager::StencilShadowRenderer::findShadowCastersForLight(const Light* light, const Camera* camera)
 {
     mShadowCasterList.clear();
 

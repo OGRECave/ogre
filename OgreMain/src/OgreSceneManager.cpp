@@ -76,7 +76,7 @@ mLateMaterialResolving(false),
 mIlluminationStage(IRS_NONE),
 mShadowTechnique(SHADOWTYPE_NONE),
 mTextureShadowRenderer(this),
-mShadowRenderer(this),
+mStencilShadowRenderer(this),
 mLightClippingInfoMapFrameNumber(999),
 mVisibilityMask(0xFFFFFFFF),
 mFindVisibleObjects(true),
@@ -951,7 +951,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     if (isShadowTechniqueStencilBased() && 
         camera->getProjectionType() == PT_PERSPECTIVE &&
         camera->getFarClipDistance() != 0 &&
-        mShadowRenderer.mShadowUseInfiniteFarPlane)
+        mStencilShadowRenderer.mShadowUseInfiniteFarPlane)
     {
         // infinite far distance
         camera->setFarClipDistance(0);
@@ -1030,7 +1030,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
         // Tell params about camera
         mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
         // Set autoparams for finite dir light extrusion
-        mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowRenderer.mShadowDirLightExtrudeDist);
+        mAutoParamDataSource->setShadowDirLightExtrusionDistance(mStencilShadowRenderer.mShadowDirLightExtrudeDist);
 
         // Tell params about render target
         mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
@@ -1109,14 +1109,14 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
-    mShadowRenderer.mDestRenderSystem = sys;
+    mStencilShadowRenderer.mDestRenderSystem = sys;
     mTextureShadowRenderer.mDestRenderSystem = sys;
 }
 //-----------------------------------------------------------------------
 void SceneManager::_releaseManualHardwareResources()
 {
     // release stencil shadows index buffer
-    mShadowRenderer.mShadowIndexBuffer.reset();
+    mStencilShadowRenderer.mShadowIndexBuffer.reset();
 
     // release hardware resources inside all movable objects
     OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
@@ -1134,11 +1134,9 @@ void SceneManager::_restoreManualHardwareResources()
     // restore stencil shadows index buffer
     if(isShadowTechniqueStencilBased())
     {
-        mShadowRenderer.mShadowIndexBuffer = HardwareBufferManager::getSingleton().
-            createIndexBuffer(HardwareIndexBuffer::IT_16BIT,
-                mShadowRenderer.mShadowIndexBufferSize,
-                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                false);
+        mStencilShadowRenderer.mShadowIndexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+            HardwareIndexBuffer::IT_16BIT, mStencilShadowRenderer.mShadowIndexBufferSize,
+            HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
     }
 
     // restore hardware resources inside all movable objects
@@ -1511,7 +1509,7 @@ void SceneManager::_renderQueueGroupObjects(RenderQueueGroup* pGroup,
     if (doShadows && isShadowTechniqueInUse() && !isShadowTechniqueIntegrated())
     {
         if(isShadowTechniqueStencilBased())
-            mShadowRenderer.render(pGroup, om);
+            mStencilShadowRenderer.render(pGroup, om);
         else
             mTextureShadowRenderer.render(pGroup, om);
         return;
@@ -2500,7 +2498,7 @@ void SceneManager::setShadowTechnique(ShadowTechnique technique)
         // Otherwise forget it
         if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_HWSTENCIL))
         {
-            mShadowRenderer.setShadowTechnique(technique);
+            mStencilShadowRenderer.setShadowTechnique(technique);
         }
         else
         {
@@ -2600,10 +2598,6 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
     } // release lock on lights collection
 
     updateCachedLightInfos(camera);
-}
-void SceneManager::initShadowVolumeMaterials()
-{
-    mShadowRenderer.initShadowVolumeMaterials();
 }
 //---------------------------------------------------------------------
 static void buildScissor(const Light* light, const Camera* cam, RealRect& rect)
@@ -2850,16 +2844,16 @@ void SceneManager::setShadowFarDistance(Real distance)
 //---------------------------------------------------------------------
 void SceneManager::setShadowDirectionalLightExtrusionDistance(Real dist)
 {
-    mShadowRenderer.mShadowDirLightExtrudeDist = dist;
+    mStencilShadowRenderer.mShadowDirLightExtrudeDist = dist;
 }
 //---------------------------------------------------------------------
 Real SceneManager::getShadowDirectionalLightExtrusionDistance(void) const
 {
-    return mShadowRenderer.mShadowDirLightExtrudeDist;
+    return mStencilShadowRenderer.mShadowDirLightExtrudeDist;
 }
 void SceneManager::setShadowIndexBufferSize(size_t size)
 {
-    mShadowRenderer.setShadowIndexBufferSize(size);
+    mStencilShadowRenderer.setShadowIndexBufferSize(size);
 }
 //---------------------------------------------------------------------
 ConstShadowTextureConfigIterator SceneManager::getShadowTextureConfigIterator() const
@@ -2953,7 +2947,7 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     // Tell params about camera
     mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
     // Set autoparams for finite dir light extrusion
-    mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowRenderer.mShadowDirLightExtrudeDist);
+    mAutoParamDataSource->setShadowDirLightExtrusionDistance(mStencilShadowRenderer.mShadowDirLightExtrudeDist);
 
     // Tell params about render target
     mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
