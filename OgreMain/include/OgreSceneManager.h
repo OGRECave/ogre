@@ -677,8 +677,6 @@ namespace Ogre {
             return OGRE_NEW AutoParamDataSource();
         }
 
-        /// Internal method for setting up materials for shadows
-        void initShadowVolumeMaterials(void);
         /// Internal method for destroying shadow textures (texture-based shadows)
         void destroyShadowTextures(void);
 
@@ -894,10 +892,10 @@ namespace Ogre {
             void sortLightsAffectingFrustum(LightList& lightList) const;
         } mTextureShadowRenderer;
 
-        struct ShadowRenderer
+        struct StencilShadowRenderer
         {
-            ShadowRenderer(SceneManager* owner);
-            ~ShadowRenderer();
+            StencilShadowRenderer(SceneManager* owner);
+            ~StencilShadowRenderer();
 
             SceneManager* mSceneManager;
             RenderSystem* mDestRenderSystem;
@@ -965,7 +963,7 @@ namespace Ogre {
                 could be affecting the frustum for a given light.
             */
             const ShadowCasterList& findShadowCastersForLight(const Light* light, const Camera* camera);
-        } mShadowRenderer;
+        } mStencilShadowRenderer;
 
         /// Struct for caching light clipping information for re-use in a frame
         struct LightClippingInfo
@@ -2566,9 +2564,9 @@ namespace Ogre {
         ShadowTechnique getShadowTechnique(void) const { return mShadowTechnique; }
 
         /** Enables / disables the rendering of debug information for shadows. */
-        void setShowDebugShadows(bool debug) { mShadowRenderer.mDebugShadows = debug; }
+        void setShowDebugShadows(bool debug) { mStencilShadowRenderer.mDebugShadows = debug; }
         /** Are debug shadows shown? */
-        bool getShowDebugShadows(void ) const { return mShadowRenderer.mDebugShadows; }
+        bool getShowDebugShadows(void ) const { return mStencilShadowRenderer.mDebugShadows; }
 
         /** Set the colour used to modulate areas in shadow. 
         This is only applicable for shadow techniques which involve
@@ -2651,7 +2649,7 @@ namespace Ogre {
         */
         void setShadowIndexBufferSize(size_t size);
         /// Get the size of the shadow index buffer
-        size_t getShadowIndexBufferSize(void) const { return mShadowRenderer.mShadowIndexBufferSize; }
+        size_t getShadowIndexBufferSize(void) const { return mStencilShadowRenderer.mShadowIndexBufferSize; }
         /** Get the shadow camera setup in use for all lights which don't have
             their own shadow camera setup.
         @see ShadowCameraSetup
@@ -2695,7 +2693,7 @@ namespace Ogre {
             of an infinite far plane based on these heuristics.
         */
         void setShadowUseInfiniteFarPlane(bool enable) {
-            mShadowRenderer.mShadowUseInfiniteFarPlane = enable; }
+            mStencilShadowRenderer.mShadowUseInfiniteFarPlane = enable; }
 
         /** Is there a stencil shadow based shadowing technique in use? */
         bool isShadowTechniqueStencilBased(void) const
@@ -2718,11 +2716,11 @@ namespace Ogre {
         /** Sets whether when using a built-in additive shadow mode, user clip
             planes should be used to restrict light rendering.
         */
-        void setShadowUseLightClipPlanes(bool enabled) { mShadowRenderer.mShadowAdditiveLightClip = enabled; }
+        void setShadowUseLightClipPlanes(bool enabled) { mStencilShadowRenderer.mShadowAdditiveLightClip = enabled; }
         /** Gets whether when using a built-in additive shadow mode, user clip
         planes should be used to restrict light rendering.
         */
-        bool getShadowUseLightClipPlanes() const { return mShadowRenderer.mShadowAdditiveLightClip; }
+        bool getShadowUseLightClipPlanes() const { return mStencilShadowRenderer.mShadowAdditiveLightClip; }
         /// @}
 
         /// @name Shadow Texture Config
