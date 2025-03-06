@@ -1512,6 +1512,12 @@ void SceneManager::_renderQueueGroupObjects(RenderQueueGroup* pGroup,
             mStencilShadowRenderer.render(pGroup, om);
         else
             mTextureShadowRenderer.render(pGroup, om);
+
+        auto visitor = mActiveQueuedRenderableVisitor;
+        for (const auto& pg : pGroup->getPriorityGroups())
+        {
+            visitor->renderTransparents(pg.second, om);
+        }
         return;
     }
 

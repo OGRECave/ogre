@@ -225,11 +225,6 @@ void SceneManager::StencilShadowRenderer::renderAdditiveStencilShadowedQueueGrou
 
 
     }// for each priority
-
-    for (const auto& pg : pGroup->getPriorityGroups())
-    {
-        visitor->renderTransparents(pg.second, om);
-    }
 }
 //-----------------------------------------------------------------------
 void SceneManager::StencilShadowRenderer::renderModulativeStencilShadowedQueueGroupObjects(
@@ -290,11 +285,6 @@ void SceneManager::StencilShadowRenderer::renderModulativeStencilShadowedQueueGr
     for (const auto& pg : pGroup->getPriorityGroups())
     {
         visitor->renderObjects(pg.second->getSolidsNoShadowReceive(), om, true, true);
-    }
-
-    for (const auto& pg : pGroup->getPriorityGroups())
-    {
-        visitor->renderTransparents(pg.second, om);
     }
 }
 //-----------------------------------------------------------------------
@@ -467,11 +457,6 @@ void SceneManager::TextureShadowRenderer::renderModulativeTextureShadowedQueueGr
         mSceneManager->mIlluminationStage = IRS_NONE;
 
     }
-
-    for (const auto& pg : pGroup->getPriorityGroups())
-    {
-        visitor->renderTransparents(pg.second, om);
-    }
 }
 //-----------------------------------------------------------------------
 void SceneManager::TextureShadowRenderer::renderAdditiveTextureShadowedQueueGroupObjects(
@@ -573,11 +558,6 @@ void SceneManager::TextureShadowRenderer::renderAdditiveTextureShadowedQueueGrou
 
 
     }// for each priority
-
-    for (const auto& pg : pGroup->getPriorityGroups())
-    {
-        visitor->renderTransparents(pg.second, om);
-    }
 }
 //-----------------------------------------------------------------------
 void SceneManager::TextureShadowRenderer::renderTextureShadowReceiverQueueGroupObjects(
