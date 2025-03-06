@@ -252,10 +252,6 @@ void SceneManager::StencilShadowRenderer::renderModulativeStencilShadowedQueueGr
         visitor->renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
     }
 
-    // Override auto param ambient to force vertex programs to use shadow colour
-    ColourValue currAmbient = mSceneManager->getAmbientLight();
-    mSceneManager->setAmbientLight(mSceneManager->getShadowColour());
-
     // Iterate over lights, render all volumes to stencil
     for (Light* l : mSceneManager->_getLightsAffectingFrustum())
     {
@@ -277,9 +273,6 @@ void SceneManager::StencilShadowRenderer::renderModulativeStencilShadowedQueueGr
         }
 
     }// for each light
-
-    // Restore ambient light
-    mSceneManager->setAmbientLight(currAmbient);
 
     // Do non-shadowable solids
     for (const auto& pg : pGroup->getPriorityGroups())
