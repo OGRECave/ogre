@@ -2524,7 +2524,7 @@ namespace Ogre {
         void destroyQuery(SceneQuery* query);
         /// @}
 
-        /// @name Shadow Setup
+        /// @name Generic Shadows Config
         /// @{
         /** Sets the general shadow technique to be used in this scene.
 
@@ -2563,11 +2563,6 @@ namespace Ogre {
         /** Gets the current shadow technique. */
         ShadowTechnique getShadowTechnique(void) const { return mShadowTechnique; }
 
-        /** Enables / disables the rendering of debug information for shadows. */
-        void setShowDebugShadows(bool debug) { mStencilShadowRenderer.mDebugShadows = debug; }
-        /** Are debug shadows shown? */
-        bool getShowDebugShadows(void ) const { return mStencilShadowRenderer.mDebugShadows; }
-
         /** Set the colour used to modulate areas in shadow. 
         This is only applicable for shadow techniques which involve
             darkening the area in shadow, as opposed to masking out the light. 
@@ -2597,30 +2592,34 @@ namespace Ogre {
         /** Gets the distance a shadow volume is extruded for a directional light.
         */
         Real getShadowDirectionalLightExtrusionDistance(void) const;
-        /** Sets the default maximum distance away from the camera that shadows
-        will be visible. You have to call this function before you create lights
-        or the default distance of zero will be used.
 
-        Shadow techniques can be expensive, therefore it is a good idea
-        to limit them to being rendered close to the camera if possible,
-        and to skip the expense of rendering shadows for distance objects.
-        This method allows you to set the distance at which shadows will no
-        longer be rendered.
-        @note
-        Each shadow technique can interpret this subtely differently.
-        For example, one technique may use this to eliminate casters,
-        another might use it to attenuate the shadows themselves.
-        You should tweak this value to suit your chosen shadow technique
-        and scene setup.
-        */
-        void setShadowFarDistance(Real distance);
-        /** Gets the default maximum distance away from the camera that shadows
-        will be visible.
-        */
-        Real getShadowFarDistance(void) const
-        { return mTextureShadowRenderer.mDefaultShadowFarDist; }
-        Real getShadowFarDistanceSquared(void) const
-        { return mTextureShadowRenderer.mDefaultShadowFarDistSquared; }
+        /** Is there a stencil shadow based shadowing technique in use? */
+        bool isShadowTechniqueStencilBased(void) const
+        { return (mShadowTechnique & SHADOWDETAILTYPE_STENCIL) != 0; }
+        /** Is there a texture shadow based shadowing technique in use? */
+        bool isShadowTechniqueTextureBased(void) const
+        { return (mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) != 0; }
+        /** Is there a modulative shadowing technique in use? */
+        bool isShadowTechniqueModulative(void) const
+        { return (mShadowTechnique & SHADOWDETAILTYPE_MODULATIVE) != 0; }
+        /** Is there an additive shadowing technique in use? */
+        bool isShadowTechniqueAdditive(void) const
+        { return (mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE) != 0; }
+        /** Is the shadow technique integrated into primary materials? */
+        bool isShadowTechniqueIntegrated(void) const
+        { return (mShadowTechnique & SHADOWDETAILTYPE_INTEGRATED) != 0; }
+        /** Is there any shadowing technique in use? */
+        bool isShadowTechniqueInUse(void) const
+        { return mShadowTechnique != SHADOWTYPE_NONE; }
+        /// @}
+
+        /// @name Stencil Shadows Config
+        /// @{
+
+        /** Enables / disables the rendering of debug information for shadows. */
+        void setShowDebugShadows(bool debug) { mStencilShadowRenderer.mDebugShadows = debug; }
+        /** Are debug shadows shown? */
+        bool getShowDebugShadows(void ) const { return mStencilShadowRenderer.mDebugShadows; }
 
         /** Sets the maximum size of the index buffer used to render shadow
             primitives.
@@ -2650,11 +2649,6 @@ namespace Ogre {
         void setShadowIndexBufferSize(size_t size);
         /// Get the size of the shadow index buffer
         size_t getShadowIndexBufferSize(void) const { return mStencilShadowRenderer.mShadowIndexBufferSize; }
-        /** Get the shadow camera setup in use for all lights which don't have
-            their own shadow camera setup.
-        @see ShadowCameraSetup
-        */
-        const ShadowCameraSetupPtr& getShadowCameraSetup() const;
 
         /** Sets whether we should use an infinite camera far plane
             when rendering stencil shadows.
@@ -2695,24 +2689,6 @@ namespace Ogre {
         void setShadowUseInfiniteFarPlane(bool enable) {
             mStencilShadowRenderer.mShadowUseInfiniteFarPlane = enable; }
 
-        /** Is there a stencil shadow based shadowing technique in use? */
-        bool isShadowTechniqueStencilBased(void) const
-        { return (mShadowTechnique & SHADOWDETAILTYPE_STENCIL) != 0; }
-        /** Is there a texture shadow based shadowing technique in use? */
-        bool isShadowTechniqueTextureBased(void) const
-        { return (mShadowTechnique & SHADOWDETAILTYPE_TEXTURE) != 0; }
-        /** Is there a modulative shadowing technique in use? */
-        bool isShadowTechniqueModulative(void) const
-        { return (mShadowTechnique & SHADOWDETAILTYPE_MODULATIVE) != 0; }
-        /** Is there an additive shadowing technique in use? */
-        bool isShadowTechniqueAdditive(void) const
-        { return (mShadowTechnique & SHADOWDETAILTYPE_ADDITIVE) != 0; }
-        /** Is the shadow technique integrated into primary materials? */
-        bool isShadowTechniqueIntegrated(void) const
-        { return (mShadowTechnique & SHADOWDETAILTYPE_INTEGRATED) != 0; }
-        /** Is there any shadowing technique in use? */
-        bool isShadowTechniqueInUse(void) const
-        { return mShadowTechnique != SHADOWTYPE_NONE; }
         /** Sets whether when using a built-in additive shadow mode, user clip
             planes should be used to restrict light rendering.
         */
@@ -2723,8 +2699,33 @@ namespace Ogre {
         bool getShadowUseLightClipPlanes() const { return mStencilShadowRenderer.mShadowAdditiveLightClip; }
         /// @}
 
-        /// @name Shadow Texture Config
+        /// @name Texture Shadows Config
         /// @{
+
+        /** Sets the default maximum distance away from the camera that shadows
+        will be visible. You have to call this function before you create lights
+        or the default distance of zero will be used.
+
+        Shadow techniques can be expensive, therefore it is a good idea
+        to limit them to being rendered close to the camera if possible,
+        and to skip the expense of rendering shadows for distance objects.
+        This method allows you to set the distance at which shadows will no
+        longer be rendered.
+        @note
+        Each shadow technique can interpret this subtely differently.
+        For example, one technique may use this to eliminate casters,
+        another might use it to attenuate the shadows themselves.
+        You should tweak this value to suit your chosen shadow technique
+        and scene setup.
+        */
+        void setShadowFarDistance(Real distance);
+        /** Gets the default maximum distance away from the camera that shadows
+        will be visible.
+        */
+        Real getShadowFarDistance(void) const
+        { return mTextureShadowRenderer.mDefaultShadowFarDist; }
+        Real getShadowFarDistanceSquared(void) const
+        { return mTextureShadowRenderer.mDefaultShadowFarDistSquared; }
 
         /// Method for preparing shadow textures ready for use in a regular render
         /// Do not call manually unless before frame start or rendering is paused
@@ -2967,6 +2968,12 @@ namespace Ogre {
         @see ShadowCameraSetup
         */
         void setShadowCameraSetup(const ShadowCameraSetupPtr& shadowSetup);
+
+        /** Get the shadow camera setup in use for all lights which don't have
+            their own shadow camera setup.
+        @see ShadowCameraSetup
+        */
+        const ShadowCameraSetupPtr& getShadowCameraSetup() const;
         /// @}
 
         /** Sets the active compositor chain of the current scene being rendered.
