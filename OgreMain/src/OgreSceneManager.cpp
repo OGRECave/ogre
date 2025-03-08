@@ -74,7 +74,9 @@ mShowBoundingBoxes(false),
 mActiveCompositorChain(0),
 mLateMaterialResolving(false),
 mIlluminationStage(IRS_NONE),
-mShadowRenderer(this),
+mShadowTechnique(SHADOWTYPE_NONE),
+mTextureShadowRenderer(this),
+mStencilShadowRenderer(this),
 mLightClippingInfoMapFrameNumber(999),
 mVisibilityMask(0xFFFFFFFF),
 mFindVisibleObjects(true),
@@ -228,9 +230,9 @@ void SceneManager::destroyCamera(const String& name)
             mCamVisibleObjectsMap.erase( camVisObjIt );
 
         // Remove light-shadow cam mapping entry
-        auto camLightIt = mShadowRenderer.mShadowCamLightMapping.find( i->second );
-        if ( camLightIt != mShadowRenderer.mShadowCamLightMapping.end() )
-            mShadowRenderer.mShadowCamLightMapping.erase( camLightIt );
+        auto camLightIt = mTextureShadowRenderer.mShadowCamLightMapping.find(i->second);
+        if (camLightIt != mTextureShadowRenderer.mShadowCamLightMapping.end())
+            mTextureShadowRenderer.mShadowCamLightMapping.erase(camLightIt);
 
         // Notify render system
         if(mDestRenderSystem)
@@ -249,7 +251,7 @@ void SceneManager::destroyAllCameras(void)
     {
         bool dontDelete = false;
          // dont destroy shadow texture cameras here. destroyAllCameras is public
-        for(auto camShadowTex : mShadowRenderer.mShadowTextureCameras)
+        for(auto camShadowTex : mTextureShadowRenderer.mShadowTextureCameras)
         {
             if( camShadowTex == camIt->second )
             {
@@ -474,7 +476,7 @@ ParticleSystem* SceneManager::getParticleSystem(const String& name) const
 //-----------------------------------------------------------------------
 void SceneManager::clearScene(void)
 {
-    mShadowRenderer.destroyShadowTextures();
+    mTextureShadowRenderer.destroyShadowTextures();
     destroyAllStaticGeometry();
     destroyAllInstanceManagers();
     destroyAllMovableObjects();
@@ -652,9 +654,9 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
         //Should we warn or throw an exception if an illegal state was achieved?
     }
 
-    if (shadowDerivation)
+    if (shadowDerivation && isShadowTechniqueTextureBased())
     {
-        pass = mShadowRenderer.deriveTextureShadowPass(pass);
+        pass = mTextureShadowRenderer.deriveTextureShadowPass(pass);
     }
 
     // Tell params about current pass
@@ -788,7 +790,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
     // Reset the shadow texture index for each pass
     size_t startLightIndex = pass->getStartLight();
     size_t shadowTexUnitIndex = 0;
-    size_t shadowTexIndex = mShadowRenderer.getShadowTexIndex(startLightIndex);
+    size_t shadowTexIndex = mTextureShadowRenderer.getShadowTexIndex(startLightIndex);
     for(auto *pTex : pass->getTextureUnitStates())
     {
         if (!pass->getIteratePerLight() && isShadowTechniqueTextureBased() &&
@@ -805,7 +807,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
             // if that's the case, we have to bind when lights are iterated
             // in renderSingleObject
 
-            mShadowRenderer.resolveShadowTexture(pTex, shadowTexIndex, shadowTexUnitIndex);
+            mTextureShadowRenderer.resolveShadowTexture(pTex, shadowTexIndex, shadowTexUnitIndex);
             ++shadowTexIndex;
             ++shadowTexUnitIndex;
         }
@@ -857,7 +859,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
 
     // Culling mode
     if (isShadowTechniqueTextureBased() && mIlluminationStage == IRS_RENDER_TO_TEXTURE &&
-        mShadowRenderer.mShadowCasterRenderBackFaces && pass->getCullingMode() == CULL_CLOCKWISE)
+        getShadowCasterRenderBackFaces() && pass->getCullingMode() == CULL_CLOCKWISE)
     {
         // render back faces into shadow caster, can help with depth comparison
         mPassCullingMode = CULL_ANTICLOCKWISE;
@@ -876,6 +878,25 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
     return pass;
 }
 //-----------------------------------------------------------------------
+static void updateShadowSplitOptions(const SceneManager* sceneManager, RenderQueue* queue)
+{
+    int shadowTechnique = sceneManager->getShadowTechnique();
+    if(!sceneManager->getCurrentViewport()->getShadowsEnabled())
+        shadowTechnique = SHADOWTYPE_NONE;
+
+    bool notIntegrated = (shadowTechnique & SHADOWDETAILTYPE_INTEGRATED) == 0;
+
+    // Stencil Casters can always be receivers
+    queue->setShadowCastersCannotBeReceivers(!(shadowTechnique & SHADOWDETAILTYPE_STENCIL) &&
+                                             !sceneManager->getShadowTextureSelfShadow());
+
+    // Additive lighting, we need to split everything by illumination stage
+    queue->setSplitPassesByLightingType((shadowTechnique & SHADOWDETAILTYPE_ADDITIVE) && notIntegrated);
+
+    // Tell render queue to split off non-shadowable materials
+    queue->setSplitNoShadowPasses(shadowTechnique && notIntegrated);
+}
+
 void SceneManager::prepareRenderQueue(void)
 {
     RenderQueue* q = getRenderQueue();
@@ -890,16 +911,14 @@ void SceneManager::prepareRenderQueue(void)
 
     // Default all the queue groups that are there, new ones will be created
     // with defaults too
-    for (size_t i = 0; i < RENDER_QUEUE_COUNT; ++i)
+    for (auto& group : q->_getQueueGroups())
     {
-        if(!q->_getQueueGroups()[i])
-            continue;
-
-        q->_getQueueGroups()[i]->defaultOrganisationMode();
+        if (group)
+            group->defaultOrganisationMode();
     }
 
-    // Global split options
-    mShadowRenderer.updateSplitOptions(q);
+    // shadow split options
+    updateShadowSplitOptions(this, q);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverlays)
@@ -932,7 +951,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     if (isShadowTechniqueStencilBased() && 
         camera->getProjectionType() == PT_PERSPECTIVE &&
         camera->getFarClipDistance() != 0 &&
-        mShadowRenderer.mShadowUseInfiniteFarPlane)
+        mStencilShadowRenderer.mShadowUseInfiniteFarPlane)
     {
         // infinite far distance
         camera->setFarClipDistance(0);
@@ -1011,7 +1030,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
         // Tell params about camera
         mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
         // Set autoparams for finite dir light extrusion
-        mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowRenderer.mShadowDirLightExtrudeDist);
+        mAutoParamDataSource->setShadowDirLightExtrusionDistance(mStencilShadowRenderer.mShadowDirLightExtrudeDist);
 
         // Tell params about render target
         mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
@@ -1090,13 +1109,14 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
-    mShadowRenderer.mDestRenderSystem = sys;
+    mStencilShadowRenderer.mDestRenderSystem = sys;
+    mTextureShadowRenderer.mDestRenderSystem = sys;
 }
 //-----------------------------------------------------------------------
 void SceneManager::_releaseManualHardwareResources()
 {
     // release stencil shadows index buffer
-    mShadowRenderer.mShadowIndexBuffer.reset();
+    mStencilShadowRenderer.mShadowIndexBuffer.reset();
 
     // release hardware resources inside all movable objects
     OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
@@ -1114,11 +1134,9 @@ void SceneManager::_restoreManualHardwareResources()
     // restore stencil shadows index buffer
     if(isShadowTechniqueStencilBased())
     {
-        mShadowRenderer.mShadowIndexBuffer = HardwareBufferManager::getSingleton().
-            createIndexBuffer(HardwareIndexBuffer::IT_16BIT,
-                mShadowRenderer.mShadowIndexBufferSize,
-                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-                false);
+        mStencilShadowRenderer.mShadowIndexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+            HardwareIndexBuffer::IT_16BIT, mStencilShadowRenderer.mShadowIndexBufferSize,
+            HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
     }
 
     // restore hardware resources inside all movable objects
@@ -1454,7 +1472,7 @@ bool SceneManager::validateRenderableForRendering(const Pass* pass, const Render
     if (mCurrentViewport->getShadowsEnabled() && isShadowTechniqueTextureBased())
     {
         if (mIlluminationStage == IRS_RENDER_RECEIVER_PASS && 
-            rend->getCastsShadows() && !mShadowRenderer.mShadowTextureSelfShadow)
+            rend->getCastsShadows() && !mTextureShadowRenderer.mShadowTextureSelfShadow)
         {
             return false;
         }
@@ -1482,15 +1500,24 @@ void SceneManager::_renderQueueGroupObjects(RenderQueueGroup* pGroup,
         // Shadow caster pass
         if (mCurrentViewport->getShadowsEnabled())
         {
-            mShadowRenderer.renderTextureShadowCasterQueueGroupObjects(pGroup, om);
+            mTextureShadowRenderer.renderTextureShadowCasterQueueGroupObjects(pGroup, om);
         }
         return;
     }
 
     // Ordinary + receiver pass
-    if (doShadows && mShadowRenderer.mShadowTechnique && !isShadowTechniqueIntegrated())
+    if (doShadows && isShadowTechniqueInUse() && !isShadowTechniqueIntegrated())
     {
-        mShadowRenderer.render(pGroup, om);
+        if(isShadowTechniqueStencilBased())
+            mStencilShadowRenderer.render(pGroup, om);
+        else
+            mTextureShadowRenderer.render(pGroup, om);
+
+        auto visitor = mActiveQueuedRenderableVisitor;
+        for (const auto& pg : pGroup->getPriorityGroups())
+        {
+            visitor->renderTransparents(pg.second, om);
+        }
         return;
     }
 
@@ -1830,11 +1857,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         if (iteratePerLight)
         {
             // Starting shadow texture index.
-            size_t shadowTexIndex = mShadowRenderer.getShadowTexIndex(lightIndex);
+            size_t shadowTexIndex = mTextureShadowRenderer.getShadowTexIndex(lightIndex);
             localLightList.resize(pass->getLightCountPerIteration());
 
             LightList::iterator destit = localLightList.begin();
-            unsigned short numShadowTextureLights = 0;
             for (; destit != localLightList.end() && lightIndex < rendLightList.size();
                  ++lightIndex, --lightsLeft)
             {
@@ -1849,7 +1875,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                     // Also skip shadow texture(s)
                     if (isShadowTechniqueTextureBased())
                     {
-                        shadowTexIndex += mShadowRenderer.mShadowTextureCountPerType[currLight->getType()];
+                        shadowTexIndex += mTextureShadowRenderer.mShadowTextureCountPerType[currLight->getType()];
                     }
                     continue;
                 }
@@ -1861,8 +1887,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
                 // potentially need to update content_type shadow texunit
                 // corresponding to this light
-                size_t textureCountPerLight = mShadowRenderer.mShadowTextureCountPerType[currLight->getType()];
-                for (size_t j = 0; j < textureCountPerLight && shadowTexIndex < mShadowRenderer.mShadowTextures.size(); ++j)
+                size_t textureCountPerLight = mTextureShadowRenderer.mShadowTextureCountPerType[currLight->getType()];
+                unsigned short numShadowTextureLights = 0;
+                for (size_t j = 0; j < textureCountPerLight && shadowTexIndex < mTextureShadowRenderer.mShadowTextures.size(); ++j)
                 {
                     // link the numShadowTextureLights'th shadow texture unit
                     ushort tuindex = pass->_getTextureUnitWithContentTypeIndex(
@@ -1870,11 +1897,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                     if (tuindex > pass->getNumTextureUnitStates()) break;
 
                     TextureUnitState* tu = pass->getTextureUnitState(tuindex);
-                    const TexturePtr& shadowTex = mShadowRenderer.mShadowTextures[shadowTexIndex];
-                    tu->_setTexturePtr(shadowTex);
-                    Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
-                    tu->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
-                    mAutoParamDataSource->setTextureProjector(cam, numShadowTextureLights);
+                    mTextureShadowRenderer.resolveShadowTexture(tu, shadowTexIndex, numShadowTextureLights);
                     ++numShadowTextureLights;
                     ++shadowTexIndex;
                     // Have to set TU on rendersystem right now, although
@@ -2335,16 +2358,16 @@ void SceneManager::removeListener(Listener* delListener)
 }
 void SceneManager::addShadowTextureListener(ShadowTextureListener* newListener)
 {
-    if (std::find(mShadowRenderer.mListeners.begin(), mShadowRenderer.mListeners.end(), newListener) ==
-        mShadowRenderer.mListeners.end())
-        mShadowRenderer.mListeners.push_back(newListener);
+    if (std::find(mTextureShadowRenderer.mListeners.begin(), mTextureShadowRenderer.mListeners.end(), newListener) ==
+        mTextureShadowRenderer.mListeners.end())
+        mTextureShadowRenderer.mListeners.push_back(newListener);
 }
 //---------------------------------------------------------------------
 void SceneManager::removeShadowTextureListener(ShadowTextureListener* delListener)
 {
-    auto i = std::find(mShadowRenderer.mListeners.begin(), mShadowRenderer.mListeners.end(), delListener);
-    if (i != mShadowRenderer.mListeners.end())
-        mShadowRenderer.mListeners.erase(i);
+    auto i = std::find(mTextureShadowRenderer.mListeners.begin(), mTextureShadowRenderer.mListeners.end(), delListener);
+    if (i != mTextureShadowRenderer.mListeners.end())
+        mTextureShadowRenderer.mListeners.erase(i);
 }
 //---------------------------------------------------------------------
 void SceneManager::firePreRenderQueues()
@@ -2474,7 +2497,24 @@ void SceneManager::_notifyAutotrackingSceneNode(SceneNode* node, bool autoTrack)
 }
 void SceneManager::setShadowTechnique(ShadowTechnique technique)
 {
-    mShadowRenderer.setShadowTechnique(technique);
+    mShadowTechnique = technique;
+    if(isShadowTechniqueStencilBased())
+    {
+        // Firstly check that we  have a stencil
+        // Otherwise forget it
+        if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_HWSTENCIL))
+        {
+            mStencilShadowRenderer.setShadowTechnique(technique);
+        }
+        else
+        {
+            LogManager::getSingleton().logWarning("Stencil shadows were requested, but this device does not "
+                                                  "have a hardware stencil. Shadows disabled.");
+            mShadowTechnique = SHADOWTYPE_NONE;
+        }
+    }
+
+    mTextureShadowRenderer.setShadowTechnique(technique);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_notifyLightsDirty(void)
@@ -2500,7 +2540,8 @@ void SceneManager::updateCachedLightInfos(const Camera* camera)
             }
         }
 
-        mShadowRenderer.sortLightsAffectingFrustum(mLightsAffectingFrustum);
+        if(isShadowTechniqueTextureBased())
+            mTextureShadowRenderer.sortLightsAffectingFrustum(mLightsAffectingFrustum);
         // Use swap instead of copy operator for efficiently
         mCachedLightInfos.swap(mTestLightInfos);
 
@@ -2563,10 +2604,6 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
     } // release lock on lights collection
 
     updateCachedLightInfos(camera);
-}
-void SceneManager::initShadowVolumeMaterials()
-{
-    mShadowRenderer.initShadowVolumeMaterials();
 }
 //---------------------------------------------------------------------
 static void buildScissor(const Light* light, const Camera* cam, RealRect& rect)
@@ -2796,71 +2833,75 @@ void SceneManager::resetLightClip()
     mDestRenderSystem->setClipPlanes(PlaneList());
 }
 //---------------------------------------------------------------------
+void SceneManager::setShadowColour(const ColourValue& colour)
+{
+    mAutoParamDataSource->setShadowColour(colour);
+}
 const ColourValue& SceneManager::getShadowColour(void) const
 {
-    return mShadowRenderer.mShadowColour;
+    return mAutoParamDataSource->getShadowColour();
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowFarDistance(Real distance)
 {
-    mShadowRenderer.mDefaultShadowFarDist = distance;
-    mShadowRenderer.mDefaultShadowFarDistSquared = distance * distance;
+    mTextureShadowRenderer.mDefaultShadowFarDist = distance;
+    mTextureShadowRenderer.mDefaultShadowFarDistSquared = distance * distance;
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowDirectionalLightExtrusionDistance(Real dist)
 {
-    mShadowRenderer.mShadowDirLightExtrudeDist = dist;
+    mStencilShadowRenderer.mShadowDirLightExtrudeDist = dist;
 }
 //---------------------------------------------------------------------
 Real SceneManager::getShadowDirectionalLightExtrusionDistance(void) const
 {
-    return mShadowRenderer.mShadowDirLightExtrudeDist;
+    return mStencilShadowRenderer.mShadowDirLightExtrudeDist;
 }
 void SceneManager::setShadowIndexBufferSize(size_t size)
 {
-    mShadowRenderer.setShadowIndexBufferSize(size);
+    mStencilShadowRenderer.setShadowIndexBufferSize(size);
 }
 //---------------------------------------------------------------------
 ConstShadowTextureConfigIterator SceneManager::getShadowTextureConfigIterator() const
 {
     return ConstShadowTextureConfigIterator(
-        mShadowRenderer.mShadowTextureConfigList.begin(), mShadowRenderer.mShadowTextureConfigList.end());
+        mTextureShadowRenderer.mShadowTextureConfigList.begin(), mTextureShadowRenderer.mShadowTextureConfigList.end());
 
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureSelfShadow(bool selfShadow) 
 { 
-    mShadowRenderer.mShadowTextureSelfShadow = selfShadow;
+    mTextureShadowRenderer.mShadowTextureSelfShadow = selfShadow;
     if (isShadowTechniqueTextureBased())
         getRenderQueue()->setShadowCastersCannotBeReceivers(!selfShadow);
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowCameraSetup(const ShadowCameraSetupPtr& shadowSetup)
 {
-    mShadowRenderer.mDefaultShadowCameraSetup = shadowSetup;
+    mTextureShadowRenderer.mDefaultShadowCameraSetup = shadowSetup;
 
 }
 //---------------------------------------------------------------------
 const ShadowCameraSetupPtr& SceneManager::getShadowCameraSetup() const
 {
-    return mShadowRenderer.mDefaultShadowCameraSetup;
+    return mTextureShadowRenderer.mDefaultShadowCameraSetup;
 }
 void SceneManager::ensureShadowTexturesCreated()
 {
-    mShadowRenderer.ensureShadowTexturesCreated();
+    mTextureShadowRenderer.ensureShadowTexturesCreated();
 }
 void SceneManager::destroyShadowTextures(void)
 {
-    mShadowRenderer.destroyShadowTextures();
+    mTextureShadowRenderer.destroyShadowTextures();
 }
 const std::vector<Camera*>& SceneManager::getShadowTextureCameras()
 {
-    return mShadowRenderer.mShadowTextureCameras;
+    return mTextureShadowRenderer.mShadowTextureCameras;
 }
 
 bool SceneManager::isShadowTextureConfigDirty() const
 {
-    return mShadowRenderer.mShadowTextureConfigDirty;
+    return mTextureShadowRenderer.mShadowTextureConfigDirty;
 }
 
 void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
@@ -2874,7 +2915,7 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 
     try
     {
-        mShadowRenderer.prepareShadowTextures(cam, vp, lightList);
+        mTextureShadowRenderer.prepareShadowTextures(cam, vp, lightList);
     }
     catch (Exception&)
     {
@@ -2912,7 +2953,7 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     // Tell params about camera
     mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
     // Set autoparams for finite dir light extrusion
-    mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowRenderer.mShadowDirLightExtrudeDist);
+    mAutoParamDataSource->setShadowDirLightExtrusionDistance(mStencilShadowRenderer.mShadowDirLightExtrudeDist);
 
     // Tell params about render target
     mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
@@ -3476,7 +3517,7 @@ SceneManager::getVisibleObjectsBoundsInfo(const Camera* cam) const
 const VisibleObjectsBoundsInfo&
 SceneManager::getShadowCasterBoundsInfo( const Light* light, size_t iteration ) const
 {
-    return mShadowRenderer.getShadowCasterBoundsInfo(light, iteration);
+    return mTextureShadowRenderer.getShadowCasterBoundsInfo(light, iteration);
 }
 //---------------------------------------------------------------------
 void SceneManager::setQueuedRenderableVisitor(SceneManager::SceneMgrQueuedRenderableVisitor* visitor)

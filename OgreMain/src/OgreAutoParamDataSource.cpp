@@ -51,6 +51,7 @@ namespace Ogre {
          mCameraPositionDirty(true),
          mCameraPositionObjectSpaceDirty(true),
          mAmbientLight(ColourValue::Black),
+         mShadowColour(ColourValue(0.25, 0.25, 0.25)),
          mPassNumber(0),
          mSceneDepthRangeDirty(true),
          mLodCameraPositionDirty(true),
@@ -1146,9 +1147,13 @@ namespace Ogre {
             return dummy;
     }
     //---------------------------------------------------------------------
+    void AutoParamDataSource::setShadowColour(const ColourValue& colour)
+    {
+        mShadowColour = colour;
+    }
     const ColourValue& AutoParamDataSource::getShadowColour() const
     {
-        return mCurrentSceneManager->getShadowColour();
+        return mShadowColour;
     }
     //-------------------------------------------------------------------------
     void AutoParamDataSource::updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const
