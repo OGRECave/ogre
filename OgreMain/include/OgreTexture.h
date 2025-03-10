@@ -400,7 +400,7 @@ namespace Ogre {
             @remarks The buffer is invalidated when the resource is unloaded or destroyed.
             Do not use it after the lifetime of the containing texture.
         */
-        virtual const HardwarePixelBufferSharedPtr& getBuffer(size_t face=0, size_t mipmap=0) const;
+        virtual const HardwarePixelBufferSharedPtr& getBuffer(size_t face=0, size_t mipmap=0);
 
 
         /** Populate an Image with the contents of this texture. 
@@ -494,6 +494,15 @@ namespace Ogre {
         /** Implementation of freeing internal texture resources 
         */
         virtual void freeInternalResourcesImpl(void) = 0;
+
+        virtual HardwarePixelBufferPtr createSurface(uint32 face, uint32 mip, uint32 width, uint32 height, uint32 depth)
+        {
+            return nullptr;
+        }
+
+        /// internal method, create HardwarePixelBuffers for every face and
+        /// mipmap level. This method must be called after the texture object was created
+        void createSurfaceList(void);
 
         /** Default implementation of unload which calls freeInternalResources */
         void unloadImpl(void) override;

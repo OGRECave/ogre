@@ -257,6 +257,9 @@ ManualObject::ManualObject(const String& name)
             rop->vertexData->vertexDeclaration->getElements();
         for (const auto & elem : elemList)
         {
+            if(elem.getSource() != 0)
+                continue; // not our buffer (e.g. auto instancing injection)
+
             float* pFloat = 0;
             RGBA* pRGBA = 0;
             switch(elem.getType())
@@ -628,28 +631,19 @@ ManualObject::ManualObject(const String& name)
     //-----------------------------------------------------------------------------
     //-----------------------------------------------------------------------------
     //-----------------------------------------------------------------------------
-    ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent,
-        const String& materialName, RenderOperation::OperationType opType, const String & groupName)
-        : mParent(parent), mMaterialName(materialName), mGroupName(groupName), m32BitIndices(false)
+    ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent, const String& materialName,
+                                                           RenderOperation::OperationType opType,
+                                                           const String& groupName)
+        : ManualObjectSection(parent, MaterialManager::getSingleton().getByName(materialName, groupName), opType)
     {
-        mRenderOperation.operationType = opType;
-        // default to no indexes unless we're told
-        mRenderOperation.useIndexes = false;
-        mRenderOperation.useGlobalInstancing = false;
-        mRenderOperation.vertexData = OGRE_NEW VertexData();
-        mRenderOperation.vertexData->vertexCount = 0;
     }
     ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent,
         const MaterialPtr& mat, RenderOperation::OperationType opType)
         : mParent(parent), mMaterial(mat), m32BitIndices(false)
     {
         assert(mMaterial);
-        mMaterialName = mMaterial->getName();
-        mGroupName = mMaterial->getGroup();
-
         mRenderOperation.operationType = opType;
         mRenderOperation.useIndexes = false;
-        mRenderOperation.useGlobalInstancing = false;
         mRenderOperation.vertexData = OGRE_NEW VertexData();
         mRenderOperation.vertexData->vertexCount = 0;
     }
@@ -667,30 +661,19 @@ ManualObject::ManualObject(const String& name)
     //-----------------------------------------------------------------------------
     const MaterialPtr& ManualObject::ManualObjectSection::getMaterial(void) const
     {
-        if (!mMaterial)
-        {
-            mMaterial = static_pointer_cast<Material>(MaterialManager::getSingleton().load(mMaterialName, mGroupName));
-        }
         return mMaterial;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::ManualObjectSection::setMaterialName(const String& name,
         const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
-        if (mMaterialName != name || mGroupName != groupName)
-        {
-            mMaterialName = name;
-            mGroupName = groupName;
-            mMaterial.reset();
-        }
+        mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
     }
     //-----------------------------------------------------------------------------
     void ManualObject::ManualObjectSection::setMaterial(const MaterialPtr& mat)
     {
         assert(mat);
         mMaterial = mat;
-        mMaterialName = mat->getName();
-        mGroupName = mat->getGroup();
     }
     //-----------------------------------------------------------------------------
     void ManualObject::ManualObjectSection::getRenderOperation(RenderOperation& op)

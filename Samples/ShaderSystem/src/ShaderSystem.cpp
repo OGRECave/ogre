@@ -67,7 +67,6 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
     mInstancedViewportsEnable = false;
     mInstancedViewportsSubRenderState = NULL;
     mInstancedViewportsFactory = NULL;
-    mBbsFlare = NULL;
     mAddedLotsOfModels = false;
     mNumberOfModelsAdded = 0;
     mCurrentBlendMode = NUM_BLEND_MODES - 1;
@@ -667,14 +666,6 @@ void Sample_ShaderSystem::createDirectionalLight()
     // create pivot node
     mDirectionalLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     mDirectionalLightNode->setDirection(dir);
-
-    // Create billboard set.
-    mBbsFlare = mSceneMgr->createBillboardSet();
-    mBbsFlare->setMaterialName("Examples/Flare3");
-    mBbsFlare->createBillboard(-dir * 500.0)->setColour(light->getDiffuseColour());
-    mBbsFlare->setCastShadows(false);
-    
-    mDirectionalLightNode->attachObject(mBbsFlare);
     mDirectionalLightNode->attachObject(light);
 }
 
@@ -781,14 +772,10 @@ void Sample_ShaderSystem::updateInstancedViewports(bool enabled)
         if (mInstancedViewportsEnable)
         {
             mCamera->setCullingFrustum(&mInfiniteFrustum);
-
-            // having problems with bb...
-            mDirectionalLightNode->detachObject(mBbsFlare);
         }
         else
         {
             mCamera->setCullingFrustum(NULL);
-            mDirectionalLightNode->attachObject(mBbsFlare);
         }
 
 
@@ -1085,6 +1072,10 @@ void Sample_ShaderSystem::destroyInstancedViewports()
 
     destroyInstancedViewportsFactory();
 
+    for (int i = 0; i < 3; i++)
+    {
+        mSceneMgr->destroyCamera(StringUtil::format("InstancedCamera%d", i));
+    }
 }
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::destroyInstancedViewportsFactory()
@@ -1107,17 +1098,30 @@ void Sample_ShaderSystem::createInstancedViewports()
         mShaderGenerator->addSubRenderStateFactory(mInstancedViewportsFactory);
     }
 
-    Ogre::Vector2 monitorCount(2.0, 2.0);
-    mInstancedViewportsSubRenderState = mShaderGenerator->createSubRenderState<RTShader::ShaderExInstancedViewports>();
-    Ogre::RTShader::ShaderExInstancedViewports* shaderExInstancedViewports 
-        = static_cast<Ogre::RTShader::ShaderExInstancedViewports*>(mInstancedViewportsSubRenderState);
-    shaderExInstancedViewports->setMonitorsCount(monitorCount);
+    if (Root::getSingletonPtr()->getRenderSystem()->getName().find("Direct3D9") != String::npos)
+    {
+        mSceneMgr->getManualObject("TextureAtlasObject")->getParentSceneNode()->setVisible(false);
+        mSceneMgr->setSkyBox(false, "");
+    }
+
+    std::vector<Camera*> cameras = {mCamera};
+    for (int i = 0; i < 3; i++)
+    {
+        auto cam = mSceneMgr->createCamera(StringUtil::format("InstancedCamera%d", i));
+        auto node = mCamera->getParentSceneNode()->createChildSceneNode();
+        node->yaw(Degree(i * 90 - 45));
+        node->attachObject(cam);
+        cameras.push_back(cam);
+    }
+
+    mInstancedViewportsSubRenderState = mShaderGenerator->createSubRenderState("SGX_InstancedViewports");
+    mInstancedViewportsSubRenderState->setParameter("viewportGrid", Vector2(2, 2));
+    mInstancedViewportsSubRenderState->setParameter("cameras", cameras);
     Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::MSN_SHADERGEN);
     renderState->addTemplateSubRenderState(mInstancedViewportsSubRenderState);
 
     // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
     mShaderGenerator->invalidateScheme(Ogre::MSN_SHADERGEN);
-    mShaderGenerator->validateScheme(Ogre::MSN_SHADERGEN);
 }
 
 void Sample_ShaderSystem::createMaterialForTexture( const String & texName, bool isTextureAtlasTexture )

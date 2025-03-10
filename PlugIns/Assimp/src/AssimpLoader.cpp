@@ -982,6 +982,12 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
         omat->setDiffuse(clr.r, clr.g, clr.b, clr.a);
     }
 
+    if (clr.a < 1.0f)
+    {
+        omat->setSceneBlending(SBT_TRANSPARENT_ALPHA);
+        omat->setDepthWriteEnabled(false);
+    }
+
     // specular
     clr = aiColor4D(1.0f, 1.0f, 1.0f, 1.0f);
     if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_SPECULAR, &clr))

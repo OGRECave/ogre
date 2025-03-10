@@ -297,7 +297,7 @@ namespace Ogre {
     {
         _createGLTexResource();
         
-        _createSurfaceList();
+        createSurfaceList();
 
         // Get final internal format
         mFormat = getBuffer(0,0)->getFormat();
@@ -354,30 +354,9 @@ namespace Ogre {
     }
 #endif
 
-    void GLES2Texture::_createSurfaceList()
+    HardwarePixelBufferPtr GLES2Texture::createSurface(uint32 face, uint32 mip, uint32 width, uint32 height,
+                                                       uint32 depth)
     {
-        mSurfaceList.clear();
-
-        uint32 depth = mDepth;
-
-        // For all faces and mipmaps, store surfaces as HardwarePixelBufferSharedPtr
-        for (size_t face = 0; face < getNumFaces(); face++)
-        {
-            uint32 width = mWidth;
-            uint32 height = mHeight;
-
-            for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
-            {
-                auto buf = std::make_shared<GLES2TextureBuffer>(this, int(face), mip, width, height, depth);
-                mSurfaceList.push_back(buf);
-
-                if (width > 1)
-                    width = width / 2;
-                if (height > 1)
-                    height = height / 2;
-                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
-                    depth = depth / 2;
-            }
-        }
+        return std::make_shared<GLES2TextureBuffer>(this, face, mip, width, height, depth);
     }
 }

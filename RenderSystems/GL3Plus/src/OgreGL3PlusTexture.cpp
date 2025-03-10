@@ -311,7 +311,7 @@ namespace Ogre {
         // Reset unpack alignment to defaults
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
 
-        _createSurfaceList();
+        createSurfaceList();
 
         // Generate mipmaps after all texture levels have been loaded
         // This is required for compressed formats such as DXT
@@ -333,29 +333,10 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusTexture::_createSurfaceList()
+    HardwarePixelBufferPtr GL3PlusTexture::createSurface(uint32 face, uint32 mipmap, uint32 width, uint32 height,
+                                                         uint32 depth)
     {
-        mSurfaceList.clear();
-
-        uint32 depth = mDepth;
-        for (uint8 face = 0; face < getNumFaces(); face++)
-        {
-            uint32 width = mWidth;
-            uint32 height = mHeight;
-
-            for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
-            {
-                auto buf = std::make_shared<GL3PlusTextureBuffer>(this, face, mip, width, height, depth);
-                mSurfaceList.push_back(buf);
-
-                if (width > 1)
-                    width = width / 2;
-                if (height > 1)
-                    height = height / 2;
-                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
-                    depth = depth / 2;
-            }
-        }
+        return std::make_shared<GL3PlusTextureBuffer>(this, face, mipmap, width, height, depth);
     }
 
     void GL3PlusTexture::createShaderAccessPoint(uint bindPoint, TextureAccess access, 

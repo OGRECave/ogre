@@ -190,7 +190,6 @@ protected:
     RTShader::SubRenderState*           mInstancedViewportsSubRenderState;// todo - doc
     bool                                mInstancedViewportsEnable;      // todo - doc
     InfiniteFrustum                     mInfiniteFrustum;               // todo - doc
-    BillboardSet*                       mBbsFlare;                      // todo - doc
     bool                                mAddedLotsOfModels;             // todo - doc
     std::vector<Entity *>              mLotsOfModelsEntities;          // todo - doc       
     std::vector<SceneNode *>           mLotsOfModelsNodes;             // todo - doc  

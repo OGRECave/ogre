@@ -51,6 +51,7 @@ namespace Ogre {
          mCameraPositionDirty(true),
          mCameraPositionObjectSpaceDirty(true),
          mAmbientLight(ColourValue::Black),
+         mShadowColour(ColourValue(0.25, 0.25, 0.25)),
          mPassNumber(0),
          mSceneDepthRangeDirty(true),
          mLodCameraPositionDirty(true),
@@ -306,21 +307,26 @@ namespace Ogre {
         return mWorldMatrixArray + int(MeshManager::getBonesUseObjectSpace());
     }
     //-----------------------------------------------------------------------------
+    Affine3 AutoParamDataSource::getViewMatrix(const Camera* cam) const
+    {
+        Affine3 view;
+        if (mCurrentRenderable && mCurrentRenderable->getUseIdentityView())
+            view = Affine3::IDENTITY;
+        else
+        {
+            view = cam->getViewMatrix(true);
+            if (mCameraRelativeRendering)
+            {
+                view.setTrans(Vector3::ZERO);
+            }
+        }
+        return view;
+    }
     const Affine3& AutoParamDataSource::getViewMatrix(void) const
     {
         if (mViewMatrixDirty)
         {
-            if (mCurrentRenderable && mCurrentRenderable->getUseIdentityView())
-                mViewMatrix = Affine3::IDENTITY;
-            else
-            {
-                mViewMatrix = mCurrentCamera->getViewMatrix(true);
-                if (mCameraRelativeRendering)
-                {
-                    mViewMatrix.setTrans(Vector3::ZERO);
-                }
-
-            }
+            mViewMatrix = getViewMatrix(mCurrentCamera);
             mViewMatrixDirty = false;
         }
         return mViewMatrix;
@@ -336,31 +342,40 @@ namespace Ogre {
         return mViewProjMatrix;
     }
     //-----------------------------------------------------------------------------
+    Matrix4 AutoParamDataSource::getProjectionMatrix(const Camera* cam) const
+    {
+        Matrix4 proj;
+
+        // NB use API-independent projection matrix since GPU programs
+        // bypass the API-specific handedness and use right-handed coords
+        if (mCurrentRenderable && mCurrentRenderable->getUseIdentityProjection())
+        {
+            // Use identity projection matrix, still need to take RS depth into account.
+            RenderSystem* rs = Root::getSingleton().getRenderSystem();
+            rs->_convertProjectionMatrix(Matrix4::IDENTITY, proj, true);
+        }
+        else
+        {
+            proj = mCurrentCamera->getProjectionMatrixWithRSDepth();
+        }
+
+        if (mCurrentRenderTarget && mCurrentRenderTarget->requiresTextureFlipping())
+        {
+            // Because we're not using setProjectionMatrix, this needs to be done here
+            // Invert transformed y
+            proj[1][0] = -proj[1][0];
+            proj[1][1] = -proj[1][1];
+            proj[1][2] = -proj[1][2];
+            proj[1][3] = -proj[1][3];
+        }
+
+        return proj;
+    }
     const Matrix4& AutoParamDataSource::getProjectionMatrix(void) const
     {
         if (mProjMatrixDirty)
         {
-            // NB use API-independent projection matrix since GPU programs
-            // bypass the API-specific handedness and use right-handed coords
-            if (mCurrentRenderable && mCurrentRenderable->getUseIdentityProjection())
-            {
-                // Use identity projection matrix, still need to take RS depth into account.
-                RenderSystem* rs = Root::getSingleton().getRenderSystem();
-                rs->_convertProjectionMatrix(Matrix4::IDENTITY, mProjectionMatrix, true);
-            }
-            else
-            {
-                mProjectionMatrix = mCurrentCamera->getProjectionMatrixWithRSDepth();
-            }
-            if (mCurrentRenderTarget && mCurrentRenderTarget->requiresTextureFlipping())
-            {
-                // Because we're not using setProjectionMatrix, this needs to be done here
-                // Invert transformed y
-                mProjectionMatrix[1][0] = -mProjectionMatrix[1][0];
-                mProjectionMatrix[1][1] = -mProjectionMatrix[1][1];
-                mProjectionMatrix[1][2] = -mProjectionMatrix[1][2];
-                mProjectionMatrix[1][3] = -mProjectionMatrix[1][3];
-            }
+            mProjectionMatrix = getProjectionMatrix(mCurrentCamera);
             mProjMatrixDirty = false;
         }
         return mProjectionMatrix;
@@ -1132,9 +1147,13 @@ namespace Ogre {
             return dummy;
     }
     //---------------------------------------------------------------------
+    void AutoParamDataSource::setShadowColour(const ColourValue& colour)
+    {
+        mShadowColour = colour;
+    }
     const ColourValue& AutoParamDataSource::getShadowColour() const
     {
-        return mCurrentSceneManager->getShadowColour();
+        return mShadowColour;
     }
     //-------------------------------------------------------------------------
     void AutoParamDataSource::updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const
