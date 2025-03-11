@@ -32,6 +32,7 @@
 %include "OgreTerrainQuadTreeNode.h"
 
 %template(LayerInstanceList) std::vector<Ogre::Terrain::LayerInstance>;
+%template(TerrainSlotMap) std::map<uint32_t, Ogre::TerrainGroup::TerrainSlot*>;
 %template(TerrainRayResult) std::pair<bool, Ogre::Vector3>;
 %ignore Ogre::Terrain::getBlendTextureCount;
 %ignore Ogre::Terrain::getBlendTextureName;
