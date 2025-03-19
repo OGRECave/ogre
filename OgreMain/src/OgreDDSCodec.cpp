@@ -1070,10 +1070,7 @@ namespace {
     bool DDSCodec::setParameter(const String& name, const String& value)
     {
         if (name == "decode_enforce")
-        {
-            StringConverter::parse(value, mDecodeEnforce);
-            return true;
-        }
+            return StringConverter::parse(value, mDecodeEnforce);
 
         return false;
     }
