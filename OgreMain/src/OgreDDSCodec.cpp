@@ -160,27 +160,6 @@ namespace {
 }
 
     //---------------------------------------------------------------------
-    // Force the DXT stream decompression
-    //---------------------------------------------------------------------
-    int DDSDecodeEnforcer::mCount = 0;
-
-    DDSDecodeEnforcer::DDSDecodeEnforcer()
-    {
-        ++mCount;
-    }
-
-    DDSDecodeEnforcer::~DDSDecodeEnforcer()
-    {
-        --mCount;
-        assert(mCount >= 0);
-    }
-
-    bool DDSDecodeEnforcer::isEnabled()
-    {
-        return mCount > 0;
-    }
-
-    //---------------------------------------------------------------------
     DDSCodec* DDSCodec::msInstance = 0;
     //---------------------------------------------------------------------
     void DDSCodec::startup(void)
@@ -210,7 +189,8 @@ namespace {
     }
     //---------------------------------------------------------------------
     DDSCodec::DDSCodec():
-        mType("dds")
+        mType("dds"),
+        mDecodeEnforce(false)
     { 
     }
     //---------------------------------------------------------------------
@@ -867,7 +847,7 @@ namespace {
         {
             if (Root::getSingleton().getRenderSystem() == NULL ||
                 !Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) ||
-                DDSDecodeEnforcer::isEnabled())
+                mDecodeEnforce)
             {
                 // We'll need to decompress
                 decompressDXT = true;
@@ -1085,6 +1065,17 @@ namespace {
 
         return BLANKSTRING;
 
+    }
+    //---------------------------------------------------------------------
+    bool DDSCodec::setParameter(const String& name, const String& value)
+    {
+        if (name == "decode_enforce")
+        {
+            StringConverter::parse(value, mDecodeEnforce);
+            return true;
+        }
+
+        return false;
     }
     
 }

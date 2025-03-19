@@ -134,6 +134,8 @@ namespace Ogre {
         @return A blank string if the magic number was unknown, or a file extension.
         */
         virtual String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const = 0;
+
+        virtual bool setParameter(const String& name, const String& value) { return false; }
     };
     /** @} */
     /** @} */
