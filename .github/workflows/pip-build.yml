@@ -7,7 +7,7 @@ env:
   TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
 jobs:
   linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         pyver: [cp310-cp310, cp312-cp312]
