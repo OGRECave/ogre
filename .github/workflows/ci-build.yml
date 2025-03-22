@@ -49,7 +49,7 @@ jobs:
         # check whitespace
         git diff --check HEAD^
   android:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
     - uses: actions/cache@v4
@@ -102,7 +102,7 @@ jobs:
       env:
         IOS: true
   custombuild:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Install Dependencies
       run: |
