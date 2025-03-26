@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreResource.h"
 #include "OgreImage.h"
 #include "OgreHeaderPrefix.h"
-#include "OgreSharedPtr.h"
 
 namespace Ogre {
 

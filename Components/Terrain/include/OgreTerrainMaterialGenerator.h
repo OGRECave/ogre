@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgrePixelFormat.h"
-#include "OgreSharedPtr.h"
 
 namespace Ogre
 {
@@ -191,7 +190,7 @@ namespace Ogre
 
     };
 
-    typedef SharedPtr<TerrainMaterialGenerator> TerrainMaterialGeneratorPtr;
+    typedef shared_ptr<TerrainMaterialGenerator> TerrainMaterialGeneratorPtr;
 
     /** @} */
     /** @} */
