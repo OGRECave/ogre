@@ -657,7 +657,8 @@ namespace Ogre {
             if (mat && mat[0] != '\0')
             {
                 // we do not load any materials - so create a dummy here to just store the name
-                sm->setMaterial(MaterialManager::getSingleton().create(mat, RGN_DEFAULT));
+                auto res = MaterialManager::getSingleton().createOrRetrieve(mat, RGN_DEFAULT).first;
+                sm->setMaterial(static_pointer_cast<Material>(res));
             }
             else
             {
