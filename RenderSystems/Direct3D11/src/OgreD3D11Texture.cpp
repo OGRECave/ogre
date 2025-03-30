@@ -584,8 +584,9 @@ namespace Ogre
         
         ID3D11Resource * pBackBuffer = buffer->getParentTexture()->getTextureResource();
 
-        D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
-        ZeroMemory( &RTVDesc, sizeof(RTVDesc) );
+        D3D11_RENDER_TARGET_VIEW_DESC RTVDesc = {};
+
+        bool allLayers = buffer->getParentTexture()->getUsage() & TU_TARGET_ALL_LAYERS;
 
         RTVDesc.Format = buffer->getParentTexture()->getShaderResourceViewDesc().Format;
         switch(buffer->getParentTexture()->getShaderResourceViewDesc().ViewDimension)
@@ -602,7 +603,7 @@ namespace Ogre
         case D3D11_SRV_DIMENSION_TEXTURECUBE:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
             RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
-            RTVDesc.Texture2DArray.ArraySize = 1;
+            RTVDesc.Texture2DArray.ArraySize = allLayers ? 6 : 1;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2D:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -610,7 +611,7 @@ namespace Ogre
         case D3D11_SRV_DIMENSION_TEXTURE2DARRAY:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
             RTVDesc.Texture2DArray.FirstArraySlice = mZOffset;
-            RTVDesc.Texture2DArray.ArraySize = 1;
+            RTVDesc.Texture2DArray.ArraySize = allLayers ? mBuffer->getDepth() : 1;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DMS:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;

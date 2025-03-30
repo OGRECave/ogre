@@ -69,8 +69,14 @@ namespace Ogre {
         mFace(face),
         mMipLevel(mipLevel)
     {
-        if(mUsage & TU_RENDERTARGET)
+        if(parentTexture->getUsage() & TU_RENDERTARGET)
         {
+            if (parentTexture->getUsage() & TU_TARGET_ALL_LAYERS)
+            {
+                if(face > 0) // only one rendertarget for all layers
+                    return;
+            }
+
             // Create render target for each slice
             mSliceTRT.reserve(mDepth);
             for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
