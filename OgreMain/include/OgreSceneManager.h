@@ -760,7 +760,7 @@ namespace Ogre {
         void _destroySceneNode(SceneNodeList::iterator it);
 
         ShadowTechnique mShadowTechnique;
-        struct TextureShadowRenderer
+        struct _OgreExport TextureShadowRenderer
         {
             typedef std::vector<Camera*> CameraList;
             typedef std::map< const Camera*, const Light* > ShadowCamLightMapping;
@@ -892,7 +892,7 @@ namespace Ogre {
             void sortLightsAffectingFrustum(LightList& lightList) const;
         } mTextureShadowRenderer;
 
-        struct StencilShadowRenderer
+        struct _OgreExport StencilShadowRenderer
         {
             StencilShadowRenderer(SceneManager* owner);
             ~StencilShadowRenderer();
