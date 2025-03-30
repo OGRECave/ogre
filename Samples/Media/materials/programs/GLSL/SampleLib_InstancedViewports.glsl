@@ -29,17 +29,10 @@ furnished to do so, subject to the following conditions:
 // Transform the output position to the current "monitor"
 //-----------------------------------------------------------------------------
 
-#ifdef OGRE_VERTEX_SHADER
-void SGX_InstancedViewportsTransform(
-    in vec4 i_position,
-    in mat4 viewportOffsetArray[NUM_MONITORS],
-    in vec4 i_monitorIndex,
-    out vec4 o_position)
+void SGX_InstancedViewportsGetLayer(in vec4 i_monitorIndex, out int layer)
 {
-    mat4 viewportOffset = viewportOffsetArray[int(i_monitorIndex.z)];
-    o_position = mul(viewportOffset, i_position);
+    layer = int(i_monitorIndex.z);
 }
-#endif
 
 //-----------------------------------------------------------------------------
 // Discard any pixel that is outside the bounds of the current "monitor"
