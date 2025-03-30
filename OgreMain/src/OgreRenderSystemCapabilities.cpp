@@ -142,6 +142,8 @@ namespace Ogre {
             pLog->logMessage("   - Number of constant 4-vectors: " +
                              StringConverter::toString(mConstantFloatCount[GPT_COMPUTE_PROGRAM]));
         }
+        pLog->logMessage(" * VP/RT index from any shader: " +
+            StringConverter::toString(hasCapability(RSC_VP_RT_INDEX_ANY_SHADER), true));
         pLog->logMessage(
             " * Supported Shader Profiles: " +
             StringConverter::toString(StringVector(mSupportedShaderProfiles.begin(), mSupportedShaderProfiles.end())));
