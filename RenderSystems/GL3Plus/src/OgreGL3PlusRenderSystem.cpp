@@ -464,6 +464,9 @@ namespace Ogre {
         if( hasMinGLVersion(4, 3) || checkExtension("GL_ARB_ES3_compatibility"))
             rsc->setCapability(RSC_PRIMITIVE_RESTART);
 
+        if( checkExtension("GL_ARB_shader_viewport_layer_array") )
+            rsc->setCapability(RSC_VP_RT_INDEX_ANY_SHADER);
+
         GLfloat lineWidth[2] = {1, 1};
         glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidth);
         if(lineWidth[1] != 1 && lineWidth[1] != lineWidth[0])
