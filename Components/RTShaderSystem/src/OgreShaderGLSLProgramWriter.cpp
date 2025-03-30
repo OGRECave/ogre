@@ -121,6 +121,11 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
         break;
     }
 
+    if (program->getType() == GPT_VERTEX_PROGRAM && program->getMain()->getOutputParameter(Parameter::SPC_LAYER))
+    {
+        os << "#extension GL_ARB_shader_viewport_layer_array : require\n";
+    }
+
     // Generate dependencies.
     writeProgramDependencies(os, program);
     os << std::endl;
@@ -268,6 +273,11 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
                 // injected by matchVStoPSInterface, but only available in VS
                 continue;
             }
+            else if(paramSemantic == Parameter::SPS_LAYER)
+            {
+                p->_rename("gl_Layer");
+                continue;
+            }
             else if(paramSemantic == Parameter::SPS_POSITION)
             {
                 p->_rename("gl_FragCoord");
@@ -336,6 +346,10 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
             else if(p->getContent() == Parameter::SPC_POINTSPRITE_SIZE)
             {
                 p->_rename("gl_PointSize");
+            }
+            else if(p->getSemantic() == Parameter::SPS_LAYER)
+            {
+                p->_rename("gl_Layer");
             }
             else
             {
