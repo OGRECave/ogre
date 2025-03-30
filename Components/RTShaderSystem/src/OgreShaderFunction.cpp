@@ -66,6 +66,8 @@ static GpuConstantType typeFromContent(int content)
         return GCT_FLOAT1;
     case Parameter::SPC_FRONT_FACING:
         return GCT_FLOAT1;
+    case Parameter::SPC_LAYER:
+        return GCT_UINT1;
     default:
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "cannot derive type from content");
         break;
@@ -91,6 +93,8 @@ static Parameter::Semantic semanticFromContent(int content, bool isVSOut = false
         return Parameter::SPS_BINORMAL;
     case Parameter::SPC_FRONT_FACING:
         return Parameter::SPS_FRONT_FACING;
+    case Parameter::SPC_LAYER:
+        return Parameter::SPS_LAYER;
     case Parameter::SPC_TANGENT_OBJECT_SPACE:
         if(!isVSOut) return Parameter::SPS_TANGENT;
         OGRE_FALLTHROUGH;
@@ -214,6 +218,9 @@ static String getParameterName(const char* prefix, Parameter::Semantic semantic,
         break;
     case Parameter::SPS_FRONT_FACING:
         name = "FrontFacing";
+        break;
+    case Parameter::SPS_LAYER:
+        name = "Layer";
         break;
     case Parameter::SPS_UNKNOWN:
         name = "Param";
@@ -341,6 +348,7 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
     case Parameter::SPS_TEXTURE_COORDINATES:
     case Parameter::SPS_COLOR:
     case Parameter::SPS_POSITION:
+    case Parameter::SPS_LAYER:
         param = std::make_shared<Parameter>(type, getParameterName(prefix, semantic, index), semantic, index,
                                             content);
         break;
