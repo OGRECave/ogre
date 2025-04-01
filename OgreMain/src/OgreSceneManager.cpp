@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreGpuProgram.h"
+#include "OgreRenderSystem.h"
 #include "OgreStableHeaders.h"
 
 #include "OgreControllerManager.h"
@@ -1604,32 +1605,29 @@ void SceneManager::issueRenderWithLights(Renderable* rend, const Pass* pass,
          resetLightClip();
 }
 //-----------------------------------------------------------------------
-static void injectGlobalInstancingDeclaration(RenderOperation& ro, const RenderSystem* rs)
+static void injectGlobalInstancingDeclaration(RenderOperation& ro, const GlobalInstancingData& instanceData)
 {
     if (!ro.useGlobalInstancing)
         return;
 
-    // Create variables related to instancing.
-    VertexDeclaration* instanceDecl = rs->getGlobalInstanceVertexDeclaration();
-
-    if(!instanceDecl || instanceDecl->getElements().empty())
+    if(!instanceData.vertexDecl || instanceData.vertexDecl->getElements().empty())
         return;
 
     auto instancingSrc = ro.vertexData->vertexDeclaration->getMaxSource();
 
-    auto testElement = instanceDecl->getElements().front();
+    auto testElement = instanceData.vertexDecl->getElements().front();
     if(!ro.vertexData->vertexDeclaration->findElementBySemantic(testElement.getSemantic(), testElement.getIndex()))
     {
         instancingSrc += 1;
-        for (auto el : instanceDecl->getElements())
+        for (auto el : instanceData.vertexDecl->getElements())
         {
             ro.vertexData->vertexDeclaration->addElement(instancingSrc, el.getOffset(), el.getType(), el.getSemantic(),
                                                          el.getIndex());
         }
     }
-    ro.vertexData->vertexBufferBinding->setBinding(instancingSrc, rs->getGlobalInstanceVertexBuffer());
+    ro.vertexData->vertexBufferBinding->setBinding(instancingSrc, instanceData.vertexBuffer);
 
-    ro.numberOfInstances *= rs->getGlobalInstanceCount();
+    ro.numberOfInstances *= instanceData.instanceCount;
 }
 
 static PolygonMode derivePolygonMode(const Pass* pass, const Renderable* rend, const Camera* cam)
@@ -1765,7 +1763,7 @@ void SceneManager::renderInstancedObject(const RenderableList& rends, const Pass
     // set again -> might have been recreated
     ro.vertexData->vertexBufferBinding->setBinding(instancingSrc, mInstanceBuffer);
 
-    injectGlobalInstancingDeclaration(ro, mDestRenderSystem);
+    injectGlobalInstancingDeclaration(ro, mSchemeInstancingData);
 
     mDestRenderSystem->_render(ro);
 
@@ -2472,6 +2470,8 @@ void SceneManager::setViewport(Viewport* vp)
     mDestRenderSystem->_setViewport(vp);
     // Set the active material scheme for this viewport
     MaterialManager::getSingleton().setActiveScheme(vp->getMaterialScheme());
+
+    mSchemeInstancingData = mDestRenderSystem->getSchemeInstancingData(vp->getMaterialScheme());
 }
 //---------------------------------------------------------------------
 void SceneManager::showBoundingBoxes(bool bShow) 
@@ -3683,7 +3683,7 @@ void SceneManager::_issueRenderOp(Renderable* rend, const Pass* pass)
 
         rend->getRenderOperation(ro);
 
-        injectGlobalInstancingDeclaration(ro, mDestRenderSystem);
+        injectGlobalInstancingDeclaration(ro, mSchemeInstancingData);
 
         mDestRenderSystem->_render(ro);
     }

@@ -1029,6 +1029,7 @@ namespace Ogre {
         typedef std::vector<EntityMaterialLodChangedEvent> EntityMaterialLodChangedEventList;
         EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
 
+        GlobalInstancingData mSchemeInstancingData;
     public:
         //A render context, used to store internal data for pausing/resuming rendering
         struct RenderContext

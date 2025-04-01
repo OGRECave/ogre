@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"
+#include "OgreMaterialManager.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -51,6 +52,7 @@ ShaderExInstancedViewports::ShaderExInstancedViewports()
     mMonitorsCountChanged       = true;
     mOwnsGlobalData             = false;
     mLayeredTarget              = false;
+    mSchemeName                = MSN_SHADERGEN;
 }
 
 //-----------------------------------------------------------------------
@@ -77,6 +79,7 @@ void ShaderExInstancedViewports::copyFrom(const SubRenderState& rhs)
     mMonitorsCountChanged = rhsInstancedViewports.mMonitorsCountChanged;
     mCameras = rhsInstancedViewports.mCameras;
     mLayeredTarget = rhsInstancedViewports.mLayeredTarget;
+    mSchemeName = rhsInstancedViewports.mSchemeName;
 }
 
 //-----------------------------------------------------------------------
@@ -209,6 +212,12 @@ void ShaderExInstancedViewports::setParameter(const String& name, const Any& val
         return;
     }
 
+    if (name == "schemeName")
+    {
+        mSchemeName = any_cast<String>(value);
+        return;
+    }
+
     SubRenderState::setParameter(name, value);
 }
 
@@ -238,9 +247,7 @@ void ShaderExInstancedViewports::setMonitorsCount( const Vector2 monitorCount )
     mOwnsGlobalData = true;
 
     auto rs = Ogre::Root::getSingleton().getRenderSystem();
-    rs->setGlobalInstanceVertexBuffer(vbuf);
-    rs->setGlobalInstanceVertexDeclaration(vertexDeclaration);
-    rs->setGlobalInstanceCount(monitorCount.x * monitorCount.y);
+    rs->enableSchemeInstancing(mSchemeName, vbuf, vertexDeclaration, monitorCount.x * monitorCount.y);
 }
 ShaderExInstancedViewports::~ShaderExInstancedViewports()
 {
@@ -248,14 +255,13 @@ ShaderExInstancedViewports::~ShaderExInstancedViewports()
         return;
 
     auto rs = Ogre::Root::getSingleton().getRenderSystem();
-    if (auto decl = rs->getGlobalInstanceVertexDeclaration())
+
+    if (auto decl = rs->getSchemeInstancingData(rs->_getDefaultViewportMaterialScheme()).vertexDecl)
     {
         Ogre::HardwareBufferManager::getSingleton().destroyVertexDeclaration(decl);
     }
 
-    rs->setGlobalInstanceVertexDeclaration(NULL);
-    rs->setGlobalInstanceCount(1);
-    rs->setGlobalInstanceVertexBuffer( NULL );
+    rs->disableSchemeInstancing(mSchemeName);
 }
 
 //-----------------------------------------------------------------------
