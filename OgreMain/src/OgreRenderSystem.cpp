@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgrePrerequisites.h"
 #include "OgreStableHeaders.h"
 // RenderSystem implementation
 // Note that most of this class is abstract since
@@ -72,8 +73,6 @@ namespace Ogre {
         , mNativeShadingLanguageVersion(0)
         , mTexProjRelative(false)
         , mTexProjRelativeOrigin(Vector3::ZERO)
-        , mGlobalInstanceVertexDeclaration(NULL)
-        , mGlobalNumberOfInstances(1)
     {
         mEventNames.push_back("RenderSystemCapabilitiesCreated");
     }
@@ -800,11 +799,20 @@ namespace Ogre {
         return MSN_DEFAULT;
     }
     //---------------------------------------------------------------------
-    void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr &val )
+    void RenderSystem::setGlobalInstanceVertexBuffer(const HardwareVertexBufferSharedPtr& val)
     {
         OgreAssert(!val || val->isInstanceData(), "not an instance buffer");
-        mGlobalInstanceVertexBuffer = val;
+        mSchemeInstancingData[_getDefaultViewportMaterialScheme()].vertexBuffer = val;
     }
+    void RenderSystem::enableSchemeInstancing(const String& materialScheme, const HardwareVertexBufferPtr& buffer,
+                                              VertexDeclaration* decl, uint32 instanceCount)
+    {
+        OgreAssert(!buffer || buffer->isInstanceData(), "not an instance buffer");
+        OgreAssert(decl, "null vertex declaration");
+        OgreAssert(instanceCount > 1, "instance count must be greater than 1");
+        mSchemeInstancingData.emplace(materialScheme, GlobalInstancingData{buffer, decl, instanceCount});
+    }
+
     //---------------------------------------------------------------------
     void RenderSystem::getCustomAttribute(const String& name, void* pData)
     {
