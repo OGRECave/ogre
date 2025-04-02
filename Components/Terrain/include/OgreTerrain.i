@@ -32,6 +32,17 @@
 %include "OgreTerrainQuadTreeNode.h"
 
 %template(LayerInstanceList) std::vector<Ogre::Terrain::LayerInstance>;
+#ifdef SWIGPYTHON
+%{
+    // this is a workaround for the following map
+    namespace swig {
+    template<> struct traits<Ogre::TerrainGroup::TerrainSlot> {
+        typedef pointer_category category;
+        static const char* type_name() { return "Ogre::TerrainGroup::TerrainSlot"; }
+    };
+    }
+%}
+#endif
 %template(TerrainSlotMap) std::map<uint32_t, Ogre::TerrainGroup::TerrainSlot*>;
 %template(TerrainRayResult) std::pair<bool, Ogre::Vector3>;
 %ignore Ogre::Terrain::getBlendTextureCount;
