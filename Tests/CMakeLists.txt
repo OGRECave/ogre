@@ -10,20 +10,20 @@
 # Configure Tests build
 if (OGRE_BUILD_TESTS)
 
-  if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-1.11.0)
+  if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-1.16.0)
     message(STATUS "Building gtest")
     file(DOWNLOAD
-        https://github.com/google/googletest/archive/refs/tags/release-1.11.0.tar.gz
-        ${PROJECT_BINARY_DIR}/release-1.11.0.tar.gz)
+        https://github.com/google/googletest/releases/download/v1.16.0/googletest-1.16.0.tar.gz
+        ${PROJECT_BINARY_DIR}/release-1.16.0.tar.gz)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf release-1.11.0.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        -E tar xf release-1.16.0.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
-        ${PROJECT_BINARY_DIR}/googletest-release-1.11.0
+        ${PROJECT_BINARY_DIR}/googletest-1.16.0
         -Dgtest_force_shared_crt=TRUE
         -DBUILD_GMOCK=FALSE
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-release-1.11.0)
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-1.16.0)
     execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/googletest-release-1.11.0 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/googletest-1.16.0 ${BUILD_COMMAND_OPTS})
   endif()
   find_package(GTest REQUIRED CONFIG)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)

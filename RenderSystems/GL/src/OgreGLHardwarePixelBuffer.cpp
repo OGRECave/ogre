@@ -634,14 +634,6 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     // Delete temp texture
     TextureManager::getSingleton().remove(tex);
 }
-//-----------------------------------------------------------------------------    
-
-RenderTexture *GLTextureBuffer::getRenderTarget(size_t zoffset)
-{
-    assert(mUsage & TU_RENDERTARGET);
-    assert(zoffset < mDepth);
-    return mSliceTRT[zoffset];
-}
 //********* GLRenderBuffer
 //----------------------------------------------------------------------------- 
 GLRenderBuffer::GLRenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):

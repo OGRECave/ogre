@@ -760,6 +760,11 @@ namespace Ogre
                     }
                     else if( extensionName == VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME )
                         deviceExtensions.push_back( VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME );
+                    else if( extensionName == VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME )
+                    {
+                        deviceExtensions.push_back( VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME );
+                        mRealCapabilities->setCapability( RSC_VP_RT_INDEX_ANY_SHADER );
+                    }
 #ifdef VK_EXT_mesh_shader
                     else if( extensionName == VK_EXT_MESH_SHADER_EXTENSION_NAME)
                     {

@@ -40,16 +40,18 @@ jobs:
         cd ../lib && python -c "import _Ogre; import _RTShader"
         cd ../../
         # validate XMLConverter output
-        build/bin/OgreXMLConverter Samples/Media/models/jaiqua.mesh && build/bin/OgreXMLConverter Samples/Media/models/jaiqua.skeleton
-        python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/jaiqua.mesh.xml
+        build/bin/OgreXMLConverter Samples/Media/models/ninja.mesh && build/bin/OgreXMLConverter Samples/Media/models/ninja.skeleton
+        python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/ninja.mesh.xml
+        # reverse conversion
+        build/bin/OgreXMLConverter Samples/Media/models/ninja.mesh.xml
         # MeshUpgrader does not crash
-        build/bin/OgreMeshUpgrader Samples/Media/models/jaiqua.mesh
+        build/bin/OgreMeshUpgrader Samples/Media/models/ninja.mesh
         # validate DotScene DTD
         python3 PlugIns/DotScene/misc/validate.py PlugIns/DotScene/misc/example.scene
         # check whitespace
         git diff --check HEAD^
   android:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
     - uses: actions/cache@v4
@@ -102,7 +104,7 @@ jobs:
       env:
         IOS: true
   custombuild:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Install Dependencies
       run: |

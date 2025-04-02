@@ -69,7 +69,9 @@ public:
         /// Tangent (X axis if normal is Z)
         SPS_TANGENT = 9,
         /// VFACE
-        SPS_FRONT_FACING
+        SPS_FRONT_FACING,
+        /// SV_RenderTargetArrayIndex
+        SPS_LAYER
     };
 
     /** Shader parameter content
@@ -179,6 +181,9 @@ public:
 
         /// gl_FrontFacing
         SPC_FRONT_FACING,
+
+        /// gl_Layer
+        SPC_LAYER,
 
         /// Reserved custom content range to be used by user custom shader extensions.
         SPC_CUSTOM_CONTENT_BEGIN    = 1000,

@@ -79,8 +79,15 @@ namespace Ogre {
             return;
 
         // Is this a render target?
-        if (mUsage & TU_RENDERTARGET)
+        if (parent->getUsage() & TU_RENDERTARGET)
         {
+            if (parent->getUsage() & TU_TARGET_ALL_LAYERS)
+            {
+                mTarget = GL_TEXTURE_2D; // will bind the whole texture to FBO
+                if(face > 0) // only one rendertarget for all layers
+                    return;
+            }
+
             // Create render target for each slice
             mSliceTRT.reserve(mDepth);
             for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)

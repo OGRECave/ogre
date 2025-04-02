@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"
+#include "OgreMaterialManager.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -50,6 +51,8 @@ ShaderExInstancedViewports::ShaderExInstancedViewports()
     mViewportGrid              = Vector2(1.0, 1.0);
     mMonitorsCountChanged       = true;
     mOwnsGlobalData             = false;
+    mLayeredTarget              = false;
+    mSchemeName                = MSN_SHADERGEN;
 }
 
 //-----------------------------------------------------------------------
@@ -75,6 +78,8 @@ void ShaderExInstancedViewports::copyFrom(const SubRenderState& rhs)
     mViewportGrid = rhsInstancedViewports.mViewportGrid;
     mMonitorsCountChanged = rhsInstancedViewports.mMonitorsCountChanged;
     mCameras = rhsInstancedViewports.mCameras;
+    mLayeredTarget = rhsInstancedViewports.mLayeredTarget;
+    mSchemeName = rhsInstancedViewports.mSchemeName;
 }
 
 //-----------------------------------------------------------------------
@@ -105,7 +110,9 @@ bool ShaderExInstancedViewports::createCpuSubPrograms(ProgramSet* programSet)
     vsProgram->addPreprocessorDefines(StringUtil::format("NUM_MONITORS=%d", numMonitors));
 
     vsProgram->addDependency("SampleLib_InstancedViewports");
-    psProgram->addDependency("SampleLib_InstancedViewports");
+
+    if(!mLayeredTarget)
+        psProgram->addDependency("SampleLib_InstancedViewports");
 
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
@@ -124,10 +131,21 @@ bool ShaderExInstancedViewports::createCpuSubPrograms(ProgramSet* programSet)
 
     // Add vertex shader invocations.
     auto vstage = vsMain->getStage(FFP_VS_TRANSFORM + 1);
-    vstage.callFunction("SGX_InstancedViewportsTransform", {In(positionIn), In(mVSInMatrixArray), In(vsInMonitorIndex),
-                                                            Out(originalOutPositionProjectiveSpace)});
+
+    auto layerIdx = vsMain->resolveLocalParameter(GCT_INT1, "layer");
+    vstage.callFunction("SGX_InstancedViewportsGetLayer", vsInMonitorIndex, layerIdx);
+    vstage.callBuiltin("mul", {In(mVSInMatrixArray), At(layerIdx), In(positionIn), Out(originalOutPositionProjectiveSpace)});
+
     // Output position in projective space.
     vstage.assign(originalOutPositionProjectiveSpace, vsOutPositionProjectiveSpace);
+
+    if(mLayeredTarget)
+    {
+        auto layer = vsMain->resolveOutputParameter(Parameter::SPC_LAYER);
+        vstage.assign(layerIdx, layer);
+        return true;
+    }
+
     // Output monitor index.
     vstage.assign(vsInMonitorIndex, vsOutMonitorIndex);
 
@@ -188,6 +206,18 @@ void ShaderExInstancedViewports::setParameter(const String& name, const Any& val
         return;
     }
 
+    if (name == "layeredTarget")
+    {
+        mLayeredTarget = any_cast<bool>(value);
+        return;
+    }
+
+    if (name == "schemeName")
+    {
+        mSchemeName = any_cast<String>(value);
+        return;
+    }
+
     SubRenderState::setParameter(name, value);
 }
 
@@ -217,9 +247,7 @@ void ShaderExInstancedViewports::setMonitorsCount( const Vector2 monitorCount )
     mOwnsGlobalData = true;
 
     auto rs = Ogre::Root::getSingleton().getRenderSystem();
-    rs->setGlobalInstanceVertexBuffer(vbuf);
-    rs->setGlobalInstanceVertexDeclaration(vertexDeclaration);
-    rs->setGlobalInstanceCount(monitorCount.x * monitorCount.y);
+    rs->enableSchemeInstancing(mSchemeName, vbuf, vertexDeclaration, monitorCount.x * monitorCount.y);
 }
 ShaderExInstancedViewports::~ShaderExInstancedViewports()
 {
@@ -227,14 +255,13 @@ ShaderExInstancedViewports::~ShaderExInstancedViewports()
         return;
 
     auto rs = Ogre::Root::getSingleton().getRenderSystem();
-    if (auto decl = rs->getGlobalInstanceVertexDeclaration())
+
+    if (auto decl = rs->getSchemeInstancingData(rs->_getDefaultViewportMaterialScheme()).vertexDecl)
     {
         Ogre::HardwareBufferManager::getSingleton().destroyVertexDeclaration(decl);
     }
 
-    rs->setGlobalInstanceVertexDeclaration(NULL);
-    rs->setGlobalInstanceCount(1);
-    rs->setGlobalInstanceVertexBuffer( NULL );
+    rs->disableSchemeInstancing(mSchemeName);
 }
 
 //-----------------------------------------------------------------------
