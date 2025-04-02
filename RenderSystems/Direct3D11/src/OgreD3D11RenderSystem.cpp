@@ -790,6 +790,15 @@ namespace Ogre
 
         rsc->setCapability(RSC_HWSTENCIL);
 
+#ifdef NTDDI_WIN10_TH2
+        D3D11_FEATURE_DATA_D3D11_OPTIONS3 fOpt3 = {};
+        HRESULT hr = mDevice->CheckFeatureSupport( D3D11_FEATURE_D3D11_OPTIONS3, &fOpt3, sizeof( fOpt3 ) );
+        if( SUCCEEDED( hr ) && fOpt3.VPAndRTArrayIndexFromAnyShaderFeedingRasterizer )
+        {
+            rsc->setCapability( RSC_VP_RT_INDEX_ANY_SHADER );
+        }
+#endif
+
         UINT formatSupport;
         if(mFeatureLevel >= D3D_FEATURE_LEVEL_9_2
         || SUCCEEDED(mDevice->CheckFormatSupport(DXGI_FORMAT_R32_UINT, &formatSupport)) && 0 != (formatSupport & D3D11_FORMAT_SUPPORT_IA_INDEX_BUFFER))

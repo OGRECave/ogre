@@ -199,6 +199,13 @@ namespace Ogre
         rsc->setFragmentProgramConstantFloatCount( 16384 );
         rsc->setComputeProgramConstantFloatCount( 16384 );
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        if( [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily5_v1] )
+            rsc->setCapability( RSC_VP_RT_INDEX_ANY_SHADER );
+#else
+        rsc->setCapability( RSC_VP_RT_INDEX_ANY_SHADER );
+#endif
+
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         uint8 mrtCount = 8u;
 #else

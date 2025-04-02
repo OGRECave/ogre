@@ -44,6 +44,7 @@ namespace Ogre {
     struct DXTExplicitAlphaBlock;
     struct DXTInterpolatedAlphaBlock;
 
+
     /** Codec specialized in loading DDS (Direct Draw Surface) images.
 
         We implement our own codec here since we need to be able to keep DXT
@@ -53,6 +54,7 @@ namespace Ogre {
     {
     private:
         String mType;
+        bool   mDecodeEnforce;
 
         PixelFormat convertFourCCFormat(uint32 fourcc) const;
         PixelFormat convertDXToOgreFormat(uint32 fourcc) const;
@@ -72,6 +74,7 @@ namespace Ogre {
         DDSCodec();
         virtual ~DDSCodec() { }
 
+        DataStreamPtr encode(const Any& input) const override;
         void encodeToFile(const Any& input, const String& outFileName) const override;
         void decode(const DataStreamPtr& input, const Any& output) const override;
         String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
@@ -81,6 +84,8 @@ namespace Ogre {
         static void startup(void);
         /// Static method to shutdown and unregister the DDS codec
         static void shutdown(void);
+
+        bool setParameter(const String& name, const String& value) override;
 
     };
     /** @} */

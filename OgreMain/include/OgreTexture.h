@@ -70,6 +70,9 @@ namespace Ogre {
         /// Texture can be bound as an Unordered Access View
         /// (imageStore/imageRead/glBindImageTexture in GL jargon)
         TU_UNORDERED_ACCESS = 0x80,
+        /// Create only a single render target which will be used for all layers
+        /// only relevant for layered textures like 2D arrays and cube maps
+        TU_TARGET_ALL_LAYERS = 0x100,
         /// Default to automatic mipmap generation static textures
         TU_DEFAULT = TU_AUTOMIPMAP | HBU_GPU_ONLY,
 

@@ -173,6 +173,8 @@ namespace Ogre
         RSC_VERTEX_BUFFER_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 16),
         /// Supports mesh and task programs
         RSC_MESH_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 17),
+        /// Supports setting viewport and rendertarget array index from any shader stage
+        RSC_VP_RT_INDEX_ANY_SHADER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 18),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
