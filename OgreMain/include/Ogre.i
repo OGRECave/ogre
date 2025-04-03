@@ -882,7 +882,9 @@ SHARED_PTR(Mesh);
     }
 %}
 #endif
+#ifndef SWIGJAVA
 %template(RegionMap) std::map<uint32_t, Ogre::StaticGeometry::Region*>;
+#endif
 #ifdef SWIGPYTHON
 %{
     // this is a workaround for the following map
