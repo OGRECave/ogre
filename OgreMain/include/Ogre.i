@@ -871,6 +871,10 @@ SHARED_PTR(Mesh);
 %ignore Ogre::StaticGeometry::Region::getLODIterator;
 %ignore Ogre::StaticGeometry::MaterialBucket::getGeometryIterator;
 %ignore Ogre::StaticGeometry::LODBucket::getMaterialIterator;
+%template(RegionMap) std::map<uint32_t, Ogre::StaticGeometry::Region*>;
+%template(LODBucketList) std::vector<Ogre::StaticGeometry::LODBucket*>;
+%template(MaterialBucketMap) std::map<std::string, Ogre::StaticGeometry::MaterialBucket*>;
+%template(GeometryBucketList) std::vector<Ogre::StaticGeometry::GeometryBucket*>;
 %include "OgreStaticGeometry.h"
 %include "OgrePatchSurface.h"
     SHARED_PTR(PatchMesh);
