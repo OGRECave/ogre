@@ -43,7 +43,9 @@
     }
 %}
 #endif
+#ifndef SWIGJAVA
 %template(TerrainSlotMap) std::map<uint32_t, Ogre::TerrainGroup::TerrainSlot*>;
+#endif
 %template(TerrainRayResult) std::pair<bool, Ogre::Vector3>;
 %ignore Ogre::Terrain::getBlendTextureCount;
 %ignore Ogre::Terrain::getBlendTextureName;
