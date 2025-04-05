@@ -28,13 +28,21 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 namespace Ogre {
+namespace {
+    constexpr ColourValue gColourValueZero(0.0, 0.0, 0.0, 0.0);
+    constexpr ColourValue gColourValueBlack(0.0, 0.0, 0.0);
+    constexpr ColourValue gColourValueWhite(1.0, 1.0, 1.0);
+    constexpr ColourValue gColourValueRed(1.0, 0.0, 0.0);
+    constexpr ColourValue gColourValueGreen(0.0, 1.0, 0.0);
+    constexpr ColourValue gColourValueBlue(0.0, 0.0, 1.0);
+}  // namespace
 
-    const ColourValue ColourValue::ZERO = ColourValue(0.0,0.0,0.0,0.0);
-    const ColourValue ColourValue::Black = ColourValue(0.0,0.0,0.0);
-    const ColourValue ColourValue::White = ColourValue(1.0,1.0,1.0);
-    const ColourValue ColourValue::Red = ColourValue(1.0,0.0,0.0);
-    const ColourValue ColourValue::Green = ColourValue(0.0,1.0,0.0);
-    const ColourValue ColourValue::Blue = ColourValue(0.0,0.0,1.0);
+    const ColourValue &ColourValue::ZERO = gColourValueZero;
+    const ColourValue &ColourValue::Black = gColourValueBlack;
+    const ColourValue &ColourValue::White = gColourValueWhite;
+    const ColourValue &ColourValue::Red = gColourValueRed;
+    const ColourValue &ColourValue::Green = gColourValueGreen;
+    const ColourValue &ColourValue::Blue = gColourValueBlue;
 
     //---------------------------------------------------------------------
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG

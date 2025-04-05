@@ -207,7 +207,6 @@ bool RTShaderSRSTexturedFog::preAddToRenderState(const RenderState* renderState,
         return false;
 
     FogMode fogMode;
-    ColourValue newFogColour;
     Real newFogStart, newFogEnd, newFogDensity;
 
     if (srcPass->getFogOverride())
