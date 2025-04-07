@@ -31,23 +31,23 @@ namespace Ogre
 {
 namespace
 {
-constexpr Vector2 gVector2Zero( 0, 0 );
+constexpr Vector2 gVector2Zero( 0 );
 constexpr Vector2 gVector2UnitX( 1, 0);
 constexpr Vector2 gVector2UnitY( 0, 1);
 constexpr Vector2 gVector2NegativeUnitX( -1,  0);
 constexpr Vector2 gVector2NegativeUnitY(  0, -1);
-constexpr Vector2 gVector2UnitScale( 1, 1 );
+constexpr Vector2 gVector2UnitScale( 1 );
 
-constexpr Vector3 gVector3Zero( 0, 0, 0 );
+constexpr Vector3 gVector3Zero( 0 );
 constexpr Vector3 gVector3UnitX( 1, 0, 0 );
 constexpr Vector3 gVector3UnitY( 0, 1, 0 );
 constexpr Vector3 gVector3UnitZ( 0, 0, 1 );
 constexpr Vector3 gVector3NegativeUnitX( -1,  0,  0 );
 constexpr Vector3 gVector3NegativeUnitY(  0, -1,  0 );
 constexpr Vector3 gVector3NegativeUnitZ(  0,  0, -1 );
-constexpr Vector3 gVector3UnitScale( 1, 1, 1 );
+constexpr Vector3 gVector3UnitScale( 1 );
 
-constexpr Vector4 gVector4Zero( 0, 0, 0, 0 );
+constexpr Vector4 gVector4Zero( 0 );
 }  // namespace
 const Vector2 &VectorBase<2, Real>::ZERO = gVector2Zero;
 const Vector2 &VectorBase<2, Real>::UNIT_X = gVector2UnitX;

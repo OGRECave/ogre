@@ -301,7 +301,7 @@ namespace Ogre
         explicit Vector(const Vector<dims, U>& o) : Vector(o.ptr()) {}
 
 
-        explicit Vector(T s)
+        explicit constexpr Vector(T s)
         {
             for (int i = 0; i < dims; i++)
                 ptr()[i] = s;
