@@ -29,21 +29,41 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-const Vector2 VectorBase<2, Real>::ZERO( 0 );
-const Vector2 VectorBase<2, Real>::UNIT_X( 1, 0);
-const Vector2 VectorBase<2, Real>::UNIT_Y( 0, 1);
-const Vector2 VectorBase<2, Real>::NEGATIVE_UNIT_X( -1,  0);
-const Vector2 VectorBase<2, Real>::NEGATIVE_UNIT_Y(  0, -1);
-const Vector2 VectorBase<2, Real>::UNIT_SCALE( 1 );
+namespace
+{
+constexpr Vector2 gVector2Zero( 0, 0 );
+constexpr Vector2 gVector2UnitX( 1, 0);
+constexpr Vector2 gVector2UnitY( 0, 1);
+constexpr Vector2 gVector2NegativeUnitX( -1,  0);
+constexpr Vector2 gVector2NegativeUnitY(  0, -1);
+constexpr Vector2 gVector2UnitScale( 1, 1 );
 
-const Vector3 VectorBase<3, Real>::ZERO( 0 );
-const Vector3 VectorBase<3, Real>::UNIT_X( 1, 0, 0 );
-const Vector3 VectorBase<3, Real>::UNIT_Y( 0, 1, 0 );
-const Vector3 VectorBase<3, Real>::UNIT_Z( 0, 0, 1 );
-const Vector3 VectorBase<3, Real>::NEGATIVE_UNIT_X( -1,  0,  0 );
-const Vector3 VectorBase<3, Real>::NEGATIVE_UNIT_Y(  0, -1,  0 );
-const Vector3 VectorBase<3, Real>::NEGATIVE_UNIT_Z(  0,  0, -1 );
-const Vector3 VectorBase<3, Real>::UNIT_SCALE( 1 );
+constexpr Vector3 gVector3Zero( 0, 0, 0 );
+constexpr Vector3 gVector3UnitX( 1, 0, 0 );
+constexpr Vector3 gVector3UnitY( 0, 1, 0 );
+constexpr Vector3 gVector3UnitZ( 0, 0, 1 );
+constexpr Vector3 gVector3NegativeUnitX( -1,  0,  0 );
+constexpr Vector3 gVector3NegativeUnitY(  0, -1,  0 );
+constexpr Vector3 gVector3NegativeUnitZ(  0,  0, -1 );
+constexpr Vector3 gVector3UnitScale( 1, 1, 1 );
 
-const Vector4 VectorBase<4, Real>::ZERO( 0 );
+constexpr Vector4 gVector4Zero( 0, 0, 0, 0 );
+}  // namespace
+const Vector2 &VectorBase<2, Real>::ZERO = gVector2Zero;
+const Vector2 &VectorBase<2, Real>::UNIT_X = gVector2UnitX;
+const Vector2 &VectorBase<2, Real>::UNIT_Y = gVector2UnitY;
+const Vector2 &VectorBase<2, Real>::NEGATIVE_UNIT_X = gVector2NegativeUnitX;
+const Vector2 &VectorBase<2, Real>::NEGATIVE_UNIT_Y = gVector2NegativeUnitY;
+const Vector2 &VectorBase<2, Real>::UNIT_SCALE = gVector2UnitScale;
+
+const Vector3 &VectorBase<3, Real>::ZERO = gVector3Zero;
+const Vector3 &VectorBase<3, Real>::UNIT_X = gVector3UnitX;
+const Vector3 &VectorBase<3, Real>::UNIT_Y = gVector3UnitY;
+const Vector3 &VectorBase<3, Real>::UNIT_Z = gVector3UnitZ;
+const Vector3 &VectorBase<3, Real>::NEGATIVE_UNIT_X = gVector3NegativeUnitX;
+const Vector3 &VectorBase<3, Real>::NEGATIVE_UNIT_Y = gVector3NegativeUnitY;
+const Vector3 &VectorBase<3, Real>::NEGATIVE_UNIT_Z = gVector3NegativeUnitZ;
+const Vector3 &VectorBase<3, Real>::UNIT_SCALE = gVector3UnitScale;
+
+const Vector4 &VectorBase<4, Real>::ZERO = gVector4Zero;
 }

@@ -46,17 +46,17 @@ namespace Ogre
     template <int dims, typename T> struct VectorBase
     {
         VectorBase() {}
-        VectorBase(T _x, T _y)
+        constexpr VectorBase(T _x, T _y)
         {
             static_assert(dims > 1, "must have at least 2 dimensions");
             data[0] = _x; data[1] = _y;
         }
-        VectorBase(T _x, T _y, T _z)
+        constexpr VectorBase(T _x, T _y, T _z)
         {
             static_assert(dims > 2, "must have at least 3 dimensions");
             data[0] = _x; data[1] = _y; data[2] = _z;
         }
-        VectorBase(T _x, T _y, T _z, T _w)
+        constexpr VectorBase(T _x, T _y, T _z, T _w)
         {
             static_assert(dims > 3, "must have at least 4 dimensions");
             data[0] = _x; data[1] = _y; data[2] = _z; data[3] = _w;
@@ -68,7 +68,7 @@ namespace Ogre
     template <> struct _OgreExport VectorBase<2, Real>
     {
         VectorBase() {}
-        VectorBase(Real _x, Real _y) : x(_x), y(_y) {}
+        constexpr VectorBase(Real _x, Real _y) : x(_x), y(_y) {}
         Real x, y;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
@@ -117,18 +117,18 @@ namespace Ogre
         Radian angleTo(const Vector2& other) const;
 
         // special points
-        static const Vector2 ZERO;
-        static const Vector2 UNIT_X;
-        static const Vector2 UNIT_Y;
-        static const Vector2 NEGATIVE_UNIT_X;
-        static const Vector2 NEGATIVE_UNIT_Y;
-        static const Vector2 UNIT_SCALE;
+        static const Vector2 &ZERO;
+        static const Vector2 &UNIT_X;
+        static const Vector2 &UNIT_Y;
+        static const Vector2 &NEGATIVE_UNIT_X;
+        static const Vector2 &NEGATIVE_UNIT_Y;
+        static const Vector2 &UNIT_SCALE;
     };
 
     template <> struct _OgreExport VectorBase<3, Real>
     {
         VectorBase() {}
-        VectorBase(Real _x, Real _y, Real _z) : x(_x), y(_y), z(_z) {}
+        constexpr VectorBase(Real _x, Real _y, Real _z) : x(_x), y(_y), z(_z) {}
         Real x, y, z;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
@@ -244,26 +244,26 @@ namespace Ogre
         const Vector3& primaryAxis() const;
 
         // special points
-        static const Vector3 ZERO;
-        static const Vector3 UNIT_X;
-        static const Vector3 UNIT_Y;
-        static const Vector3 UNIT_Z;
-        static const Vector3 NEGATIVE_UNIT_X;
-        static const Vector3 NEGATIVE_UNIT_Y;
-        static const Vector3 NEGATIVE_UNIT_Z;
-        static const Vector3 UNIT_SCALE;
+        static const Vector3 &ZERO;
+        static const Vector3 &UNIT_X;
+        static const Vector3 &UNIT_Y;
+        static const Vector3 &UNIT_Z;
+        static const Vector3 &NEGATIVE_UNIT_X;
+        static const Vector3 &NEGATIVE_UNIT_Y;
+        static const Vector3 &NEGATIVE_UNIT_Z;
+        static const Vector3 &UNIT_SCALE;
     };
 
     template <> struct _OgreExport VectorBase<4, Real>
     {
         VectorBase() {}
-        VectorBase(Real _x, Real _y, Real _z, Real _w) : x(_x), y(_y), z(_z), w(_w) {}
+        constexpr VectorBase(Real _x, Real _y, Real _z, Real _w) : x(_x), y(_y), z(_z), w(_w) {}
         Real x, y, z, w;
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
 
         // special points
-        static const Vector4 ZERO;
+        static const Vector4 &ZERO;
     };
 
     /** Standard N-dimensional vector.
@@ -283,9 +283,9 @@ namespace Ogre
             @note It does <b>NOT</b> initialize the vector for efficiency.
         */
         Vector() {}
-        Vector(T _x, T _y) : VectorBase<dims, T>(_x, _y) {}
-        Vector(T _x, T _y, T _z) : VectorBase<dims, T>(_x, _y, _z) {}
-        Vector(T _x, T _y, T _z, T _w) : VectorBase<dims, T>(_x, _y, _z, _w) {}
+        constexpr Vector(T _x, T _y) : VectorBase<dims, T>(_x, _y) {}
+        constexpr Vector(T _x, T _y, T _z) : VectorBase<dims, T>(_x, _y, _z) {}
+        constexpr Vector(T _x, T _y, T _z, T _w) : VectorBase<dims, T>(_x, _y, _z, _w) {}
 
         // use enable_if as function parameter for VC < 2017 compatibility
         template <int N = dims>
