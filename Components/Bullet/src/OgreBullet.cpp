@@ -107,7 +107,7 @@ static void onTick(btDynamicsWorld* world, btScalar timeStep)
 
         for (int j = 0; j < manifold->getNumContacts(); j++)
         {
-            const btManifoldPoint& mp = manifold->getContactPoint(i);
+            const btManifoldPoint& mp = manifold->getContactPoint(j);
             auto body0 = static_cast<EntityCollisionListener*>(manifold->getBody0()->getUserPointer());
             auto body1 = static_cast<EntityCollisionListener*>(manifold->getBody1()->getUserPointer());
             if (body0->listener)
