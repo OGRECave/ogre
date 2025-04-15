@@ -57,14 +57,14 @@ namespace Ogre {
     class _OgreExport ColourValue
     {
     public:
-        static const ColourValue ZERO;
-        static const ColourValue Black;
-        static const ColourValue White;
-        static const ColourValue Red;
-        static const ColourValue Green;
-        static const ColourValue Blue;
+        static const ColourValue &ZERO;
+        static const ColourValue &Black;
+        static const ColourValue &White;
+        static const ColourValue &Red;
+        static const ColourValue &Green;
+        static const ColourValue &Blue;
 
-        explicit ColourValue( float red = 1.0f,
+        explicit constexpr ColourValue( float red = 1.0f,
                     float green = 1.0f,
                     float blue = 1.0f,
                     float alpha = 1.0f ) : r(red), g(green), b(blue), a(alpha)

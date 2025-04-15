@@ -49,6 +49,8 @@ class ShaderExInstancedViewports : public SubRenderState
     friend class ShaderExInstancedViewportsFactory;
     bool mOwnsGlobalData; // only true for template sub render state
     bool mLayeredTarget;
+
+    String mSchemeName;
 // Interface.
 public:
     /** Class default constructor */    

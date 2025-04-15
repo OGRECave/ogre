@@ -874,6 +874,34 @@ SHARED_PTR(Mesh);
 %ignore Ogre::StaticGeometry::Region::getLODIterator;
 %ignore Ogre::StaticGeometry::MaterialBucket::getGeometryIterator;
 %ignore Ogre::StaticGeometry::LODBucket::getMaterialIterator;
+#ifdef SWIGPYTHON
+%{
+    // this is a workaround for the following map
+    namespace swig {
+    template<> struct traits<Ogre::StaticGeometry::Region> {
+        typedef pointer_category category;
+        static const char* type_name() { return "Ogre::StaticGeometry::Region"; }
+    };
+    }
+%}
+#endif
+#ifndef SWIGJAVA
+%template(RegionMap) std::map<uint32_t, Ogre::StaticGeometry::Region*>;
+#endif
+#ifdef SWIGPYTHON
+%{
+    // this is a workaround for the following map
+    namespace swig {
+    template<> struct traits<Ogre::StaticGeometry::MaterialBucket> {
+        typedef pointer_category category;
+        static const char* type_name() { return "Ogre::StaticGeometry::MaterialBucket"; }
+    };
+    }
+%}
+#endif
+%template(MaterialBucketMap) std::map<std::string, Ogre::StaticGeometry::MaterialBucket*>;
+%template(LODBucketList) std::vector<Ogre::StaticGeometry::LODBucket*>;
+%template(GeometryBucketList) std::vector<Ogre::StaticGeometry::GeometryBucket*>;
 %include "OgreStaticGeometry.h"
 %include "OgrePatchSurface.h"
     SHARED_PTR(PatchMesh);

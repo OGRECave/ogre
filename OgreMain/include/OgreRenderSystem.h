@@ -143,6 +143,13 @@ namespace Ogre
         }
     };
 
+    struct _OgreExport GlobalInstancingData
+    {
+        HardwareVertexBufferPtr vertexBuffer;
+        VertexDeclaration* vertexDecl = nullptr;
+        uint32 instanceCount = 1;
+    };
+
     /** Defines the functionality of a 3D API
 
     The RenderSystem class provides a base interface
@@ -444,24 +451,48 @@ namespace Ogre
         */
         virtual RenderTarget * detachRenderTarget( const String &name );
 
-        /** Returns the global instance vertex buffer.
-        */
-        HardwareVertexBufferPtr getGlobalInstanceVertexBuffer() const { return mGlobalInstanceVertexBuffer; }
-        /** Sets the global instance vertex buffer.
-        */
-        void setGlobalInstanceVertexBuffer(const HardwareVertexBufferPtr &val);
-        /** Gets vertex declaration for the global vertex buffer for the global instancing
-        */
-        VertexDeclaration* getGlobalInstanceVertexDeclaration() const { return mGlobalInstanceVertexDeclaration; }
-        /** Sets vertex declaration for the global vertex buffer for the global instancing
-        */
-        void setGlobalInstanceVertexDeclaration( VertexDeclaration* val) { mGlobalInstanceVertexDeclaration = val; }
-        /** Gets the global number of instances.
-        */
-        uint32 getGlobalInstanceCount() const { return mGlobalNumberOfInstances; }
-        /** Sets the global number of instances.
-        */
-        void setGlobalInstanceCount(uint32 val) { mGlobalNumberOfInstances = val; }
+        /// @deprecated use getSchemeInstancingData instead
+        OGRE_DEPRECATED HardwareVertexBufferPtr getGlobalInstanceVertexBuffer() const
+        {
+            auto it = mSchemeInstancingData.find(_getDefaultViewportMaterialScheme());
+            return it != mSchemeInstancingData.end() ? it->second.vertexBuffer : nullptr;
+        }
+        /// @deprecated use enableSchemeInstancing instead
+        OGRE_DEPRECATED void setGlobalInstanceVertexBuffer(const HardwareVertexBufferPtr& val);
+        /// @deprecated use getSchemeInstancingData instead
+        OGRE_DEPRECATED VertexDeclaration* getGlobalInstanceVertexDeclaration() const
+        {
+            auto it = mSchemeInstancingData.find(_getDefaultViewportMaterialScheme());
+            return it != mSchemeInstancingData.end() ? it->second.vertexDecl : nullptr;
+        }
+        /// @deprecated use enableSchemeInstancing instead
+        OGRE_DEPRECATED void setGlobalInstanceVertexDeclaration(VertexDeclaration* val)
+        {
+            mSchemeInstancingData[_getDefaultViewportMaterialScheme()].vertexDecl = val;
+        }
+        /// @deprecated use getSchemeInstancingData instead
+        OGRE_DEPRECATED uint32 getGlobalInstanceCount() const
+        {
+            auto it = mSchemeInstancingData.find(_getDefaultViewportMaterialScheme());
+            return it != mSchemeInstancingData.end() ? it->second.instanceCount : 1;
+        }
+        /// @deprecated use enableSchemeInstancing instead
+        OGRE_DEPRECATED void setGlobalInstanceCount(uint32 val)
+        {
+            mSchemeInstancingData[_getDefaultViewportMaterialScheme()].instanceCount = val;
+        }
+
+        /// Sets the global instance data for the given material scheme.
+        void enableSchemeInstancing(const String& materialScheme, const HardwareVertexBufferPtr& buffer,
+                                    VertexDeclaration* decl, uint32 instanceCount);
+        /// Gets all data for the global scheme based instancing
+        GlobalInstancingData getSchemeInstancingData(const String& materialScheme) const
+        {
+            auto it = mSchemeInstancingData.find(materialScheme);
+            return it != mSchemeInstancingData.end() ? it->second : GlobalInstancingData();
+        }
+        /// disables instancing for the given material scheme
+        void disableSchemeInstancing(const String& materialScheme) { mSchemeInstancingData.erase(materialScheme); }
 
         /** Retrieves an existing DepthBuffer or creates a new one suited for the given RenderTarget
             and sets it.
@@ -1207,14 +1238,11 @@ namespace Ogre
     private:
         StencilState mStencilState;
 
-        /// a global vertex buffer for global instancing
-        HardwareVertexBufferSharedPtr mGlobalInstanceVertexBuffer;
-        /// a vertex declaration for the global vertex buffer for the global instancing
-        VertexDeclaration* mGlobalInstanceVertexDeclaration;
         /// buffers for default uniform blocks
         HardwareBufferPtr mUniformBuffer[GPT_COUNT];
-        /// the number of global instances (this number will be multiply by the render op instance number)
-        uint32 mGlobalNumberOfInstances;
+
+        /// a global vertex buffer for global instancing
+        std::map<String, GlobalInstancingData> mSchemeInstancingData;
     };
     /** @} */
     /** @} */
