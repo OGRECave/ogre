@@ -183,7 +183,7 @@ void Compositor::createGlobalTextures()
             OgreAssert(def->width && def->height, "Global compositor texture definition must have absolute size");
             if (def->pooled)
             {
-                LogManager::getSingleton().logWarning("Pooling global compositor textures has no effect");
+                LogManager::getSingleton().logWarning(mName+" - pooling global compositor textures has no effect");
             }
             globalTextureNames.insert(def->name);
 
@@ -304,8 +304,7 @@ const TexturePtr& Compositor::getTextureInstance(const String& name, size_t mrtI
         return i->second;
     }
 
-    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Non-existent global texture name",
-        "Compositor::getTextureInstance");
+    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Non-existent global texture name");
 
 }
 //---------------------------------------------------------------------
@@ -320,9 +319,8 @@ RenderTarget* Compositor::getRenderTarget(const String& name, int slice)
     GlobalMRTMap::iterator mi = mGlobalMRTs.find(name);
     if (mi != mGlobalMRTs.end())
         return mi->second;
-    else
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Non-existent global texture name",
-            "Compositor::getRenderTarget");
+
+    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Non-existent global texture name");
 }
 //---------------------------------------------------------------------
 }
