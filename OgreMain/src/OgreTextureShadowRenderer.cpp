@@ -7,6 +7,8 @@
 #include "OgreShadowCameraSetup.h"
 #include "OgreViewport.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreCompositorManager.h"
+#include "OgreCompositor.h"
 
 namespace Ogre {
 
@@ -919,6 +921,37 @@ void SceneManager::TextureShadowRenderer::setShadowTextureConfig(size_t shadowIn
 
     mShadowTextureConfigDirty = true;
 }
+
+void SceneManager::TextureShadowRenderer::setShadowTextureCompositor(const String& compositorName,
+                                                                     const String& resourceGroup)
+{
+    auto compositor = CompositorManager::getSingleton().getByName(compositorName, resourceGroup);
+    OgreAssert(compositor, "Compositor not found");
+    OgreAssert(compositor->getNumTechniques() > 0, "Compositor has no techniques");
+
+    auto compositorTech = compositor->getTechnique(0);
+    const auto& textures = compositorTech->getTextureDefinitions();
+    OgreAssert(!textures.empty(), "Compositor technique has no textures");
+
+    mShadowTextureConfigList.clear();
+    mShadowTextureConfigDirty = true;
+
+    for(const auto& texture : textures)
+    {
+        OgreAssert(texture->width && texture->height, "Compositor texture definition must have absolute size");
+        OgreAssert(texture->formatList.size() == 1, "Compositor texture definition must have exactly one format");
+
+        ShadowTextureConfig cfg;
+        cfg.width = texture->width;
+        cfg.height = texture->height;
+        cfg.format = texture->formatList.front();
+        cfg.fsaa = texture->fsaa > 1 ? texture->fsaa : 0;
+        cfg.depthBufferPoolId = texture->depthBufferId;
+
+        mShadowTextureConfigList.push_back(cfg);
+    }
+}
+
 //---------------------------------------------------------------------
 void SceneManager::TextureShadowRenderer::setShadowTextureSize(unsigned short size)
 {
