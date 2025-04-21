@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "@PKG_NAME@"
         minSdkVersion 16
-        targetSdkVersion 30
+        targetSdkVersion 33
     }
 
     buildTypes {
