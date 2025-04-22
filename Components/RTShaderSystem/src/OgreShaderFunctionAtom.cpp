@@ -421,6 +421,9 @@ void SampleTextureAtom::writeSourceCode(std::ostream& os, const String& targetLa
     case GCT_SAMPLERCUBE:
         os << "Cube";
         break;
+    case GCT_SAMPLER2DARRAY:
+        os << "2DArray";
+        break;
     default:
         OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "unknown sampler");
         break;
