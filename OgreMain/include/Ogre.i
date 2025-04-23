@@ -17,6 +17,7 @@
 #include "OgrePredefinedControllers.h"
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreDefaultDebugDrawer.h"
+#include "OgreCompositorLogic.h"
 %}
 
 %include stdint.i
@@ -747,6 +748,7 @@ SHARED_PTR(Material);
 %ignore Ogre::RenderSystem::setScissorTest(bool, uint32, uint32 = 0, uint32 = 800, uint32 = 600);
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
+%include "OgreCompositorLogic.h"
 #ifdef SWIGJAVA
 %ignore Ogre::CompositorInstance::Listener; // issue with converting shared_ptr<Material>
 #endif
