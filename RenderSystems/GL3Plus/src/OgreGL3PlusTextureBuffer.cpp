@@ -479,8 +479,10 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(which, attachment,
                                                        mFaceTarget, mTextureID, mLevel));
             break;
-        case GL_TEXTURE_3D:
         case GL_TEXTURE_2D_ARRAY:
+            OGRE_CHECK_GL_ERROR(glFramebufferTextureLayer(which, attachment, mTextureID, mLevel, zoffset));
+            break;
+        case GL_TEXTURE_3D:
             OGRE_CHECK_GL_ERROR(glFramebufferTexture3D(which, attachment,
                                                        mFaceTarget, mTextureID, mLevel, zoffset));
             break;
