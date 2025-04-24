@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreParticleAffector.h"
 #include "OgreCompositor.h"
 #include "OgreCompositorManager.h"
-#include "OgreCompositionTechnique.h"
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionPass.h"
 #include "OgreExternalTextureSourceManager.h"

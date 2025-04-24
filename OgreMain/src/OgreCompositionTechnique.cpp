@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
-#include "OgreCompositionTechnique.h"
 #include "OgreCompositionTargetPass.h"
 
 namespace Ogre {
