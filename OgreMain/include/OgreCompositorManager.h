@@ -129,7 +129,12 @@ namespace Ogre {
             twice (this is important for example if you request 2 ping-pong textures, 
             you don't want to get the same texture for both requests!
         */
-        TexturePtr getPooledTexture(const String& name, const String& localName, 
+        TexturePtr getPooledTexture(const CompositionTechnique::TextureDefinition& def, const String& localName,
+                                    PixelFormat f, const String& aaHint, UniqueTextureSet& texturesAlreadyAssigned,
+                                    CompositorInstance* inst);
+
+        /// @deprecated do not use
+        OGRE_DEPRECATED TexturePtr getPooledTexture(const String& name, const String& localName,
             uint32 w, uint32 h,
             PixelFormat f, uint aa, const String& aaHint, bool srgb, UniqueTextureSet& texturesAlreadyAssigned, 
             CompositorInstance* inst, CompositionTechnique::TextureScope scope, TextureType type = TEX_TYPE_2D);

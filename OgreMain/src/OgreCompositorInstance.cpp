@@ -613,20 +613,15 @@ TexturePtr CompositorInstance::getLocalTexture(const CompositionTechnique::Textu
                                                const String& fsaaHint, const String& localName,
                                                std::set<Texture*>& assignedTextures)
 {
-    bool hwGamma = def.hwGammaWrite && !PixelUtil::isFloatingPoint(p);
-
     TexturePtr tex;
     if (def.pooled)
     {
         // get / create pooled texture
-        tex = CompositorManager::getSingleton().getPooledTexture(def.name, localName, def.width, def.height, p,
-                                                                 def.fsaa, fsaaHint, hwGamma, assignedTextures, this,
-                                                                 def.scope, def.type);
+        tex = CompositorManager::getSingleton().getPooledTexture(def, localName, p, fsaaHint, assignedTextures, this);
     }
     else
     {
-        tex = TextureManager::getSingleton().createManual(def.name, RGN_INTERNAL, def.type, def.width, def.height, 0, p,
-                                                          TU_RENDERTARGET, 0, hwGamma, def.fsaa, fsaaHint);
+        tex = createTexture(def.name, def, p, fsaaHint);
     }
 
     // Also add to local textures so we can look up
@@ -651,6 +646,9 @@ void CompositorInstance::createResources(bool forResizeOnly)
             continue;
         }
 
+        MultiRenderTarget* mrt = nullptr;
+        TexturePtr tex;
+
         if (def->scope == CompositionTechnique::TS_GLOBAL) {
             //This is a global texture, just link the created resources from the parent
             Compositor* parentComp = mTechnique->getParent();
@@ -658,21 +656,15 @@ void CompositorInstance::createResources(bool forResizeOnly)
             {
                 for (size_t atch = 0; atch < def->formatList.size(); atch++)
                 {
-                    Ogre::TexturePtr tex = parentComp->getTextureInstance(def->name, atch);
-                    mLocalTextures[getMRTTexLocalName(def->name, atch)] = tex;
+                    Ogre::TexturePtr mrttex = parentComp->getTextureInstance(def->name, atch);
+                    mLocalTextures[getMRTTexLocalName(def->name, atch)] = mrttex;
                 }
-                auto mrt = static_cast<MultiRenderTarget*>(parentComp->getRenderTarget(def->name));
+                mrt = static_cast<MultiRenderTarget*>(parentComp->getRenderTarget(def->name));
                 mLocalMRTs[def->name] = mrt;
-                
-                setupRenderTarget(mrt, def->depthBufferId);
             } else {
-                Ogre::TexturePtr tex = parentComp->getTextureInstance(def->name, 0);
+                tex = parentComp->getTextureInstance(def->name, 0);
                 mLocalTextures[def->name] = tex;
-                
-                for(size_t i = 0; i < tex->getNumFaces(); i++)
-                    setupRenderTarget(tex->getBuffer(i)->getRenderTarget(), def->depthBufferId);
             }
-            
         } else {
             // Skip this one if we're only (re)creating for a resize & it's not derived
             // from the target size
@@ -702,7 +694,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
             /// Make the tetxure
             if (def->formatList.size() > 1)
             {
-                MultiRenderTarget* mrt = Root::getSingleton().getRenderSystem()->createMultiRenderTarget(baseName);
+                mrt = Root::getSingleton().getRenderSystem()->createMultiRenderTarget(baseName);
                 mLocalMRTs[def->name] = mrt;
 
                 // create and bind individual surfaces
@@ -711,15 +703,13 @@ void CompositorInstance::createResources(bool forResizeOnly)
                 {
                     derivedDef.name = StringUtil::format("mrt%d.%s", atch, baseName.c_str());
                     String mrtLocalName = getMRTTexLocalName(def->name, atch);
-                    TexturePtr tex = getLocalTexture(derivedDef, p, fsaaHint, mrtLocalName, assignedTextures);
-                    RenderTexture* rt = tex->getBuffer()->getRenderTarget();
+                    TexturePtr mrttex = getLocalTexture(derivedDef, p, fsaaHint, mrtLocalName, assignedTextures);
+                    RenderTexture* rt = mrttex->getBuffer()->getRenderTarget();
                     rt->setAutoUpdated(false);
                     mrt->bindSurface(atch, rt);
 
                     atch++;
                 }
-                
-                setupRenderTarget(mrt, def->depthBufferId);
             }
             else
             {
@@ -728,10 +718,18 @@ void CompositorInstance::createResources(bool forResizeOnly)
                 // this is an auto generated name - so no spaces can't hart us.
                 std::replace( derivedDef.name.begin(), derivedDef.name.end(), ' ', '_' );
 
-                TexturePtr tex = getLocalTexture(derivedDef, def->formatList[0], fsaaHint, def->name, assignedTextures);
-                for(size_t i = 0; i < tex->getNumFaces(); i++)
-                    setupRenderTarget(tex->getBuffer(i)->getRenderTarget(), def->depthBufferId);
+                tex = getLocalTexture(derivedDef, def->formatList[0], fsaaHint, def->name, assignedTextures);
             }
+        }
+
+        if(mrt)
+        {
+            setupRenderTarget(mrt, def->depthBufferId);
+        }
+        else
+        {
+            for(size_t i = 0; i < tex->getNumFaces(); i++)
+                setupRenderTarget(tex->getBuffer(i)->getRenderTarget(), def->depthBufferId);
         }
     }
 

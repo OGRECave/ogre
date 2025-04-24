@@ -215,11 +215,28 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
     CompositorManager::UniqueTextureSet& texturesAssigned, 
     CompositorInstance* inst, CompositionTechnique::TextureScope scope, TextureType type)
 {
-    OgreAssert(scope != CompositionTechnique::TS_GLOBAL, "Global scope texture can not be pooled");
+    CompositionTechnique::TextureDefinition def;
+    def.name = name;
+    def.width = w;
+    def.height = h;
+    def.type = type;
+    def.fsaa = aa;
+    def.hwGammaWrite = srgb;
+    def.pooled = true;
+    def.scope = scope;
+    return getPooledTexture(def, localName, f, aaHint, texturesAssigned, inst);
+}
+TexturePtr CompositorManager::getPooledTexture(const CompositionTechnique::TextureDefinition& idef,
+                                               const String& localName, PixelFormat f, const String& aaHint,
+                                               CompositorManager::UniqueTextureSet& texturesAssigned,
+                                               CompositorInstance* inst)
+{
+    OgreAssert(idef.scope != CompositionTechnique::TS_GLOBAL, "Global scope texture can not be pooled");
 
-    TextureDef def(w, h, type, f, aa, aaHint, srgb);
+    bool srgb = idef.hwGammaWrite && !PixelUtil::isFloatingPoint(f);
+    TextureDef def(idef.width, idef.height, idef.type, f, idef.fsaa, aaHint, srgb);
 
-    if (scope == CompositionTechnique::TS_CHAIN)
+    if (idef.scope == CompositionTechnique::TS_CHAIN)
     {
         StringPair pair = std::make_pair(inst->getCompositor()->getName(), localName);
         TextureDefMap& defMap = mChainTexturesByDef[pair];
@@ -229,11 +246,7 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
             return it->second;
         }
         // ok, we need to create a new one
-        TexturePtr newTex = TextureManager::getSingleton().createManual(
-            name, 
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
-            (uint)w, (uint)h, 0, f, TU_RENDERTARGET, 0,
-            srgb, aa, aaHint);
+        TexturePtr newTex = createTexture(idef.name, idef, f, aaHint);
         defMap.emplace(def, newTex);
         return newTex;
     }
@@ -286,14 +299,8 @@ TexturePtr CompositorManager::getPooledTexture(const String& name,
     if (!ret)
     {
         // ok, we need to create a new one
-        ret = TextureManager::getSingleton().createManual(
-            name, 
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
-            w, h, 0, f, TU_RENDERTARGET, 0,
-            srgb, aa, aaHint); 
-
+        ret = createTexture(idef.name, idef, f, aaHint);
         texList.push_back(ret);
-
     }
 
     // record that we used this one in the requester's list

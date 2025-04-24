@@ -117,6 +117,7 @@ extern "C" {
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreUserObjectBindings.h"
 #include "OgreVector.h"
+#include "OgreCompositionTechnique.h"
 #if OGRE_NO_ZIP_ARCHIVE == 0
 #   include "OgreZip.h"
 #endif
@@ -153,6 +154,9 @@ struct GpuEventScope
     GpuEventScope(const String& name) { Root::getSingleton().getRenderSystem()->beginProfileEvent(name); }
     ~GpuEventScope() { Root::getSingleton().getRenderSystem()->endProfileEvent(); }
 };
-}
+
+TexturePtr createTexture(const String& name, const CompositionTechnique::TextureDefinition& def, PixelFormat pf,
+                         const String& fsaaHint = BLANKSTRING);
+} // namespace Ogre
 
 #endif 
