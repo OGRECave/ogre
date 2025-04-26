@@ -385,6 +385,11 @@ namespace Ogre
         mErrors.push_back({file, msg, line, code});
     }
 
+    void ScriptCompiler::addError(const AbstractNode& node, const String& msg, uint32 code)
+    {
+        addError(code, node.file, node.line, msg);
+    }
+
     void ScriptCompiler::setListener(ScriptCompilerListener *listener)
     {
         mListener = listener;
