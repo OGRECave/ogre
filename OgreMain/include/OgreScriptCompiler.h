@@ -248,6 +248,8 @@ namespace Ogre
         bool compile(const ConcreteNodeListPtr &nodes, const String &group);
         /// Adds the given error to the compiler's list of errors
         void addError(uint32 code, const String &file, int line, const String &msg = "");
+        /// @overload
+        void addError(const AbstractNode& node, const String &msg = "", uint32 code = CE_INVALIDPARAMETERS);
         /// Sets the listener used by the compiler
         void setListener(ScriptCompilerListener *listener);
         /// Returns the currently set listener
