@@ -205,23 +205,20 @@ const String& FFPFogFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* FFPFogFactory::createInstance(ScriptCompiler* compiler, 
-                                                    PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+SubRenderState* FFPFogFactory::createInstance(const ScriptProperty& prop, Pass* pass, SGScriptTranslator* translator)
 {
-    if (prop->name == "fog_stage")
+    if (prop.name == "fog_stage")
     {
-        if(prop->values.size() >= 1)
+        if(prop.values.size() >= 1)
         {
-            if (prop->values.front()->getString() == "ffp")
+            if (prop.values[0] == "ffp")
             {
                 SubRenderState* subRenderState = createOrRetrieveInstance(translator);
-                AbstractNodeList::const_iterator it = prop->values.begin();
 
-                if(prop->values.size() >= 2)
+                if(prop.values.size() >= 2)
                 {
-                    ++it;
-                    if(!subRenderState->setParameter("calc_mode", (*it)->getString()))
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    if(!subRenderState->setParameter("calc_mode", prop.values[1]))
+                        translator->emitError();
                 }
                 
                 return subRenderState;

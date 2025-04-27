@@ -484,10 +484,15 @@ SubRenderState* ShaderGenerator::createSubRenderState(ScriptCompiler* compiler,
     OGRE_LOCK_AUTO_MUTEX;
     SubRenderState* subRenderState = NULL;
 
+    const auto p = prop->getProperty();
     for (auto& s : mSubRenderStateFactories)
     {
         subRenderState = s.second->createInstance(compiler, prop, pass, translator);
-        if (subRenderState != NULL)
+        if (subRenderState)
+            break;
+
+        subRenderState = s.second->createInstance(p, pass, translator);
+        if (subRenderState)
             break;
     }
 
@@ -502,9 +507,15 @@ SubRenderState* ShaderGenerator::createSubRenderState(ScriptCompiler* compiler,
     OGRE_LOCK_AUTO_MUTEX;
     SubRenderState* subRenderState = NULL;
 
+
+    const auto p = prop->getProperty();
     for (auto& s : mSubRenderStateFactories)
     {
         subRenderState = s.second->createInstance(compiler, prop, texState, translator);
+        if (subRenderState != NULL)
+            break;
+
+        subRenderState = s.second->createInstance(p, texState, translator);
         if (subRenderState != NULL)
             break;
     }

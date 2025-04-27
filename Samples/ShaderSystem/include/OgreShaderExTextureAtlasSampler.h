@@ -246,16 +246,6 @@ public:
     */
     const String& getType() const override;
 
-    /** 
-    @see SubRenderStateFactory::createInstance.
-    */
-    SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) override;
-
-    /** 
-    @see SubRenderStateFactory::writeInstance.
-    */
-    void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass) override;
-    
     /**
         Adds a texture atlas definition from a stream. 
 

@@ -207,64 +207,57 @@ bool NormalMapLighting::setParameter(const String& name, const String& value)
 const String& NormalMapLightingFactory::getType() const { return SRS_NORMALMAP; }
 
 //-----------------------------------------------------------------------
-SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop,
-                                                         Pass* pass, SGScriptTranslator* translator)
+SubRenderState* NormalMapLightingFactory::createInstance(const ScriptProperty& prop, Pass* pass,
+                                                         SGScriptTranslator* translator)
 {
-    if (prop->name == "lighting_stage")
+    if (prop.name == "lighting_stage")
     {
-        if (prop->values.size() >= 2)
+        if (prop.values.size() >= 2)
         {
-            AbstractNodeList::const_iterator it = prop->values.begin();
-
             // Case light model type is normal map
-            if ((*it)->getString() == "normal_map")
+            if (prop.values[0] == "normal_map")
             {
-                ++it;
                 SubRenderState* subRenderState = createOrRetrieveInstance(translator);
 
                 TextureUnitState* normalMapTexture = pass->createTextureUnitState();
                 uint16 texureIdx = pass->getNumTextureUnitStates() - 1;
-                normalMapTexture->setTextureName((*it)->getString());
+                normalMapTexture->setTextureName(prop.values[1]);
                 subRenderState->setParameter("texture_index", std::to_string(texureIdx));
 
                 ShaderGenerator::_markNonFFP(normalMapTexture);
 
                 // Read normal map space type.
-                if (prop->values.size() >= 3)
+                if (prop.values.size() >= 3)
                 {
-                    ++it;
-                    if (!subRenderState->setParameter("normalmap_space", (*it)->getString()))
+                    if (!subRenderState->setParameter("normalmap_space", prop.values[2]))
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        translator->emitError();
                     }
                 }
 
                 // Read texture coordinate index.
-                if (prop->values.size() >= 4)
+                if (prop.values.size() >= 4)
                 {
                     unsigned int textureCoordinateIndex = 0;
-
-                    ++it;
-                    if (SGScriptTranslator::getUInt(*it, &textureCoordinateIndex))
+                    if (StringConverter::parse(prop.values[3], textureCoordinateIndex))
                     {
                         normalMapTexture->setTextureCoordSet(textureCoordinateIndex);
                     }
-                    compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
-                                       "use the texture_unit format to specify tex_coord_set and sampler_ref");
+                    translator->emitError("use the texture_unit format to specify tex_coord_set and sampler_ref",
+                                          ScriptCompiler::CE_DEPRECATEDSYMBOL);
                 }
 
                 // Read texture filtering format.
-                if (prop->values.size() >= 5)
+                if (prop.values.size() >= 5)
                 {
-                    ++it;
                     // sampler reference
-                    if (auto sampler = TextureManager::getSingleton().getSampler((*it)->getString()))
+                    if (auto sampler = TextureManager::getSingleton().getSampler(prop.values[4]))
                     {
                         normalMapTexture->setSampler(sampler);
                     }
                     else
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        translator->emitError();
                     }
                 }
 
@@ -275,10 +268,10 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
     return NULL;
 }
 
-SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop,
-                                                         TextureUnitState* texState, SGScriptTranslator* translator)
+SubRenderState* NormalMapLightingFactory::createInstance(const ScriptProperty& prop, TextureUnitState* texState,
+                                                         SGScriptTranslator* translator)
 {
-    if (prop->name == "normal_map" && !prop->values.empty())
+    if (prop.name == "normal_map" && !prop.values.empty())
     {
         auto pass = texState->getParent();
         auto texureIdx = pass->getTextureUnitStateIndex(texState);
@@ -289,28 +282,24 @@ SubRenderState* NormalMapLightingFactory::createInstance(ScriptCompiler* compile
         SubRenderState* subRenderState = createOrRetrieveInstance(translator);
         subRenderState->setParameter("texture_index", std::to_string(texureIdx));
 
-        auto it = prop->values.begin();
-        if (!subRenderState->setParameter("normalmap_space", (*it)->getString()))
+        if (!subRenderState->setParameter("normalmap_space", prop.values[0]))
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            translator->emitError();
             return subRenderState;
         }
 
-        if (prop->values.size() % 2 != 1) // parameters must come in pairs now
+        if (prop.values.size() % 2 != 1) // parameters must come in pairs now
         {
-            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+            translator->emitError();
             return subRenderState;
         }
 
-        it++;
-        while(it != prop->values.end())
+        auto it = prop.values.begin() + 1;
+        while(it != prop.values.end())
         {
-            String paramName = (*it)->getString();
-            String paramValue = (*++it)->getString();
-
-            if (!subRenderState->setParameter(paramName, paramValue))
+            if (!subRenderState->setParameter(*it, *++it))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                translator->emitError();
                 return subRenderState;
             }
             it++;

@@ -356,30 +356,31 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* IntegratedPSSM3Factory::createInstance(ScriptCompiler* compiler,
-                                                      PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+SubRenderState* IntegratedPSSM3Factory::createInstance(const ScriptProperty& prop, Pass* pass, SGScriptTranslator* translator)
 {
-    if (prop->name == "integrated_pssm4")
+    if (prop.name == "integrated_pssm4")
     {
-        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, "integrated_pssm4. Use shadow_mapping instead.");
+        translator->emitError("integrated_pssm4. Use shadow_mapping instead.", ScriptCompiler::CE_DEPRECATEDSYMBOL);
 
         SubRenderState* subRenderState = createOrRetrieveInstance(translator);
 
-        auto it = prop->values.begin();
-        auto itEnd = prop->values.end();
-
-        if (prop->values.size() >= 4)
+        if (prop.values.size() >= 4)
         {
-            IntegratedPSSM3::SplitPointList splitPointList;
-            if(SGScriptTranslator::getVector(it, itEnd, splitPointList, 4))
-                subRenderState->setParameter("split_points", splitPointList);
-
-            std::advance(it, 4);
+            IntegratedPSSM3::SplitPointList splitPointList(4);
+            for(int i = 0; i < 4; ++i)
+            {
+                if (!StringConverter::parse(prop.values[i], splitPointList[i]))
+                {
+                    translator->emitError();
+                }
+            }
+            subRenderState->setParameter("split_points", splitPointList);
         }
 
-        for (; it != itEnd; ++it)
+        auto it = prop.values.begin() + 4;
+        for (; it != prop.values.end(); ++it)
         {
-            const auto& val = (*it)->getString();
+            const auto& val = (*it);
             if(val == "debug")
             {
                 subRenderState->setParameter("debug", "true");
@@ -393,19 +394,19 @@ SubRenderState* IntegratedPSSM3Factory::createInstance(ScriptCompiler* compiler,
         return subRenderState;
     }
 
-    if (prop->name == "shadow_mapping")
+    if (prop.name == "shadow_mapping")
     {
         SubRenderState* subRenderState = createOrRetrieveInstance(translator);
 
-        auto it = prop->values.begin();
-        while(it != prop->values.end())
+        auto it = prop.values.begin();
+        while(it != prop.values.end())
         {
-            String paramName = (*it)->getString();
-            String paramValue = (*++it)->getString();
+            String paramName = (*it);
+            String paramValue = (*++it);
 
             if (!subRenderState->setParameter(paramName, paramValue))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, paramName);
+                translator->emitError(paramName);
                 return subRenderState;
             }
             it++;

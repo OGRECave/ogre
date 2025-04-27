@@ -643,22 +643,20 @@ const String& FFPTexturingFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* FFPTexturingFactory::createInstance(ScriptCompiler* compiler,
-                                                 PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+SubRenderState* FFPTexturingFactory::createInstance(const ScriptProperty& prop, Pass* pass,
+                                                    SGScriptTranslator* translator)
 {
-    if (prop->name == "texturing_stage")
+    if (prop.name == "texturing_stage")
     {
-        if(prop->values.size() == 1)
+        if(prop.values.size() == 1)
         {
-            const String& value = prop->values.front()->getString();
-
             auto inst = createOrRetrieveInstance(translator);
 
-            if (value == "ffp")
+            if (prop.values[0] == "ffp")
                 return inst;
 
-            if (value == "late_add_blend")
-                inst->setParameter(value, "true");
+            if (prop.values[0] == "late_add_blend")
+                inst->setParameter(prop.values[0], "true");
 
             return inst;
         }
