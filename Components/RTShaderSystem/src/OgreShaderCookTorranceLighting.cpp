@@ -195,31 +195,28 @@ bool CookTorranceLighting::setParameter(const String& name, const String& value)
 const String& CookTorranceLightingFactory::getType() const { return SRS_COOK_TORRANCE_LIGHTING; }
 
 //-----------------------------------------------------------------------
-SubRenderState* CookTorranceLightingFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop,
-                                                            Pass* pass, SGScriptTranslator* translator)
+SubRenderState* CookTorranceLightingFactory::createInstance(const ScriptProperty& prop, Pass* pass,
+                                                            SGScriptTranslator* translator)
 {
-    if (prop->name == "lighting_stage" && prop->values.size() >= 1)
+    if (prop.name == "lighting_stage" && prop.values.size() >= 1)
     {
-        String strValue;
-        AbstractNodeList::const_iterator it = prop->values.begin();
-
         // Read light model type.
-        if ((*it++)->getString()!= "metal_roughness")
+        if (prop.values[0] != "metal_roughness")
             return NULL;
 
         auto subRenderState = createOrRetrieveInstance(translator);
 
-        if(prop->values.size() < 3)
+        if(prop.values.size() < 3)
             return subRenderState;
 
-        if ((*it++)->getString() != "texture")
+        if (prop.values[1] != "texture")
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            translator->emitError(prop.values[1]);
             return subRenderState;
         }
 
-        if(!subRenderState->setParameter("texture", (*it++)->getString()))
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+        if(!subRenderState->setParameter("texture", prop.values[2]))
+            translator->emitError();
 
         return subRenderState;
     }

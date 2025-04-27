@@ -207,38 +207,27 @@ namespace RTShader {
     }
 
     //-----------------------------------------------------------------------
-    SubRenderState* TriplanarTexturingFactory::createInstance(ScriptCompiler* compiler, 
-                                                       PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+    SubRenderState* TriplanarTexturingFactory::createInstance(const ScriptProperty& prop, Pass* pass,
+                                                              SGScriptTranslator* translator)
     {
-        if (prop->name == "triplanarTexturing")
+        if (prop.name == "triplanarTexturing")
         {
-            if (prop->values.size() == 6)
+            if (prop.values.size() == 6)
             {
                 SubRenderState* subRenderState = createOrRetrieveInstance(translator);
                 TriplanarTexturing* tpSubRenderState = static_cast<TriplanarTexturing*>(subRenderState);
                 
-                AbstractNodeList::const_iterator it = prop->values.begin();
-                float parameters[3];
-                if (false == SGScriptTranslator::getFloat(*it, parameters))
+                Vector3 parameters;
+                for(int i = 0; i < 3; ++i)
                 {
-                    return NULL;
+                    if (!StringConverter::parse(prop.values[i], parameters[i]))
+                    {
+                        return NULL;
+                    }
                 }
-                ++it;
-                if (false == SGScriptTranslator::getFloat(*it, parameters + 1))
-                {
-                    return NULL;
-                }
-                ++it;
-                if (false == SGScriptTranslator::getFloat(*it, parameters + 2))
-                {
-                    return NULL;
-                }
-                ++it;
-                Vector3 vParameters(parameters[0], parameters[1], parameters[2]);
-                tpSubRenderState->setParameter("parameters", vParameters);
+                tpSubRenderState->setParameter("parameters", parameters);
 
-                StringVector textureNames = {(*it++)->getString(), (*it++)->getString(), (*it++)->getString()};
-
+                StringVector textureNames(prop.values.begin() + 3, prop.values.end());
                 if(textureNames[0].empty() || textureNames[1].empty() || textureNames[2].empty())
                     return NULL;
 

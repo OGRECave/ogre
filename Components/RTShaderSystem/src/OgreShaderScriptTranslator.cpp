@@ -60,7 +60,9 @@ SubRenderState* SGScriptTranslator::getGeneratedSubRenderState(const String& typ
         return mGeneratedRenderState->getSubRenderState(typeName);
     return NULL;
 }
-    
+
+void SGScriptTranslator::emitError(const String& msg, uint32 code) { mCompiler->addError(*mCurrentNode, msg, code); }
+
 //-----------------------------------------------------------------------------
 /*
 note: we can know the texture unit index by getting parent then finding it in the list of children
@@ -164,6 +166,9 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
             {
                 PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
 
+                mCurrentNode = prop;
+                mCompiler = compiler;
+
                 // Handle light count property.
                 if (prop->name == "light_count")
                 {
@@ -182,11 +187,11 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
                         renderState->setLightCountAutoUpdate(false);
 
                         if(prop->values.size() == 3)
-                            compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, "light_count only takes 1 parameter now");
+                            emitError("light_count only takes 1 parameter now", ScriptCompiler::CE_DEPRECATEDSYMBOL);
                     }
                     else
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        emitError();
                     }                   
                 }
 
@@ -200,7 +205,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
                     }
                     else
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, prop->name);
+                        emitError(prop->name);
                     }
                 }               
             }

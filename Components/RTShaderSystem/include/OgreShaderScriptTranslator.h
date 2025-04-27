@@ -76,7 +76,7 @@ public:
     */
     virtual SubRenderState* getGeneratedSubRenderState(const String& typeName);
 
-
+    void emitError(const String &msg = BLANKSTRING, uint32 code = ScriptCompiler::CE_INVALIDPARAMETERS);
 protected:
     /**
     * Translates RT Shader System section within a pass context.
@@ -110,6 +110,8 @@ private:
     //Render state created as a result of the current node being parsed
     RenderState* mGeneratedRenderState;
 
+    ScriptCompiler* mCompiler;
+    const AbstractNode* mCurrentNode;
 };
 
 }

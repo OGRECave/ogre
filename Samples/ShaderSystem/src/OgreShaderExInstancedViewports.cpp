@@ -265,21 +265,6 @@ ShaderExInstancedViewports::~ShaderExInstancedViewports()
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* ShaderExInstancedViewportsFactory::createInstance(ScriptCompiler* compiler, 
-                                                         PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
-{
-    SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
-    return subRenderState;                              
-}
-//-----------------------------------------------------------------------
-void ShaderExInstancedViewportsFactory::writeInstance(MaterialSerializer* ser, 
-                                             SubRenderState* subRenderState, 
-                                             Pass* srcPass, Pass* dstPass)
-{
-
-}
-
-//-----------------------------------------------------------------------
 const String& ShaderExInstancedViewportsFactory::getType() const
 {
     return ShaderExInstancedViewports::Type;

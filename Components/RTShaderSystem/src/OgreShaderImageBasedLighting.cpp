@@ -122,31 +122,30 @@ void ImageBasedLighting::updateGpuProgramsParams(Renderable* rend, const Pass* p
 const String& ImageBasedLightingFactory::getType() const { return SRS_IMAGE_BASED_LIGHTING; }
 
 //-----------------------------------------------------------------------
-SubRenderState* ImageBasedLightingFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass,
-                                               SGScriptTranslator* translator)
+SubRenderState* ImageBasedLightingFactory::createInstance(const ScriptProperty& prop, Pass* pass,
+                                                          SGScriptTranslator* translator)
 {
-    if (prop->name != "image_based_lighting" || prop->values.size() < 2)
+    if (prop.name != "image_based_lighting" || prop.values.size() < 2)
         return NULL;
 
-    auto it = prop->values.begin();
-    if((*it++)->getString() != "texture")
+    if(prop.values[0] != "texture")
     {
-        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+        translator->emitError();
         return NULL;
     }
     auto ret = static_cast<ImageBasedLighting*>(createOrRetrieveInstance(translator));
-    ret->setParameter("texture", (*it++)->getString());
+    ret->setParameter("texture", prop.values[1]);
 
-    if (prop->values.size() < 4)
+    if (prop.values.size() < 4)
         return ret;
 
-    if((*it++)->getString() != "luminance")
+    if(prop.values[2] != "luminance")
     {
-        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+        translator->emitError();
         return NULL;
     }
 
-    ret->setParameter("luminance", (*it++)->getString());
+    ret->setParameter("luminance", prop.values[3]);
 
     return ret;
 }

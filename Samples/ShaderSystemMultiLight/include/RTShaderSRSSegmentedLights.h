@@ -235,17 +235,6 @@ public:
     */
     const Ogre::String& getType() const override;
 
-    /** 
-    @see SubRenderStateFactory::createInstance.
-    */
-    Ogre::RTShader::SubRenderState* createInstance(Ogre::ScriptCompiler* compiler, Ogre::PropertyAbstractNode* prop, Ogre::Pass* pass, Ogre::RTShader::SGScriptTranslator* translator) override;
-
-    /** 
-    @see SubRenderStateFactory::writeInstance.
-    */
-    void writeInstance(Ogre::MaterialSerializer* ser, Ogre::RTShader::SubRenderState* subRenderState, Ogre::Pass* srcPass, Ogre::Pass* dstPass) override;
-
-
 protected:
 
     /** 

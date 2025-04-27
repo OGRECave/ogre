@@ -373,23 +373,21 @@ const String& FFPLightingFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
-SubRenderState*	FFPLightingFactory::createInstance(ScriptCompiler* compiler, 
-												PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+SubRenderState* FFPLightingFactory::createInstance(const ScriptProperty& prop, Pass* pass,
+                                                   SGScriptTranslator* translator)
 {
-    if (prop->name != "lighting_stage" || prop->values.empty())
+    if (prop.name != "lighting_stage" || prop.values.empty())
         return NULL;
 
-    auto it = prop->values.begin();
-
     SubRenderState* ret = NULL;
-    if ((*it++)->getString() == "ffp")
+    if (prop.values[0] == "ffp")
     {
         ret = createOrRetrieveInstance(translator);
     }
 
-    if(ret && prop->values.size() >= 2)
+    if(ret && prop.values.size() >= 2)
     {
-        ret->setParameter((*it)->getString(), "true"); // normalise
+        ret->setParameter(prop.values[1], "true"); // normalise
     }
 
     return ret;

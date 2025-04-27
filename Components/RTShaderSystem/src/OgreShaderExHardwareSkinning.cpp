@@ -262,36 +262,31 @@ const String& HardwareSkinningFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* HardwareSkinningFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+SubRenderState* HardwareSkinningFactory::createInstance(const ScriptProperty& prop, Pass* pass, SGScriptTranslator* translator)
 {
-    if (prop->name == "hardware_skinning")
+    if (prop.name == "hardware_skinning")
     {
         String skinningType = "linear";
         
-        if(prop->values.size() < 2)
+        if(prop.values.size() < 2)
             return NULL;
 
         std::map<String, String> params;
-        AbstractNodeList::iterator it = prop->values.begin();
-        params["max_bone_count"] = (*it)->getString();
-        ++it;
-        params["weight_count"] = (*it)->getString();
+        params["max_bone_count"] = prop.values[0];
+        params["weight_count"] = prop.values[1];
 
-        if(prop->values.size() >= 3)
+        if(prop.values.size() >= 3)
         {
-            ++it;
-            skinningType = (*it)->getString();
+            skinningType = prop.values[2];
         }
 
         if(skinningType != "dual_quaternion" && skinningType != "linear")
             return NULL;
 
-        if(prop->values.size() >= 5)
+        if(prop.values.size() >= 5)
         {
-            ++it;
-            params["correct_antipodality"] = (*it)->getString();
-            ++it;
-            params["scale_shearing"] = (*it)->getString();
+            params["correct_antipodality"] = prop.values[3];
+            params["scale_shearing"] = prop.values[4];
         }
 
         //create and update the hardware skinning sub render state
@@ -302,7 +297,7 @@ SubRenderState* HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
         {
             if(!subRenderState->setParameter(p.first, p.second))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, p.second);
+                translator->emitError(p.second);
             }
         }
 

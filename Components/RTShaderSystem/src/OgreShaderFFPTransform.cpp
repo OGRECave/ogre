@@ -148,19 +148,18 @@ const String& FFPTransformFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* FFPTransformFactory::createInstance(ScriptCompiler* compiler, 
-                                                   PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+SubRenderState* FFPTransformFactory::createInstance(const ScriptProperty& prop, Pass* pass,
+                                                    SGScriptTranslator* translator)
 {
-    if (prop->name == "transform_stage")
+    if (prop.name == "transform_stage")
     {
-        if(prop->values.size() > 0)
+        if(prop.values.size() > 0)
         {
-            auto it = prop->values.begin();
-            if((*it)->getString() != "instanced")
+            if(prop.values[0] != "instanced")
                 return NULL;
 
             int texCoordSlot = 1;
-            if(++it != prop->values.end() && !SGScriptTranslator::getInt(*++it, &texCoordSlot))
+            if(prop.values.size() > 1 && !StringConverter::parse(prop.values[1], texCoordSlot))
                 return NULL;
 
             auto ret = createOrRetrieveInstance(translator);

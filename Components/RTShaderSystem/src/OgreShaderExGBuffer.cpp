@@ -224,22 +224,15 @@ void GBuffer::copyFrom(const SubRenderState& rhs)
 const String& GBufferFactory::getType() const { return SRS_GBUFFER; }
 
 //-----------------------------------------------------------------------
-SubRenderState* GBufferFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass,
-                                               SGScriptTranslator* translator)
+SubRenderState* GBufferFactory::createInstance(const ScriptProperty& prop, Pass* pass, SGScriptTranslator* translator)
 {
-    if (prop->name != "lighting_stage" || prop->values.size() < 2)
+    if (prop.name != "lighting_stage" || prop.values.size() < 2)
         return NULL;
 
-    auto it = prop->values.begin();
-    if((*it++)->getString() != "gbuffer")
+    if(prop.values[0] != "gbuffer")
         return NULL;
 
-    StringVector targets;
-    targets.push_back((*it++)->getString());
-
-    if(it != prop->values.end())
-        targets.push_back((*it++)->getString());
-
+    StringVector targets(prop.values.begin() + 1, prop.values.end());
     auto ret = static_cast<GBuffer*>(createOrRetrieveInstance(translator));
     ret->setParameter("target_buffers", targets);
     return ret;

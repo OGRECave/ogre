@@ -303,24 +303,21 @@ const String& PerPixelLightingFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* PerPixelLightingFactory::createInstance(ScriptCompiler* compiler, 
-                                                        PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+SubRenderState* PerPixelLightingFactory::createInstance(const ScriptProperty& prop, Pass* pass, SGScriptTranslator* translator)
 {
-    if (prop->name != "lighting_stage" || prop->values.empty())
+    if (prop.name != "lighting_stage" || prop.values.empty())
         return NULL;
 
-    auto it = prop->values.begin();
-    if((*it++)->getString() != "per_pixel")
+    if(prop.values[0] != "per_pixel")
         return NULL;
 
     auto ret = createOrRetrieveInstance(translator);
 
     // process the flags
-    while(it != prop->values.end())
+    for(auto it = prop.values.begin() + 1; it != prop.values.end(); it++)
     {
-        const String& val = (*it++)->getString();
-        if (!ret->setParameter(val, "true"))
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, val);
+        if (!ret->setParameter(*it, "true"))
+            translator->emitError(*it);
     }
 
     return ret;

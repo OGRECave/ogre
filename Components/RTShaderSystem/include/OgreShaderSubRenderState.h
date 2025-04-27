@@ -291,22 +291,34 @@ public:
     /** Create an instance of the SubRenderState based on script properties.    
     This method is called in the context of script parsing and let this factory
     the opportunity to create custom SubRenderState instances based on extended script properties.
-    @param compiler The compiler instance.
-    @param prop The abstract property node.
+    @param prop The property
     @param pass The pass that is the parent context of this node.
     @param translator The translator instance holding existing scripts.
     */
+    virtual SubRenderState* createInstance(const ScriptProperty& prop, Pass* pass,
+                                           SGScriptTranslator* translator) OGRE_NODISCARD
+    {
+        return NULL;
+    }
+
+    /// @deprecated
     virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) OGRE_NODISCARD 
     { return NULL; }
 
     /** Create an instance of the SubRenderState based on script properties.    
     This method is called in the context of script parsing and let this factory
     the opportunity to create custom SubRenderState instances based on extended script properties.
-    @param compiler The compiler instance.
-    @param prop The abstract property node.
+    @param prop The property
     @param texState The pass that is the parent context of this node.
     @param translator The translator instance holding existing scripts.
     */
+    virtual SubRenderState* createInstance(const ScriptProperty& prop, TextureUnitState* texState,
+                                           SGScriptTranslator* translator) OGRE_NODISCARD
+    {
+        return NULL;
+    }
+
+    /// @deprecated
     virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator) OGRE_NODISCARD 
     { return NULL; }
 

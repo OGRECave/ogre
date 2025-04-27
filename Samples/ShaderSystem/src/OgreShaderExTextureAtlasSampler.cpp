@@ -357,19 +357,6 @@ const String& TextureAtlasSamplerFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* TextureAtlasSamplerFactory::createInstance(ScriptCompiler* compiler, 
-                                                    PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
-{
-    return NULL;
-}
-
-//-----------------------------------------------------------------------
-void TextureAtlasSamplerFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
-                                        Pass* srcPass, Pass* dstPass)
-{
-}
-
-//-----------------------------------------------------------------------
 bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( const Ogre::String& filename, const TextureAtlasTablePtr& textureAtlasTable )
 {
     std::ifstream inp;

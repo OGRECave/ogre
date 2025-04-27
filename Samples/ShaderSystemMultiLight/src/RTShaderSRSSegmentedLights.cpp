@@ -779,32 +779,6 @@ const String& RTShaderSRSSegmentedLightsFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* RTShaderSRSSegmentedLightsFactory::createInstance(ScriptCompiler* compiler, 
-        PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
-{
-    if (prop->name == "lighting_stage")
-    {
-        if(prop->values.size() == 1)
-        {
-            if (prop->values.front()->getString() == "per_pixel")
-            {
-                return createOrRetrieveInstance(translator);
-            }
-        }       
-    }
-
-    return NULL;
-}
-
-//-----------------------------------------------------------------------
-void RTShaderSRSSegmentedLightsFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
-    Pass* srcPass, Pass* dstPass)
-{
-    ser->writeAttribute(4, "lighting_stage");
-    ser->writeValue("per_pixel");
-}
-
-//-----------------------------------------------------------------------
 SubRenderState* RTShaderSRSSegmentedLightsFactory::createInstanceImpl()
 {
     return OGRE_NEW RTShaderSRSSegmentedLights;

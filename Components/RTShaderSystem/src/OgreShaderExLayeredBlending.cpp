@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderPrecompiledHeaders.h"
+#include "OgreStringConverter.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
 namespace Ogre {
@@ -420,36 +421,33 @@ const String& LayeredBlendingFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
-SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler, 
-                                    PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator)
+SubRenderState* LayeredBlendingFactory::createInstance(const ScriptProperty& prop, TextureUnitState* texState,
+                                                       SGScriptTranslator* translator)
 {
-    if (prop->name == "layered_blend")
+    if (prop.name == "layered_blend" && !prop.values.empty())
     {
-        if (stringToBlendMode(prop->values.front()->getString()) == LB_Invalid)
+        if (stringToBlendMode(prop.values[0]) == LB_Invalid)
         {
             StringVector vec;
             for (const auto& m : _blendModes)
                 vec.push_back(m.name);
 
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                "Expected one of the following blend modes: " + StringConverter::toString(vec));
+            translator->emitError("Expected one of the following blend modes: " + StringConverter::toString(vec));
             return NULL;
         }
 
-        
-        //get the layer blend sub-render state to work on
-        LayeredBlending* layeredBlendState =
-            createOrRetrieveSubRenderState(translator);
-        
+        // get the layer blend sub-render state to work on
+        LayeredBlending* layeredBlendState = createOrRetrieveSubRenderState(translator);
+
         //update the layer sub render state
         unsigned short texIndex = texState->getParent()->getTextureUnitStateIndex(texState);
-        layeredBlendState->setBlendMode(texIndex, prop->values.front()->getString());
+        layeredBlendState->setBlendMode(texIndex, prop.values[0]);
 
         return layeredBlendState;
     }
-    if (prop->name == "source_modifier")
+    if (prop.name == "source_modifier")
     {
-        if(prop->values.size() < 3)
+        if(prop.values.size() < 3)
             return NULL;
 
         // Read light model type.
@@ -458,30 +456,25 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
         String paramType;
         int customNum;
         
-        AbstractNodeList::const_iterator itValue = prop->values.begin();
-        modifierString = (*itValue)->getString();
+        modifierString = prop.values[0];
         isParseSuccess = stringToSourceModifier(modifierString) != SM_Invalid;
         if (isParseSuccess == false)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, 
-                "Expected one of the following modifier type as first parameter: " \
-                "src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate.");
+            translator->emitError("Expected one of the following modifier type as first parameter: "
+                                  "src1_modulate, src2_modulate, src1_inverse_modulate, src2_inverse_modulate.");
             return NULL;
         }
 
-        ++itValue;
-        isParseSuccess &= ((*itValue)->getString() == "custom");
+        isParseSuccess &= (prop.values[1] == "custom");
         if(isParseSuccess == false)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, 
-                "Expected reserved word custom as second parameter.");
+            translator->emitError("Expected reserved word custom as second parameter.");
             return NULL;
         }
-        ++itValue;
-        if(!SGScriptTranslator::getInt(*itValue, &customNum))
+
+        if(!StringConverter::parse(prop.values[2], customNum))
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, 
-                "Expected number of custom parameter as third parameter.");
+            translator->emitError("Expected number of custom parameter as third parameter.");
             return NULL;
         }
 
@@ -497,7 +490,6 @@ SubRenderState* LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
     }
     
     return NULL;
-        
 }
 
 //-----------------------------------------------------------------------
