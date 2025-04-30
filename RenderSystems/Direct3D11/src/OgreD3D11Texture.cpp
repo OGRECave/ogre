@@ -603,6 +603,7 @@ namespace Ogre
         case D3D11_SRV_DIMENSION_TEXTURECUBE:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
             RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
+            RTVDesc.Texture2DArray.MipSlice = buffer->getMipLevel();
             RTVDesc.Texture2DArray.ArraySize = allLayers ? 6 : 1;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2D:
