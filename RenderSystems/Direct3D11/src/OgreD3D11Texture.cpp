@@ -596,21 +596,26 @@ namespace Ogre
             break;
         case D3D11_SRV_DIMENSION_TEXTURE1D:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
+            RTVDesc.Texture1D.MipSlice = buffer->getMipLevel();
             break;
         case D3D11_SRV_DIMENSION_TEXTURE1DARRAY:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
+            RTVDesc.Texture1DArray.MipSlice = buffer->getMipLevel();
             break;
         case D3D11_SRV_DIMENSION_TEXTURECUBE:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
             RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
+            RTVDesc.Texture2DArray.MipSlice = buffer->getMipLevel();
             RTVDesc.Texture2DArray.ArraySize = allLayers ? 6 : 1;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2D:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+            RTVDesc.Texture2D.MipSlice = buffer->getMipLevel();
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DARRAY:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
             RTVDesc.Texture2DArray.FirstArraySlice = mZOffset;
+            RTVDesc.Texture2DArray.MipSlice = buffer->getMipLevel();
             RTVDesc.Texture2DArray.ArraySize = allLayers ? mBuffer->getDepth() : 1;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DMS:
@@ -625,6 +630,7 @@ namespace Ogre
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
             RTVDesc.Texture3D.FirstWSlice = mZOffset;
             RTVDesc.Texture3D.WSize = 1;
+            RTVDesc.Texture3D.MipSlice = buffer->getMipLevel();
             break;
         default:
             assert(false);
