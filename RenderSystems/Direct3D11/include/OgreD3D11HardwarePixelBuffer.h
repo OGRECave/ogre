@@ -83,6 +83,7 @@ namespace Ogre {
         D3D11Texture * getParentTexture() const;
 
         UINT getFace() const;
+        UINT getMipLevel() const;
         UINT getSubresourceIndex(size_t box_front) const;
         D3D11_BOX getSubresourceBox(const Box &box) const;
     };

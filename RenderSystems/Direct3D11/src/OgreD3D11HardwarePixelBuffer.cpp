@@ -465,6 +465,11 @@ namespace Ogre {
         return mFace;
     }
     //-----------------------------------------------------------------------------    
+    UINT D3D11HardwarePixelBuffer::getMipLevel() const
+    {
+        return mMipLevel;
+    }
+    //-----------------------------------------------------------------------------
     void D3D11HardwarePixelBuffer::createStagingBuffer()
     {
         D3D11Texture *tex = static_cast<D3D11Texture*>(mParentTexture);
