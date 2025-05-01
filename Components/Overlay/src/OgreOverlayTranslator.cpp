@@ -56,70 +56,74 @@ void FontTranslator::translate(ScriptCompiler* compiler, const AbstractNodePtr& 
     {
         if (c->type == ANT_PROPERTY)
         {
-            parseAttribute(compiler, font, static_cast<PropertyAbstractNode*>(c.get()));
+            parseAttribute(compiler, font, *c);
         }
     }
 }
 //! [font_translate]
 
-void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
-                                    PropertyAbstractNode* prop)
+void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont, const AbstractNode& node)
 {
-    String& attrib = prop->name;
-    String val;
-
-    if (attrib == "glyph")
+    auto p = node.getProperty();
+    if (p.name == "glyph")
     {
-        std::vector<float> coords;
-        if (prop->values.size() != 5 || !getString(prop->values.front(), &val) ||
-            !getVector(++prop->values.begin(), prop->values.end(), coords, 4))
+        if (p.values.size() != 5)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            compiler->addError(node);
             return;
+        }
+
+        std::vector<float> coords(4);
+        for(size_t i = 0; i < 4; ++i)
+        {
+
+            if (!StringConverter::parse(p.values[1 + i], coords[i]))
+            {
+                compiler->addError(node);
+                return;
+            }
         }
 
         // Set
         // Support numeric and character glyph specification
         Font::CodePoint cp;
-        if (val.size() > 1 && val[0] == 'u')
+        if (p.values[0].size() > 1 && p.values[0][0] == 'u')
         {
             // Unicode glyph spec
-            String trimmed = val.substr(1);
+            String trimmed = p.values[0].substr(1);
             cp = StringConverter::parseUnsignedInt(trimmed);
         }
         else
         {
             // Direct character
-            cp = val[0];
+            cp = p.values[0][0];
         }
         pFont->setGlyphInfoFromTexCoords(
             cp, FloatRect(coords[0], coords[1], coords[2], coords[3])); // assume image is square
     }
-    else if (attrib == "antialias_colour")
+    else if (p.name == "antialias_colour")
     {
         bool flag;
-        if (prop->values.empty() || !getBoolean(prop->values.front(), &flag))
+        if (p.values.empty() || !StringConverter::parse(p.values.front(), flag))
         {
-            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+            compiler->addError(node, BLANKSTRING, ScriptCompiler::CE_STRINGEXPECTED);
             return;
         }
         pFont->setAntialiasColour(flag);
-        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, attrib);
+        compiler->addError(node, p.name, ScriptCompiler::CE_DEPRECATEDSYMBOL);
     }
-    else if (attrib == "code_points")
+    else if (p.name == "code_points")
     {
-        if (prop->values.empty())
+        if (p.values.empty())
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            compiler->addError(node);
             return;
         }
 
-        for (auto& v : prop->values)
+        for (auto& val : p.values)
         {
-
-            bool succ = getString(v, &val);
             StringVector itemVec = StringUtil::split(val, "-");
-            if (succ && itemVec.size() == 2)
+            if (itemVec.size() == 2)
             {
                 pFont->addCodePointRange(
                     Font::CodePointRange(StringConverter::parseUnsignedInt(itemVec[0]),
@@ -127,12 +131,11 @@ void FontTranslator::parseAttribute(ScriptCompiler* compiler, FontPtr& pFont,
             }
         }
     }
-    else if(attrib == "character_spacer")
-        compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, attrib);
-    else if (prop->values.empty() || !getString(prop->values.front(), &val) ||
-             !pFont->setParameter(attrib, val))
+    else if(p.name == "character_spacer")
+        compiler->addError(node, p.name, ScriptCompiler::CE_DEPRECATEDSYMBOL);
+    else if (p.values.empty() || !pFont->setParameter(p.name, p.values.front()))
     {
-        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, attrib);
+        compiler->addError(node, p.name);
     }
 }
 
@@ -194,34 +197,33 @@ void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
     if(newElement->isContainer())
         obj->context = (OverlayContainer*)newElement;
 
-    String val;
     for (auto& c : obj->children)
     {
         if (c->type == ANT_PROPERTY)
         {
-            PropertyAbstractNode* prop = static_cast<PropertyAbstractNode*>(c.get());
+            auto prop = c->getProperty();
 
             bool succ = true;
-            if(prop->values.size() > 1)
+            String val;
+            if(prop.values.size() > 1)
             {
                 // FIXME: joining string, just so setParameter can split it again..
                 StringStream ss;
-                for(auto& v : prop->values) {
-                    succ = succ && getString(v, &val);
-                    ss << val << " ";
+                for(auto& v : prop.values) {
+                    ss << v << " ";
                 }
                 val = ss.str();
             }
             else
             {
-                succ = getString(prop->values.front(), &val);
+                val = prop.values.front();
             }
 
-            if(prop->name == "space_width")
-                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line, prop->name);
+            if(prop.name == "space_width")
+                compiler->addError(*c, prop.name, ScriptCompiler::CE_DEPRECATEDSYMBOL);
 
-            if(!succ || !newElement->setParameter(prop->name, val))
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            if(!succ || !newElement->setParameter(prop.name, val))
+                compiler->addError(*c);
         }
         else if(c->type == ANT_OBJECT)
             translate(compiler, c); // recurse
@@ -250,12 +252,12 @@ void OverlayTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
     {
         if (c->type == ANT_PROPERTY)
         {
-            PropertyAbstractNode* prop = static_cast<PropertyAbstractNode*>(c.get());
+            auto prop = c->getProperty();
 
             uint32 zorder;
-            if (prop->name != "zorder" || prop->values.empty() || !getUInt(prop->values.front(), &zorder))
+            if (prop.name != "zorder" || prop.values.empty() || !StringConverter::parse(prop.values.front(), zorder))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, prop->name);
+                compiler->addError(*c, prop.name);
                 continue;
             }
             overlay->setZOrder(Math::uint16Cast(zorder));

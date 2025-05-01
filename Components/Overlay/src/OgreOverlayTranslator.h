@@ -37,7 +37,7 @@ namespace Ogre
 struct FontTranslator : public ScriptTranslator
 {
     void translate(ScriptCompiler* compiler, const AbstractNodePtr& node) override;
-    void parseAttribute(ScriptCompiler* compiler, FontPtr& pFont, PropertyAbstractNode* prop);
+    void parseAttribute(ScriptCompiler* compiler, FontPtr& pFont, const AbstractNode& node);
 };
 //! [font_translator]
 
