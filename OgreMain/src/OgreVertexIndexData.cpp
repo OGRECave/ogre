@@ -105,7 +105,7 @@ namespace Ogre {
         auto numVerts = srcBuf->getNumVertices();
 
         auto elemSize = elem->getSize();
-        auto elemOffset = elem->getOffset();
+        int elemOffset = elem->getOffset();
 
         auto postVertexOffset = elemOffset + elemSize;
         auto postVertexSize = vertexSize - postVertexOffset;
@@ -279,7 +279,7 @@ namespace Ogre {
         auto srcType = elem->getType();
         auto vbuf = vertexBufferBinding->getBuffer(elem->getSource());
 
-        size_t newElemSize = VertexElement::getTypeSize(dstType);
+        uint32 newElemSize = VertexElement::getTypeSize(dstType);
         size_t newVertexSize = vbuf->getVertexSize() - elem->getSize() + newElemSize;
         auto newVBuf = vbuf->getManager()->createVertexBuffer(newVertexSize, vbuf->getNumVertices(), vbuf->getUsage(),
                                                               vbuf->hasShadowBuffer());
