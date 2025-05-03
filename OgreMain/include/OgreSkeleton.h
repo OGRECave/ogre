@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreAnimation.h"
 #include "OgreHeaderPrefix.h"
-#include "OgreSharedPtr.h"
 
 namespace Ogre {
     /** \addtogroup Core

@@ -64,7 +64,7 @@ namespace Ogre {
     };
 
     typedef std::vector<FileInfo> FileInfoList;
-    typedef SharedPtr<FileInfoList> FileInfoListPtr;
+    typedef shared_ptr<FileInfoList> FileInfoListPtr;
 
     /** Archive-handling class.
 
