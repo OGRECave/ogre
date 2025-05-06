@@ -70,15 +70,6 @@ namespace Ogre{
         }
     }
 
-    String getPropertyName(const ScriptCompiler *compiler, uint32 id)
-    {
-        for(auto& kv : compiler->mIds)
-            if(kv.second == id)
-                return kv.first;
-        OgreAssertDbg(false,  "should not get here");
-        return "unknown";
-    }
-
     template <typename T>
     bool getValue(const AbstractNodePtr &node, T& result);
     template<> bool getValue(const AbstractNodePtr &node, float& result)
@@ -461,24 +452,21 @@ namespace Ogre{
     template <typename T>
     static bool getValue(PropertyAbstractNode* prop, ScriptCompiler *compiler, T& val)
     {
-        if(prop->values.empty())
+        if (prop->values.empty())
         {
-            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+            compiler->addError(*prop, BLANKSTRING, ScriptCompiler::CE_STRINGEXPECTED);
         }
-        else if(prop->values.size() > 1)
+        else if (prop->values.size() > 1)
         {
-            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                               getPropertyName(compiler, prop->id) +
-                                   " must have at most 1 argument");
+            compiler->addError(*prop, prop->name + " must have at most 1 argument",
+                               ScriptCompiler::CE_FEWERPARAMETERSEXPECTED);
         }
         else
         {
             if (getValue(prop->values.front(), val))
                 return true;
             else
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                   prop->values.front()->getValue() + " is not a valid value for " +
-                                       getPropertyName(compiler, prop->id));
+                compiler->addError(*prop, prop->values.front()->getValue() + " is not a valid value for " + prop->name);
         }
 
         return false;
