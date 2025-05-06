@@ -324,6 +324,11 @@ namespace Ogre
 
     bool ScriptCompiler::compile(const ConcreteNodeListPtr &nodes, const String &group)
     {
+        if(nodes && !nodes->empty())
+        {
+            mSourceFile = nodes->front()->file;
+        }
+
         // Set up the compilation context
         mGroup = group;
 
@@ -366,6 +371,7 @@ namespace Ogre
         mImports.clear();
         mImportRequests.clear();
         mImportTable.clear();
+        mSourceFile.clear();
 
         return mErrors.empty();
     }
@@ -387,7 +393,7 @@ namespace Ogre
 
     void ScriptCompiler::addError(const AbstractNode& node, const String& msg, uint32 code)
     {
-        addError(code, node.file, node.line, msg);
+        addError(code, mSourceFile, node.line, msg);
     }
 
     void ScriptCompiler::setListener(ScriptCompilerListener *listener)
