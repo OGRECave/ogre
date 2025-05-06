@@ -353,7 +353,7 @@ namespace Ogre
         for(auto & i : *ast)
         {
 #if DEBUG_AST
-            logAST(0, *i);
+            logAST(0, i);
 #endif
             if(i->type == ANT_OBJECT && static_cast<ObjectAbstractNode*>(i.get())->abstract)
                 continue;
