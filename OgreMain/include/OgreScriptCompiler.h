@@ -256,6 +256,8 @@ namespace Ogre
         ScriptCompilerListener *getListener();
         /// Returns the resource group currently set for this compiler
         const String &getResourceGroup() const;
+        /// Returns the current source file name
+        const String& getFileName() const { return mSourceFile; }
         /// Internal method for firing the handleEvent method
         bool _fireEvent(ScriptCompilerEvent *evt, void *retval);
 
@@ -292,6 +294,7 @@ namespace Ogre
         void initWordMap();
     private:
         friend String getPropertyName(const ScriptCompiler *compiler, uint32 id);
+        String mSourceFile;
         // Resource group
         String mGroup;
         // The word -> id conversion table
