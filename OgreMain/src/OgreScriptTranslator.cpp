@@ -3389,16 +3389,10 @@ namespace Ogre{
         {
             if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = (PropertyAbstractNode*)i.get();
+                auto prop = i->getProperty();
                 // Glob the property values all together
-                String str = "";
-                for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
-                {
-                    if(j != prop->values.begin())
-                        str = str + " ";
-                    str = str + (*j)->getValue();
-                }
-                ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter(prop->name, str);
+                String str = StringConverter::toString(prop.values);
+                ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter(prop.name, str);
             }
             else if(i->type == ANT_OBJECT)
             {
@@ -3487,33 +3481,23 @@ namespace Ogre{
                 }
                 else
                 {
-                    String value;
-                    bool first = true;
-                    for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
+                    StringVector values;
+                    _getVector(prop->values.begin(), prop->values.end(), values, prop->values.size());
+
+                    if(prop->name == "attach")
                     {
-                        if((*it)->type == ANT_ATOM)
+                        compiler->addError(*prop, "attach. Use the #include directive instead",
+                                           ScriptCompiler::CE_DEPRECATEDSYMBOL);
+
+                        for (auto& value : values)
                         {
-                            if(!first)
-                                value += " ";
-                            else
-                                first = false;
-
-                            if(prop->name == "attach")
-                            {
-                                ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, ((AtomAbstractNode*)(*it).get())->value);
-                                compiler->_fireEvent(&evt, 0);
-                                value += evt.mName;
-
-                                compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file,
-                                                   prop->line,
-                                                   "attach. Use the #include directive instead");
-                            }
-                            else
-                            {
-                                value += ((AtomAbstractNode*)(*it).get())->value;
-                            }
+                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, value);
+                            compiler->_fireEvent(&evt, 0);
+                            value = evt.mName;
                         }
                     }
+
+                    String value = StringConverter::toString(values);
 
                     if(prop->name == "profiles")
                         profiles = value;
