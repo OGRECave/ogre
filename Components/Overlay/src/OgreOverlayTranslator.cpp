@@ -208,11 +208,7 @@ void ElementTranslator::translate(ScriptCompiler* compiler, const AbstractNodePt
             if(prop.values.size() > 1)
             {
                 // FIXME: joining string, just so setParameter can split it again..
-                StringStream ss;
-                for(auto& v : prop.values) {
-                    ss << v << " ";
-                }
-                val = ss.str();
+                val = StringConverter::toString(prop.values);
             }
             else
             {

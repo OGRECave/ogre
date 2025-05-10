@@ -197,12 +197,9 @@ const String& FFPColourFactory::getType() const
 //-----------------------------------------------------------------------
 SubRenderState* FFPColourFactory::createInstance(const ScriptProperty& prop, Pass* pass, SGScriptTranslator* translator)
 {
-    if (prop.name == "colour_stage")
+    if (prop.name == "colour_stage" && prop.values[0] == "ffp")
     {
-        if (!prop.values.empty() && prop.values[0] == "ffp")
-        {
-            return createOrRetrieveInstance(translator);
-        }
+        return createOrRetrieveInstance(translator);
     }
 
     return NULL;
