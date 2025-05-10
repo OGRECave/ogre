@@ -1480,6 +1480,12 @@ namespace Ogre
                 impl->id = iter2->second;
 
             asn = AbstractNodePtr(impl);
+
+            if(mCurrent && mCurrent->type != ANT_PROPERTY)
+            {
+                // stray atom outside of a property is likely a property without a value
+                mCompiler->addError(*impl, "missing property value");
+            }
         }
 
         // Here, we must insert the node into the tree

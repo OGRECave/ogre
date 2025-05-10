@@ -73,7 +73,7 @@ const String& WBOITFactory::getType() const { return SRS_WBOIT; }
 //-----------------------------------------------------------------------
 SubRenderState* WBOITFactory::createInstance(const ScriptProperty& prop, Pass* pass, SGScriptTranslator* translator)
 {
-    if (prop.name != "weighted_blended_oit" || prop.values.empty())
+    if (prop.name != "weighted_blended_oit")
         return NULL;
 
     bool val;
