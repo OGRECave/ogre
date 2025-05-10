@@ -452,11 +452,7 @@ namespace Ogre{
     template <typename T>
     static bool getValue(PropertyAbstractNode* prop, ScriptCompiler *compiler, T& val)
     {
-        if (prop->values.empty())
-        {
-            compiler->addError(*prop, BLANKSTRING, ScriptCompiler::CE_STRINGEXPECTED);
-        }
-        else if (prop->values.size() > 1)
+        if (prop->values.size() > 1)
         {
             compiler->addError(*prop, prop->name + " must have at most 1 argument",
                                ScriptCompiler::CE_FEWERPARAMETERSEXPECTED);
