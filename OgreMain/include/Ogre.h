@@ -121,6 +121,7 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreSubEntity.h"
 #include "OgreSubMesh.h"
+#include "OgreTagPoint.h"
 #include "OgreTechnique.h"
 #include "OgreTextureManager.h"
 #include "OgreTextureUnitState.h"

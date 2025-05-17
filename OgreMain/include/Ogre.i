@@ -791,6 +791,7 @@ SHARED_PTR(Material);
     %template(NodeList) std::vector<Ogre::Node*>;
     %include "OgreNode.h"
         %include "OgreBone.h"
+        %include "OgreTagPoint.h"
         %ignore Ogre::SceneNode::getAttachedObjectIterator;
         %template(MovableObjectList) std::vector<Ogre::MovableObject*>;
         %include "OgreSceneNode.h"
