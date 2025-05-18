@@ -132,8 +132,6 @@ private:
 
     SkeletonPtr mSkeleton;
 
-    static int msBoneCount;
-
     bool mQuietMode;
     Real mTicksPerSecond;
     Real mAnimationSpeedModifier;
