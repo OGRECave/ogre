@@ -331,8 +331,6 @@ String ReplaceSpaces(const String& s)
 }
 } // namespace
 
-int AssimpLoader::msBoneCount = 0;
-
 AssimpLoader::AssimpLoader()
 {
     Assimp::DefaultLogger::create("");
@@ -421,9 +419,7 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
     {
         mSkeleton = SkeletonManager::getSingleton().create(basename + ".skeleton", RGN_DEFAULT, true);
 
-        msBoneCount = 0;
         createBonesFromNode(scene, scene->mRootNode);
-        msBoneCount = 0;
         createBoneHiearchy(scene, scene->mRootNode);
 
         if (scene->HasAnimations())
@@ -764,7 +760,7 @@ void AssimpLoader::createBonesFromNode(const aiScene* mScene, const aiNode* pNod
 {
     if (isNodeNeeded(pNode->mName.data))
     {
-        Bone* bone = mSkeleton->createBone(String(pNode->mName.data), msBoneCount);
+        Bone* bone = mSkeleton->createBone(String(pNode->mName.data));
 
         aiQuaternion rot;
         aiVector3D pos;
@@ -781,10 +777,9 @@ void AssimpLoader::createBonesFromNode(const aiScene* mScene, const aiNode* pNod
 
         if (!mQuietMode)
         {
-            LogManager::getSingleton().logMessage(StringConverter::toString(msBoneCount) +
+            LogManager::getSingleton().logMessage(StringConverter::toString(bone->getHandle()) +
                                                   ") Creating bone '" + String(pNode->mName.data) + "'");
         }
-        msBoneCount++;
     }
     // Traverse all child nodes of the current node instance
     for (unsigned int childIdx = 0; childIdx < pNode->mNumChildren; ++childIdx)
