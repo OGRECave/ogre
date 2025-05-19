@@ -453,24 +453,20 @@ namespace Ogre {
 
         unsigned short numBones = pSkel->getNumBones();
         LogManager::getSingleton().logMessage("There are " + StringConverter::toString(numBones) + " bones.");
-        unsigned short i;
-        for (i = 0; i < numBones; ++i)
+        for (Bone* pBone : pSkel->getBones())
         {
-            LogManager::getSingleton().logMessage("   Exporting Bone number " + StringConverter::toString(i));
-            Bone* pBone = pSkel->getBone(i);
+            LogManager::getSingleton().logMessage("   Exporting Bone number " + StringConverter::toString(pBone->getHandle()));
             writeBone(bonesElem, pBone);
         }
 
         // Write parents
         pugi::xml_node hierElem = rootNode.append_child("bonehierarchy");
-        for (i = 0; i < numBones; ++i)
+        for (Bone* pBone : pSkel->getBones())
         {
-            Bone* pBone = pSkel->getBone(i);
             String name = pBone->getName() ;
 
-            if ((pBone->getParent())!=NULL) // root bone
+            if (auto pParent = pBone->getParent())
             {
-                Bone* pParent = (Bone*)pBone->getParent();
                 writeBoneParent(hierElem, name, pParent->getName());
             }
         }
