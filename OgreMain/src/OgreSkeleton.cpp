@@ -120,25 +120,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Bone* Skeleton::createBone(unsigned short handle)
     {
-        OgreAssert(handle < OGRE_MAX_NUM_BONES, "Exceeded the maximum number of bones per skeleton");
-        // Check handle not used
-        if (handle < mBoneList.size() && mBoneList[handle] != NULL)
-        {
-            OGRE_EXCEPT(
-                Exception::ERR_DUPLICATE_ITEM,
-                "A bone with the handle " + StringConverter::toString(handle) + " already exists",
-                "Skeleton::createBone" );
-        }
-        Bone* ret = OGRE_NEW Bone(handle, this);
-        assert(mBoneListByName.find(ret->getName()) == mBoneListByName.end());
-        if (mBoneList.size() <= handle)
-        {
-            mBoneList.resize(handle+1);
-        }
-        mBoneList[handle] = ret;
-        mBoneListByName[ret->getName()] = ret;
-        return ret;
-
+        return createBone(StringUtil::format("Bone%u", handle), handle);
     }
     //---------------------------------------------------------------------
     Bone* Skeleton::createBone(const String& name, unsigned short handle)
