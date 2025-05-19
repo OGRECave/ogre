@@ -200,12 +200,7 @@ namespace Ogre {
         virtual Node* createChildImpl(const String& name) = 0;
     public:
         /// Constructor, should only be called by parent, not directly.
-        Node();
-        /** Constructor, should only be called by parent, not directly.
-
-            Assigned a name.
-        */
-        Node(const String& name);
+        Node(const String& name = "");
 
         virtual ~Node();  
 
