@@ -419,11 +419,6 @@ namespace Ogre {
             mManualBones.erase(bone);
     }
     //-----------------------------------------------------------------------
-    unsigned short Skeleton::getNumBones(void) const
-    {
-        return (unsigned short)mBoneList.size();
-    }
-    //-----------------------------------------------------------------------
     void Skeleton::_getBoneMatrices(Affine3* pMatrices)
     {
         // Update derived transforms
@@ -463,12 +458,6 @@ namespace Ogre {
         std::advance(i, index);
 
         return i->second;
-    }
-    //---------------------------------------------------------------------
-    Bone* Skeleton::getBone(unsigned short handle) const
-    {
-        assert(handle < mBoneList.size() && "Index out of bounds");
-        return mBoneList[handle];
     }
     //---------------------------------------------------------------------
     Bone* Skeleton::getBone(const String& name) const
@@ -559,16 +548,6 @@ namespace Ogre {
             }
         }
         return o;
-    }
-    //---------------------------------------------------------------------
-    SkeletonAnimationBlendMode Skeleton::getBlendMode() const
-    {
-        return mBlendState;
-    }
-    //---------------------------------------------------------------------
-    void Skeleton::setBlendMode(SkeletonAnimationBlendMode state) 
-    {
-        mBlendState = state;
     }
     //---------------------------------------------------------------------
     Skeleton::BoneIterator Skeleton::getRootBoneIterator(void)
