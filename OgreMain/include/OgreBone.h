@@ -77,7 +77,7 @@ namespace Ogre
             const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
 
         /** Gets the numeric handle for this bone (unique within the skeleton). */
-        unsigned short getHandle(void) const;
+        unsigned short getHandle(void) const { return mHandle; }
 
         /** Sets the current position / orientation to be the 'binding pose' ie the layout in which 
             bones were originally bound to a mesh.
@@ -107,7 +107,7 @@ namespace Ogre
         void setManuallyControlled(bool manuallyControlled);
 
         /** Getter for mManuallyControlled Flag */
-        bool isManuallyControlled() const;
+        bool isManuallyControlled() const { return mManuallyControlled; }
 
         
         /** Gets the transform which takes bone space to current from the binding pose. 
