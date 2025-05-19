@@ -1780,9 +1780,6 @@ namespace Ogre
         Image mCpuTerrainNormalMap;
 
         static NameGenerator msBlendTextureGenerator;
-        static NameGenerator msNormalMapNameGenerator;
-        static NameGenerator msLightmapNameGenerator;
-        static NameGenerator msCompositeMapNameGenerator;
 
         bool mLodMorphRequired;
         bool mNormalMapRequired;
