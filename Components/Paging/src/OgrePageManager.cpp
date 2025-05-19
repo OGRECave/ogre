@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreStreamSerialiser.h"
 #include "OgreRoot.h"
 #include "OgrePageContent.h"
+#include <sstream>
 
 namespace Ogre
 {

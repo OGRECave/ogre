@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLNativeSupport.h"
+#include <sstream>
 
 namespace Ogre {
 

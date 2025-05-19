@@ -6,6 +6,7 @@
  */
 
 #include "OgreTrays.h"
+#include <sstream>
 
 namespace OgreBites
 {
