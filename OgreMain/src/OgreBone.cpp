@@ -85,10 +85,6 @@ namespace Ogre {
         mCreator->_notifyManualBoneStateChange(this);
     }
     //---------------------------------------------------------------------
-    bool Bone::isManuallyControlled() const {
-        return mManuallyControlled;
-    }
-    //---------------------------------------------------------------------
     void Bone::_getOffsetTransform(Affine3& m) const
     {
         // Combine scale with binding pose inverse scale,
@@ -106,11 +102,6 @@ namespace Ogre {
         Vector3 locTranslate = _getDerivedPosition() + locRotate * (locScale * mBindDerivedInversePosition);
 
         m.makeTransform(locTranslate, locScale, locRotate);
-    }
-    //---------------------------------------------------------------------
-    unsigned short Bone::getHandle(void) const
-    {
-        return mHandle;
     }
     //---------------------------------------------------------------------
     void Bone::needUpdate(bool forceParentUpdate)
