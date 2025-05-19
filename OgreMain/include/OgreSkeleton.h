@@ -155,7 +155,7 @@ namespace Ogre {
         virtual Bone* createBone(const String& name, unsigned short handle);
 
         /** Returns the number of bones in this skeleton. */
-        virtual unsigned short getNumBones(void) const;
+        unsigned short getNumBones(void) const { return (unsigned short)mBoneList.size(); }
 
         typedef std::vector<Bone*> BoneList;
         typedef VectorIterator<BoneList> BoneIterator;
@@ -185,18 +185,22 @@ namespace Ogre {
         }
 
         /** Gets a bone by it's handle. */
-        virtual Bone* getBone(unsigned short handle) const;
+        Bone* getBone(unsigned short handle) const
+        {
+            assert(handle < mBoneList.size() && "Index out of bounds");
+            return mBoneList[handle];
+        }
 
         /** Gets a bone by it's name. */
-        virtual Bone* getBone(const String& name) const;
+        Bone* getBone(const String& name) const;
 
         /** Returns whether this skeleton contains the named bone. */
-        virtual bool hasBone(const String& name) const;
+        bool hasBone(const String& name) const;
 
         /** Sets the current position / orientation to be the 'binding pose' i.e. the layout in which 
             bones were originally bound to a mesh.
         */
-        virtual void setBindingPose(void);
+        void setBindingPose(void);
 
         /** Resets the position and orientation of all bones in this skeleton to their original binding position.
 
@@ -207,7 +211,7 @@ namespace Ogre {
             too, which is normally not done to allow the manual state to persist even 
             when keyframe animation is applied.
         */
-        virtual void reset(bool resetManualBones = false);
+        void reset(bool resetManualBones = false);
 
         /** Creates a new Animation object for animating this skeleton. 
         @copydetails AnimationContainer::createAnimation
@@ -272,7 +276,7 @@ namespace Ogre {
             be at least as large as the number of bones.
             Assumes animation has already been updated.
         */
-        virtual void _getBoneMatrices(Affine3* pMatrices);
+        void _getBoneMatrices(Affine3* pMatrices);
 
         unsigned short getNumAnimations(void) const override;
 
@@ -285,9 +289,9 @@ namespace Ogre {
 
 
         /** Gets the animation blending mode which this skeleton will use. */
-        virtual SkeletonAnimationBlendMode getBlendMode() const;
+        SkeletonAnimationBlendMode getBlendMode() const { return mBlendState; }
         /** Sets the animation blending mode this skeleton will use. */
-        virtual void setBlendMode(SkeletonAnimationBlendMode state);
+        void setBlendMode(SkeletonAnimationBlendMode state) { mBlendState = state; }
 
         /// Updates all the derived transforms in the skeleton
         virtual void _updateTransforms(void);
