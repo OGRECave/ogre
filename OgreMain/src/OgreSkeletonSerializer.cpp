@@ -185,17 +185,13 @@ namespace Ogre {
         }
         
         // Write each bone
-        unsigned short numBones = pSkel->getNumBones();
-        unsigned short i;
-        for (i = 0; i < numBones; ++i)
+        for (Bone* pBone : pSkel->getBones())
         {
-            Bone* pBone = pSkel->getBone(i);
             writeBone(pSkel, pBone);
         }
         // Write parents
-        for (i = 0; i < numBones; ++i)
+        for (Bone* pBone : pSkel->getBones())
         {
-            Bone* pBone = pSkel->getBone(i);
             unsigned short handle = pBone->getHandle();
             Bone* pParent = static_cast<Bone*>(pBone->getParent());
             if (pParent != NULL) 
