@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreGL3PlusStateCacheManager.h"
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreRoot.h"
+#include <sstream>
 
 namespace Ogre {
 

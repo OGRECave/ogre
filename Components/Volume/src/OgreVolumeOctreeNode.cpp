@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreVolumeSource.h"
 #include "OgreVolumeOctreeNodeSplitPolicy.h"
 #include "OgreSceneManager.h"
+#include <sstream>
 
 namespace Ogre {
 namespace Volume {

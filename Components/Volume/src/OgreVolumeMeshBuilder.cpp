@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreManualObject.h"
 #include "OgreMeshManager.h"
 #include "OgreSceneManager.h"
+#include <sstream>
 
 namespace Ogre {
 namespace Volume {

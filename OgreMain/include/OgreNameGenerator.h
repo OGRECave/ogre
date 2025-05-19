@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __NameGenerator_H__
 
 #include "OgreString.h"
-#include <sstream>
 #include "OgreHeaderPrefix.h"
 
 #include "Threading/OgreThreadHeaders.h"
@@ -59,9 +58,7 @@ namespace Ogre {
         String generate()
         {
             OGRE_LOCK_AUTO_MUTEX;
-            StringStream s;
-            s << mPrefix << mNext++;
-            return s.str();
+            return StringUtil::format("%s%llu", mPrefix.c_str(), mNext++);
         }
 
         /// Reset the internal counter
