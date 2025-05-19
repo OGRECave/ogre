@@ -31,8 +31,6 @@ namespace Ogre {
 
     Node::QueuedUpdates Node::msQueuedUpdates;
     //-----------------------------------------------------------------------
-    Node::Node() : Node(BLANKSTRING) {}
-    //-----------------------------------------------------------------------
     Node::Node(const String& name)
         :mParent(0),
         mName(name),

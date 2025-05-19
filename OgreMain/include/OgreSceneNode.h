@@ -116,14 +116,9 @@ namespace Ogre {
     public:
         /** Constructor, only to be called by the creator SceneManager.
 
-            Creates a node with a generated name.
-        */
-        SceneNode(SceneManager* creator);
-        /** Constructor, only to be called by the creator SceneManager.
-
             Creates a node with a specified name.
         */
-        SceneNode(SceneManager* creator, const String& name);
+        SceneNode(SceneManager* creator, const String& name = "");
         ~SceneNode();
 
         /** Adds an instance of a scene object to this node.
