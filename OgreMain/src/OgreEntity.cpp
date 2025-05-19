@@ -440,14 +440,9 @@ namespace Ogre {
                 AxisAlignedBox bbox;
                 bbox.setNull();
                 Real maxScale = Real(0);
-                bool boneHasVerts[ OGRE_MAX_NUM_BONES ];
-                uint16 numBones = mSkeletonInstance->getNumBones();
-                for (size_t iBone = 0; iBone < numBones; ++iBone)
-                {
-                    boneHasVerts[ iBone ] = false;
-                }
+                bool boneHasVerts[ OGRE_MAX_NUM_BONES ] = { false };
                 // for each bone that has vertices weighted to it,
-                for (unsigned long iBone : mMesh->sharedBlendIndexToBoneIndexMap)
+                for (uint16 iBone : mMesh->sharedBlendIndexToBoneIndexMap)
                 {
                     // record which bones have vertices assigned
                     boneHasVerts[ iBone ] = true;
@@ -460,18 +455,17 @@ namespace Ogre {
                     if ( ! submesh->useSharedVertices )
                     {
                         // record which bones have vertices assigned
-                        for (unsigned long iBone : submesh->blendIndexToBoneIndexMap)
+                        for (uint16 iBone : submesh->blendIndexToBoneIndexMap)
                         {
                             boneHasVerts[ iBone ] = true;
                         }
                     }
                 }
                 // for each bone that has vertices weighted to it,
-                for (uint16 iBone = 0; iBone < numBones; ++iBone)
+                for (const Bone* bone : mSkeletonInstance->getBones())
                 {
-                    if ( boneHasVerts[ iBone ] )
+                    if ( boneHasVerts[ bone->getHandle() ] )
                     {
-                        const Bone* bone = mSkeletonInstance->getBone( iBone );
                         Vector3 scaleVec = bone->_getDerivedScale();
                         Real scale = std::max( std::max( Math::Abs(scaleVec.x), Math::Abs(scaleVec.y)), Math::Abs(scaleVec.z) );
                         maxScale = std::max( maxScale, scale );
