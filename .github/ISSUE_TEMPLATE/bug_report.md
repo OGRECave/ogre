@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Something does not seem to work as intended
 title: ''
 labels: ''
 assignees: ''
@@ -8,11 +8,6 @@ assignees: ''
 ---
 
 <!--
-If you have a question rather than reporting a bug please go to
-- https://gitter.im/OGRECave/ogre or
-- https://forums.ogre3d.org/
-where you get much faster responses.
-
 This is a template helping you to create an issue which can be processed as quickly as possible.
 -->
 #### System Information
