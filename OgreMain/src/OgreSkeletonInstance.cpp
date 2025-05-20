@@ -35,7 +35,6 @@ namespace Ogre {
     SkeletonInstance::SkeletonInstance(const SkeletonPtr& masterCopy) 
         : Skeleton()
         , mSkeleton(masterCopy)
-        , mNextTagPointAutoHandle(0)
     {
     }
     //-------------------------------------------------------------------------
@@ -146,7 +145,6 @@ namespace Ogre {
     //-------------------------------------------------------------------------
     void SkeletonInstance::prepareImpl(void)
     {
-        mNextTagPointAutoHandle = 0;
         // construct self from master
         mBlendState = mSkeleton->mBlendState;
         // Copy bones
@@ -190,7 +188,7 @@ namespace Ogre {
     {
         TagPoint* ret;
         if (mFreeTagPoints.empty()) {
-            ret = OGRE_NEW TagPoint(mNextTagPointAutoHandle++, this);
+            ret = OGRE_NEW TagPoint(uint16(-1), this);
             mActiveTagPoints.push_back(ret);
         } else {
             ret = mFreeTagPoints.front();
