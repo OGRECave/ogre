@@ -436,8 +436,6 @@ namespace Ogre {
         /// List of references to other skeletons to use animations from 
         mutable LinkedSkeletonAnimSourceList mLinkedSkeletonAnimSourceList;
 
-        /// Bone automatic handles
-        unsigned short mNextAutoHandle;
         SkeletonAnimationBlendMode mBlendState;
         /// Manual bones dirty?
         bool mManualBonesDirty;

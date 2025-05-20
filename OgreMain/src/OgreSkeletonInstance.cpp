@@ -146,7 +146,6 @@ namespace Ogre {
     //-------------------------------------------------------------------------
     void SkeletonInstance::prepareImpl(void)
     {
-        mNextAutoHandle = mSkeleton->mNextAutoHandle;
         mNextTagPointAutoHandle = 0;
         // construct self from master
         mBlendState = mSkeleton->mBlendState;
