@@ -143,9 +143,6 @@ namespace Ogre {
         */
         TagPointList mFreeTagPoints;
 
-        /// TagPoint automatic handles
-        unsigned short mNextTagPointAutoHandle;
-
         void cloneBoneAndChildren(Bone* source, Bone* parent);
         void prepareImpl(void) override;
         void unprepareImpl(void) override;
