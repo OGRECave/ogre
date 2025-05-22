@@ -417,7 +417,7 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
 
     if (mBonesByName.size())
     {
-        mSkeleton = SkeletonManager::getSingleton().create(basename + ".skeleton", RGN_DEFAULT, true);
+        mSkeleton = SkeletonManager::getSingleton().create(basename + ".skeleton", mesh->getGroup(), true);
 
         createBonesFromNode(scene, scene->mRootNode);
         createBoneHiearchy(scene, scene->mRootNode);
