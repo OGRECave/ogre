@@ -1,4 +1,4 @@
- %module(package="Ogre", directors="1") Ogre
+ %module(package="Ogre", directors="1", threads="1") Ogre
  %{
  /* Includes the header in the wrapper code */
 #include "Ogre.h"
@@ -20,6 +20,7 @@
 #include "OgreCompositorLogic.h"
 %}
 
+%feature("nothreadallow");
 %include stdint.i
 %include std_shared_ptr.i
 %include std_string.i
@@ -516,6 +517,7 @@ SHARED_PTR(FileHandleDataStream);
 %include "OgreCodec.h"
 %include "OgreSerializer.h"
 %include "OgreScriptLoader.h"
+
 // Listeners
 %feature("director") Ogre::FrameListener;
 %include "OgreFrameListener.h"
@@ -529,6 +531,7 @@ SHARED_PTR(FileHandleDataStream);
 %include "OgreRenderTargetListener.h"
 %feature("director") Ogre::MeshSerializerListener;
 %feature("director") Ogre::ResourceLoadingListener;
+
 // More Data Types
 %ignore Ogre::ColourValue::getHSB; // deprecated
 %include "OgreColourValue.h"
@@ -965,33 +968,10 @@ SHARED_PTR(Mesh);
 %ignore Ogre::Root::createSceneManager(uint16, const String&);
 %ignore Ogre::Root::getMovableObjectFactoryIterator;
 #ifdef SWIGPYTHON
-%{
-class ThreadAllowFrameListener : public Ogre::FrameListener {
-    PyThreadState* _save = 0;
-public:
-    bool frameRenderingQueued(const Ogre::FrameEvent& evt)
-    {
-        if(!_save)
-            _save = PyEval_SaveThread();
-        return true;
-    }
-    bool frameEnded(const Ogre::FrameEvent& evt)
-    {
-        if(_save) {
-            PyEval_RestoreThread(_save);
-            _save = 0;
-        }
-        return true;
-    }
-};
-%}
-%extend Ogre::Root {
-    void allowPyThread()
-    {
-        static ThreadAllowFrameListener listener;
-        $self->addFrameListener(&listener);
-    }
-}
+/* Unlocks SIG when called from python */
+%threadallow Ogre::Root::startRendering;
+%threadallow Ogre::Root::renderOneFrame;
+%threadallow Ogre::Root::_updateAllRenderTargets;
 #endif
 %include "OgreRoot.h"
 // dont wrap: not useful in high level languages
