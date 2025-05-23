@@ -212,6 +212,8 @@ int main(int numargs, char** args)
 
         auto codec = Codec::getCodec(ext);
 
+        ResourceGroupManager::getSingleton().addResourceLocation(path, "FileSystem", RGN_DEFAULT);
+
         MeshPtr mesh = MeshManager::getSingleton().createManual(basename + "." + ext, RGN_DEFAULT);
         mesh->getUserObjectBindings().setUserAny("_AssimpLoaderOptions", opts.options);
         codec->decode(Root::openFileStream(opts.source), mesh.get());
