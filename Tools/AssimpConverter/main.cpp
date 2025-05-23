@@ -184,7 +184,7 @@ int main(int numargs, char** args)
         ConfigFile pluginsCfg;
         pluginsCfg.load(fsLayer.getConfigFilePath("plugins.cfg"));
 
-        auto pluginDir = pluginsCfg.getSetting("PluginFolder")+"/";
+        auto pluginDir = FileSystemLayer::resolveBundlePath(pluginsCfg.getSetting("PluginFolder")+"/");
 
         logMgr.setDefaultLog(NULL); // swallow startup messages
 
