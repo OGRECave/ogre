@@ -20,6 +20,8 @@ class _OgreExport DefaultDebugDrawer : public DebugDrawer
     void preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v) override;
     void postFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v) override;
     void beginLines();
+    void beginAxes();
+    void drawAxis2D(const Affine3& pose, const Matrix3& rot, float scale, const ColourValue& col);
 public:
     enum DrawType
     {
