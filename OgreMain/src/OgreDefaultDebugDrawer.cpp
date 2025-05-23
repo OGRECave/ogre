@@ -2,8 +2,10 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at https://www.ogre3d.org/licensing.
 
+#include "OgreMatrix3.h"
 #include "OgreStableHeaders.h"
 #include "OgreDefaultDebugDrawer.h"
+#include "OgreTagPoint.h"
 
 namespace Ogre
 {
@@ -39,6 +41,31 @@ void DefaultDebugDrawer::beginLines()
     else if (mLines.getCurrentVertexCount() == 0)
         mLines.beginUpdate(0);
 }
+void DefaultDebugDrawer::beginAxes()
+{
+    if (mAxes.getSections().empty())
+    {
+        const char* matName = "Ogre/Debug/AxesMat";
+        auto mat = MaterialManager::getSingleton().getByName(matName, RGN_INTERNAL);
+        if (!mat)
+        {
+            mat = MaterialManager::getSingleton().create(matName, RGN_INTERNAL);
+            Pass* p = mat->getTechnique(0)->getPass(0);
+            p->setLightingEnabled(false);
+            p->setPolygonModeOverrideable(false);
+            p->setVertexColourTracking(TVC_AMBIENT);
+            p->setSceneBlending(SBT_TRANSPARENT_ALPHA);
+            p->setCullingMode(CULL_NONE);
+            p->setDepthWriteEnabled(false);
+            p->setDepthCheckEnabled(false);
+        }
+
+        mAxes.setBufferUsage(HBU_CPU_TO_GPU);
+        mAxes.begin(mat);
+    }
+    else if (mAxes.getCurrentVertexCount() == 0)
+        mAxes.beginUpdate(0);
+}
 void DefaultDebugDrawer::drawWireBox(const AxisAlignedBox& aabb, const ColourValue& colour)
 {
     beginLines();
@@ -69,47 +96,40 @@ void DefaultDebugDrawer::drawFrustum(const Frustum* frust)
     for (int i : idx)
         mLines.index(base + i);
 }
-void DefaultDebugDrawer::drawAxes(const Affine3& pose, float size)
+void DefaultDebugDrawer::drawAxis2D(const Affine3& pose, const Matrix3& rot, float scale, const ColourValue& col)
 {
-    if (mAxes.getSections().empty())
-    {
-        const char* matName = "Ogre/Debug/AxesMat";
-        auto mat = MaterialManager::getSingleton().getByName(matName, RGN_INTERNAL);
-        if (!mat)
-        {
-            mat = MaterialManager::getSingleton().create(matName, RGN_INTERNAL);
-            Pass* p = mat->getTechnique(0)->getPass(0);
-            p->setLightingEnabled(false);
-            p->setPolygonModeOverrideable(false);
-            p->setVertexColourTracking(TVC_AMBIENT);
-            p->setSceneBlending(SBT_TRANSPARENT_ALPHA);
-            p->setCullingMode(CULL_NONE);
-            p->setDepthWriteEnabled(false);
-            p->setDepthCheckEnabled(false);
-        }
-
-        mAxes.setBufferUsage(HBU_CPU_TO_GPU);
-        mAxes.begin(mat);
-    }
-    else if (mAxes.getCurrentVertexCount() == 0)
-        mAxes.beginUpdate(0);
-
-    /* 3 axes, each made up of 2 of these (base plane = XY)
+    /* each made up of 2 of these (base plane = XY)
      *   .------------|\
      *   '------------|/
      */
-    Vector3 basepos[7] =
-    {
-        // stalk
-        Vector3(0, 0.05, 0),
-        Vector3(0, -0.05, 0),
-        Vector3(0.7, -0.05, 0),
-        Vector3(0.7, 0.05, 0),
-        // head
-        Vector3(0.7, -0.15, 0),
-        Vector3(1, 0, 0),
-        Vector3(0.7, 0.15, 0)
-    };
+     static Vector3 basepos[7] =
+     {
+         // stalk
+         Vector3(0, 0.05, 0),
+         Vector3(0, -0.05, 0),
+         Vector3(0.7, -0.05, 0),
+         Vector3(0.7, 0.05, 0),
+         // head
+         Vector3(0.7, -0.15, 0),
+         Vector3(1, 0, 0),
+         Vector3(0.7, 0.15, 0)
+     };
+
+     uint32 base = mAxes.getCurrentVertexCount();
+     // vertices
+     for (const auto& p : basepos)
+     {
+         mAxes.position(pose * (rot * p * scale));
+         mAxes.colour(col);
+     }
+
+     // indices
+     mAxes.quad(base + 0, base + 1, base + 2, base + 3);
+     mAxes.triangle(base + 4, base + 5, base + 6);
+}
+void DefaultDebugDrawer::drawAxes(const Affine3& pose, float size)
+{
+    beginAxes();
 
     ColourValue col[3] = {ColourValue(1, 0, 0, 0.8), ColourValue(0, 1, 0, 0.8), ColourValue(0, 0, 1, 0.8)};
 
@@ -128,26 +148,51 @@ void DefaultDebugDrawer::drawAxes(const Affine3& pose, float size)
     // 6 arrows
     for (size_t i = 0; i < 6; ++i)
     {
-        uint32 base = mAxes.getCurrentVertexCount();
-        // vertices
-        for (const auto& p : basepos)
-        {
-            mAxes.position(pose * (rot[i] * p * size));
-            mAxes.colour(col[i / 2]);
-        }
-
-        // indices
-        mAxes.quad(base + 0, base + 1, base + 2, base + 3);
-        mAxes.triangle(base + 4, base + 5, base + 6);
+        drawAxis2D(pose, rot[i], size, col[i / 2]);
     }
 }
 void DefaultDebugDrawer::setBoneAxesSize(float size)
 {
     mBoneAxesSize = size;
 }
-void DefaultDebugDrawer::drawBone(const Node* node, const Affine3 & transform)
+void DefaultDebugDrawer::drawBone(const Node* node, const Affine3& transform)
 {
-    drawAxes(transform * node->_getFullTransform(), mBoneAxesSize);
+    beginAxes();
+
+    ColourValue col(0.5, 0, 1, 0.9);
+    Affine3 pose = transform * node->_getFullTransform();
+
+    Matrix3 rot[2];
+    // x-axis
+    rot[0] = Matrix3::IDENTITY;
+    rot[1].FromAxes(Vector3::UNIT_X, Vector3::NEGATIVE_UNIT_Z, Vector3::UNIT_Y);
+
+    for(const auto* child : node->getChildren())
+    {
+        if(dynamic_cast<const TagPoint*>(child))
+            continue;
+
+        float size = child->getPosition().length(); // we can assume relative to parent position
+
+        Matrix3 crot;
+        Vector3::UNIT_X.getRotationTo(child->getPosition()).ToRotationMatrix(crot);
+
+        for (const auto& r : rot)
+        {
+            drawAxis2D(pose, crot * r, size, col);
+        }
+    }
+
+    if(node->getChildren().empty())
+    {
+        Matrix3 crot;
+        Vector3::UNIT_X.getRotationTo(node->getPosition()).ToRotationMatrix(crot);
+        // draw the axes of the node itself
+        for (const auto& r : rot)
+        {
+            drawAxis2D(pose, crot * r, mBoneAxesSize, col);
+        }
+    }
 }
 void DefaultDebugDrawer::drawSceneNode(const SceneNode* node)
 {
