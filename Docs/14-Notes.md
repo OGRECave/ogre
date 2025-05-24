@@ -93,6 +93,12 @@ A new spot light type `LT_RECTLIGHT` has been introduced along with the `setSour
 
 The shader types `GPT_MESH_PROGRAM` and `GPT_TASK_PROGRAM` are now available, with support indicated by the `RSC_MESH_PROGRAM` capability. This functionality is provided in GL3Plus through the `GL_NV_mesh_shader` extension and in Vulkan via the `VK_NV_mesh_shader` extension.
 
+### Layered Rendering (since 14.4)
+
+`TU_RENDERTARGET` can now be combined with `TU_TARGET_ALL_LAYERS` to render to all layers of a texture array or cubemap (also called VPRT targets). This is useful for rendering to multiple layers in a single pass, such as when rendering a environment map, doing PSSM shadow mapping, or doing side-by-side stereo rendering.
+
+Additionally, you can check `RSC_VP_RT_INDEX_ANY_SHADER` to see if the rendering system supports efficient dispatch from vertex shaders, eliminating the need for a geometry shader.
+
 ## Python
 
 The double `ImGui` namespacing in `Ogre.ImGui` enums was removed; e.g. `ImGui.ImGuiWindowFlags_NoTitleBar` is now `ImGui.WindowFlags_NoTitleBar`.
