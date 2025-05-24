@@ -566,6 +566,7 @@ SHARED_PTR(GpuProgramParameters);
 %ignore Ogre::Particle::hasOwnDimensions ; // deprecated
 %include "OgreParticle.h"
 %apply unsigned int* OUTPUT { unsigned int* result };
+%ignore Ogre::HardwareOcclusionQuery::getLastQuerysPixelcount; // deprecated
 %include "OgreHardwareOcclusionQuery.h"
 SHARED_PTR(HardwareBuffer);
 %include "OgreHardwareBuffer.h"
@@ -745,6 +746,12 @@ SHARED_PTR(Material);
 %ignore Ogre::RenderSystem::getColourVertexElementType;
 %ignore Ogre::RenderSystem::setStencilCheckEnabled;
 %ignore Ogre::RenderSystem::setStencilBufferParams;
+%ignore Ogre::RenderSystem::setGlobalInstanceCount;
+%ignore Ogre::RenderSystem::getGlobalInstanceCount;
+%ignore Ogre::RenderSystem::setGlobalInstanceVertexDeclaration;
+%ignore Ogre::RenderSystem::getGlobalInstanceVertexDeclaration;
+%ignore Ogre::RenderSystem::setGlobalInstanceVertexBuffer;
+%ignore Ogre::RenderSystem::getGlobalInstanceVertexBuffer;
 %ignore Ogre::RenderSystem::setScissorTest(bool, uint32, uint32 = 0, uint32 = 800, uint32 = 600);
 %include "OgreRenderSystem.h"
 %include "OgreCompositorManager.h"
@@ -831,8 +838,12 @@ SHARED_PTR(Material);
         ADD_REPR(Camera)
     %include "OgreManualObject.h"
     %template(SubEntityList) std::vector<Ogre::SubEntity*>;
-    %ignore Ogre::Entity::getAttachedObjectIterator;
     %include "OgreEntity.h"
+    %ignore Ogre::SubEntity::getAttachedObjectIterator;
+    %ignore Ogre::SubEntity::setIndexDataStartIndex;
+    %ignore Ogre::SubEntity::getIndexDataStartIndex;
+    %ignore Ogre::SubEntity::setIndexDataEndIndex;
+    %ignore Ogre::SubEntity::getIndexDataEndIndex;
     %include "OgreSubEntity.h"
     %ignore Ogre::ParticleSystemRenderer::_createVisualData;
     %ignore Ogre::ParticleSystemRenderer::_destroyVisualData;
@@ -951,6 +962,19 @@ SHARED_PTR(Mesh);
 %ignore Ogre::SceneManager::getMovableObjectIterator;
 %ignore Ogre::SceneManager::getShadowTextureCount;
 %ignore Ogre::SceneManager::getShadowTextureConfigIterator;
+%ignore Ogre::SceneManager::getShadowCasterBoundsInfo;
+%ignore Ogre::SceneManager::getSkyDomeGenParameters;
+%ignore Ogre::SceneManager::getSkyDomeNode;
+%ignore Ogre::SceneManager::isSkyDomeEnabled;
+%ignore Ogre::SceneManager::setSkyDomeEnabled;
+%ignore Ogre::SceneManager::getSkyBoxGenParameters;
+%ignore Ogre::SceneManager::getSkyBoxNode;
+%ignore Ogre::SceneManager::isSkyBoxEnabled;
+%ignore Ogre::SceneManager::setSkyBoxEnabled;
+%ignore Ogre::SceneManager::getSkyPlaneGenParameters;
+%ignore Ogre::SceneManager::getSkyPlaneNode;
+%ignore Ogre::SceneManager::isSkyPlaneEnabled;
+%ignore Ogre::SceneManager::setSkyPlaneEnabled;
 %newobject Ogre::SceneManager::createRayQuery(const Ray&, uint32 mask);
 %newobject Ogre::SceneManager::createRayQuery(const Ray&);
 %rename(SceneManager_Listener) Ogre::SceneManager::Listener;
