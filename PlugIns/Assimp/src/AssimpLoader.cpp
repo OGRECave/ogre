@@ -963,6 +963,13 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
         LogManager::getSingleton().logMessage("Creating " + matName);
     }
 
+    aiString tmp;
+    String alphaMode;
+    if (AI_SUCCESS == aiGetMaterialString(mat, "$mat.gltf.alphaMode", 0, 0, &tmp))
+    {
+        alphaMode = String(tmp.data);
+    }
+
     // ambient
     aiColor4D clr(1.0f, 1.0f, 1.0f, 1.0);
     // Ambient is usually way too low! FIX ME!
@@ -977,7 +984,7 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
         omat->setDiffuse(clr.r, clr.g, clr.b, clr.a);
     }
 
-    if (clr.a < 1.0f)
+    if (clr.a < 1.0f || alphaMode == "BLEND")
     {
         omat->setSceneBlending(SBT_TRANSPARENT_ALPHA);
         omat->setDepthWriteEnabled(false);
@@ -1021,6 +1028,12 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
         default:
             break;
         }
+    }
+
+    float alphaCutoff = 1.0f;
+    if (AI_SUCCESS == mat->Get("$mat.gltf.alphaCutoff", 0, 0, alphaCutoff) && alphaMode == "MASK")
+    {
+        omat->getTechnique(0)->getPass(0)->setAlphaRejectSettings(CMPF_GREATER, alphaCutoff * 255.0f);
     }
 
     String basename;
