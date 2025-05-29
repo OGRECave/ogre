@@ -69,7 +69,8 @@ namespace Ogre {
             String refTexName;  //If a reference, the name of the texture in the compositor being referenced
             uint32 width;       // 0 means adapt to target width
             uint32 height;      // 0 means adapt to target height
-            TextureType type;   // either 2d or cubic
+            uint32 depth;       // only used for 2d_array textures
+            TextureType type;   // either 2d, 2d_array or cubic
             float widthFactor;  // multiple of target width to use (if width = 0)
             float heightFactor; // multiple of target height to use (if height = 0)
             PixelFormatList formatList; // more than one means MRT
@@ -79,7 +80,7 @@ namespace Ogre {
             bool pooled;        // whether to use pooled textures for this one
             TextureScope scope; // Which scope has access to this texture
 
-            TextureDefinition() :width(0), height(0), type(TEX_TYPE_2D), widthFactor(1.0f), heightFactor(1.0f),
+            TextureDefinition() :width(0), height(0), depth(1), type(TEX_TYPE_2D), widthFactor(1.0f), heightFactor(1.0f),
                 fsaa(1), hwGammaWrite(false), depthBufferId(1), pooled(false), scope(TS_LOCAL) {}
         };
         /// Typedefs for several iterators

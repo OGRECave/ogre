@@ -156,8 +156,8 @@ TexturePtr createTexture(const String& name, const CompositionTechnique::Texture
                          const String& fsaaHint)
 {
     bool hwGamma = def.hwGammaWrite && !PixelUtil::isFloatingPoint(pf);
-    return TextureManager::getSingleton().createManual(name, RGN_INTERNAL, def.type, def.width, def.height, 0, pf,
-                                                       TU_RENDERTARGET, 0, hwGamma, def.fsaa, fsaaHint);
+    return TextureManager::getSingleton().createManual(name, RGN_INTERNAL, def.type, def.width, def.height, def.depth,
+                                                       0, pf, TU_RENDERTARGET, 0, hwGamma, def.fsaa, fsaaHint);
 }
 
 //-----------------------------------------------------------------------

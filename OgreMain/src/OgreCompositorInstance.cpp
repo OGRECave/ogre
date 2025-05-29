@@ -730,6 +730,8 @@ void CompositorInstance::createResources(bool forResizeOnly)
         {
             for(size_t i = 0; i < tex->getNumFaces(); i++)
                 setupRenderTarget(tex->getBuffer(i)->getRenderTarget(), def->depthBufferId);
+            for(uint32 i = 1; i < tex->getDepth(); i++) // first target handled above
+                setupRenderTarget(tex->getBuffer()->getRenderTarget(i), def->depthBufferId);
         }
     }
 
@@ -997,7 +999,12 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name, int slice)
     // try simple texture
     LocalTextureMap::iterator i = mLocalTextures.find(name);
     if(i != mLocalTextures.end())
-        return i->second->getBuffer(slice)->getRenderTarget();
+    {
+        if(i->second->getTextureType() == TEX_TYPE_CUBE_MAP)
+            return i->second->getBuffer(slice)->getRenderTarget();
+        else
+            return i->second->getBuffer()->getRenderTarget(slice);
+    }
 
     // try MRTs
     LocalMRTMap::iterator mi = mLocalMRTs.find(name);
