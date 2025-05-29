@@ -4569,6 +4569,7 @@ namespace Ogre{
                         AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
                         uint32 width = 0, height = 0;
+                        uint32 depth = 1;
                         float widthFactor = 1.0f, heightFactor = 1.0f;
                         bool widthSet = false, heightSet = false, formatSet = false;
                         bool pooled = false;
@@ -4636,6 +4637,9 @@ namespace Ogre{
                             case ID_CUBIC:
                                 type = TEX_TYPE_CUBE_MAP;
                                 break;
+                            case ID_2DARRAY:
+                                type = TEX_TYPE_2D_ARRAY;
+                                break;
                             case ID_SCOPE_LOCAL:
                                 scope = CompositionTechnique::TS_LOCAL;
                                 break;
@@ -4685,6 +4689,10 @@ namespace Ogre{
                                         height = uival;
                                         heightSet = true;
                                     }
+                                    else if (atomIndex == 4)
+                                    {
+                                        depth = uival;
+                                    }
                                     else
                                     {
                                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -4713,12 +4721,19 @@ namespace Ogre{
                             return;
                         }
 
+                        if(depth != 1 && type != TEX_TYPE_2D_ARRAY)
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "depth only supported for 2d_array textures");
+                            return;
+                        }
 
                         // No errors, create
                         try {
                             CompositionTechnique::TextureDefinition *def = mTechnique->createTextureDefinition(atom0->value);
                             def->width = width;
                             def->height = height;
+                            def->depth = depth;
                             def->type = type;
                             def->widthFactor = widthFactor;
                             def->heightFactor = heightFactor;

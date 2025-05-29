@@ -327,7 +327,7 @@ Techniques can have the following nested elements:
 
 This declares a render texture for use in subsequent @ref Compositor-Target-Passes.
 @par
-Format: texture &lt;name&gt; &lt;width&gt; &lt;height&gt; &lt;PixelFormat&gt; \[&lt;MRT Pixel_Format2&gt;\] \[&lt;MRT Pixel_FormatN&gt;\] \[pooled\] \[gamma\] \[no\_fsaa\] [fsaa &lt;level&gt;] \[depth\_pool &lt;poolId&gt;\] \[&lt;scope&gt;\] \[&lt;cubic&gt;\]
+Format: texture &lt;name&gt; &lt;width&gt; &lt;height&gt; \[depth\] &lt;PixelFormat&gt; \[&lt;MRT Pixel_Format2&gt;\] \[&lt;MRT Pixel_FormatN&gt;\] \[pooled\] \[gamma\] \[no\_fsaa\] [fsaa &lt;level&gt;] \[depth\_pool &lt;poolId&gt;\] \[&lt;scope&gt;\] \[cubic|2d_array\]
 
 @param name
 A name to give the render texture, which must be unique within this compositor. This name is used to reference the texture in @ref Compositor-Target-Passes, when the texture is rendered to, and in @ref Compositor-Passes, when the texture is used as input to a material rendering a fullscreen quad.
@@ -338,10 +338,12 @@ A name to give the render texture, which must be unique within this compositor. 
 The dimensions of the render texture. You can either specify a fixed width and height, or you can request that the texture is based on the physical dimensions of the viewport to which the compositor is attached. The options for the latter are either of
 <ul>
 <li> @c target_width and @c target_height
-<li> @c target_width_scaled &lt;factor&gt; and @c target_height_scaled &lt;factor&gt;
+<li> `target_width_scaled <factor>` and `target_height_scaled <factor>`
 </ul>
 where &lt;factor&gt; is the amount by which you wish to multiply the size of the main target to derive the dimensions.
 @endparblock
+@param depth
+The number of slices in the texture. This is only relevant for @c 2d_array textures. The default is 1 slice.
 @param PixelFormat
 The Ogre::PixelFormat of the render texture. This affects how much memory it will take, what colour channels will be available, and what precision you will have within those channels.
 You can in fact repeat this element if you wish. If you do so, that means that this render texture becomes a Multiple Render Target (MRT), when the GPU writes to multiple textures at once.
@@ -375,6 +377,9 @@ If present, this directive sets the scope for the texture for being accessed by 
 
 @param cubic
 This texture is of type Ogre::TEX_TYPE_CUBE_MAP - i.e. made up of 6 2D textures which are pasted around the inside of a cube.
+
+@param 2d_array
+This texture is of type Ogre::TEX_TYPE_2D_ARRAY - i.e. made up of N 2D textures which are stacked on top of each other in a single texture.
 
 @par
 Example: texture rt0 512 512 PF\_R8G8B8A8
@@ -446,7 +451,7 @@ Format: target\_output { }
 
 The contents of both are identical, the only real difference is that you can only have a single target\_output entry, whilst you can have many target entries. 
 
-Note, the target entry can refer to @ref Cube-map-textures. Therefore, it takes an optional _decimal_ slice parameter that specifies which face you want to render on. The default is 0, hence +X.
+Note, the target entry can refer to @ref Cube-map-textures and 2D Array textures. Therefore, it takes an optional _decimal_ slice parameter that specifies which face you want to render on. The default is 0, hence +X.
 
 Here are the attributes you can use in a ’target’ or ’target\_output’ section of a .compositor script:
 
