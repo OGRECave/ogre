@@ -19,6 +19,8 @@ Since 14.3, textures defined in compositor scripts can explicitly set the FSAA l
 
 Since 14.3, `float16` vertex elements are supported via the `VET_HALFx` types. Note, that `VET_HALF3` is not supported on D3D11 and D3D9 and is padded to `VET_HALF4` on loading there.
 
+Since 14.4, compositor textures declaration allow the `2d_array` type and specific layers addressed with `target myTex 1 {...`.
+
 ### OgreUnifiedShader.h
 
 Sampler definitions now implicitly include the `uniform` keyword to support Vulkan; i.e. this will generate an error:
