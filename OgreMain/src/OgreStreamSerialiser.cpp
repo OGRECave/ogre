@@ -259,7 +259,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void StreamSerialiser::readHeader()
     {
-        uint32 headerid;
+        uint32 headerid = 0;
         size_t actually_read = mStream->read(&headerid, sizeof(uint32));
         // skip back
         mStream->skip(0 - (long)actually_read);
