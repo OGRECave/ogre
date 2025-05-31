@@ -332,7 +332,7 @@ namespace Ogre
                 A pointer to the automatically created window, if
                 requested, otherwise <b>NULL</b>.
         */
-        RenderWindow* initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
+        RenderWindow* initialise(bool autoCreateWindow = false, const String& windowTitle = "OGRE Render Window");
 
         /** Returns whether the system is initialised or not. */
         bool isInitialised(void) const { return mIsInitialised; }
@@ -560,15 +560,8 @@ namespace Ogre
         /// @deprecated use ColourValue::getAsBYTE()
         OGRE_DEPRECATED static void convertColourValue(const ColourValue& colour, uint32* pDest) { *pDest = colour.getAsBYTE(); }
 
-        /** Retrieves a pointer to the window that was created automatically
-
-            When Root is initialised an optional window is created. This
-            method retrieves a pointer to that window.
-            @note
-                returns a null pointer when Root has not been initialised with
-                the option of creating a window.
-        */
-        RenderWindow* getAutoCreatedWindow(void);
+        /// @deprecated use #createRenderWindow instead
+        OGRE_DEPRECATED RenderWindow* getAutoCreatedWindow(void);
 
         /** @copydoc RenderSystem::_createRenderWindow
         */
