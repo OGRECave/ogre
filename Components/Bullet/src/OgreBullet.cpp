@@ -284,6 +284,36 @@ btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType 
     return co;
 }
 
+void DynamicsWorld::attachRigidBody(btRigidBody *rigidBody, Entity* ent, CollisionListener* listener,
+                                         int group, int mask)
+{
+    auto node = ent->getParentSceneNode();
+    OgreAssert(node, "entity must be attached");
+    /* If the body has incorrect btMotionState and is in world
+     * we will crash or corrupt some memory. Hope the user
+     * will know what he/she is doing */
+    if (!rigidBody->isInWorld()) {
+        RigidBodyState* state = new RigidBodyState(node);
+	rigidBody->setMotionState(state);
+        getBtWorld()->addRigidBody(rigidBody, group, mask);
+    }
+    rigidBody->setUserPointer(new EntityCollisionListener{ent, listener});
+    // transfer ownership to node
+    auto objWrapper = std::make_shared<RigidBody>(rigidBody, mBtWorld);
+    node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
+}
+void CollisionWorld::attachCollisionObject(btCollisionObject *collisionObject, Entity* ent, int group, int mask)
+{
+    auto node = ent->getParentSceneNode();
+    OgreAssert(node, "entity must be attached");
+    if (collisionObject->getWorldArrayIndex() == -1)
+        mBtWorld->addCollisionObject(collisionObject, group, mask);
+
+    // transfer ownership to node
+    auto objWrapper = std::make_shared<CollisionObject>(collisionObject, mBtWorld);
+    node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
+}
+
 struct RayResultCallbackWrapper : public btCollisionWorld::RayResultCallback
 {
     Bullet::RayResultCallback* mCallback;
