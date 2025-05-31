@@ -31,7 +31,8 @@ enum ColliderType
     CT_CYLINDER,
     CT_CAPSULE,
     CT_TRIMESH,
-    CT_HULL
+    CT_HULL,
+    CT_COMPOUND
 };
 
 inline btQuaternion convert(const Quaternion& q) { return btQuaternion(q.x, q.y, q.z, q.w); }
@@ -72,6 +73,12 @@ _OgreBulletExport btBoxShape* createBoxCollider(const MovableObject* mo);
 _OgreBulletExport btCapsuleShape* createCapsuleCollider(const MovableObject* mo);
 /// create capsule collider using ogre provided data
 _OgreBulletExport btCylinderShape* createCylinderCollider(const MovableObject* mo);
+/// create triMesh collider
+_OgreBulletExport btBvhTriangleMeshShape* createTrimeshCollider(const Entity* ent);
+/// create convex hull collider
+_OgreBulletExport btConvexHullShape* createConvexHullCollider(const Entity* ent);
+/// create compound shape
+_OgreBulletExport btCompoundShape* createCompoundShape();
 
 struct _OgreBulletExport CollisionListener
 {
