@@ -91,6 +91,12 @@ btCylinderShape* createCylinderCollider(const MovableObject* mo)
     return shape;
 }
 
+/// create compound shape because we can
+btCompoundShape* createCompoundShape()
+{
+	return new btCompoundShape;
+}
+
 struct EntityCollisionListener
 {
     const MovableObject* entity;
@@ -162,6 +168,18 @@ private:
     Vector3 mScale;
 };
 
+/// create trimesh collider using ogre provided data
+btBvhTriangleMeshShape* createTrimeshCollider(const Entity* ent)
+{
+        return VertexIndexToShape(ent).createTrimesh();
+}
+
+/// create convex hull collider using ogre provided data
+btConvexHullShape* createConvexHullCollider(const Entity* ent)
+{
+	return VertexIndexToShape(ent).createConvex();
+}
+
 /// wrapper with automatic memory management
 class CollisionObject
 {
@@ -229,11 +247,14 @@ static btCollisionShape* getCollisionShape(Entity* ent, ColliderType ct)
         cs = createCapsuleCollider(ent);
         break;
     case CT_TRIMESH:
-        cs = VertexIndexToShape(ent).createTrimesh();
+        cs = createTrimeshCollider(ent);
         break;
     case CT_HULL:
-        cs = VertexIndexToShape(ent).createConvex();
+        cs = createConvexHullCollider(ent);
         break;
+    case CT_COMPOUND:
+	cs = createCompoundShape();
+	break;
     }
 
     if (ent->hasSkeleton())
