@@ -29,8 +29,6 @@ Also see acknowledgements in Readme.html
 #include "OgreTerrainQuadTreeNode.h"
 #include "SdkSample.h"
 
-#define TERRAIN_FILE_PREFIX String("testTerrain")
-#define TERRAIN_FILE_SUFFIX String("dat")
 #define TERRAIN_WORLD_SIZE 12000.0f
 #define TERRAIN_SIZE 513
 
@@ -223,30 +221,23 @@ public:
             mInfoLabel->show();
             if (mTerrainsImported)
             {
-                mInfoLabel->setCaption("Building terrain, please wait...");
+                mInfoLabel->setCaption("Building terrain...");
             }
             else
             {
-                mInfoLabel->setCaption("Updating textures, patience...");
+                mInfoLabel->setCaption("Updating textures...");
             }
         }
         else
         {
             mTrayMgr->removeWidgetFromTray(mInfoLabel);
             mInfoLabel->hide();
-            if (mTerrainsImported)
-            {
-                // FIXME does not end up in the correct resource group
-                // saveTerrains(true);
-                mTerrainsImported = false;
-            }
+            mTerrainsImported = false;
         }
         //! [loading_label]
 
         return SdkSample::frameRenderingQueued(evt); // don't forget the parent updates!
     }
-
-    void saveTerrains(bool onlyIfModified) { mTerrainGroup->saveAllTerrains(onlyIfModified); }
 
     bool keyReleased(const KeyboardEvent& evt) override
     {
@@ -261,12 +252,14 @@ public:
 
         switch (e.keysym.sym)
         {
+        //! [terrain_save_trigger]
         case 's':
             // CTRL-S to save
             if (e.keysym.mod & KMOD_CTRL)
             {
-                saveTerrains(true);
+                mTerrainGroup->saveAllTerrains(true);
             }
+        //! [terrain_save_trigger]
             else
                 return SdkSample::keyPressed(e);
             break;
@@ -381,9 +374,7 @@ protected:
     SelectMenu* mShadowsMenu;
     CheckBox* mFlyBox;
     CheckBox* mParallaxOcclusionBox;
-    //! [infolabel]
     OgreBites::Label* mInfoLabel = nullptr;
-    //! [infolabel]
     bool mTerrainsImported;
     ShadowCameraSetupPtr mPSSMSetup;
 
@@ -410,7 +401,7 @@ protected:
         String filename = mTerrainGroup->generateFilename(x, y);
         if (ResourceGroupManager::getSingleton().resourceExists(mTerrainGroup->getResourceGroup(), filename))
         {
-            mTerrainGroup->defineTerrain(x, y);
+            mTerrainGroup->defineTerrain(x, y, filename);
         }
         else
         {
@@ -516,7 +507,7 @@ protected:
         //! [import_settings]
 
         //! [tex_from_src]
-        Image combined;
+        Ogre::Image combined;
         combined.loadTwoImagesAsRGBA("Ground23_col.jpg", "Ground23_spec.png", "General");
         TextureManager::getSingleton().loadImage("Ground23_diffspec", "General", combined);
         //! [tex_from_src]
@@ -723,9 +714,14 @@ protected:
 
         //! [terrain_create]
         mTerrainGroup = new Ogre::TerrainGroup(mSceneMgr, Ogre::Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
-        mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
         mTerrainGroup->setOrigin(mTerrainPos);
         //! [terrain_create]
+
+        //! [terrain_save_config]
+        ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem", mTerrainGroup->getResourceGroup(),
+                                                                 false, true);
+        mTerrainGroup->setFilenameConvention("TerrainSample", "bin");
+        //! [terrain_save_config]
 
         configureTerrainDefaults(l);
 #ifdef PAGING
