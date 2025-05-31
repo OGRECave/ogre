@@ -717,11 +717,13 @@ protected:
         mTerrainGroup->setOrigin(mTerrainPos);
         //! [terrain_create]
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         //! [terrain_save_config]
         ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem", mTerrainGroup->getResourceGroup(),
                                                                  false, true);
         mTerrainGroup->setFilenameConvention("TerrainSample", "bin");
         //! [terrain_save_config]
+#endif
 
         configureTerrainDefaults(l);
 #ifdef PAGING
