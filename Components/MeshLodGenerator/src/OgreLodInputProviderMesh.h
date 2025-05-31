@@ -38,8 +38,6 @@
 #include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
 
-#include <sstream>
-
 namespace Ogre
 {
 

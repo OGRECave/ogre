@@ -30,8 +30,6 @@ THE SOFTWARE.
 #include "OgreOverlayManager.h"
 #include "OgreOverlayContainer.h"
 
-#include <sstream>
-
 namespace Ogre
 {
 //! [font_translate]
