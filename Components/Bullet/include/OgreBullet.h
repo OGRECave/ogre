@@ -110,6 +110,7 @@ public:
     btCollisionObject* addCollisionObject(Entity* ent, ColliderType ct, int group = 1, int mask = -1);
 
     void rayTest(const Ray& ray, RayResultCallback* callback, float maxDist = 1000);
+    void attachCollisionObject(btCollisionObject *collisionObject, Entity *ent, int group = 1, int mask = -1);
 };
 
 /// simplified wrapper with automatic memory management
@@ -131,8 +132,9 @@ public:
     */
     btRigidBody* addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener = nullptr,
                               int group = 1, int mask = -1);
-
-    btDynamicsWorld* getBtWorld() const { return (btDynamicsWorld*)mBtWorld; }
+    void attachRigidBody(btRigidBody *rigidBody, Entity *ent, CollisionListener* listener = nullptr,
+                              int group = 1, int mask = -1);
+    btDynamicsWorld* getBtWorld() const { return static_cast<btDynamicsWorld*>(mBtWorld); }
 };
 
 class _OgreBulletExport DebugDrawer : public btIDebugDraw
