@@ -536,6 +536,8 @@ namespace Ogre {
 
         if (autoCreateWindow)
         {
+            LogManager::getSingleton().logWarning(
+                "Root::initialise: autoCreateWindow is deprecated, use createRenderWindow instead");
             auto desc = mActiveRenderer->getRenderWindowDescription();
             desc.name = windowTitle;
             mAutoWindow = createRenderWindow(desc);

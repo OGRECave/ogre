@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "Ogre.h"
 #include "OgreCodec.h"
 #include "OgreDefaultHardwareBufferManager.h"
+#include "OgreFileSystemLayer.h"
 
 #include <assimp/postprocess.h>
 
