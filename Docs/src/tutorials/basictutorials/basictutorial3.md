@@ -48,7 +48,7 @@ Next we construct our TerrainGroup object. This will manage a grid of Terrains.
 
 @snippet Samples/Simple/include/Terrain.h terrain_create
 
-The TerrainGroup constructor takes the SceneManager as its first parameter. It then takes an alignment option, terrain size, and terrain world size. You can read the Ogre::TerrainGroup for more information. The `setFilenameConvention` allows us to choose how our terrain will be saved. Finally, we set the origin to be used for our terrain.
+The TerrainGroup constructor takes the SceneManager as its first parameter. It then takes an alignment option, terrain size, and terrain world size. You can read the Ogre::TerrainGroup for more information. Finally, we set the origin to be used for our terrain.
 
 The next thing we will do is call our terrain configuration method, which we will fill in soon. Make sure to pass the Light we created as a parameter.
 ```cpp
@@ -132,29 +132,37 @@ Finally, we will finish up our configuration methods by completing the `initBlen
 
 @snippet Samples/Simple/include/Terrain.h blendmap
 
+## Storing changes {#bt3StoringChanges}
+
+Next, we'll implement the ability to save terrain modifications. The first step is to specify the storage location for the terrain data by adding a writable path to the terrain resource group, configured as follows:
+
+@snippet Samples/Simple/include/Terrain.h terrain_save_config
+
+The `setFilenameConvention` method lets us define the naming pattern for terrain files. We've opted for a straightforward format that generates filenames like `TerrainSample_00000000.bin`, where the numeric portion corresponds to the terrain's index within the TerrainGroup.
+
+To control when terrain saving occurs, we'll tie it to the Ctrl+S keyboard shortcut by adding this logic to the `keyPressed` handler:
+
+@snippet Samples/Simple/include/Terrain.h terrain_save_trigger
+
+Saving the terrain serves two purposes: it preserves user modifications and optimizes future loading. When reloaded, the terrain will use the pre-saved data rather than regenerating it, resulting in faster load times.
+
 ## Loading Label {#bt3LoadingLabel}
 
-There are a number of things we will improve. We will add a label to the overlay that allows us to see when the terrain generation has finished. We will also make sure to save our terrain so that it can be reloaded instead of rebuilding it every time. Finally, we will make sure to clean up after ourselves.
-
-First, we need to add a data member to private section of our Sample_Terrain header.
-
-@snippet Samples/Simple/include/Terrain.h infolabel
-
+We will add a label to the overlay that allows us to see when the terrain generation has finished.
 Let's construct this label in the `createFrameListener` method.
 
 @snippet Samples/Simple/include/Terrain.h infolabel_create
 
 We use the TrayManager pointer that was defined in SdkSample to request the creation of a new label. This method takes a TrayLocation, a name for the label, a caption to display, and a width.
 
-Next we will add logic to `frameRenderingQueued` that tracks whether the terrain is still loading or not. We will also take care of saving our terrain after it has been loaded. Add the following to `frameRenderingQueued` right after the call to the parent method:
+Next we will add logic to `frameRenderingQueued` that tracks whether the terrain is still loading or not. Add the following to `frameRenderingQueued` right after the call to the parent method:
 
 @snippet Samples/Simple/include/Terrain.h loading_label
 
 The first thing we do is determine if our terrain is still being built. If it is, then we add our Label to the tray and ask for it to be shown. Then we check to see if any new terrains have been imported. If they have, then we display text saying that the terrain is still being built. Otherwise we assume the textures are being updated.
+If the terrain is no longer being updated, then we ask the OgreBites::TrayManager to remove the our Label widget and hide the Label.
 
-If the terrain is no longer being updated, then we ask the OgreBites::TrayManager to remove the our Label widget and hide the Label. We also check to see if new terrains have been imported and save them for future use. In our case, the file will be named 'terrain_00000000.dat' and it will reside in your 'bin' directory alongside your application's executable. After saving any new terrains, we reset the `mTerrainsImported` flag.
-
-Compile and run your application again. You should now see a Label at the top of the screen while the terrain is being built. While the terrain is loading, you will not be able to press escape to exit and your movement controls will be choppy. This is what loading screens are for in games. But if you exit and run the application a second time, then it should load the terrain file that was saved the first time. This should be a much faster process.
+Compile and run your application again. You should now see a Label at the top of the screen while the terrain is being built. While the terrain is loading, you will not be able to press escape to exit and your movement controls will be choppy. This is what loading screens are for in games.
 
 ![](bt3_building_terrain_label_visual.png)
 
