@@ -128,7 +128,7 @@ ShaderGenerator& ShaderGenerator::getSingleton()
 //-----------------------------------------------------------------------------
 ShaderGenerator::ShaderGenerator() :
     mActiveSceneMgr(NULL), mShaderLanguage(""),
-    mFSLayer(0), mActiveViewportValid(false), mVSOutputCompactPolicy(VSOCP_LOW),
+    mActiveViewportValid(false), mVSOutputCompactPolicy(VSOCP_LOW),
     mCreateShaderOverProgrammablePass(false), mIsFinalizing(false)
 {
     mLightCount[0]              = 0;

@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreSingleton.h"
-#include "OgreFileSystemLayer.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreSceneManager.h"
 #include "OgreShaderRenderState.h"
@@ -840,8 +839,6 @@ private:
     std::unique_ptr<ProgramManager> mProgramManager;
     // Shader program writer manager.
     std::unique_ptr<ProgramWriterManager> mProgramWriterManager;
-    // File system layer manager.
-    FileSystemLayer* mFSLayer;
     // Material entries map.
     SGMaterialMap mMaterialEntriesMap;
     // Scheme entries map.
