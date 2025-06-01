@@ -7,56 +7,65 @@
 
 ## OGRE - scene-oriented, flexible 3D engine
 
-**OGRE** (Object-Oriented Graphics Rendering Engine) is a
-scene-oriented, flexible 3D engine written in C++ designed to make it
-easier and more intuitive for developers to produce games and demos
-utilising 3D hardware. The class library abstracts all the details of
-using the underlying system libraries like Direct3D and OpenGL and
-provides an interface based on world objects and other intuitive
-classes.
+**OGRE (Object-Oriented Graphics Rendering Engine)** is a powerful, open-source 3D rendering engine that empowers you to create stunning games, simulations, and visualizations without getting bogged down in low-level graphics APIs.
 
-[Try it](#try-it) -
-[Building](https://ogrecave.github.io/ogre/api/latest/building-ogre.html) -
+Focus on creating your world, not on boilerplate code. OGRE's scene-oriented approach and clean C++ architecture provide an intuitive framework, abstracting the complexities of Direct3D and OpenGL so you can be more productive.
+
+[Get Started](#get-started-now) -
 [Tutorials](https://ogrecave.github.io/ogre/api/latest/tutorials.html) -
-[Manual](https://ogrecave.github.io/ogre/api/latest/manual.html) -
-[What's New?](Docs/14-Notes.md) -
-[Who is using it?](#who-is-using-it) -
-[Community Support](http://forums.ogre3d.org/)
+[Documentation](https://ogrecave.github.io/ogre/api/latest/manual.html) -
+[Community Support](http://forums.ogre3d.org/) -
+[What's New?](Docs/14-Notes.md)
 
 
 ## Features
 
-For an exhaustive list, see the [features page](http://www.ogre3d.org/about/features) and try our Sample Browser. For a quick overview see below
+OGRE provides the tools you need to build immersive experiences, from advanced lighting and shadow effects to complex character animations and rich particle systems.
 
-| Integrated Bump and Offset Mapping | Integrated shadows |
+| Physically Based Shading | Dynamic Shadows |
 |----|----|
-| ![](Other/screenshots/bumpmap.webp) | ![](Other/screenshots/shadows.jpg) |
+| ![](Other/screenshots/pbr.webp) | ![](Other/screenshots/shadows.jpg) |
+| Achieve stunning surfaces with PBR workflows | Stencil and texture-based shadows for any environment |
 
-| Physically Based Shading | Particle Effects |
+| Character Animation| Particle Effects |
 |----|----|
-| ![](Other/screenshots/pbr.webp) | ![](Other/screenshots/particle.jpg) |
+| ![](Other/screenshots/skeletal.jpg) | ![](Other/screenshots/particle.jpg) |
+| Hardware & software skeletal animation support | Flexible particle systems for fire, smoke, sparks & more. |
 
-| HW & SW skeletal animation | Multi-layer Terrain |
+| Advanced Compositor Pipeline | Terrain Rendering |
 |----|----|
-| ![](Other/screenshots/skeletal.jpg) | ![](Other/screenshots/terrain.jpg) |
+| ![](Other/screenshots/compositor.jpg) | ![](Other/screenshots/terrain.jpg) |
+| Streamline post-processing like bloom and HDR | Multi-layered, textured landscapes with LOD |
 
-| Automatic Rendertarget pipelining (Compositors) | Volume Rendering with CSG & Triplanar Texturing |
-|----|----|
-| ![](Other/screenshots/compositor.jpg) | ![](Other/screenshots/volume.jpg) |
-
-| [Dear ImGui](https://github.com/ocornut/imgui) | [Bullet Physics](https://pybullet.org/) Integration |
+| UI Toolkit | Physics Engine Integration |
 |----|----|
 | ![](Other/screenshots/imgui.jpg) | ![](Other/screenshots/bullet.webp) |
+| Seamless integration with [Dear ImGui](https://github.com/ocornut/imgui) for in-game UI | Use [Bullet Physics](https://pybullet.org/) for rigid body dynamics |
 
-## Try it
-* [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/)
-* [Windows Demos Distribution](https://dl.cloudsmith.io/public/ogrecave/ogre/raw/versions/master/ogre-sdk-master-msvc142-x64.zip)
-* [Linux Snap Package](https://snapcraft.io/ogre)
-* [Android App on F-Droid](https://f-droid.org/packages/org.ogre.browser/)
+| Realistic Surface Details | Volumetric Rendering |
+|----|----|
+| ![](Other/screenshots/bumpmap.webp) | ![](Other/screenshots/volume.jpg) |
+| Bump and offset mapping for enhanced textures | With CSG and triplanar texturing |
+
+For a complete list of capabilities, see our [features page](http://www.ogre3d.org/about/features).
+
+## Get started now
+
+Ready to try OGRE? You can be up and running in minutes.
+
+* **Try it Online:** [Launch the Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/) right in your browser.
+* **Download for Windows:** [Get the latest SDK](https://dl.cloudsmith.io/public/ogrecave/ogre/raw/versions/master/ogre-sdk-master-msvc142-x64.zip) with pre-compiled demos.
+* **Install on Linux:** Use our [Snap Package](https://snapcraft.io/ogre) for easy installation.
+* **Get it on Android:** Find our sample browser on [F-Droid](https://f-droid.org/packages/org.ogre.browser/).
+
+
+For detailed instructions on compiling from source, see our [**Building OGRE guide**](https://ogrecave.github.io/ogre/api/latest/building-ogre.html).
 
 ## Who is using it?
 
-**Open Source**
+Trusted by both open-source communities and commercial studios:
+
+**Open Source & Research**
 - [Stunt Rally 2.x - 3D Racing Game with Track Editor](https://github.com/stuntrally/stuntrally/)
 - [Rigs of Rods - Soft Body Physics Simulator](https://rigsofrods.org/)
 - [Gazebo - Robot simulation](http://gazebosim.org/)
@@ -64,13 +73,29 @@ For an exhaustive list, see the [features page](http://www.ogre3d.org/about/feat
 - [ROS 3D visualization tool](http://wiki.ros.org/rviz)
 - [Surgical Image Toolkit](https://github.com/IRCAD/sight#applications)
 
-**Closed Source**
+**Commercial Games**
 - [Hob](http://store.steampowered.com/app/404680/Hob/)
 - [Torchlight II](http://store.steampowered.com/app/200710/Torchlight_II/)
 - [Battlezone 98 Redux](http://store.steampowered.com/app/301650/Battlezone_98_Redux/)
 
-## Citing
-If you use Ogre in your research, please cite it like this:
+## Join Our Community
+We believe in the power of collaboration. Whether you're a seasoned developer or just starting, you are welcome in the OGRE community.
+
+* **Ask a question** in our [Forums](http://forums.ogre3d.org/) or on [Gitter](https://gitter.im/OGRECave/ogre).
+* **Contribute to the engine** by creating a [pull request](https://github.com/OGRECave/ogre/pulls). We welcome everything from bug fixes and documentation to new features.
+* **Support the project** via [Patreon](https://www.patreon.com/ogre1) to help fund continued development.
+
+
+| Build | Status |
+|-------|-----------------|
+| Linux, OSX, Android, iOS | [![CI Build](https://github.com/OGRECave/ogre/actions/workflows/ci-build.yml/badge.svg)](https://github.com/OGRECave/ogre/actions/workflows/ci-build.yml) |
+| MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
+
+## Licensing
+OGRE is licensed under the **MIT License**. Please see the [full license documentation](Docs/License.md) for details.
+
+## Citing OGRE in Research
+If you use OGRE in your academic work, please cite it:
 
 ```bibtex
   @misc{rojtberg2024ogre,
@@ -80,17 +105,3 @@ If you use Ogre in your research, please cite it like this:
     howpublished = "\url{https://www.ogre3d.org/}",
   }
 ```
-
-## Contributing
-We welcome all contributions to OGRE, be that new
-plugins, bugfixes, extensions, tutorials, documentation, example
-applications, artwork or pretty much anything else! If you would like
-to contribute to the development of OGRE, please create a [pull request](https://github.com/OGRECave/ogre/pulls).
-
-| Build | Status |
-|-------|-----------------|
-| Linux, OSX, Android, iOS | [![CI Build](https://github.com/OGRECave/ogre/workflows/CI%20Build/badge.svg?branch=master)](https://github.com/OGRECave/ogre/actions?query=branch%3Amaster) |
-| MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
-
-## Licensing
-Please see the [full license documentation](Docs/License.md) for details.
