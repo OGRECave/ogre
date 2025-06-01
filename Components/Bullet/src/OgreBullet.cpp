@@ -287,6 +287,17 @@ btRigidBody* DynamicsWorld::addRigidBody(float mass, Entity* ent, ColliderType c
     return rb;
 }
 
+btRigidBody* DynamicsWorld::addKinematicRigidBody(Entity* ent, ColliderType ct, int group, int mask)
+{
+    btRigidBody* rb = addRigidBody(0, ent, ct, nullptr, group, mask);
+    rb->setCollisionFlags(rb->getCollisionFlags()
+                    | btCollisionObject::CF_KINEMATIC_OBJECT
+                    | btCollisionObject::CF_NO_CONTACT_RESPONSE
+                    );
+    rb->setActivationState(DISABLE_DEACTIVATION);
+    return rb;
+}
+
 btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType ct, int group, int mask)
 {
     auto node = ent->getParentSceneNode();
