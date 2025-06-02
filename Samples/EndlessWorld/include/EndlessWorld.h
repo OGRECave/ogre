@@ -102,10 +102,10 @@ public:
 
 		if (mLodStatus)
 		{
-			for(LabelList::iterator li = mLodStatusLabelList.begin(); li != mLodStatusLabelList.end(); li++)
+			for(auto& l : mLodStatusLabelList)
 			{
-				mLodInfoOverlayContainer->_removeChild(*li);
-				OverlayManager::getSingleton().destroyOverlayElement(*li);
+				mLodInfoOverlayContainer->_removeChild(l);
+				OverlayManager::getSingleton().destroyOverlayElement(l);
 			}
 			mLodStatusLabelList.clear();
 
@@ -200,10 +200,10 @@ public:
 			mLodStatus = mLodStatusBox->isChecked();
 			if (!mLodStatus)
 			{
-				for(LabelList::iterator li = mLodStatusLabelList.begin(); li != mLodStatusLabelList.end(); li++)
+				for(auto& l : mLodStatusLabelList)
 				{
-					mLodInfoOverlayContainer->_removeChild(*li);
-					OverlayManager::getSingleton().destroyOverlayElement(*li);
+					mLodInfoOverlayContainer->_removeChild(l);
+					OverlayManager::getSingleton().destroyOverlayElement(l);
 				}
 				mLodStatusLabelList.clear();
 			}
@@ -378,15 +378,15 @@ protected:
 
 		// Paging setup
 		mPageManager = OGRE_NEW PageManager();
-		// Since we're not loading any pages from .page files, we need a way just 
+		// Since we're not loading any pages from .page files, we need a way just
 		// to say we've loaded them without them actually being loaded
 		mPageManager->setPageProvider(&mDummyPageProvider);
 		mPageManager->addCamera(mCamera);
 		mPageManager->setDebugDisplayLevel(0);
 		mTerrainPaging = OGRE_NEW TerrainPaging(mPageManager);
 		mPagedWorld = mPageManager->createWorld();
-		mTerrainPagedWorldSection = mTerrainPaging->createWorldSection(mPagedWorld, mTerrainGroup, 400, 500, 
-			ENDLESS_PAGE_MIN_X, ENDLESS_PAGE_MIN_Y, 
+		mTerrainPagedWorldSection = mTerrainPaging->createWorldSection(mPagedWorld, mTerrainGroup, 400, 500,
+			ENDLESS_PAGE_MIN_X, ENDLESS_PAGE_MIN_Y,
 			ENDLESS_PAGE_MAX_X, ENDLESS_PAGE_MAX_Y);
 
 #if USE_PERLIN_DEFINER == 1
@@ -432,10 +432,10 @@ protected:
 
         if(mLodInfoOverlayContainer)
         {
-            for(LabelList::iterator li = mLodStatusLabelList.begin(); li != mLodStatusLabelList.end(); li++)
+            for(auto& l : mLodStatusLabelList)
             {
-                mLodInfoOverlayContainer->_removeChild(*li);
-                OverlayManager::getSingleton().destroyOverlayElement(*li);
+                mLodInfoOverlayContainer->_removeChild(l);
+                OverlayManager::getSingleton().destroyOverlayElement(l);
             }
             mLodStatusLabelList.clear();
 
