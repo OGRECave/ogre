@@ -36,11 +36,11 @@ MaterialGenerator::~MaterialGenerator()
 {
     // we have generated fragment shaders and materials
     // so delete them
-    for(ProgramMap::iterator it = mFs.begin(); it != mFs.end(); ++it) {
-        HighLevelGpuProgramManager::getSingleton().remove(it->second);
+    for(const auto& f : mFs) {
+        HighLevelGpuProgramManager::getSingleton().remove(f.second);
     }
-    for(MaterialMap::iterator it = mMaterials.begin(); it != mMaterials.end(); ++it) {
-        MaterialManager::getSingleton().remove(it->second);
+    for(const auto& m : mMaterials) {
+        MaterialManager::getSingleton().remove(m.second);
     }
 
     delete mImpl;
@@ -60,7 +60,7 @@ const MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)
         MaterialPtr templ = getTemplateMaterial(permutation & matMask);
         GpuProgramPtr vs = getVertexShader(permutation & vsMask);
         GpuProgramPtr fs = getFragmentShader(permutation & fsMask);
-        
+
         /// Create material name
         String name = materialBaseName + StringConverter::toString(permutation);
 
@@ -71,7 +71,7 @@ const MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)
         Pass *pass = tech->getPass(0);
         pass->setFragmentProgram(fs->getName());
         pass->setVertexProgram(vs->getName());
-    
+
         /// And store it
         mMaterials[permutation] = mat;
         return mMaterials[permutation];

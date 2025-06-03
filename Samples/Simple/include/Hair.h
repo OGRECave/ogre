@@ -95,35 +95,35 @@ public:
         if (box->getName() == "RenderMStrands")
         {
             mRenderMStrands = !mRenderMStrands;
-            
+
             MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
             lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_RenderMStrands", mRenderMStrands );
         }
         if (box->getName() == "RenderSStrands")
         {
             mRenderSStrands = !mRenderSStrands;
-            
+
             MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
             lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_RenderSStrands", mRenderSStrands );
         }
         if (box->getName() == "HWTessellation")
         {
             mHWTessellation = !mHWTessellation;
-            
+
             MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
             lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_HWTessellation", mHWTessellation );
         }
         if (box->getName() == "DynamicLOD" && mHWTessellation)
         {
             mDynamicLOD = !mDynamicLOD;
-            
+
             MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( "Hair" ).staticCast<Material>();
             lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_DynamicLOD", mDynamicLOD );
         }
         if (box->getName() == "WindForce")
         {
             mAddWindForce = !mAddWindForce;
-        }   
+        }
         if (box->getName() == "ComputeShader")
         {
             mComputeShader = !mComputeShader;
@@ -185,14 +185,14 @@ protected:
         setupModels();
         setupLights();
         setupControls();
-        
+
         // set our camera
         mCamera->setFOVy(Ogre::Degree(50.0));
         mCamera->setFOVy(Ogre::Degree(50.0));
         mCamera->setNearClipDistance(0.01f);
         mCamera->lookAt(Ogre::Vector3::ZERO);
         mCameraNode->setPosition(0, 0, 500);
-        
+
 
         // Set our camera to orbit around the origin at a suitable distance
         mCameraMan->setStyle(CS_ORBIT);
@@ -213,7 +213,7 @@ protected:
 
     void setupLights()
     {
-        mSceneMgr->setAmbientLight(ColourValue::Black); 
+        mSceneMgr->setAmbientLight(ColourValue::Black);
         mViewport->setBackgroundColour(ColourValue(0.41f, 0.41f, 0.41f));
     }
 
@@ -225,16 +225,16 @@ protected:
         mTrayMgr->showLogo(TL_TOPRIGHT);
         mTrayMgr->showFrameStats(TL_TOPRIGHT);
         mTrayMgr->toggleAdvancedFrameStats();
-        
+
         mTrayMgr->createCheckBox(TL_TOPLEFT, "Wire", "Render Wire Frame")->setChecked(false, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "PlayAnimation", "Play Animation")->setChecked(false, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "LoopAnimation", "Loop Animation")->setChecked(false, false);
-        
+
         // create a menu to choose the model displayed
         mMeshMenu = mTrayMgr->createLongSelectMenu(TL_LEFT, "Mesh", "Mesh", 370, 290, 10);
-        for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
-            mMeshMenu->addItem(it->first);
-        
+        for (const auto& p : mPossibilities)
+            mMeshMenu->addItem(p.first);
+
         mTrayMgr->createCheckBox(TL_TOPLEFT, "ShortHair", "Short Hair")->setChecked(false, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "CurlyHair", "Curly Hair")->setChecked(false, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "Shadows", "Shadows")->setChecked(true, false);
@@ -242,21 +242,21 @@ protected:
         mTrayMgr->createCheckBox(TL_TOPLEFT, "RenderSStrands", "Render S strands")->setChecked(true, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "HWTessellation", "HW Tessellation")->setChecked(true, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "DynamicLOD", "Dynamic LOD")->setChecked(true, false);
-        
+
         mManualLOD = mTrayMgr->createThickSlider(TL_TOPLEFT, "tessellationLOD", "Manual tessellation LOD", 200, 40, 1, 50, 50);
         mManualLOD->show();
-        
+
         mHairWidth = mTrayMgr->createThickSlider(TL_TOPLEFT, "HairWidth", "Hair Width", 200, 40, 1, 100, 100);
         mHairWidth->show();
-        
+
         mLODRate = mTrayMgr->createThickSlider(TL_TOPLEFT, "LODRate", "LOD Rate", 200, 40, 1, 100, 100);
         mLODRate->show();
-        
+
         mTrayMgr->createCheckBox(TL_TOPLEFT, "WindForce", "Add wind force")->setChecked(true, false);
-        
+
         mWindStrength = mTrayMgr->createThickSlider(TL_TOPLEFT, "WindStrength", "Wind Strength", 200, 40, 0.01, 0.25, 25);
         mWindStrength->show();
-        
+
         mTrayMgr->createCheckBox(TL_TOPLEFT, "ComputeShader", "Compute Shader")->setChecked(true, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "SimulationLOD", "SimulationLOD")->setChecked(true, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "Simulate", "Simulate")->setChecked(true, false);
@@ -267,7 +267,7 @@ protected:
         StringVector names;
         names.push_back("Help");
         mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
-        
+
         mPlayAnimation = false;
         mLoopAnimation = false;
         mShortHair = false;
@@ -282,7 +282,7 @@ protected:
         mSimulationLOD = true;
         mSimulate = true;
         mShowCollision = false;
-        mShowScene = true;      
+        mShowScene = true;
     }
 
     void cleanupContent()
@@ -294,10 +294,10 @@ protected:
     SceneNode* mObjectNode;
     bool mPlayAnimation;
     bool mLoopAnimation;
-    
+
     SelectMenu* mColorMenu;
     std::map<String, StringVector> mPossibilities;
-    
+
     bool mShortHair;
     bool mCurlyHair;
     bool mShadows;
