@@ -188,7 +188,7 @@ namespace Ogre {
     {
         TagPoint* ret;
         if (mFreeTagPoints.empty()) {
-            ret = OGRE_NEW TagPoint(uint16(-1), this);
+            ret = OGRE_NEW TagPoint();
             mActiveTagPoints.push_back(ret);
         } else {
             ret = mFreeTagPoints.front();
@@ -206,7 +206,6 @@ namespace Ogre {
         ret->setPosition(offsetPosition);
         ret->setOrientation(offsetOrientation);
         ret->setScale(Vector3::UNIT_SCALE);
-        ret->setBindingPose();
         bone->addChild(ret);
 
         return ret;
