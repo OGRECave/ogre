@@ -73,7 +73,6 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
     injectTechnique(sm, tech, mAmbientLight, 0);
 
     const LightList& lightList = sm->_getLightsAffectingFrustum();
-    // for (LightList::const_iterator it = lightList.begin(); it != lightList.end(); it++)
     for (auto *l : lightList)
     {
         Ogre::LightList ll;
