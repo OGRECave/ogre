@@ -66,7 +66,7 @@ struct TextureAtlasRecord
 };
 
 typedef std::vector<TextureAtlasRecord> TextureAtlasTable;
-typedef SharedPtr<TextureAtlasTable> TextureAtlasTablePtr;
+typedef shared_ptr<TextureAtlasTable> TextureAtlasTablePtr;
 typedef std::map<String, TextureAtlasTablePtr> TextureAtlasMap;
 
 

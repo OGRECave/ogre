@@ -91,9 +91,9 @@ namespace Ogre
     class D3D9VertexDeclaration;
     class D3D9Resource;
 
-    typedef SharedPtr<D3D9GpuProgram>  D3D9GpuProgramPtr;
-    typedef SharedPtr<D3D9HLSLProgram> D3D9HLSLProgramPtr;
-    typedef SharedPtr<D3D9Texture>     D3D9TexturePtr;
+    typedef shared_ptr<D3D9GpuProgram>  D3D9GpuProgramPtr;
+    typedef shared_ptr<D3D9HLSLProgram> D3D9HLSLProgramPtr;
+    typedef shared_ptr<D3D9Texture>     D3D9TexturePtr;
 
     //-------------------------------------------
     // Windows setttings

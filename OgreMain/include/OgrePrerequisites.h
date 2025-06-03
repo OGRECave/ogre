@@ -287,29 +287,31 @@ OGRE_DEBUG_NS_END
 
     using std::shared_ptr;
     using std::unique_ptr;
-    template<typename T> class SharedPtr;
 
-    typedef SharedPtr<AnimableValue> AnimableValuePtr;
-    typedef SharedPtr<Compositor> CompositorPtr;
-    typedef SharedPtr<DataStream> DataStreamPtr;
-    typedef SharedPtr<GpuProgram> GpuProgramPtr;
-    typedef SharedPtr<GpuNamedConstants> GpuNamedConstantsPtr;
-    typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
-    typedef SharedPtr<GpuSharedParameters> GpuSharedParametersPtr;
-    typedef SharedPtr<GpuProgramParameters> GpuProgramParametersPtr;
-    typedef SharedPtr<HardwareBuffer> HardwareBufferPtr;
-    typedef SharedPtr<HardwareIndexBuffer> HardwareIndexBufferPtr;
-    typedef SharedPtr<HardwarePixelBuffer> HardwarePixelBufferPtr;
-    typedef SharedPtr<HardwareVertexBuffer> HardwareVertexBufferPtr;
-    typedef SharedPtr<Material> MaterialPtr;
-    typedef SharedPtr<MemoryDataStream> MemoryDataStreamPtr;
-    typedef SharedPtr<Mesh> MeshPtr;
-    typedef SharedPtr<PatchMesh> PatchMeshPtr;
-    typedef SharedPtr<RenderToVertexBuffer> RenderToVertexBufferPtr;
-    typedef SharedPtr<Resource> ResourcePtr;
-    typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
-    typedef SharedPtr<Skeleton> SkeletonPtr;
-    typedef SharedPtr<Texture> TexturePtr;
+    using std::static_pointer_cast;
+    using std::dynamic_pointer_cast;
+
+    typedef shared_ptr<AnimableValue> AnimableValuePtr;
+    typedef shared_ptr<Compositor> CompositorPtr;
+    typedef shared_ptr<DataStream> DataStreamPtr;
+    typedef shared_ptr<GpuProgram> GpuProgramPtr;
+    typedef shared_ptr<GpuNamedConstants> GpuNamedConstantsPtr;
+    typedef shared_ptr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
+    typedef shared_ptr<GpuSharedParameters> GpuSharedParametersPtr;
+    typedef shared_ptr<GpuProgramParameters> GpuProgramParametersPtr;
+    typedef shared_ptr<HardwareBuffer> HardwareBufferPtr;
+    typedef shared_ptr<HardwareIndexBuffer> HardwareIndexBufferPtr;
+    typedef shared_ptr<HardwarePixelBuffer> HardwarePixelBufferPtr;
+    typedef shared_ptr<HardwareVertexBuffer> HardwareVertexBufferPtr;
+    typedef shared_ptr<Material> MaterialPtr;
+    typedef shared_ptr<MemoryDataStream> MemoryDataStreamPtr;
+    typedef shared_ptr<Mesh> MeshPtr;
+    typedef shared_ptr<PatchMesh> PatchMeshPtr;
+    typedef shared_ptr<RenderToVertexBuffer> RenderToVertexBufferPtr;
+    typedef shared_ptr<Resource> ResourcePtr;
+    typedef shared_ptr<ShadowCameraSetup> ShadowCameraSetupPtr;
+    typedef shared_ptr<Skeleton> SkeletonPtr;
+    typedef shared_ptr<Texture> TexturePtr;
 
     typedef RenderToVertexBufferPtr RenderToVertexBufferSharedPtr; //!< @deprecated
     typedef HardwareIndexBufferPtr HardwareIndexBufferSharedPtr; //!< @deprecated

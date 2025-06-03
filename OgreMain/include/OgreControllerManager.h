@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreSingleton.h"
 #include "OgreTextureUnitState.h"
-#include "OgreSharedPtr.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -44,8 +43,8 @@ namespace Ogre {
     *  @{
     */
 
-    typedef SharedPtr< ControllerValue<float> > ControllerValueRealPtr;
-    typedef SharedPtr< ControllerFunction<float> > ControllerFunctionRealPtr;
+    typedef shared_ptr< ControllerValue<float> > ControllerValueRealPtr;
+    typedef shared_ptr< ControllerFunction<float> > ControllerFunctionRealPtr;
 
     /** Class for managing Controller instances.
 

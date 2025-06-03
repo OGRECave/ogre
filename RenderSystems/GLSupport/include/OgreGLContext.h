@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreGLStateCacheManagerCommon.h"
-#include "OgreSharedPtr.h"
 
 namespace Ogre {
 
@@ -78,7 +77,7 @@ namespace Ogre {
             if(!mStateCacheManager) {
                 StateCacheManager* stateCache = OGRE_NEW StateCacheManager;
                 stateCache->initializeCache();
-                mStateCacheManager = SharedPtr<GLStateCacheManagerCommon>(stateCache);
+                mStateCacheManager = shared_ptr<GLStateCacheManagerCommon>(stateCache);
             }
             return static_cast<StateCacheManager*>(mStateCacheManager.get());
         }
@@ -90,7 +89,7 @@ namespace Ogre {
         
     protected:
         bool initialized;
-        SharedPtr<GLStateCacheManagerCommon> mStateCacheManager;
+        shared_ptr<GLStateCacheManagerCommon> mStateCacheManager;
         std::vector<uint32> mVaoDeferredForDestruction;
         std::vector<uint32> mFboDeferredForDestruction;
     };

@@ -29,7 +29,6 @@ THE SOFTWARE.
 #ifndef __SCRIPTCOMPILER_H_
 #define __SCRIPTCOMPILER_H_
 
-#include "OgreSharedPtr.h"
 #include "OgreSingleton.h"
 #include "OgreScriptLoader.h"
 #include "OgreGpuProgram.h"
@@ -60,9 +59,9 @@ namespace Ogre
 
     /** The ConcreteNode is the struct that holds an un-conditioned sub-tree of parsed input */
     struct ConcreteNode;
-    typedef SharedPtr<ConcreteNode> ConcreteNodePtr;
+    typedef shared_ptr<ConcreteNode> ConcreteNodePtr;
     typedef std::list<ConcreteNodePtr> ConcreteNodeList;
-    typedef SharedPtr<ConcreteNodeList> ConcreteNodeListPtr;
+    typedef shared_ptr<ConcreteNodeList> ConcreteNodeListPtr;
     struct ConcreteNode : public ScriptCompilerAlloc
     {
         String token, file;
@@ -84,9 +83,9 @@ namespace Ogre
         ANT_VARIABLE_ACCESS
     };
     class AbstractNode;
-    typedef SharedPtr<AbstractNode> AbstractNodePtr;
+    typedef shared_ptr<AbstractNode> AbstractNodePtr;
     typedef std::list<AbstractNodePtr> AbstractNodeList;
-    typedef SharedPtr<AbstractNodeList> AbstractNodeListPtr;
+    typedef shared_ptr<AbstractNodeList> AbstractNodeListPtr;
 
     struct _OgreExport ScriptProperty
     {

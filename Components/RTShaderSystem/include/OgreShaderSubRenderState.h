@@ -40,7 +40,7 @@ namespace RTShader {
 *  @{
 */
 
-typedef SharedPtr<SubRenderStateAccessor>   SubRenderStateAccessorPtr; 
+typedef shared_ptr<SubRenderStateAccessor>   SubRenderStateAccessorPtr;
 
 /// Computes the position of the vertex in projection space, allows using instancing
 _OgreRTSSExport extern const String SRS_TRANSFORM;

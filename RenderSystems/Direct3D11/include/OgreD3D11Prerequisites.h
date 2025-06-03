@@ -121,8 +121,8 @@ namespace Ogre
     class D3D11HardwarePixelBuffer;
     class D3D11RenderTarget;
 
-    typedef SharedPtr<D3D11HLSLProgram> D3D11HLSLProgramPtr;
-    typedef SharedPtr<D3D11Texture>     D3D11TexturePtr;
+    typedef shared_ptr<D3D11HLSLProgram> D3D11HLSLProgramPtr;
+    typedef shared_ptr<D3D11Texture>     D3D11TexturePtr;
 
     //-------------------------------------------
     // Windows setttings

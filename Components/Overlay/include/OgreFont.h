@@ -30,7 +30,6 @@ THE SOFTWARE
 #include "OgreOverlayPrerequisites.h"
 #include "OgreResource.h"
 #include "OgreCommon.h"
-#include "OgreSharedPtr.h"
 #include "OgreColourValue.h"
 #include "OgreException.h"
 
@@ -344,7 +343,7 @@ namespace Ogre
         void _setMaterial(const MaterialPtr& mat);
     };
 
-    typedef SharedPtr<Font> FontPtr;
+    typedef shared_ptr<Font> FontPtr;
     /** @} */
     /** @} */
 }
