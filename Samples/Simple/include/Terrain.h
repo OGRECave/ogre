@@ -170,8 +170,8 @@ public:
                 Sphere sphere(rayResult.position, brushSizeWorldSpace);
                 mTerrainGroup->sphereIntersects(sphere, &terrainList);
 
-                for (TerrainGroup::TerrainList::iterator ti = terrainList.begin(); ti != terrainList.end(); ++ti)
-                    doTerrainModify(*ti, rayResult.position, evt.timeSinceLastFrame);
+                for (const auto& t : terrainList)
+                    doTerrainModify(t, rayResult.position, evt.timeSinceLastFrame);
             }
             else
             {

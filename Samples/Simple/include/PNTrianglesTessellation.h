@@ -113,14 +113,14 @@ protected:
         setupModels();
         setupLights();
         setupControls();
-        
+
         // set our camera
         mCamera->setFOVy(Ogre::Degree(50.0));
         mCamera->setFOVy(Ogre::Degree(50.0));
         mCamera->setNearClipDistance(0.01f);
         mCameraNode->lookAt(Ogre::Vector3::ZERO, Ogre::Node::TS_PARENT);
         mCameraNode->setPosition(0, 0, 500);
-        
+
 
         // Set our camera to orbit around the origin at a suitable distance
         mCameraMan->setStyle(CS_ORBIT);
@@ -143,15 +143,15 @@ protected:
         matNames.push_back("Ogre/SimpleTessellation");
         //matNames.push_back("Ogre/AdaptiveTessellation");
         matNames.push_back("Ogre/AdaptivePNTrianglesTessellation");
-        
+
         mPossibilities["ogrehead.mesh"] = matNames;
         mPossibilities["knot.mesh"] = matNames;
         mPossibilities["uv_sphere.mesh"] = matNames;
 
-        for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
+        for (const auto& p : mPossibilities)
         {
             // load each mesh with non-default hardware buffer usage options
-            MeshPtr mesh = MeshManager::getSingleton().load(it->first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            MeshPtr mesh = MeshManager::getSingleton().load(p.first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                 HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
 
             // build tangent vectors for our mesh
@@ -159,13 +159,13 @@ protected:
 
             // create an entity from the mesh and set the first available material
             Entity* ent = mSceneMgr->createEntity(mesh->getName(), mesh->getName());
-            ent->setMaterialName(it->second.front());
+            ent->setMaterialName(p.second.front());
         }
     }
 
     void setupLights()
     {
-        mSceneMgr->setAmbientLight(ColourValue::Black); 
+        mSceneMgr->setAmbientLight(ColourValue::Black);
         mViewport->setBackgroundColour(ColourValue(0.41f, 0.41f, 0.41f));
 
         // create pivot nodes
@@ -175,7 +175,7 @@ protected:
         mLightPivot1->setPosition(Vector3(200, 0, 0));
         mLightPivot2->setPosition(Vector3(-200, 0, 0));
 
-        mLightPivot1->setDirection(-Vector3::UNIT_X);        
+        mLightPivot1->setDirection(-Vector3::UNIT_X);
         mLightPivot2->setDirection(Vector3::UNIT_X);
 
         Light* l;
@@ -217,18 +217,18 @@ protected:
 
         // create a menu to choose the model displayed
         mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", 370, 290, 10);
-        for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
-            mMeshMenu->addItem(it->first);
+        for (const auto& p : mPossibilities)
+            mMeshMenu->addItem(p.first);
 
         // create a menu to choose the material used by the model
         mMaterialMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Material", "Material", 370, 290, 10);
-        
+
         mTrayMgr->createCheckBox(TL_TOPLEFT, "Wire", "Wire Frame")->setChecked(false, false);
         // create checkboxes to toggle lights
         mTrayMgr->createCheckBox(TL_TOPLEFT, "Light1", "Light A")->setChecked(true, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "Light2", "Light B")->setChecked(true, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "MoveLights", "Move Lights")->setChecked(true, false);
-        
+
         mTessellationAmount = mTrayMgr->createThickSlider(TL_TOPLEFT, "tessellationAmount", "Tessellation Amount", 200, 40, 1, 8, 8);
         mTessellationAmount->hide();
 
@@ -243,8 +243,8 @@ protected:
     void cleanupContent() override
     {
         // clean up properly to avoid interfering with subsequent samples
-        for (std::map<String, StringVector>::iterator it = mPossibilities.begin(); it != mPossibilities.end(); it++)
-            MeshManager::getSingleton().unload(it->first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        for (const auto& p : mPossibilities)
+            MeshManager::getSingleton().unload(p.first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         mPossibilities.clear();
     }
 

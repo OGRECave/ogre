@@ -24,7 +24,7 @@ DeferredLightRenderOperation::DeferredLightRenderOperation(
     CompositorInstance* instance, const CompositionPass* pass)
 {
     mViewport = instance->getChain()->getViewport();
-    
+
     //Get the names of the GBuffer textures
     const CompositionPass::InputTex& input0 = pass->getInput(0);
     mTexName0 = instance->getTextureInstanceName(input0.name, input0.mrtIndex);
@@ -33,7 +33,7 @@ DeferredLightRenderOperation::DeferredLightRenderOperation(
 
     // Create lights material generator
     mLightMaterialGenerator = new LightMaterialGenerator();
-    
+
     // Create the ambient light
     mAmbientLight = new AmbientLight();
     const MaterialPtr& mat = mAmbientLight->getMaterial();
@@ -52,15 +52,15 @@ static void injectTechnique(SceneManager* sm, Technique* tech, Renderable* rend,
     for(unsigned short i=0; i<tech->getNumPasses(); ++i)
     {
         Ogre::Pass* pass = tech->getPass(i);
-        if (lightList != 0) 
+        if (lightList != 0)
         {
             sm->_injectRenderWithPass(pass, rend, false, false, lightList);
-        } 
+        }
         else
         {
             sm->_injectRenderWithPass(pass, rend, false);
         }
-        
+
     }
 }
 //! [execute]
@@ -73,23 +73,22 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
     injectTechnique(sm, tech, mAmbientLight, 0);
 
     const LightList& lightList = sm->_getLightsAffectingFrustum();
-    for (LightList::const_iterator it = lightList.begin(); it != lightList.end(); it++) 
+    for (auto *l : lightList)
     {
-        Light* light = *it;
         Ogre::LightList ll;
-        ll.push_back(light);
+        ll.push_back(l);
 
         //if (++i != 2) continue;
         //if (light->getType() != Light::LT_DIRECTIONAL) continue;
         //if (light->getDiffuseColour() != ColourValue::Red) continue;
 
-        LightsMap::iterator dLightIt = mLights.find(light);
+        LightsMap::iterator dLightIt = mLights.find(l);
         DLight* dLight = 0;
-        if (dLightIt == mLights.end()) 
+        if (dLightIt == mLights.end())
         {
-            dLight = createDLight(light);
+            dLight = createDLight(l);
         }
-        else 
+        else
         {
             dLight = dLightIt->second;
             dLight->updateFromParent();
@@ -104,7 +103,7 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
 
             sm->prepareShadowTextures(cam, mViewport, &ll);
             sm->_resumeRendering(context);
-            
+
             Pass* pass = tech->getPass(0);
             TextureUnitState* tus = pass->getTextureUnitState("ShadowMap");
             assert(tus);
@@ -113,9 +112,9 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
             {
                 tus->_setTexturePtr(shadowTex);
             }
-            
+
         }
-        
+
         injectTechnique(sm, tech, dLight, &ll);
     }
 }
@@ -123,12 +122,12 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
 //-----------------------------------------------------------------------
 DeferredLightRenderOperation::~DeferredLightRenderOperation()
 {
-    for (LightsMap::iterator it = mLights.begin(); it != mLights.end(); ++it)
+    for (const auto& l : mLights)
     {
-        delete it->second;
+        delete l.second;
     }
     mLights.clear();
-    
+
     delete mAmbientLight;
     delete mLightMaterialGenerator;
 }
