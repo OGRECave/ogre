@@ -49,8 +49,8 @@ GLenum GLArbGpuProgram::getProgramType() const
 }
 
 GLGpuProgram::GLGpuProgram(ResourceManager* creator, const String& name,
-    ResourceHandle handle, const String& group, bool isManual, 
-    ManualResourceLoader* loader) 
+    ResourceHandle handle, const String& group, bool isManual,
+    ManualResourceLoader* loader)
     : GpuProgram(creator, name, handle, group, isManual, loader)
 {
     if (createParamDictionary("GLGpuProgram"))
@@ -63,7 +63,7 @@ GLGpuProgram::~GLGpuProgram()
 {
     // have to call this here reather than in Resource destructor
     // since calling virtual methods in base destructors causes crash
-    unload(); 
+    unload();
 }
 
 bool GLGpuProgramBase::isAttributeValid(VertexElementSemantic semantic, uint index)
@@ -87,9 +87,9 @@ bool GLGpuProgramBase::isAttributeValid(VertexElementSemantic semantic, uint ind
     return false;
 }
 
-GLArbGpuProgram::GLArbGpuProgram(ResourceManager* creator, const String& name, 
-    ResourceHandle handle, const String& group, bool isManual, 
-    ManualResourceLoader* loader) 
+GLArbGpuProgram::GLArbGpuProgram(ResourceManager* creator, const String& name,
+    ResourceHandle handle, const String& group, bool isManual,
+    ManualResourceLoader* loader)
     : GLGpuProgram(creator, name, handle, group, isManual, loader)
 {
     glGenProgramsARB(1, &mProgramID);
@@ -99,7 +99,7 @@ GLArbGpuProgram::~GLArbGpuProgram()
 {
     // have to call this here reather than in Resource destructor
     // since calling virtual methods in base destructors causes crash
-    unload(); 
+    unload();
 }
 
 void GLArbGpuProgram::bindProgram(void)
@@ -117,19 +117,18 @@ void GLArbGpuProgram::unbindProgram(void)
 void GLArbGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
 {
     GLenum type = getProgramType();
-    
+
     // only supports float constants
     GpuLogicalBufferStructPtr floatStruct = params->getLogicalBufferStruct();
 
-    for (GpuLogicalIndexUseMap::const_iterator i = floatStruct->map.begin();
-        i != floatStruct->map.end(); ++i)
+    for (const auto& m : floatStruct->map)
     {
-        if (i->second.variability & mask)
+        if (m.second.variability & mask)
         {
-            GLuint logicalIndex = static_cast<GLuint>(i->first);
-            const float* pFloat = params->getFloatPointer(i->second.physicalIndex);
+            GLuint logicalIndex = static_cast<GLuint>(m.first);
+            const float* pFloat = params->getFloatPointer(m.second.physicalIndex);
             // Iterate over the params, set in 4-float chunks (low-level)
-            for (size_t j = 0; j < i->second.currentSize; j+=4)
+            for (size_t j = 0; j < m.second.currentSize; j+=4)
             {
                 glProgramLocalParameter4fvARB(type, logicalIndex, pFloat);
                 pFloat += 4;
@@ -163,5 +162,5 @@ void GLArbGpuProgram::loadFromSource(void)
     glBindProgramARB(getProgramType(), 0);
 }
 
-    
+
 }
