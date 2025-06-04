@@ -17,11 +17,11 @@ Implementation of a Deferred Shading engine in OGRE, using Multiple Render Targe
 CG high level language shaders.
     // W.J. :wumpus: van der Laan 2005 / Noam Gat 2009 //
 
-Deferred shading renders the scene to a 'fat' texture format, using a shader that outputs colour, 
-normal, depth, and possible other attributes per fragment. Multi Render Target is required as we 
+Deferred shading renders the scene to a 'fat' texture format, using a shader that outputs colour,
+normal, depth, and possible other attributes per fragment. Multi Render Target is required as we
 are dealing with many outputs which get written into multiple render textures in the same pass.
 
-After rendering the scene in this format, the shading (lighting) can be done as a post process. 
+After rendering the scene in this format, the shading (lighting) can be done as a post process.
 This means that lighting is done in screen space, using light-representing geometry (sphere for
 point light, cone for spot light and quad for directional) to render their contribution.
 
@@ -56,7 +56,7 @@ protected:
     Light* mMainLight;
     DeferredShadingSystem *mSystem;
     SelectMenu* mDisplayModeMenu;
-    
+
 public:
     Sample_DeferredShading()
     {
@@ -68,22 +68,22 @@ public:
     }
 
 protected:
-    
+
     void cleanupContent(void) override
     {
         delete mSystem;
     }
-    
+
     void setupControls()
     {
         mTrayMgr->showCursor();
-        
+
         // create checkboxs to toggle ssao and shadows
         mTrayMgr->createCheckBox(TL_TOPLEFT, "DeferredShading", "Deferred Shading", 220)->setChecked(true, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "SSAO", "Ambient Occlusion", 220)->setChecked(false, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "GlobalLight", "Global Light", 220)->setChecked(true, false);
         mTrayMgr->createCheckBox(TL_TOPLEFT, "Shadows", "Shadows", 220)->setChecked(true, false);
-        
+
         // create a menu to choose the model displayed
         mDisplayModeMenu = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "DisplayMode", "Display Mode", 220, 4);
         mDisplayModeMenu->addItem("Regular view");
@@ -91,13 +91,13 @@ protected:
         mDisplayModeMenu->addItem("Debug normals");
         mDisplayModeMenu->addItem("Debug depth / specular");
     }
-    
+
     void itemSelected(SelectMenu* menu) override
     {
         //Options are aligned with the mode enum
         mSystem->setMode((DeferredShadingSystem::DSMode)menu->getSelectionIndex());
     }
-    
+
     void checkBoxToggled(CheckBox* box) override
     {
         if (box->getName() == "SSAO")
@@ -110,7 +110,7 @@ protected:
         }
         else if (box->getName() == "Shadows")
         {
-            mSceneMgr->setShadowTechnique(box->isChecked() ? 
+            mSceneMgr->setShadowTechnique(box->isChecked() ?
                                           SHADOWTYPE_TEXTURE_ADDITIVE :
                                           SHADOWTYPE_NONE);
         }
@@ -119,17 +119,17 @@ protected:
             mSystem->setActive(box->isChecked());
         }
     }
-    
+
     //Utility function to help set scene up
     void setEntityHeight(Entity* ent, Real newHeight)
     {
         Real curHeight = ent->getMesh()->getBounds().getSize().y;
         Real scaleFactor = newHeight / curHeight;
-        
+
         SceneNode* parentNode = ent->getParentSceneNode();
         parentNode->setScale(scaleFactor, scaleFactor, scaleFactor);
     }
-    
+
     void createAtheneScene(SceneNode* rootNode)
     {
         // Prepare athene mesh for normalmapping
@@ -147,7 +147,7 @@ protected:
         // Create some happy little lights to decorate the athena statue
         createSampleLights();
     }
-    
+
     void createKnotScene(SceneNode* rootNode)
     {
         // Prepare knot mesh for normal mapping
@@ -181,7 +181,7 @@ protected:
             knotLight->setAttenuation(6, 1, 0.2, 0);
         }
     }
-    
+
     void createObjects(SceneNode* rootNode)
     {
         // Create ogre heads to decorate the wall
@@ -189,7 +189,7 @@ protected:
         //rootNode->createChildSceneNode( "Head" )->attachObject( ogreHead );
         Vector3 headStartPos[2] = { Vector3(25.25,11,3), Vector3(25.25,11,-3) };
         Vector3 headDiff(-3.7,0,0);
-        for (int i=0; i < 12; i++) 
+        for (int i=0; i < 12; i++)
         {
             Entity* cloneHead = ogreHead->clone(StringUtil::format("OgreHead%d", i));
             Vector3 clonePos = headStartPos[i%2] + headDiff*(i/2);
@@ -202,7 +202,7 @@ protected:
                 cloneNode->yaw(Degree(180));
             }
         }
-        
+
         // Create a pile of wood pallets
         Entity* woodPallet = mSceneMgr->createEntity("Pallet", "WoodPallet.mesh");
         Vector3 woodStartPos(10, 0.5, -5.5);
@@ -216,7 +216,7 @@ protected:
             setEntityHeight(clonePallet, 0.3);
             cloneNode->yaw(Degree(i*20));
         }
-        
+
     }
 
     void testCapabilities(const RenderSystemCapabilities* caps) override
@@ -224,7 +224,7 @@ protected:
         if (caps->getNumMultiRenderTargets()<2)
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support at least two simultaneous render targets, so cannot "
-                        "run this demo. Sorry!", 
+                        "run this demo. Sorry!",
                         "DeferredShading::testCapabilities");
         }
 
@@ -249,7 +249,7 @@ protected:
         l1->setShadowFarDistance(75);
         //Turn this on to have the directional light cast shadows
         l1->setCastShadows(false);
-        
+
         auto ln = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         ln->setDirection(Vector3(1, -0.5, -0.2));
         ln->attachObject(l1);
@@ -259,39 +259,39 @@ protected:
         mCamera->setFarClipDistance(1000.0);
         mCamera->setNearClipDistance(0.5);
         setDragLook(true);
-        
+
         mSystem = new DeferredShadingSystem(mWindow->getViewport(0), mSceneMgr, mCamera);
         mSystem->initialize();
-        
+
         mMainLight = l1;
-        
+
         //Create the scene
         // Create "root" node
         SceneNode* rootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        
+
         // Create the cathedral - this will be the static scene
         Entity* cathedralEnt = mSceneMgr->createEntity("Cathedral", "sibenik.mesh");
         SceneNode* cathedralNode = rootNode->createChildSceneNode();
         cathedralNode->attachObject(cathedralEnt);
-        
+
         createAtheneScene(rootNode);
         createKnotScene(rootNode);
         createObjects(rootNode);
-        
+
         setupControls();
     }
-    
+
     void createSampleLights()
     {
-        // Create some lights       
+        // Create some lights
         std::vector<Light*> lights;
         SceneNode *parentNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("LightsParent");
         // Create light nodes
         std::vector<Node*> nodes;
-        
+
         Vector4 attParams = Vector4(4,1,0,7);
         Real lightRadius = 25;
-        
+
         Light *a = mSceneMgr->createLight();
         SceneNode *an = parentNode->createChildSceneNode();
         an->attachObject(a);
@@ -302,7 +302,7 @@ protected:
         //a->setSpecularColour(0.5,0,0);
         lights.push_back(a);
         nodes.push_back(an);
-        
+
         Light *b = mSceneMgr->createLight();
         SceneNode *bn = parentNode->createChildSceneNode();
         bn->attachObject(b);
@@ -312,7 +312,7 @@ protected:
         //b->setSpecularColour(0.5,0.5,0);
         lights.push_back(b);
         nodes.push_back(bn);
-        
+
         Light *c = mSceneMgr->createLight();
         SceneNode *cn = parentNode->createChildSceneNode();
         cn->attachObject(c);
@@ -322,7 +322,7 @@ protected:
         c->setSpecularColour(0.25,1.0,1.0); // Cyan light has specular component
         lights.push_back(c);
         nodes.push_back(cn);
-        
+
         Light *d = mSceneMgr->createLight();
         SceneNode *dn = parentNode->createChildSceneNode();
         dn->attachObject(d);
@@ -332,7 +332,7 @@ protected:
         d->setSpecularColour(0.0,0,0.0);
         lights.push_back(d);
         nodes.push_back(dn);
-        
+
         Light *e = mSceneMgr->createLight();
         SceneNode *en = parentNode->createChildSceneNode();
         en->attachObject(e);
@@ -342,7 +342,7 @@ protected:
         e->setSpecularColour(0,0,0);
         lights.push_back(e);
         nodes.push_back(en);
-        
+
         Light *f = mSceneMgr->createLight();
         SceneNode *fn = parentNode->createChildSceneNode();
         fn->attachObject(f);
@@ -352,37 +352,35 @@ protected:
         f->setSpecularColour(0,0.0,0.0);
         lights.push_back(f);
         nodes.push_back(fn);
-        
+
         // Create marker meshes to show user where the lights are
         Entity *ent;
         GeomUtils::createSphere("PointLightMesh", 0.05f, 5, 5, true, true);
-        for(std::vector<Light*>::iterator i=lights.begin(); i!=lights.end(); ++i)
+        for(const auto& l : lights)
         {
-            Light* light = *i;
-            ent = mSceneMgr->createEntity(light->getName()+"v", "PointLightMesh");
-            String matname = light->getName()+"m";
+            ent = mSceneMgr->createEntity(l->getName()+"v", "PointLightMesh");
+            String matname = l->getName()+"m";
             // Create coloured material
-            MaterialPtr mat = MaterialManager::getSingleton().create(matname,
-                                                                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            MaterialPtr mat = MaterialManager::getSingleton().create(matname, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
             Pass* pass = mat->getTechnique(0)->getPass(0);
             pass->setDiffuse(0.0f,0.0f,0.0f,1.0f);
             pass->setAmbient(0.0f,0.0f,0.0f);
-            pass->setSelfIllumination(light->getDiffuseColour());
-            
+            pass->setSelfIllumination(l->getDiffuseColour());
+
             ent->setMaterialName(matname);
             //ent->setRenderQueueGroup(light->getRenderQueueGroup());
             ent->setRenderQueueGroup(DeferredShadingSystem::POST_GBUFFER_RENDER_QUEUE);
-            static_cast<SceneNode*>(light->getParentNode())->attachObject(ent);
+            static_cast<SceneNode*>(l->getParentNode())->attachObject(ent);
             ent->setVisible(true);
-        }       
-        
+        }
+
         // Do some animation for node a-f
         // Generate helix structure
         float seconds_per_station = 1.0f;
         float r = 1.0;
         //Vector3 base(0,-30,0);
         Vector3 base(-8.75, 3.5, 0);
-        
+
         float h=3;
         const size_t s_to_top = 16;
         const size_t stations = s_to_top*2-1;
@@ -423,7 +421,7 @@ protected:
 
         auto& controllerMgr = ControllerManager::getSingleton();
         controllerMgr.createFrameTimePassthroughController(AnimationStateControllerValue::create(animState, true));
-        
+
         /*Light* spotLight = mSceneMgr->createLight("Spotlight1");
          spotLight->setType(Light::LT_SPOTLIGHT);
          spotLight->setAttenuation(200, 1.0f, 0, 0);
