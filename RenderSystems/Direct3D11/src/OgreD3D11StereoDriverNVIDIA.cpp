@@ -64,7 +64,7 @@ namespace Ogre
 			if (!logErrorMessage(nvStatus) || !mStereoEnabled)
 				return;
 		}
-		
+
 		logErrorMessage(nvStatus);
 	}
 	//---------------------------------------------------------------------
@@ -108,7 +108,7 @@ namespace Ogre
 		NvAPI_Status nvStatus = NvAPI_Stereo_DestroyHandle(stereoHandle.nvapiStereoHandle);
 		logErrorMessage(nvStatus);
 		mStereoMap.erase(renderWindowName);
-		
+
 		return true;
 	}
 	//---------------------------------------------------------------------
@@ -159,20 +159,20 @@ namespace Ogre
 		NvAPI_Status nvStatus;
 
 		// Set the active eye for all render windows that have stereo enabled
-		for (StereoHandleMap::iterator i = mStereoMap.begin(); i != mStereoMap.end(); ++i)
+		for (const auto& m : mStereoMap)
 		{
-			if ((*i).second.renderWindow->isStereoEnabled())
+			if (m.second.renderWindow->isStereoEnabled())
 			{
 				switch (colourBuffer)
 				{
 				case CBT_BACK:
-					nvStatus = NvAPI_Stereo_SetActiveEye((*i).second.nvapiStereoHandle, NVAPI_STEREO_EYE_MONO);
+					nvStatus = NvAPI_Stereo_SetActiveEye(m.second.nvapiStereoHandle, NVAPI_STEREO_EYE_MONO);
 					break;
 				case CBT_BACK_LEFT:
-					nvStatus = NvAPI_Stereo_SetActiveEye((*i).second.nvapiStereoHandle, NVAPI_STEREO_EYE_LEFT);
+					nvStatus = NvAPI_Stereo_SetActiveEye(m.second.nvapiStereoHandle, NVAPI_STEREO_EYE_LEFT);
 					break;
 				case CBT_BACK_RIGHT:
-					nvStatus = NvAPI_Stereo_SetActiveEye((*i).second.nvapiStereoHandle, NVAPI_STEREO_EYE_RIGHT);
+					nvStatus = NvAPI_Stereo_SetActiveEye(m.second.nvapiStereoHandle, NVAPI_STEREO_EYE_RIGHT);
 					break;
 				default:
 					return false;
@@ -181,7 +181,7 @@ namespace Ogre
 				logErrorMessage(nvStatus);
 			}
 		}
-		
+
 		return true;
 	}
 	//---------------------------------------------------------------------

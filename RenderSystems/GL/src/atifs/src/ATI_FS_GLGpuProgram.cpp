@@ -37,8 +37,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-ATI_FS_GLGpuProgram::ATI_FS_GLGpuProgram(ResourceManager* creator, 
-        const String& name, ResourceHandle handle, 
+ATI_FS_GLGpuProgram::ATI_FS_GLGpuProgram(ResourceManager* creator,
+        const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader) :
     GLGpuProgram(creator, name, handle, group, isManual, loader)
 {
@@ -50,7 +50,7 @@ ATI_FS_GLGpuProgram::~ATI_FS_GLGpuProgram()
 {
     // have to call this here reather than in Resource destructor
     // since calling virtual methods in base destructors causes crash
-    unload(); 
+    unload();
 }
 
 void ATI_FS_GLGpuProgram::bindProgram(void)
@@ -70,15 +70,14 @@ void ATI_FS_GLGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr pa
     // only supports float constants
     GpuLogicalBufferStructPtr floatStruct = params->getLogicalBufferStruct();
 
-    for (GpuLogicalIndexUseMap::const_iterator i = floatStruct->map.begin();
-        i != floatStruct->map.end(); ++i)
+    for (const auto& m : floatStruct->map)
     {
-        if (i->second.variability & mask)
+        if (m.second.variability & mask)
         {
-            size_t logicalIndex = i->first;
-            const float* pFloat = params->getFloatPointer(i->second.physicalIndex);
+            size_t logicalIndex = m.first;
+            const float* pFloat = params->getFloatPointer(m.second.physicalIndex);
             // Iterate over the params, set in 4-float chunks (low-level)
-            for (size_t j = 0; j < i->second.currentSize; j+=4)
+            for (size_t j = 0; j < m.second.currentSize; j+=4)
             {
                 glSetFragmentShaderConstantATI(GL_CON_0_ATI + logicalIndex, pFloat);
                 pFloat += 4;
@@ -106,7 +105,7 @@ void ATI_FS_GLGpuProgram::loadFromSource(void)
 
     bool Error = !PS1_4Assembler.compile(mSource.c_str());
 
-    if(!Error) { 
+    if(!Error) {
         glBindFragmentShaderATI(mProgramID);
         glBeginFragmentShaderATI();
             // compile was successful so send the machine instructions thru GL to GPU
@@ -116,8 +115,8 @@ void ATI_FS_GLGpuProgram::loadFromSource(void)
         // check GL for GPU machine instruction bind erros
         if (Error)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                "Cannot Bind ATI fragment shader :" + mName, mName); 
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "Cannot Bind ATI fragment shader :" + mName, mName);
         }
 
     }
@@ -130,8 +129,8 @@ void ATI_FS_GLGpuProgram::loadFromSource(void)
         LogManager::getSingleton().logMessage("Warning: atifs compiler reported the following errors:");
         LogManager::getSingleton().logMessage(buff + mName);
 
-        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-            "Cannot Compile ATI fragment shader : " + mName + "\n\n" + buff , mName);// + 
+        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+            "Cannot Compile ATI fragment shader : " + mName + "\n\n" + buff , mName);// +
     }
 
 
