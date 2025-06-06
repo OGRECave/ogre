@@ -64,9 +64,6 @@ namespace Ogre {
         FilterOptions mMinFilter;
         FilterOptions mMipFilter;
 
-        /// Holds texture type settings for every stage
-        GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
-
         GLint mLargestSupportedAnisotropy;
 
         /// Store last depth write state
