@@ -80,7 +80,7 @@ namespace Ogre {
         void _clearSliceRTT(size_t zoffset);
         friend class RenderTexture;
 
-        String getNameForRenderTexture(const String& parentName) const;
+        String getNameForRenderTexture(const String& parentName, uint32 layer = 0) const;
     public:
         /// Should be called by HardwareBufferManager
         HardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,

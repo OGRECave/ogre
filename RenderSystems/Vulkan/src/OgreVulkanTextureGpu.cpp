@@ -55,7 +55,7 @@ namespace Ogre
             mSliceTRT.reserve(mDepth);
             for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
             {
-                String name = getNameForRenderTexture(mParent->getName());
+                String name = getNameForRenderTexture(mParent->getName(), zoffset + face);
 
                 RenderTexture *trt = new VulkanRenderTexture(name, this, zoffset, mParent, mFace);
                 mSliceTRT.push_back(trt);

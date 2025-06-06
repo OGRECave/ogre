@@ -143,7 +143,7 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent
         mSliceTRT.reserve(mDepth);
         for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
         {
-            String name = getNameForRenderTexture(parent->getName());
+            String name = getNameForRenderTexture(parent->getName(), zoffset + face);
             GLSurfaceDesc surface;
             surface.buffer = this;
             surface.zoffset = zoffset;
