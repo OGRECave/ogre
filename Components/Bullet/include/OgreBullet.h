@@ -109,9 +109,10 @@ protected:
     std::unique_ptr<btBroadphaseInterface> mBroadphase;
 
     btCollisionWorld* mBtWorld;
+    btGhostPairCallback* mGhostPairCallback;
 
 public:
-    CollisionWorld(btCollisionWorld* btWorld) : mBtWorld(btWorld) {}
+    CollisionWorld(btCollisionWorld* btWorld) : mBtWorld(btWorld), mGhostPairCallback(nullptr) {}
     virtual ~CollisionWorld();
 
     btCollisionObject* addCollisionObject(Entity* ent, ColliderType ct, int group = 1, int mask = -1);

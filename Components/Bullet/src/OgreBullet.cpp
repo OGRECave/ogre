@@ -219,6 +219,8 @@ DynamicsWorld::DynamicsWorld(const Vector3& gravity) : CollisionWorld(NULL) // p
     auto btworld = new btDiscreteDynamicsWorld(mDispatcher.get(), mBroadphase.get(), mSolver.get(), mCollisionConfig.get());
     btworld->setGravity(convert(gravity));
     btworld->setInternalTickCallback(onTick);
+    mGhostPairCallback = new btGhostPairCallback();
+    btworld->getPairCache()->setInternalGhostPairCallback(mGhostPairCallback);
     mBtWorld = btworld;
 }
 
@@ -334,14 +336,16 @@ void DynamicsWorld::attachRigidBody(btRigidBody *rigidBody, Entity* ent, Collisi
     auto objWrapper = std::make_shared<RigidBody>(rigidBody, mBtWorld);
     node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
 }
-void CollisionWorld::attachCollisionObject(btCollisionObject *collisionObject, Entity* ent, int group, int mask)
+void CollisionWorld::attachCollisionObject(btCollisionObject* collisionObject, Entity* ent, int group, int mask)
 {
     auto node = ent->getParentSceneNode();
     OgreAssert(node, "entity must be attached");
+    OgreAssert(collisionObject->getWorldArrayIndex() == -1, "Object should not be attached to world");
     if (collisionObject->getWorldArrayIndex() == -1)
         mBtWorld->addCollisionObject(collisionObject, group, mask);
 
     // transfer ownership to node
+    collisionObject->setUserPointer(new EntityCollisionListener{ent, nullptr});
     auto objWrapper = std::make_shared<CollisionObject>(collisionObject, mBtWorld);
     node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
 }
@@ -370,7 +374,12 @@ void CollisionWorld::rayTest(const Ray& ray, RayResultCallback* callback, float 
     mBtWorld->rayTest(from, to, wrapper);
 }
 
-CollisionWorld::~CollisionWorld() { delete mBtWorld; }
+CollisionWorld::~CollisionWorld()
+{
+    delete mBtWorld;
+    if (mGhostPairCallback)
+        delete mGhostPairCallback;
+}
 
 /*
  * =============================================================================================
