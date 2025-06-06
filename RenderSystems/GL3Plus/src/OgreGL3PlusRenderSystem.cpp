@@ -142,8 +142,6 @@ namespace Ogre {
           mHardwareBufferManager(0),
           mActiveTextureUnit(0)
     {
-        size_t i;
-
         LogManager::getSingleton().logMessage(getName() + " created.");
 
         // Get our GLSupport
@@ -151,12 +149,6 @@ namespace Ogre {
         glsupport = mGLSupport;
 
         initConfigOptions();
-
-        for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
-        {
-            // Dummy value
-            mTextureTypes[i] = 0;
-        }
 
         mActiveRenderTarget = 0;
         mCurrentContext = 0;
@@ -712,9 +704,7 @@ namespace Ogre {
 
             // Note used
             tex->touch();
-            mTextureTypes[stage] = tex->getGL3PlusTextureTarget();
-
-            mStateCacheManager->bindGLTexture( mTextureTypes[stage], tex->getGLID() );
+            mStateCacheManager->bindGLTexture(tex->getGL3PlusTextureTarget(), tex->getGLID());
         }
         else
         {
