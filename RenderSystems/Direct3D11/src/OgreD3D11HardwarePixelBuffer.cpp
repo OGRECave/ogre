@@ -81,7 +81,7 @@ namespace Ogre {
             mSliceTRT.reserve(mDepth);
             for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
             {
-                String name = getNameForRenderTexture(parentTexture->getName());
+                String name = getNameForRenderTexture(parentTexture->getName(), zoffset + face);
                 RenderTexture *trt = new D3D11RenderTexture(name, this, zoffset, mDevice);
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);

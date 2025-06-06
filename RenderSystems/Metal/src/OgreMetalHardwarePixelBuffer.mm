@@ -268,7 +268,7 @@ namespace Ogre {
             mSliceTRT.reserve(mDepth);
             for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
             {
-                String name = getNameForRenderTexture(baseName);
+                String name = getNameForRenderTexture(baseName, zoffset + face);
                 RenderTexture *trt = OGRE_NEW MetalRenderTexture( device, name, this,
                                                                   renderTexture, resolveTexture,
                                                                   mFormat, zoffset, mFace, fsaa, level,
