@@ -57,7 +57,7 @@ namespace Ogre
             {
                 String name = getNameForRenderTexture(mParent->getName(), zoffset + face);
 
-                RenderTexture *trt = new VulkanRenderTexture(name, this, zoffset, mParent, mFace);
+                RenderTexture *trt = new VulkanRenderTexture(name, this, zoffset + face, mParent);
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
             }
@@ -714,9 +714,9 @@ namespace Ogre
         vmaDestroyImage(device->getAllocator(), mMsaaTextureName, mMsaaAllocation);
     }
 
-    VulkanRenderTexture::VulkanRenderTexture(const String& name, HardwarePixelBuffer* buffer, uint32 zoffset,
-                                             VulkanTextureGpu* target, uint32 face)
-        : RenderTexture(buffer, zoffset)
+    VulkanRenderTexture::VulkanRenderTexture(const String& name, HardwarePixelBuffer* buffer, uint32 slice,
+                                             VulkanTextureGpu* target)
+        : RenderTexture(buffer, slice)
     {
         mName = name;
 
@@ -739,7 +739,7 @@ namespace Ogre
 
         mRenderPassDescriptor = std::make_unique<VulkanRenderPassDescriptor>(&device->mGraphicsQueue, device->mRenderSystem);
         mRenderPassDescriptor->mColour[0] = depthTarget ? 0 : target;
-        mRenderPassDescriptor->mSlice = face;
+        mRenderPassDescriptor->mSlice = slice;
         mRenderPassDescriptor->mDepth = depthTarget ? target : mDepthTexture.get();
         mRenderPassDescriptor->mNumColourEntries = int(depthTarget == 0);
         mRenderPassDescriptor->entriesModified(true);
