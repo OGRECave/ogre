@@ -8,8 +8,10 @@
 
 #include "OgreBulletExports.h"
 
-#include "btBulletDynamicsCommon.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "Ogre.h"
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
 
 namespace Ogre
 {
@@ -121,6 +123,29 @@ public:
     void attachCollisionObject(btCollisionObject *collisionObject, Entity *ent, int group = 1, int mask = -1);
 };
 
+/// helper class for kinematic body motion
+class _OgreBulletExport KinematicMotionSimple : public btActionInterface
+{
+    std::vector<btCollisionShape*> mCollisionShapes;
+    std::vector<btTransform> mCollisionTransforms;
+    btPairCachingGhostObject* mGhostObject;
+    btVector3 mCurrentPosition;
+    btQuaternion mCurrentOrientation;
+    btManifoldArray mManifoldArray;
+    btScalar mMaxPenetrationDepth;
+    Node* mNode;
+    virtual bool needsCollision(const btCollisionObject* body0, const btCollisionObject* body1);
+    void preStep(btCollisionWorld* collisionWorld);
+    void playerStep(btCollisionWorld* collisionWorld, btScalar dt);
+    void setupCollisionShapes(btCollisionObject* body);
+
+public:
+    KinematicMotionSimple(btPairCachingGhostObject* ghostObject, Node* node);
+    ~KinematicMotionSimple();
+    bool recoverFromPenetration(btCollisionWorld* collisionWorld);
+    virtual void updateAction(btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;
+    virtual void debugDraw(btIDebugDraw* debugDrawer) override;
+};
 /// simplified wrapper with automatic memory management
 class _OgreBulletExport DynamicsWorld : public CollisionWorld
 {
