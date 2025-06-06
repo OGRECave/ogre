@@ -255,8 +255,8 @@ static btCollisionShape* getCollisionShape(Entity* ent, ColliderType ct)
         cs = createConvexHullCollider(ent);
         break;
     case CT_COMPOUND:
-	cs = createCompoundShape();
-	break;
+        cs = createCompoundShape();
+        break;
     }
 
     if (ent->hasSkeleton())
