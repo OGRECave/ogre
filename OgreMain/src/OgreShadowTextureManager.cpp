@@ -87,8 +87,9 @@ namespace Ogre
                 if (usedTextures.find(tex.get()) != usedTextures.end())
                     continue;
 
-                if (config.width == tex->getWidth() && config.height == tex->getHeight()
-                    && config.format == tex->getFormat() && config.fsaa == tex->getFSAA())
+                if (config.width == tex->getWidth() && config.height == tex->getHeight() &&
+                    config.depth == tex->getDepth() && config.type == tex->getTextureType() &&
+                    config.format == tex->getFormat() && config.fsaa == tex->getFSAA())
                 {
                     // Ok, a match
                     listToPopulate.push_back(tex);
@@ -100,13 +101,11 @@ namespace Ogre
             if (!found)
             {
                 // Create a new texture
-                static const String baseName = "Ogre/ShadowTexture";
-                String targName = baseName + StringConverter::toString(mCount++);
+                String targName = StringUtil::format("Ogre/ShadowTexture%zu", mCount++);
                 TexturePtr shadowTex = TextureManager::getSingleton().createManual(
-                    targName, 
-                    ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
-                    TEX_TYPE_2D, config.width, config.height, 0, config.format, 
+                    targName, RGN_INTERNAL, config.type, config.width, config.height, config.depth, 0, config.format,
                     TU_RENDERTARGET, NULL, false, config.fsaa);
+                OgreAssert(shadowTex, "Unsupported shadow texture configuration");
                 // Ensure texture loaded
                 shadowTex->load();
 

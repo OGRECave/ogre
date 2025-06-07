@@ -63,13 +63,15 @@ namespace Ogre {
     /** Structure containing the configuration for one shadow texture. */
     struct ShadowTextureConfig
     {
-        unsigned int width;
-        unsigned int height;
+        uint32 width;
+        uint32 height;
+        uint32 depth;
         PixelFormat format;
-        unsigned int fsaa;
         uint16      depthBufferPoolId;
+        uint8       fsaa;
+        TextureType type;
 
-        ShadowTextureConfig() : width(512), height(512), format(PF_BYTE_RGBA), fsaa(0), depthBufferPoolId(1) {}
+        ShadowTextureConfig() : width(512), height(512), depth(1), format(PF_BYTE_RGBA), depthBufferPoolId(1), fsaa(0), type(TEX_TYPE_2D) {}
     };
 
     typedef std::vector<ShadowTextureConfig> ShadowTextureConfigList;
@@ -843,6 +845,7 @@ namespace Ogre {
 
             /// Internal method for creating shadow textures (texture-based shadows)
             void ensureShadowTexturesCreated();
+            void setupRenderTarget(const String& camName, RenderTarget* rendTarget, uint16 depthBufferId);
             void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList);
             /// Internal method for destroying shadow textures (texture-based shadows)
             void destroyShadowTextures(void);
