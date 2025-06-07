@@ -177,6 +177,7 @@ protected:
     bool mUseColourShadows;
     bool mDebug;
     bool mIsD3D9;
+    bool mUseArrayTexture;
     uchar mMultiLightCount;
 };
 

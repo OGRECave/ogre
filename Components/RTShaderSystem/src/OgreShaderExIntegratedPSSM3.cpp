@@ -48,6 +48,7 @@ IntegratedPSSM3::IntegratedPSSM3()
     mUseColourShadows = false;
     mDebug = false;
     mIsD3D9 = false;
+    mUseArrayTexture = false;
     mShadowTextureParamsList.resize(1); // normal single texture depth shadowmapping
     mMultiLightCount = 1;
 }
@@ -97,6 +98,7 @@ void IntegratedPSSM3::copyFrom(const SubRenderState& rhs)
     mUseColourShadows = rhsPssm.mUseColourShadows;
     mDebug = rhsPssm.mDebug;
     mMultiLightCount = rhsPssm.mMultiLightCount;
+    mUseArrayTexture = rhsPssm.mUseArrayTexture;
     mShadowTextureParamsList.resize(rhsPssm.mShadowTextureParamsList.size());
 
     ShadowTextureParamsConstIterator itSrc = rhsPssm.mShadowTextureParamsList.begin();
@@ -176,6 +178,10 @@ bool IntegratedPSSM3::setParameter(const String& name, const String& value)
         mMultiLightCount = StringConverter::parseInt(value);
         return true;
     }
+    else if (name == "array_texture")
+    {
+        return StringConverter::parse(value, mUseArrayTexture);
+    }
 
     return false;
 }
@@ -228,12 +234,22 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
 
     int lightIndex = 0;
 
+    auto stype = GCT_SAMPLER2D;
+    if(mUseTextureCompare)
+    {
+        stype = mUseArrayTexture ? GCT_SAMPLER2DARRAYSHADOW : GCT_SAMPLER2DSHADOW;
+    }
+    else {
+        stype = mUseArrayTexture ? GCT_SAMPLER2DARRAY : GCT_SAMPLER2D;
+    }
+
     for (auto& p : mShadowTextureParamsList)
     {
         p.mWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX, lightIndex);
         p.mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex);
         p.mPSInLightPosition = psMain->resolveInputParameter(p.mVSOutLightPosition);
-        auto stype = mUseTextureCompare ? GCT_SAMPLER2DSHADOW : GCT_SAMPLER2D;
+        if(mUseArrayTexture)
+            p.mTextureSamplerIndex = mShadowTextureParamsList[0].mTextureSamplerIndex;
         p.mTextureSampler = psProgram->resolveParameter(stype, "shadow_map", p.mTextureSamplerIndex);
         p.mInvTextureSize = psProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE, p.mTextureSamplerIndex);
         ++lightIndex;
@@ -264,6 +280,9 @@ bool IntegratedPSSM3::resolveDependencies(ProgramSet* programSet)
 
     if(mUseColourShadows)
         psProgram->addPreprocessorDefines("PSSM_SAMPLE_COLOUR");
+
+    if(mUseArrayTexture)
+        psProgram->addPreprocessorDefines("PSSM_ARRAY_TEXTURE");
 
     return true;
 }
