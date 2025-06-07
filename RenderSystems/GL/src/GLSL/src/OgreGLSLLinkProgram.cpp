@@ -327,8 +327,10 @@ namespace Ogre {
                     case GCT_SAMPLER2D:
                     case GCT_SAMPLER2DSHADOW:
                     case GCT_SAMPLER2DARRAY:
+                    case GCT_SAMPLER2DARRAYSHADOW:
                     case GCT_SAMPLER3D:
                     case GCT_SAMPLERCUBE:
+                    case GCT_SAMPLERCUBESHADOW:
                         // samplers handled like 1-element ints
                     case GCT_INT1:
                         glUniform1ivARB(currentUniform->mLocation, glArraySize, (GLint*)val);

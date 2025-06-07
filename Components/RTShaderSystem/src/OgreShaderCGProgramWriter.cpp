@@ -42,6 +42,8 @@ CGProgramWriter::CGProgramWriter()
     {
         mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "Sampler2DArray";
         mGpuConstTypeMap[GCT_SAMPLER2DSHADOW] = "Sampler2DShadow";
+        mGpuConstTypeMap[GCT_SAMPLER2DARRAYSHADOW] = "Sampler2DArrayShadow";
+        mGpuConstTypeMap[GCT_SAMPLERCUBESHADOW] = "SamplerCubeShadow";
     }
 }
 

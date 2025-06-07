@@ -79,11 +79,11 @@ namespace Ogre {
         mTypeEnumMap.emplace("uvec2", GCT_UINT2);
         mTypeEnumMap.emplace("uvec3", GCT_UINT3);
         mTypeEnumMap.emplace("uvec4", GCT_UINT4);
-        mTypeEnumMap.emplace("samplerCubeShadow", GCT_SAMPLERCUBE);
+        mTypeEnumMap.emplace("samplerCubeShadow", GCT_SAMPLERCUBESHADOW);
         mTypeEnumMap.emplace("sampler1DArray", GCT_SAMPLER2DARRAY);
         mTypeEnumMap.emplace("sampler2DArray", GCT_SAMPLER2DARRAY);
         mTypeEnumMap.emplace("sampler1DArrayShadow", GCT_SAMPLER2DARRAY);
-        mTypeEnumMap.emplace("sampler2DArrayShadow", GCT_SAMPLER2DARRAY);
+        mTypeEnumMap.emplace("sampler2DArrayShadow", GCT_SAMPLER2DARRAYSHADOW);
         mTypeEnumMap.emplace("isampler1D", GCT_SAMPLER1D);
         mTypeEnumMap.emplace("isampler2D", GCT_SAMPLER2D);
         mTypeEnumMap.emplace("isampler3D", GCT_SAMPLER3D);

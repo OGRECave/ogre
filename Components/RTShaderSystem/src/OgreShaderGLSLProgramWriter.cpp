@@ -71,8 +71,10 @@ void GLSLProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "sampler2DArray";
     mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
     mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCube";
+    mGpuConstTypeMap[GCT_SAMPLERCUBESHADOW] = "samplerCubeShadow";
     mGpuConstTypeMap[GCT_SAMPLER1DSHADOW] = "sampler1DShadow";
     mGpuConstTypeMap[GCT_SAMPLER2DSHADOW] = "sampler2DShadow";
+    mGpuConstTypeMap[GCT_SAMPLER2DARRAYSHADOW] = "sampler2DArrayShadow";
     mGpuConstTypeMap[GCT_SAMPLER_EXTERNAL_OES] = "samplerExternalOES";
     mGpuConstTypeMap[GCT_MATRIX_2X2] = "mat2";
     mGpuConstTypeMap[GCT_MATRIX_2X3] = "mat2x3";

@@ -109,10 +109,12 @@ namespace Ogre {
             defToUpdate.constType = GCT_SAMPLER3D;
             break;
         case GL_SAMPLER_CUBE:
-        case GL_SAMPLER_CUBE_SHADOW:
         case GL_INT_SAMPLER_CUBE:
         case GL_UNSIGNED_INT_SAMPLER_CUBE:
             defToUpdate.constType = GCT_SAMPLERCUBE;
+            break;
+        case GL_SAMPLER_CUBE_SHADOW:
+            defToUpdate.constType = GCT_SAMPLERCUBESHADOW;
             break;
         case GL_SAMPLER_1D_SHADOW:
         case GL_SAMPLER_1D_ARRAY_SHADOW:
@@ -120,8 +122,10 @@ namespace Ogre {
             break;
         case GL_SAMPLER_2D_SHADOW:
         case GL_SAMPLER_2D_RECT_SHADOW:
-        case GL_SAMPLER_2D_ARRAY_SHADOW:
             defToUpdate.constType = GCT_SAMPLER2DSHADOW;
+            break;
+        case GL_SAMPLER_2D_ARRAY_SHADOW:
+            defToUpdate.constType = GCT_SAMPLER2DARRAYSHADOW;
             break;
         case GL_INT:
             defToUpdate.constType = GCT_INT1;
