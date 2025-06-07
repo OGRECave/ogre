@@ -39,13 +39,18 @@
 #define texture2DArray tex2DARRAY
 #define textureCube texCUBE
 #define shadow2D tex2Dcmp
+#define shadow2DArray tex2DARRAYcmp
+#define shadowCube texCUBEcmp
 #define texture2DProj tex2Dproj
 vec4 texture2DLod(sampler2D s, vec2 v, float lod) { return tex2Dlod(s, vec4(v.x, v.y, 0, lod)); }
 
 #define samplerCube samplerCUBE
 vec4 textureCubeLod(samplerCube s, vec3 v, float lod) { return texCUBElod(s, vec4(v.x, v.y, v.z, lod)); }
 
+#define sampler2DArray Sampler2DArray
 #define sampler2DShadow Sampler2DShadow
+#define sampler2DArrayShadow Sampler2DArrayShadow
+#define samplerCubeShadow SamplerCubeShadow
 
 #define mix lerp
 #define fract frac
@@ -118,6 +123,8 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define SAMPLER2DARRAY(name, reg) _UNIFORM_BINDING(reg) sampler2DArray name
 #define SAMPLERCUBE(name, reg) _UNIFORM_BINDING(reg) samplerCube name
 #define SAMPLER2DSHADOW(name, reg) _UNIFORM_BINDING(reg) sampler2DShadow name
+#define SAMPLER2DARRAYSHADOW(name, reg) _UNIFORM_BINDING(reg) sampler2DArrayShadow name
+#define SAMPLERCUBESHADOW(name, reg) _UNIFORM_BINDING(reg) samplerCubeShadow name
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 #define mul(a, b) ((a) * (b))

@@ -218,17 +218,19 @@ static GpuConstantType mapToGCT(int gltype)
     case GL_UNSIGNED_INT_SAMPLER_3D:
         return GCT_SAMPLER3D;
     case GL_SAMPLER_CUBE:
-    case GL_SAMPLER_CUBE_SHADOW:
     case GL_INT_SAMPLER_CUBE:
     case GL_UNSIGNED_INT_SAMPLER_CUBE:
         return GCT_SAMPLERCUBE;
+    case GL_SAMPLER_CUBE_SHADOW:
+        return GCT_SAMPLERCUBESHADOW;
     case GL_SAMPLER_1D_SHADOW:
     case GL_SAMPLER_1D_ARRAY_SHADOW:
         return GCT_SAMPLER1DSHADOW;
     case GL_SAMPLER_2D_SHADOW:
     case GL_SAMPLER_2D_RECT_SHADOW:
-    case GL_SAMPLER_2D_ARRAY_SHADOW:
         return GCT_SAMPLER2DSHADOW;
+    case GL_SAMPLER_2D_ARRAY_SHADOW:
+        return GCT_SAMPLER2DARRAYSHADOW;
     case GL_INT:
         return GCT_INT1;
     case GL_INT_VEC2:

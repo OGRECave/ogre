@@ -110,6 +110,12 @@ void ProgramWriter::writeSamplerParameter(std::ostream& os, const UniformParamet
     case GCT_SAMPLER2DARRAY:
         os << "SAMPLER2DARRAY(";
         break;
+    case GCT_SAMPLER2DARRAYSHADOW:
+        os << "SAMPLER2DARRAYSHADOW(";
+        break;
+    case GCT_SAMPLERCUBESHADOW:
+        os << "SAMPLERCUBESHADOW(";
+        break;
     default:
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "unsupported sampler type");
     }

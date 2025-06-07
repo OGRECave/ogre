@@ -75,6 +75,16 @@ struct Sampler2DArray
     Texture2DArray t;
     SamplerState s;
 };
+struct Sampler2DArrayShadow
+{
+    Texture2DArray t;
+    SamplerComparisonState s;
+};
+struct SamplerCubeShadow
+{
+    TextureCube t;
+    SamplerComparisonState s;
+};
 
 #define SAMPLER2DSHADOW(name, reg) \
     Texture2D name ## Tex : register(t ## reg);\
@@ -86,8 +96,20 @@ struct Sampler2DArray
     SamplerState name ## State : register(s ## reg);\
     static Sampler2DArray name = {name ## Tex, name ## State}
 
+#define SAMPLER2DARRAYSHADOW(name, reg) \
+    Texture2DArray name ## Tex : register(t ## reg);\
+    SamplerComparisonState name ## State : register(s ## reg);\
+    static Sampler2DArrayShadow name = {name ## Tex, name ## State}
+
+#define SAMPLERCUBESHADOW(name, reg) \
+    TextureCube name ## Tex : register(t ## reg);\
+    SamplerComparisonState name ## State : register(s ## reg);\
+    static SamplerCubeShadow name = {name ## Tex, name ## State}
+
 float tex2Dcmp(Sampler2DShadow s, float3 v) { return s.t.SampleCmpLevelZero(s.s, v.xy, v.z); }
 float4 tex2DARRAY(Sampler2DArray s, float3 v) { return s.t.Sample(s.s, v); }
+float tex2DARRAYcmp(Sampler2DArrayShadow s, float4 v) { return s.t.SampleCmpLevelZero(s.s, v.xyz, v.w); }
+float texCUBEcmp(SamplerCubeShadow s, float4 v) { return s.t.SampleCmpLevelZero(s.s, v.xyz, v.w); }
 #else
 
 #define SAMPLER1D(name, reg) sampler1D name : register(s ## reg)
