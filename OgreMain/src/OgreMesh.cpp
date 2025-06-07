@@ -116,7 +116,7 @@ namespace Ogre {
         std::advance(i, index);
         OGRE_DELETE *i;
         mSubMeshList.erase(i);
-        
+
         // Fix up any name/index entries
         for(SubMeshNameMap::iterator ni = mSubMeshNameMap.begin(); ni != mSubMeshNameMap.end();)
         {
@@ -144,7 +144,7 @@ namespace Ogre {
 
         if (isLoaded())
             _dirtyState();
-        
+
     }
     //-----------------------------------------------------------------------
     void Mesh::destroySubMesh(const String& name)
@@ -192,8 +192,8 @@ namespace Ogre {
         // transformation of user values must occur after loading is complete.
 
         // Transform user LOD values (starting at index 1, no need to transform base value)
-        for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin() + 1; i != mMeshLodUsageList.end(); ++i)
-            i->value = mLodStrategy->transformUserValue(i->userValue);
+        for (auto& m : mMeshLodUsageList)
+            m.value = mLodStrategy->transformUserValue(m.userValue);
         // Rewrite first value
         mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
 #endif
@@ -208,7 +208,7 @@ namespace Ogre {
         mFreshFromDisk =
             ResourceGroupManager::getSingleton().openResource(
                 mName, mGroup, this);
- 
+
         // fully prebuffer into host RAM
         mFreshFromDisk = DataStreamPtr(OGRE_NEW MemoryDataStream(mName,mFreshFromDisk));
     }
@@ -361,7 +361,7 @@ namespace Ogre {
         newMesh->mPreparedForShadowVolumes = mPreparedForShadowVolumes;
 
         newMesh->mEdgeListsBuilt = mEdgeListsBuilt;
-        
+
         // Clone vertex animation
         for (auto & i : mAnimationsList)
         {
@@ -699,7 +699,7 @@ namespace Ogre {
 
             if (maxBones != 0)
             {
-                compileBoneAssignments(mBoneAssignments, maxBones, 
+                compileBoneAssignments(mBoneAssignments, maxBones,
                     sharedBlendIndexToBoneIndexMap, sharedVertexData);
             }
         }
@@ -1313,7 +1313,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void Mesh::organiseTangentsBuffer(VertexData *vertexData,
-        VertexElementSemantic targetSemantic, unsigned short index, 
+        VertexElementSemantic targetSemantic, unsigned short index,
         unsigned short sourceTexCoordSet)
     {
         VertexDeclaration *vDecl = vertexData->vertexDeclaration ;
@@ -1348,7 +1348,7 @@ namespace Ogre {
             {
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
                     "Cannot locate the first texture coordinate element to "
-                    "which to append the new tangents.", 
+                    "which to append the new tangents.",
                     "Mesh::orgagniseTangentsBuffer");
             }
             // Find the buffer associated with  this element
@@ -1432,7 +1432,7 @@ namespace Ogre {
                             // multimap insert doesn't invalidate iterators
                             addBoneAssignment(newAsgn);
                         }
-                        
+
                     }
                 }
 
@@ -1472,9 +1472,9 @@ namespace Ogre {
                     for (auto & remap : res.indexesRemapped)
                     {
                         // Copy all bone assignments from the split vertex
-                        VertexBoneAssignmentList::const_iterator vbstart = 
+                        VertexBoneAssignmentList::const_iterator vbstart =
                             sm->getBoneAssignments().lower_bound(remap.splitVertex.first);
-                        VertexBoneAssignmentList::const_iterator vbend = 
+                        VertexBoneAssignmentList::const_iterator vbend =
                             sm->getBoneAssignments().upper_bound(remap.splitVertex.first);
                         for (VertexBoneAssignmentList::const_iterator vba = vbstart; vba != vbend; ++vba)
                         {
@@ -1602,8 +1602,8 @@ namespace Ogre {
                 // Prepare the builder using the submesh information
                 for (auto *s : mSubMeshList)
                 {
-                    if (s->operationType != RenderOperation::OT_TRIANGLE_FAN && 
-                        s->operationType != RenderOperation::OT_TRIANGLE_LIST && 
+                    if (s->operationType != RenderOperation::OT_TRIANGLE_FAN &&
+                        s->operationType != RenderOperation::OT_TRIANGLE_LIST &&
                         s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
                     {
                         continue;
@@ -1676,8 +1676,8 @@ namespace Ogre {
         // Prepare the builder using the submesh information
         for (auto *s : mSubMeshList)
         {
-            if (s->operationType != RenderOperation::OT_TRIANGLE_FAN && 
-                s->operationType != RenderOperation::OT_TRIANGLE_LIST && 
+            if (s->operationType != RenderOperation::OT_TRIANGLE_FAN &&
+                s->operationType != RenderOperation::OT_TRIANGLE_LIST &&
                 s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
             {
                 continue;
@@ -1747,8 +1747,8 @@ namespace Ogre {
         }
         for (auto *s : mSubMeshList)
         {
-            if (!s->useSharedVertices && 
-                (s->operationType == RenderOperation::OT_TRIANGLE_FAN || 
+            if (!s->useSharedVertices &&
+                (s->operationType == RenderOperation::OT_TRIANGLE_FAN ||
                 s->operationType == RenderOperation::OT_TRIANGLE_LIST ||
                 s->operationType == RenderOperation::OT_TRIANGLE_STRIP))
             {
@@ -1927,12 +1927,12 @@ namespace Ogre {
         assert(posElem);
         const VertexElement* normElem =
             targetVertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
-        
+
         bool morphNormals = false;
         if (normElem && normElem->getSource() == posElem->getSource() &&
             b1->getVertexSize() == 24 && b2->getVertexSize() == 24)
             morphNormals = true;
-        
+
         HardwareVertexBufferSharedPtr destBuf =
             targetVertexData->vertexBufferBinding->getBuffer(
                 posElem->getSource());
@@ -1974,7 +1974,7 @@ namespace Ogre {
         // Have to lock in normal mode since this is incremental
         HardwareBufferLockGuard destLock(destBuf, HardwareBuffer::HBL_NORMAL);
         float* pBase = static_cast<float*>(destLock.pData);
-                
+
         // Iterate over affected vertices
         for (const auto & i : vertexOffsetMap)
         {
@@ -1987,9 +1987,9 @@ namespace Ogre {
             ++pdst;
             *pdst = *pdst + (i.second[2] * weight);
             ++pdst;
-            
+
         }
-        
+
         if (normals)
         {
             float* pNormBase;
@@ -2004,8 +2004,8 @@ namespace Ogre {
                 *pdst = *pdst + (i.second[1] * weight);
                 ++pdst;
                 *pdst = *pdst + (i.second[2] * weight);
-                ++pdst;             
-                
+                ++pdst;
+
             }
         }
     }
@@ -2078,7 +2078,7 @@ namespace Ogre {
             i->mVertexAnimationType = VAT_NONE;
             i->mVertexAnimationIncludesNormals = false;
         }
-        
+
         mPosesIncludeNormals = false;
         for (PoseList::const_iterator i = mPoseList.begin(); i != mPoseList.end(); ++i)
         {
@@ -2113,7 +2113,7 @@ namespace Ogre {
                     mSharedVertexDataAnimationType = track->getAnimationType();
                     if (track->getAnimationType() == VAT_MORPH)
                         mSharedVertexDataAnimationIncludesNormals = track->getVertexAnimationIncludesNormals();
-                    else 
+                    else
                         mSharedVertexDataAnimationIncludesNormals = mPosesIncludeNormals;
 
                 }
@@ -2135,7 +2135,7 @@ namespace Ogre {
                     sm->mVertexAnimationType = track->getAnimationType();
                     if (track->getAnimationType() == VAT_MORPH)
                         sm->mVertexAnimationIncludesNormals = track->getVertexAnimationIncludesNormals();
-                    else 
+                    else
                         sm->mVertexAnimationIncludesNormals = mPosesIncludeNormals;
 
                 }
@@ -2343,10 +2343,10 @@ namespace Ogre {
         mLodStrategy = lodStrategy;
 
         assert(mMeshLodUsageList.size());
-        
+
         // Re-transform user LOD values (starting at index 1, no need to transform base value)
-        for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin()+1; i != mMeshLodUsageList.end(); ++i)
-            i->value = mLodStrategy->transformUserValue(i->userValue);
+        for (auto& m : mMeshLodUsageList)
+            m.value = mLodStrategy->transformUserValue(m.userValue);
 
         // Rewrite first value
         mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();

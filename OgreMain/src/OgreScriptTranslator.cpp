@@ -1059,10 +1059,10 @@ namespace Ogre{
                 case ID_LOD_VALUES:
                     {
                         Material::LodValueList lods;
-                        for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
+                        for(const auto& j : prop->values)
                         {
                             Real v = 0;
-                            if(getReal(*j, &v))
+                            if(getReal(j, &v))
                                 lods.push_back(v);
                             else
                                 compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
@@ -3634,8 +3634,7 @@ namespace Ogre{
                 start = declarator.find_first_of('[', end);
             }
         }
-        
-        return dimensions; 
+        return dimensions;
     }
     //-------------------------------------------------------------------------
     template <typename T, typename It>
@@ -3776,7 +3775,7 @@ namespace Ogre{
                                 else if (type == BCT_DOUBLE)
                                 {
                                     safeSetConstant<double>(params, name, index, k, prop->values.cend(), count, prop, compiler);
-                                }                                
+                                }
                                 else if (type == BCT_BOOL)
                                 {
                                     std::vector<bool> tmp;
@@ -4068,7 +4067,7 @@ namespace Ogre{
                 //                            "workgroup_dimensions property requires 3 arguments");
                 //     }
 
-                    
+
                 //     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
@@ -4379,14 +4378,14 @@ namespace Ogre{
                 String value;
 
                 // Glob the values together
-                for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
+                for(const auto& v : prop->values)
                 {
-                    if((*it)->type == ANT_ATOM)
+                    if(v->type == ANT_ATOM)
                     {
                         if(value.empty())
-                            value = ((AtomAbstractNode*)(*it).get())->value;
+                            value = ((AtomAbstractNode*)v.get())->value;
                         else
-                            value = value + " " + ((AtomAbstractNode*)(*it).get())->value;
+                            value = value + " " + ((AtomAbstractNode*)v.get())->value;
                     }
                     else
                     {
@@ -4445,14 +4444,14 @@ namespace Ogre{
                 String value;
 
                 // Glob the values together
-                for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
+                for (const auto& v : prop->values)
                 {
-                    if((*it)->type == ANT_ATOM)
+                    if(v->type == ANT_ATOM)
                     {
                         if(value.empty())
-                            value = ((AtomAbstractNode*)(*it).get())->value;
+                            value = ((AtomAbstractNode*)v.get())->value;
                         else
-                            value = value + " " + ((AtomAbstractNode*)(*it).get())->value;
+                            value = value + " " + ((AtomAbstractNode*)v.get())->value;
                     }
                     else
                     {
@@ -4943,7 +4942,7 @@ namespace Ogre{
         mPass = target->createPass(ptype);
         obj->context = mPass;
 
-        if(mPass->getType() == CompositionPass::PT_RENDERCUSTOM) 
+        if(mPass->getType() == CompositionPass::PT_RENDERCUSTOM)
         {
             String customType;
             //This is the ugly one liner for safe access to the second parameter.
@@ -5008,11 +5007,11 @@ namespace Ogre{
                 case ID_BUFFERS:
                     {
                         uint32 buffers = 0;
-                        for(AbstractNodeList::iterator k = prop->values.begin(); k != prop->values.end(); ++k)
+                        for(const auto& v : prop->values)
                         {
-                            if((*k)->type == ANT_ATOM)
+                            if(v->type == ANT_ATOM)
                             {
-                                switch(((AtomAbstractNode*)(*k).get())->id)
+                                switch(((AtomAbstractNode*)v.get())->id)
                                 {
                                 case ID_COLOUR:
                                     buffers |= FBT_COLOUR;
@@ -5219,7 +5218,7 @@ namespace Ogre{
             else if(obj->id == ID_FRAGMENT_PROGRAM ||
                     obj->id == ID_VERTEX_PROGRAM ||
                     obj->id == ID_GEOMETRY_PROGRAM ||
-                    obj->id == ID_TESSELLATION_HULL_PROGRAM || 
+                    obj->id == ID_TESSELLATION_HULL_PROGRAM ||
                     obj->id == ID_TESSELLATION_DOMAIN_PROGRAM ||
                     obj->id == ID_COMPUTE_PROGRAM ||
                     obj->id == ID_MESH_PROGRAM ||
