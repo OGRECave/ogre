@@ -650,9 +650,18 @@ namespace Ogre
         // Create the depth stencil view
         D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
         descDSV.Format = DXGI_FORMAT_D32_FLOAT;
-        descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
         descDSV.Flags = 0 /* D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL */;    // TODO: Allows bind depth buffer as depth view AND texture simultaneously.
-        descDSV.Texture2D.MipSlice = 0;
+        if(buffer->getParentTexture()->getTextureType() == TEX_TYPE_2D_ARRAY)
+        {
+            descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY : D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+            descDSV.Texture2DArray.FirstArraySlice = mZOffset;
+            descDSV.Texture2DArray.ArraySize = allLayers ? BBDesc.ArraySize : 1;
+        }
+        else
+        {
+            descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
+            descDSV.Texture2D.MipSlice = 0;
+        }
 
         ID3D11DepthStencilView      *depthStencilView;
         OGRE_CHECK_DX_ERROR(mDevice->CreateDepthStencilView(pBackBuffer, &descDSV, &depthStencilView ));
