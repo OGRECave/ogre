@@ -55,7 +55,7 @@ namespace Ogre
 
             ParamDictionary* dict = getParamDictionary();
 
-            dict->addParameter(ParameterDef("delegate", 
+            dict->addParameter(ParameterDef("delegate",
                 "Additional delegate programs containing implementations.",
                 PT_STRING),&msCmdDelegate);
         }
@@ -133,8 +133,8 @@ namespace Ogre
         memSize += GpuProgram::calculateSize();
 
         // Delegate Names
-        for (StringVector::const_iterator i = mDelegateNames.begin(); i != mDelegateNames.end(); ++i)
-            memSize += (*i).size() * sizeof(char);
+        for (const auto& n : mDelegateNames)
+            memSize += n.size() * sizeof(char);
 
         return memSize;
     }
@@ -372,21 +372,21 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void UnifiedHighLevelGpuProgram::createLowLevelImpl(void)
     {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
             "This method should never get called!",
             "UnifiedHighLevelGpuProgram::createLowLevelImpl");
     }
     //-----------------------------------------------------------------------
     void UnifiedHighLevelGpuProgram::unloadHighLevelImpl(void)
     {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
             "This method should never get called!",
             "UnifiedHighLevelGpuProgram::unloadHighLevelImpl");
     }
     //-----------------------------------------------------------------------
     void UnifiedHighLevelGpuProgram::loadFromSource(void)
     {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
             "This method should never get called!",
             "UnifiedHighLevelGpuProgram::loadFromSource");
     }

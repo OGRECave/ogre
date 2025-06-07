@@ -188,7 +188,7 @@ namespace Ogre
             return;
 
         // Call polymorphic load
-        try 
+        try
         {
             loadFromSource();
         }
@@ -226,7 +226,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     bool GpuProgram::isRequiredCapabilitiesSupported(void) const
     {
-        const RenderSystemCapabilities* caps = 
+        const RenderSystemCapabilities* caps =
             Root::getSingleton().getRenderSystem()->getCapabilities();
 
         // Basic support check
@@ -240,7 +240,7 @@ namespace Ogre
         }
 
         // Vertex texture fetch required?
-        if (isVertexTextureFetchRequired() && 
+        if (isVertexTextureFetchRequired() &&
             !caps->getNumVertexTextureUnits())
         {
             return false;
@@ -289,18 +289,16 @@ namespace Ogre
         mLogicalToPhysical->bufferSize = mConstantDefs->bufferSize;
         mLogicalToPhysical->map.clear();
         // need to set up logical mappings too for some rendersystems
-        for (GpuConstantDefinitionMap::const_iterator i = mConstantDefs->map.begin();
-            i != mConstantDefs->map.end(); ++i)
+        for (const auto& d : mConstantDefs->map)
         {
-            const String& name = i->first;
-            const GpuConstantDefinition& def = i->second;
+            const String& name = d.first;
+            const GpuConstantDefinition& def = d.second;
             // only consider non-array entries
             if (name.find('[') == String::npos)
             {
                 GpuLogicalIndexUseMap::value_type val(
                     def.logicalIndex,
-                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, def.variability,
-                                       GpuConstantDefinition::getBaseType(def.constType)));
+                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, def.variability, GpuConstantDefinition::getBaseType(def.constType)));
                 mLogicalToPhysical->map.emplace(val);
             }
         }
@@ -311,17 +309,17 @@ namespace Ogre
     GpuProgramParametersSharedPtr GpuProgram::createParameters(void)
     {
         // Default implementation simply returns standard parameters.
-        GpuProgramParametersSharedPtr ret = 
+        GpuProgramParametersSharedPtr ret =
             GpuProgramManager::getSingleton().createParameters();
-        
-        
+
+
         // optionally load manually supplied named constants
         if (!mManualNamedConstantsFile.empty() && !mLoadedManualNamedConstants)
         {
-            try 
+            try
             {
                 GpuNamedConstants namedConstants;
-                DataStreamPtr stream = 
+                DataStreamPtr stream =
                     ResourceGroupManager::getSingleton().openResource(
                     mManualNamedConstantsFile, mGroup, this);
                 namedConstants.load(stream);
@@ -335,8 +333,8 @@ namespace Ogre
             }
             mLoadedManualNamedConstants = true;
         }
-        
-        
+
+
         // set up named parameters, if any
         if (mConstantDefs && !mConstantDefs->map.empty())
         {
@@ -348,7 +346,7 @@ namespace Ogre
         // Copy in default parameters if present
         if (mDefaultParams)
             ret->copyConstantsFrom(*(mDefaultParams.get()));
-        
+
         return ret;
     }
     //-----------------------------------------------------------------------------
@@ -399,24 +397,24 @@ namespace Ogre
             ParameterDef("syntax", "Syntax code, e.g. vs_1_1", PT_STRING), &msSyntaxCmd);
         dict->addParameter("includes_instancing", &msInstancingCmd);
         dict->addParameter(
-            ParameterDef("includes_skeletal_animation", 
-                         "Whether this vertex program includes skeletal animation", PT_BOOL), 
+            ParameterDef("includes_skeletal_animation",
+                         "Whether this vertex program includes skeletal animation", PT_BOOL),
             &msSkeletalCmd);
         dict->addParameter(
-            ParameterDef("includes_morph_animation", 
-                         "Whether this vertex program includes morph animation", PT_BOOL), 
+            ParameterDef("includes_morph_animation",
+                         "Whether this vertex program includes morph animation", PT_BOOL),
             &msMorphCmd);
         dict->addParameter(
-            ParameterDef("includes_pose_animation", 
+            ParameterDef("includes_pose_animation",
                          "The number of poses this vertex program supports for pose animation", PT_INT),
             &msPoseCmd);
         dict->addParameter(
-            ParameterDef("uses_vertex_texture_fetch", 
-                         "Whether this vertex program requires vertex texture fetch support.", PT_BOOL), 
+            ParameterDef("uses_vertex_texture_fetch",
+                         "Whether this vertex program requires vertex texture fetch support.", PT_BOOL),
             &msVTFCmd);
         dict->addParameter(
-            ParameterDef("manual_named_constants", 
-                         "File containing named parameter mappings for low-level programs.", PT_BOOL), 
+            ParameterDef("manual_named_constants",
+                         "File containing named parameter mappings for low-level programs.", PT_BOOL),
             &msManNamedConstsFileCmd);
     }
 

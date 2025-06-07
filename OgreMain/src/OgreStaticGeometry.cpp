@@ -381,8 +381,8 @@ namespace Ogre {
             id->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT;
         IndexRemap indexRemap;
         HardwareBufferLockGuard indexLock(id->indexBuffer,
-                                          id->indexStart * id->indexBuffer->getIndexSize(), 
-                                          id->indexCount * id->indexBuffer->getIndexSize(), 
+                                          id->indexStart * id->indexBuffer->getIndexSize(),
+                                          id->indexCount * id->indexBuffer->getIndexSize(),
                                           HardwareBuffer::HBL_READ_ONLY);
         if (use32bitIndexes)
         {
@@ -455,8 +455,8 @@ namespace Ogre {
                 HardwareBuffer::HBU_STATIC);
 
         HardwareBufferLockGuard srcIndexLock(id->indexBuffer,
-                                             id->indexStart * id->indexBuffer->getIndexSize(), 
-                                             id->indexCount * id->indexBuffer->getIndexSize(), 
+                                             id->indexStart * id->indexBuffer->getIndexSize(),
+                                             id->indexCount * id->indexBuffer->getIndexSize(),
                                              HardwareBuffer::HBL_READ_ONLY);
         HardwareBufferLockGuard dstIndexLock(ibuf, HardwareBuffer::HBL_DISCARD);
         if (use32bitIndexes)
@@ -533,7 +533,7 @@ namespace Ogre {
         for (auto & ri : mRegionMap)
         {
             ri.second->build(stencilShadows);
-            
+
             // Set the visibility flags on these regions
             ri.second->setVisibilityFlags(mVisibilityFlags);
         }
@@ -616,10 +616,9 @@ namespace Ogre {
     void StaticGeometry::setVisibilityFlags(uint32 flags)
     {
         mVisibilityFlags = flags;
-        for (RegionMap::const_iterator ri = mRegionMap.begin();
-            ri != mRegionMap.end(); ++ri)
+        for (const auto& r : mRegionMap)
         {
-            ri->second->setVisibilityFlags(flags);
+            r.second->setVisibilityFlags(flags);
         }
     }
     //--------------------------------------------------------------------------
@@ -651,7 +650,7 @@ namespace Ogre {
         return o;
     }
     //---------------------------------------------------------------------
-    void StaticGeometry::visitRenderables(Renderable::Visitor* visitor, 
+    void StaticGeometry::visitRenderables(Renderable::Visitor* visitor,
         bool debugRenderables)
     {
         for (RegionMap::const_iterator ri = mRegionMap.begin();
@@ -848,7 +847,7 @@ namespace Ogre {
             mLodValue);
     }
     //---------------------------------------------------------------------
-    void StaticGeometry::Region::visitRenderables(Renderable::Visitor* visitor, 
+    void StaticGeometry::Region::visitRenderables(Renderable::Visitor* visitor,
         bool debugRenderables)
     {
         for (auto & i : mLodBucketList)
@@ -1071,13 +1070,12 @@ namespace Ogre {
         return o;
     }
     //---------------------------------------------------------------------
-    void StaticGeometry::LODBucket::visitRenderables(Renderable::Visitor* visitor, 
+    void StaticGeometry::LODBucket::visitRenderables(Renderable::Visitor* visitor,
         bool debugRenderables)
     {
-        for (MaterialBucketMap::const_iterator i = mMaterialBucketMap.begin();
-            i != mMaterialBucketMap.end(); ++i)
+        for (const auto& m : mMaterialBucketMap)
         {
-            i->second->visitRenderables(visitor, debugRenderables);
+            m.second->visitRenderables(visitor, debugRenderables);
         }
 
     }
@@ -1261,7 +1259,7 @@ namespace Ogre {
         return o;
     }
     //---------------------------------------------------------------------
-    void StaticGeometry::MaterialBucket::visitRenderables(Renderable::Visitor* visitor, 
+    void StaticGeometry::MaterialBucket::visitRenderables(Renderable::Visitor* visitor,
         bool debugRenderables)
     {
         for (auto i : mGeometryBucketList)
@@ -1458,7 +1456,7 @@ namespace Ogre {
             // Copy indexes across with offset
             IndexData* srcIdxData = geom->geometry->indexData;
             HardwareBufferLockGuard srcIdxLock(srcIdxData->indexBuffer,
-                                               srcIdxData->indexStart * srcIdxData->indexBuffer->getIndexSize(), 
+                                               srcIdxData->indexStart * srcIdxData->indexBuffer->getIndexSize(),
                                                srcIdxData->indexCount * srcIdxData->indexBuffer->getIndexSize(),
                                                HardwareBuffer::HBL_READ_ONLY);
             if (indexType == HardwareIndexBuffer::IT_32BIT)
