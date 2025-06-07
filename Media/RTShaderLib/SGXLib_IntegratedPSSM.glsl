@@ -31,10 +31,20 @@ THE SOFTWARE.
 // Language: GLSL
 //-----------------------------------------------------------------------------
 
-#ifdef PSSM_SAMPLE_CMP
-#define SAMPLER_TYPE sampler2DShadow
+#ifdef PSSM_ARRAY_TEXTURE
+#   ifdef PSSM_SAMPLE_CMP
+    #define SAMPLER_TYPE sampler2DArrayShadow
+#   else
+    #define SAMPLER_TYPE sampler2DArray
+#   endif
+#define PSSM_LAYER_ARG(x) x,
 #else
-#define SAMPLER_TYPE sampler2D
+#   ifdef PSSM_SAMPLE_CMP
+    #define SAMPLER_TYPE sampler2DShadow
+#   else
+    #define SAMPLER_TYPE sampler2D
+#   endif
+#define PSSM_LAYER_ARG(x)
 #endif
 
 // default to 2x2 PCF
@@ -63,10 +73,23 @@ void SGX_ApplyShadowFactor_Modulative(in vec4 ambient,
 #endif
 }
 #endif
-	
-float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, float depth)
+//-----------------------------------------------------------------------------
+#ifdef PSSM_SAMPLE_COLOUR
+void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in vec4 shadowMapPos, in vec2 invTexSize, PSSM_LAYER_ARG(in float layer) out float c)
 {
-#ifdef PSSM_SAMPLE_CMP
+#	ifdef PSSM_ARRAY_TEXTURE
+	c = texture2DArray(shadowMap, vec3(shadowMapPos.xy/shadowMapPos.w, layer)).x;
+#	else
+	c = texture2DProj(shadowMap, shadowMapPos).x;
+#	endif
+}
+#else
+float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, PSSM_LAYER_ARG(in float layer) float depth)
+{
+#ifdef PSSM_ARRAY_TEXTURE
+	// we can assume PSSM_SAMPLE_CMP is always defined when using array textures
+	return shadow2DArray(shadowMap, vec4(uv, layer, depth));
+#elif defined(PSSM_SAMPLE_CMP)
 #	if defined(OGRE_GLSL) && OGRE_GLSL < 130
 	return shadow2D(shadowMap, vec3(uv, depth)).r;
 #	else
@@ -76,15 +99,7 @@ float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, float depth)
 	return (depth <= texture2D(shadowMap, uv).r) ? 1.0 : 0.0;
 #endif
 }
-
-//-----------------------------------------------------------------------------
-#ifdef PSSM_SAMPLE_COLOUR
-void SGX_ShadowPCF4(in sampler2D shadowMap, in vec4 shadowMapPos, in vec2 invTexSize, out float c)
-{
-	c = texture2DProj(shadowMap, shadowMapPos).x;
-}
-#else
-void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in vec4 shadowMapPos, in vec2 invTexSize, out float c)
+void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in vec4 shadowMapPos, in vec2 invTexSize, PSSM_LAYER_ARG(in float layer) out float c)
 {
 	shadowMapPos = shadowMapPos / shadowMapPos.w;
 #if !defined(OGRE_REVERSED_Z) && !defined(OGRE_HLSL) && !defined(VULKAN)
@@ -102,7 +117,7 @@ void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in vec4 shadowMapPos, in vec2 inv
 	float offset = (PCF_XSAMPLES / 2.0 - 0.5) * scale;
 	for (float y = -offset; y <= offset; y += scale)
 		for (float x = -offset; x <= offset; x += scale)
-			c += sampleDepth(shadowMap, uv + invTexSize * vec2(x, y), depth);
+			c += sampleDepth(shadowMap, uv + invTexSize * vec2(x, y), PSSM_LAYER_ARG(layer) depth);
 
 	c /= PCF_XSAMPLES * PCF_XSAMPLES;
 }
@@ -144,7 +159,7 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 
 	if (fDepth  <= vSplitPoints.x)
 	{
-		SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0, oShadowFactor);
+		SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0, PSSM_LAYER_ARG(0.0) oShadowFactor);
 #ifdef DEBUG_PSSM
         oDiffuse.r += 1.0;
 #endif
@@ -152,7 +167,7 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 #if PSSM_NUM_SPLITS > 2
 	else if (fDepth <= vSplitPoints.y)
 	{
-		SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1, oShadowFactor);
+		SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1, PSSM_LAYER_ARG(1.0) oShadowFactor);
 #ifdef DEBUG_PSSM
         oDiffuse.g += 1.0;
 #endif
@@ -161,7 +176,7 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 #if PSSM_NUM_SPLITS > 3
 	else if (fDepth <= vSplitPoints.z)
 	{
-		SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2, oShadowFactor);
+        SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2, PSSM_LAYER_ARG(2.0) oShadowFactor);
 #ifdef DEBUG_PSSM
 		oDiffuse.r += 1.0;
         oDiffuse.g += 1.0;
@@ -170,7 +185,7 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 #endif
 	else if (fDepth <= vSplitPoints.w)
 	{
-		SGX_ShadowPCF4(shadowMap3, lightPosition3, invShadowMapSize3, oShadowFactor);
+		SGX_ShadowPCF4(shadowMap3, lightPosition3, invShadowMapSize3, PSSM_LAYER_ARG(float(PSSM_NUM_SPLITS - 1)) oShadowFactor);
 #ifdef DEBUG_PSSM
         oDiffuse.b += 1.0;
 #endif
