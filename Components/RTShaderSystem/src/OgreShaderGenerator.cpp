@@ -159,8 +159,8 @@ ShaderGenerator::ShaderGenerator() :
         LogManager::getSingleton().logWarning("ShaderGenerator: No supported language found. Falling back to 'null'");
     }
 
-    setShaderProfiles(GPT_VERTEX_PROGRAM, "vs_3_0 vs_2_a vs_2_0 vs_1_1");
-    setShaderProfiles(GPT_FRAGMENT_PROGRAM, "ps_3_0 ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1");
+    setShaderProfiles(GPT_VERTEX_PROGRAM, "vs_4_1 vs_3_0 vs_2_a vs_2_0 vs_1_1");
+    setShaderProfiles(GPT_FRAGMENT_PROGRAM, "ps_4_1 ps_3_0 ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1");
 }
 
 //-----------------------------------------------------------------------------
