@@ -404,6 +404,11 @@ void Sample_ShaderSystem::setupUI()
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
     mShadowMenu->addItem("PSSM 3");
     mShadowMenu->addItem("PSSM debug");
+
+    if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_VP_RT_INDEX_ANY_SHADER))
+    {
+        mShadowMenu->addItem("PSSM3 SP");
+    }
 #endif
 
 
@@ -871,7 +876,8 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
     // Integrated shadow PSSM with 3 splits.
     else if (menuIndex >= 1)
     {
-        mSceneMgr->setShadowTextureCasterMaterial(MaterialManager::getSingleton().getByName("PSSM/shadow_caster"));
+        auto casterMat = MaterialManager::getSingleton().getByName("PSSM/shadow_caster");
+        mSceneMgr->setShadowTextureCasterMaterial(casterMat);
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
         mSceneMgr->setShadowFarDistance(3000);
 
@@ -901,7 +907,29 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
     
         auto subRenderState = mShaderGenerator->createSubRenderState(SRS_SHADOW_MAPPING);
         subRenderState->setParameter("split_points", pssmSetup->getSplitPoints());
-        subRenderState->setParameter("debug", menuIndex > 1);
+        subRenderState->setParameter("debug", menuIndex == 2);
+        subRenderState->setParameter("array_texture", menuIndex == 3);
+
+        if(menuIndex == 3)
+        {
+            mSceneMgr->setShadowTextureCount(1);
+            ShadowTextureConfig shadowTextureConfig;
+            shadowTextureConfig.format = PF_DEPTH16;
+            shadowTextureConfig.width = 512;
+            shadowTextureConfig.height = 512;
+            shadowTextureConfig.depth = 3;
+            shadowTextureConfig.type = TEX_TYPE_2D_ARRAY;
+            shadowTextureConfig.extraFlags = TU_TARGET_ALL_LAYERS;
+            mSceneMgr->setShadowTextureConfig(0, shadowTextureConfig);
+
+            auto vprtState= mShaderGenerator->createSubRenderState("SGX_InstancedViewports");
+            vprtState->setParameter("schemeName", Any(MSN_SHADOWCASTER));
+            vprtState->setParameter("layeredTarget", true);
+            vprtState->setParameter("viewportGrid", Vector2(3, 1));
+
+            auto casterRenderState = mShaderGenerator->getRenderState(MSN_SHADERGEN, *casterMat, 0);
+            casterRenderState->addTemplateSubRenderState(vprtState);
+        }
         schemRenderState->addTemplateSubRenderState(subRenderState);        
     }
 #endif
@@ -922,6 +950,8 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::unloadResources()
 {
+    mShaderGenerator->removeAllShaderBasedTechniques("PSSM/shadow_caster");
+
     if (mTextureAtlasFactory)
     {
         mTextureAtlasFactory->destroyAllInstances();
