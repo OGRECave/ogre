@@ -67,7 +67,7 @@ namespace Ogre
 
     // this call adds the given node to either the zone's list
     // of nodes at home in the zone, or to the list of visiting nodes
-    // NOTE: The list is decided by the node's homeZone value, so 
+    // NOTE: The list is decided by the node's homeZone value, so
     // that must be set correctly before calling this function.
     void DefaultZone::_addNode( PCZSceneNode * n )
     {
@@ -95,7 +95,7 @@ namespace Ogre
         }
     }
 
-    /** Indicates whether or not this zone requires zone-specific data for 
+    /** Indicates whether or not this zone requires zone-specific data for
         *  each scene node
         */
     bool DefaultZone::requiresZoneSpecificNodeData(void)
@@ -107,12 +107,12 @@ namespace Ogre
     /* Recursively check for intersection of the given scene node
      * with zone portals.  If the node touches a portal, then the
      * connected zone is assumed to be touched.  The zone adds
-     * the node to its node list and the node adds the zone to 
-     * its visiting zone list. 
+     * the node to its node list and the node adds the zone to
+     * its visiting zone list.
      *
-     * NOTE: This function assumes that the home zone of the node 
+     * NOTE: This function assumes that the home zone of the node
      *       is correct.  The function "_updateHomeZone" in PCZSceneManager
-     *       takes care of this and should have been called before 
+     *       takes care of this and should have been called before
      *       this function.
      */
 
@@ -152,8 +152,8 @@ namespace Ogre
     * NOTE: This is the default implementation, which doesn't take advantage
     *       of any zone-specific optimizations for checking portal visibility
     */
-    void DefaultZone::_checkLightAgainstPortals(PCZLight *light, 
-                                                unsigned long frameCount, 
+    void DefaultZone::_checkLightAgainstPortals(PCZLight *light,
+                                                unsigned long frameCount,
                                                 PCZFrustum *portalFrustum,
                                                 Portal * ignorePortal)
     {
@@ -174,7 +174,7 @@ namespace Ogre
                         // point lights - just check if within illumination range
                         if (lightToPortal.length() <= light->getAttenuationRange())
                         {
-                            // if portal is quad portal it must be pointing towards the light 
+                            // if portal is quad portal it must be pointing towards the light
                             if ((p->getType() == Portal::PORTAL_TYPE_QUAD && lightToPortal.dotProduct(p->getDerivedDirection()) < 0.0) ||
                                 (p->getType() != Portal::PORTAL_TYPE_QUAD))
                             {
@@ -188,8 +188,8 @@ namespace Ogre
                                     // set culling frustum from the portal
                                     portalFrustum->addPortalCullingPlanes(p);
                                     // recurse into the target zone of the portal
-                                    p->getTargetZone()->_checkLightAgainstPortals(light, 
-                                                                                frameCount, 
+                                    p->getTargetZone()->_checkLightAgainstPortals(light,
+                                                                                frameCount,
                                                                                 portalFrustum,
                                                                                 p->getTargetPortal());
                                     // remove the planes added by this portal
@@ -203,7 +203,7 @@ namespace Ogre
                         // the direction is facing the portal
                         if (lightToPortal.dotProduct(light->getDerivedDirection()) >= 0.0)
                         {
-                            // if portal is quad portal it must be pointing towards the light 
+                            // if portal is quad portal it must be pointing towards the light
                             if ((p->getType() == Portal::PORTAL_TYPE_QUAD && lightToPortal.dotProduct(p->getDerivedDirection()) < 0.0) ||
                                 (p->getType() != Portal::PORTAL_TYPE_QUAD))
                             {
@@ -217,8 +217,8 @@ namespace Ogre
                                     // set culling frustum from the portal
                                     portalFrustum->addPortalCullingPlanes(p);
                                     // recurse into the target zone of the portal
-                                    p->getTargetZone()->_checkLightAgainstPortals(light, 
-                                                                                frameCount, 
+                                    p->getTargetZone()->_checkLightAgainstPortals(light,
+                                                                                frameCount,
                                                                                 portalFrustum,
                                                                                 p->getTargetPortal());
                                     // remove the planes added by this portal
@@ -235,7 +235,7 @@ namespace Ogre
                         // as a future optimisation.
                         if (lightToPortal.length() <= light->getAttenuationRange())
                         {
-                            // if portal is quad portal it must be pointing towards the light 
+                            // if portal is quad portal it must be pointing towards the light
                             if ((p->getType() == Portal::PORTAL_TYPE_QUAD && lightToPortal.dotProduct(p->getDerivedDirection()) < 0.0) ||
                                 (p->getType() != Portal::PORTAL_TYPE_QUAD))
                             {
@@ -249,8 +249,8 @@ namespace Ogre
                                     // set culling frustum from the portal
                                     portalFrustum->addPortalCullingPlanes(p);
                                     // recurse into the target zone of the portal
-                                    p->getTargetZone()->_checkLightAgainstPortals(light, 
-                                                                                frameCount, 
+                                    p->getTargetZone()->_checkLightAgainstPortals(light,
+                                                                                frameCount,
                                                                                 portalFrustum,
                                                                                 p->getTargetPortal());
                                     // remove the planes added by this portal
@@ -262,7 +262,7 @@ namespace Ogre
                     }
                 }
             }
-        }           
+        }
     }
 
     /** Update the zone data for the portals in the zone
@@ -280,11 +280,11 @@ namespace Ogre
 
             Real pRadius = p->getDerivedRadius();
 
-            // First we check against portals in the SAME zone (and only if they have a 
+            // First we check against portals in the SAME zone (and only if they have a
             // target zone different from the home zone)
             // Here we check only against portals that moved and of smaller size.
 
-            // We do not need to check portal againts previous portals 
+            // We do not need to check portal againts previous portals
             // since it would have been already checked.
             // Hence we start with the next portal after the current portal.
             PortalList::iterator it2 = it;
@@ -448,7 +448,7 @@ namespace Ogre
             {
             default:
             case Portal::NO_INTERSECT: // node does not intersect portal - do nothing
-            case Portal::INTERSECT_NO_CROSS:// node intersects but does not cross portal - do nothing               
+            case Portal::INTERSECT_NO_CROSS:// node intersects but does not cross portal - do nothing
                 break;
             case Portal::INTERSECT_BACK_NO_CROSS:// node intersects but on the back of the portal
                 if (allowBackTouches)
@@ -486,10 +486,10 @@ namespace Ogre
     /*
     // Recursively walk the zones, adding all visible SceneNodes to the list of visible nodes.
     */
-    void DefaultZone::findVisibleNodes(PCZCamera *camera, 
+    void DefaultZone::findVisibleNodes(PCZCamera *camera,
                                   NodeList & visibleNodeList,
                                   RenderQueue * queue,
-                                  VisibleObjectsBoundsInfo* visibleBounds, 
+                                  VisibleObjectsBoundsInfo* visibleBounds,
                                   bool onlyShadowCasters,
                                   bool displayNodes,
                                   bool showBoundingBoxes)
@@ -503,12 +503,12 @@ namespace Ogre
 
         // Else, the zone is automatically assumed to be visible since either
         // it is the camera the zone is in, or it was reached because
-        // a connecting portal was deemed visible to the camera.  
+        // a connecting portal was deemed visible to the camera.
 
         // enable sky if called to do so for this zone
         if (mHasSky)
         {
-            // enable sky 
+            // enable sky
             mPCZSM->enableSky(true);
         }
 
@@ -618,7 +618,7 @@ namespace Ogre
                 // tell target zone it's visible this frame
                 portal->getTargetZone()->setLastVisibleFrame(mLastVisibleFrame);
                 portal->getTargetZone()->setLastVisibleFromCamera(camera);
-                // recurse into the connected zone 
+                // recurse into the connected zone
                 portal->getTargetZone()->findVisibleNodes(camera,
                                                           visibleNodeList,
                                                           queue,
@@ -657,8 +657,8 @@ namespace Ogre
     }
 
     // --- find nodes which intersect various types of BV's ---
-    void DefaultZone::_findNodes( const AxisAlignedBox &t, 
-                                  PCZSceneNodeList &list, 
+    void DefaultZone::_findNodes( const AxisAlignedBox &t,
+                                  PCZSceneNodeList &list,
                                   PortalList &visitedPortals,
                                   bool includeVisitors,
                                   bool recurseThruPortals,
@@ -737,12 +737,12 @@ namespace Ogre
                     {
                         // save portal to the visitedPortals list
                         visitedPortals.push_front(portal);
-                        // recurse into the connected zone 
-                        portal->getTargetZone()->_findNodes(t, 
-                                                            list, 
+                        // recurse into the connected zone
+                        portal->getTargetZone()->_findNodes(t,
+                                                            list,
                                                             visitedPortals,
-                                                            includeVisitors, 
-                                                            recurseThruPortals, 
+                                                            includeVisitors,
+                                                            recurseThruPortals,
                                                             exclude);
                     }
                 }
@@ -751,8 +751,8 @@ namespace Ogre
         }
     }
 
-    void DefaultZone::_findNodes(const Sphere &t, 
-                                 PCZSceneNodeList &list, 
+    void DefaultZone::_findNodes(const Sphere &t,
+                                 PCZSceneNodeList &list,
                                  PortalList &visitedPortals,
                                  bool includeVisitors,
                                  bool recurseThruPortals,
@@ -831,12 +831,12 @@ namespace Ogre
                     {
                         // save portal to the visitedPortals list
                         visitedPortals.push_front(portal);
-                        // recurse into the connected zone 
-                        portal->getTargetZone()->_findNodes(t, 
-                                                            list, 
+                        // recurse into the connected zone
+                        portal->getTargetZone()->_findNodes(t,
+                                                            list,
                                                             visitedPortals,
-                                                            includeVisitors, 
-                                                            recurseThruPortals, 
+                                                            includeVisitors,
+                                                            recurseThruPortals,
                                                             exclude);
                     }
                 }
@@ -846,8 +846,8 @@ namespace Ogre
 
     }
 
-    void DefaultZone::_findNodes( const PlaneBoundedVolume &t, 
-                                  PCZSceneNodeList &list, 
+    void DefaultZone::_findNodes( const PlaneBoundedVolume &t,
+                                  PCZSceneNodeList &list,
                                   PortalList &visitedPortals,
                                   bool includeVisitors,
                                   bool recurseThruPortals,
@@ -926,12 +926,12 @@ namespace Ogre
                     {
                         // save portal to the visitedPortals list
                         visitedPortals.push_front(portal);
-                        // recurse into the connected zone 
-                        portal->getTargetZone()->_findNodes(t, 
-                                                            list, 
+                        // recurse into the connected zone
+                        portal->getTargetZone()->_findNodes(t,
+                                                            list,
                                                             visitedPortals,
-                                                            includeVisitors, 
-                                                            recurseThruPortals, 
+                                                            includeVisitors,
+                                                            recurseThruPortals,
                                                             exclude);
                     }
                 }
@@ -941,8 +941,8 @@ namespace Ogre
 
     }
 
-    void DefaultZone::_findNodes( const Ray &t, 
-                                  PCZSceneNodeList &list, 
+    void DefaultZone::_findNodes( const Ray &t,
+                                  PCZSceneNodeList &list,
                                   PortalList &visitedPortals,
                                   bool includeVisitors,
                                   bool recurseThruPortals,
@@ -1022,12 +1022,12 @@ namespace Ogre
                     {
                         // save portal to the visitedPortals list
                         visitedPortals.push_front(portal);
-                        // recurse into the connected zone 
-                        portal->getTargetZone()->_findNodes(t, 
-                                                            list, 
+                        // recurse into the connected zone
+                        portal->getTargetZone()->_findNodes(t,
+                                                            list,
                                                             visitedPortals,
-                                                            includeVisitors, 
-                                                            recurseThruPortals, 
+                                                            includeVisitors,
+                                                            recurseThruPortals,
                                                             exclude);
                     }
                 }
