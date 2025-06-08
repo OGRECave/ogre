@@ -38,9 +38,7 @@
 #define texture3D tex3D
 #define texture2DArray tex2DARRAY
 #define textureCube texCUBE
-#define shadow2D tex2Dcmp
-#define shadow2DArray tex2DARRAYcmp
-#define shadowCube texCUBEcmp
+#define shadow2D texcmp
 #define texture2DProj tex2Dproj
 vec4 texture2DLod(sampler2D s, vec2 v, float lod) { return tex2Dlod(s, vec4(v.x, v.y, 0, lod)); }
 
