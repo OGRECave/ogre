@@ -88,7 +88,7 @@ float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, PSSM_LAYER_ARG(in float la
 {
 #ifdef PSSM_ARRAY_TEXTURE
 	// we can assume PSSM_SAMPLE_CMP is always defined when using array textures
-	return shadow2DArray(shadowMap, vec4(uv, layer, depth));
+	return shadow2D(shadowMap, vec4(uv, layer, depth));
 #elif defined(PSSM_SAMPLE_CMP)
 #	if defined(OGRE_GLSL) && OGRE_GLSL < 130
 	return shadow2D(shadowMap, vec3(uv, depth)).r;
