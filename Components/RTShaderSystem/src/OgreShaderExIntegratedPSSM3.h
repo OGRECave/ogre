@@ -108,8 +108,6 @@ protected:
         UniformParameterPtr mTextureSampler;
         // The inverse texture 
         UniformParameterPtr mInvTextureSize;
-        // The source light view projection matrix combined with world matrix.      
-        UniformParameterPtr mWorldViewProjMatrix;
         // The vertex shader output position in light space.
         ParameterPtr mVSOutLightPosition;
         // The pixel shader input position in light space.
@@ -161,6 +159,8 @@ protected:
     ShadowTextureParamsList mShadowTextureParamsList;
     // Split points parameter.
     UniformParameterPtr mPSSplitPoints;
+    // The source light view projection matrix combined with world matrix.
+    UniformParameterPtr mWorldViewProjMatrices;
     // Vertex shader input position parameter.  
     ParameterPtr mVSInPos;
     // Vertex shader output position (clip space) parameter.

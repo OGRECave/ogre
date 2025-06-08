@@ -243,9 +243,10 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
         stype = mUseArrayTexture ? GCT_SAMPLER2DARRAY : GCT_SAMPLER2D;
     }
 
+    mWorldViewProjMatrices = vsProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX_ARRAY,
+                                                         mShadowTextureParamsList.size());
     for (auto& p : mShadowTextureParamsList)
     {
-        p.mWorldViewProjMatrix = vsProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX, lightIndex);
         p.mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex);
         p.mPSInLightPosition = psMain->resolveInputParameter(p.mVSOutLightPosition);
         if(mUseArrayTexture)
@@ -317,9 +318,10 @@ bool IntegratedPSSM3::addVSInvocation(Function* vsMain, const int groupOrder)
     }
 
     // Compute world space position.
+    int idx = 0;
     for (auto& p : mShadowTextureParamsList)
     {
-        stage.callBuiltin("mul", p.mWorldViewProjMatrix, mVSInPos, p.mVSOutLightPosition);
+        stage.callBuiltin("mul", {In(mWorldViewProjMatrices), At(idx++), In(mVSInPos), Out(p.mVSOutLightPosition)});
     }
 
     return true;
