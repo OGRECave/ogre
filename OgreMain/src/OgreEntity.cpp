@@ -2207,6 +2207,7 @@ namespace Ogre {
                     visitor->visit(e->getSubEntity(s), lodi, false);
                 }
             }
+          ++lodi;
         }
 #endif
     }
