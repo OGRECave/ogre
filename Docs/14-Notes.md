@@ -19,8 +19,6 @@ Since 14.3, textures defined in compositor scripts can explicitly set the FSAA l
 
 Since 14.3, `float16` vertex elements are supported via the `VET_HALFx` types. Note, that `VET_HALF3` is not supported on D3D11 and D3D9 and is padded to `VET_HALF4` on loading there.
 
-Since 14.4, compositor textures declaration allow the `2d_array` type and specific layers addressed with `target myTex 1 {...`.
-
 ### OgreUnifiedShader.h
 
 Sampler definitions now implicitly include the `uniform` keyword to support Vulkan; i.e. this will generate an error:
@@ -95,9 +93,15 @@ A new spot light type `LT_RECTLIGHT` has been introduced along with the `setSour
 
 The shader types `GPT_MESH_PROGRAM` and `GPT_TASK_PROGRAM` are now available, with support indicated by the `RSC_MESH_PROGRAM` capability. This functionality is provided in GL3Plus through the `GL_NV_mesh_shader` extension and in Vulkan via the `VK_NV_mesh_shader` extension.
 
-### Layered Rendering (since 14.4)
+### Enhanced Layered RenderTarget Support (since 14.4)
 
-`TU_RENDERTARGET` can now be combined with `TU_TARGET_ALL_LAYERS` to render to all layers of a texture array or cubemap (also called VPRT targets). This is useful for rendering to multiple layers in a single pass, such as when rendering a environment map, doing PSSM shadow mapping, or doing side-by-side stereo rendering.
+Version 14.4 introduces significant improvements for layered rendering:
+
+**Compositor Textures:** You can now declare `2d_array` compositor textures, and individual layers can be targeted using the syntax `target myTex 1 {...`.
+
+**Layered Shadow Samplers:** Support for `GCT_SAMPLER2DARRAYSHADOW` and `GCT_SAMPLERCUBESHADOW` was added, allowing the shadow mapping system to render directly to texture arrays and cubemaps. The assignment of lights to specific texture layers is controlled by `setShadowTextureCountPerLightType`. The count you provide dictates how layers are addressed; for instance, setting 6 textures for a point light will render its shadows across the faces of a cubemap.
+
+**Rendering to All Layers (VPRT Targets):** `TU_RENDERTARGET` can now be combined with `TU_TARGET_ALL_LAYERS` to render to all layers of a texture array or cubemap. This is useful for rendering to multiple layers in a single pass, such as when rendering a environment map, doing PSSM shadow mapping, or doing side-by-side stereo rendering.
 
 Additionally, you can check `RSC_VP_RT_INDEX_ANY_SHADER` to see if the rendering system supports efficient dispatch from vertex shaders, eliminating the need for a geometry shader.
 
