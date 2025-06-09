@@ -106,13 +106,14 @@ struct SamplerCubeShadow
     SamplerComparisonState name ## State : register(s ## reg);\
     static SamplerCubeShadow name = {name ## Tex, name ## State}
 
-float4 tex2DARRAY(Sampler2DArray s, float3 v) { return s.t.Sample(s.s, v); }
-float texcmp(Sampler2DShadow s, float3 v) { return s.t.SampleCmpLevelZero(s.s, v.xy, v.z); }
-float texcmp(Sampler2DArrayShadow s, float4 v) { return s.t.SampleCmpLevelZero(s.s, v.xyz, v.w); }
-float texcmp(SamplerCubeShadow s, float4 v) { return s.t.SampleCmpLevelZero(s.s, v.xyz, v.w); }
+float4 texSample(Sampler2DArray s, float3 v) { return s.t.Sample(s.s, v); }
+float texSample(Sampler2DShadow s, float3 v) { return s.t.SampleCmpLevelZero(s.s, v.xy, v.z); }
+float texSample(Sampler2DArrayShadow s, float4 v) { return s.t.SampleCmpLevelZero(s.s, v.xyz, v.w); }
+float texSample(SamplerCubeShadow s, float4 v) { return s.t.SampleCmpLevelZero(s.s, v.xyz, v.w); }
 
 // @deprecated to be removed with ogre 15
-#define tex2Dcmp texcmp
+#define tex2Dcmp texSample
+#define tex2DARRAY texSample
 #else
 
 #define SAMPLER1D(name, reg) sampler1D name : register(s ## reg)
