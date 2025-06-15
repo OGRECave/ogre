@@ -4,7 +4,6 @@ set(CROSS)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(BUILD_DEPS FALSE)
-set(SWIG_EXECUTABLE /usr/bin/swig4.0)
 
 set(RENDERSYSTEMS
     -DOGRE_BUILD_PLUGIN_GLSLANG=TRUE # only builds on Linux, this is the Linux specific config
@@ -56,17 +55,11 @@ if(DEFINED ENV{APPVEYOR})
         -DCMAKE_GENERATOR_PLATFORM=x64
         -DCMAKE_GENERATOR_TOOLSET=v142
         -DOGRE_BUILD_DEPENDENCIES=TRUE
-        "-DPYTHON_EXECUTABLE=C:\\Python310-x64\\python.exe"
-        "-DPYTHON_LIBRARY=C:\\Python310-x64\\libs\\python310.lib"
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
 
-    set(GENERATOR -G "Visual Studio 16 2019")
-    set(OTHER ${OTHER}
-        -DCMAKE_PREFIX_PATH="C:\\Qt\\6.2\\msvc2019_64"
-        -DQt6_DIR="C:\\Qt\\6.2\\msvc2019_64\\lib\\cmake\\Qt6")
+    set(GENERATOR -G "Visual Studio 17 2022")
 
     set(BUILD_DEPS TRUE)
-    set(SWIG_EXECUTABLE "C:\\Python310-x64\\Scripts\\swig.exe")
 endif()
 
 if(DEFINED ENV{ANDROID})
@@ -110,7 +103,6 @@ execute_process(COMMAND ${CMAKE_COMMAND}
     -DOGRE_RESOURCEMANAGER_STRICT=2
     -DOGRE_NODELESS_POSITIONING=OFF
     -DOGRE_BUILD_DEPENDENCIES=${BUILD_DEPS}
-    -DSWIG_EXECUTABLE=${SWIG_EXECUTABLE}
     ${RENDERSYSTEMS}
     ${OTHER}
     ${GENERATOR}
