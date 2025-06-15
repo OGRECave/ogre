@@ -26,8 +26,6 @@ cache:
 - ogredeps -> CMake/Dependencies.cmake
 branches:
   only:
-    - master
-    - stable
     - /v\d+\.\d+\.\d+/
 after_build:
   - IF NOT "%APPVEYOR_REPO_TAG%" == "true" set APPVEYOR_REPO_TAG_NAME=master
