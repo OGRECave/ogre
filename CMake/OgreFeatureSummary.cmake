@@ -17,7 +17,7 @@ set(_features "${_features}-----------------------------------------------------
 #summarise components
 if (OGRE_BUILD_COMPONENT_BITES)
 	set(_components "${_components}  + Bites\n")
-	if(Qt5_FOUND)
+	if(Qt5_FOUND OR Qt6_FOUND)
 	set(_components "${_components}  + Bites Qt Support\n")
 	endif()
 endif ()
