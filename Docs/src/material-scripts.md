@@ -53,12 +53,6 @@ material walls/funkywall1
 }
 ```
 
-A material can be made up of many @ref Techniques - a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. 
-
-Each technique can be made up of many @ref Passes, that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as ’ambient’ to set the amount & colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See @ref Passes for more details. 
-
-Within each pass, there can be zero or many @ref Texture-Units in use. These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.
-
 You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (See [GPU Program Scripts](@ref Declaring-Vertex_002fGeometry_002fFragment-Programs)) and are used as described in @ref Using-Vertex_002fGeometry_002fFragment-Programs-in-a-Pass.
 
 <a name="Top_002dlevel-material-attributes"></a>
@@ -175,7 +169,7 @@ Techniques have only a small number of attributes of their own:
 
 ## scheme
 
-Sets the ’scheme’ this Technique belongs to. Material schemes are used to control top-level switching from one set of techniques to another. For example, you might use this to define ’high’, ’medium’ and ’low’ complexity levels on materials to allow a user to pick a performance / quality ratio. Another possibility is that you have a fully HDR-enabled pipeline for top machines, rendering all objects using unclamped shaders, and a simpler pipeline for others; this can be implemented using schemes. The active scheme is typically controlled at a viewport level, and the active one defaults to ’Default’.
+Sets the ’scheme’ this Technique belongs to. Material schemes are used to control top-level switching from one set of techniques to another. For example, you might have a fully HDR-enabled pipeline for top machines, rendering all objects using unclamped shaders, and a simpler pipeline for others; this can be implemented using schemes. The active scheme is typically controlled at a viewport level, and the active one defaults to ’Default’.
 
 @par
 Format: scheme &lt;name&gt;<br> Example: scheme hdr<br> Default: scheme Default

@@ -146,7 +146,7 @@ You can also create Mesh objects manually by calling the Ogre::MeshManager::crea
 
 Mesh objects are the basis for the individual movable objects in the world, which are called @ref Entities.
 
-Mesh objects can also be animated using See @ref Skeletal-Animation.
+Mesh objects can also be animated using @ref Skeletal-Animation and @ref Vertex-Animation.
 
 # Entities {#Entities}
 
@@ -166,19 +166,23 @@ When an Ogre::Entity is created based on this Mesh, it is composed of (possibly)
 
 # Materials {#Materials}
 
-The Ogre::Material object controls how objects in the scene are rendered. It specifies what basic surface properties objects have such as reflectance of colours, shininess etc, how many texture layers are present, what images are on them and how they are blended together, what special effects are applied such as environment mapping, what culling mode is used, how the textures are filtered etc.
+The Ogre::Material is your primary tool for controlling how objects in your scene look. While the shape of an object is defined by its mesh, the material dictates everything else about its appearance. It specifies what basic surface properties objects have (like reflectance of colours, shininess etc.), texture layers (including their images, filtering, and how they are blended together), special effects (such as environment mapping), culling modes and more.
 
-Materials can either be set up programmatically, by calling Ogre::MaterialManager::create and tweaking the settings, or by specifying it in a ’script’ which is loaded at runtime. See [Material Scripts](@ref Material-Scripts) for more info.
+## Managing {#Materials-Manage}
 
-Basically everything about the appearance of an object apart from its shape is controlled by the Material class.
+The Ogre::MaterialManager manages the collection of materials available to the scene. Materials can either be set up programmatically, by calling Ogre::MaterialManager::create and tweaking the settings, or by specifying it in a ’script’ which is loaded at runtime. See @ref Material-Scripts for more info.
 
-The Ogre::MaterialManager class manages the master list of materials available to the scene. The list can be added to by the application by calling Ogre::MaterialManager::create, or by loading a Mesh (which will in turn load material properties).
+Entities automatically have Material’s associated with them if they use a Ogre::Mesh object, since the Ogre::Mesh object typically sets up its required materials on loading. You can also customise the material used by an entity as described in @ref Entities. Just create a new Material, set it up how you like (you can copy an existing material into it if you like using a standard assignment statement) and point the SubEntity entries at it using Ogre::SubEntity::setMaterial().
 
-@copydetails Ogre::MaterialManager::getDefaultSettings()
+## Structure {#Materials-Structure}
 
-You can alter these settings by calling Ogre::MaterialManager::getDefaultSettings() and making the required changes to the Material which is returned.
+A material comprises one or more @ref Techniques, which can be thought of as distinct "recipes" for rendering the material. Providing multiple techniques allows you to define lower levels of detail for materials, conserving rendering power when objects are distant or rendered as reflections.
+Furthermore, each technique can be associated with a scheme, enabling you to switch the entire rendering pipeline.
+By registering a Ogre::MaterialManager::Listener, you can even generate techniques on-the-fly for new schemes. The @ref rtss leverages this concept by adding a shader-based technique for materials that lack their own shaders.
 
-Entities automatically have Material’s associated with them if they use a Ogre::Mesh object, since the Ogre::Mesh object typically sets up its required materials on loading. You can also customise the material used by an entity as described in @ref Entities. Just create a new Material, set it up how you like (you can copy an existing material into it if you like using a standard assignment statement) and point the SubEntity entries at it using Ogre::SubEntity::setMaterialName().
+Each technique can be made up of several @ref Passes, that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Each pass has a number of top-level attributes such as ’ambient’ to set the amount & colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See @ref Passes for more details.
+
+Within each pass, there can be zero or many @ref Texture-Units in use. These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.
 
 
 
