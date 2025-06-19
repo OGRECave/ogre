@@ -529,30 +529,24 @@ void ShaderGenerator::createScheme(const String& schemeName)
     createOrRetrieveScheme(schemeName);
 }
 
-//-----------------------------------------------------------------------------
-RenderState* ShaderGenerator::getRenderState(const String& schemeName)
+ShaderGenerator::SGScheme* ShaderGenerator::getScheme(const String& name) const
 {
     OGRE_LOCK_AUTO_MUTEX;
 
-    SGSchemeIterator itFind = mSchemeEntriesMap.find(schemeName);
-
-    if (itFind == mSchemeEntriesMap.end())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-            "A scheme named'" + schemeName + "' doesn't exists.",
-            "ShaderGenerator::getRenderState");
-    }
-
-    return itFind->second->getRenderState();
+    auto itFind = mSchemeEntriesMap.find(name);
+    return itFind == mSchemeEntriesMap.end() ? nullptr : itFind->second;
 }
 
 //-----------------------------------------------------------------------------
-bool ShaderGenerator::hasRenderState(const String& schemeName) const
+RenderState* ShaderGenerator::getRenderState(const String& schemeName)
 {
-    OGRE_LOCK_AUTO_MUTEX;
+    if (auto scheme = getScheme(schemeName))
+    {
+        return scheme->getRenderState();
+    }
 
-    SGSchemeConstIterator itFind = mSchemeEntriesMap.find(schemeName);
-    return itFind != mSchemeEntriesMap.end();
+    OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "A scheme named'" + schemeName + "' doesn't exists.");
+    return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -590,18 +584,14 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName,
                                      const String& groupName,
                                      unsigned short passIndex)
 {
-    OGRE_LOCK_AUTO_MUTEX;
-
-    SGSchemeIterator itFind = mSchemeEntriesMap.find(schemeName);
-
-    if (itFind == mSchemeEntriesMap.end())
+    if (auto scheme = getScheme(schemeName))
     {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-            "A scheme named'" + schemeName + "' doesn't exists.",
-            "ShaderGenerator::getRenderState");
+        return scheme->getRenderState(materialName, groupName, passIndex);
     }
 
-    return itFind->second->getRenderState(materialName, groupName, passIndex);
+    OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "A scheme named'" + schemeName + "' doesn't exists.");
+
+    return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -826,13 +816,10 @@ bool ShaderGenerator::removeShaderBasedTechnique(const Technique* srcTech, const
     OGRE_LOCK_AUTO_MUTEX;
 
     // Make sure scheme exists.
-    SGSchemeIterator itScheme = mSchemeEntriesMap.find(dstTechniqueSchemeName);
-    SGScheme* schemeEntry = NULL;
+    SGScheme* schemeEntry = getScheme(dstTechniqueSchemeName);
 
-    if (itScheme == mSchemeEntriesMap.end())
+    if (!schemeEntry)
         return false;
-
-    schemeEntry = itScheme->second;
 
     // Find the material entry.
     Material* srcMat = srcTech->getParent();
@@ -1039,81 +1026,41 @@ void ShaderGenerator::preFindVisibleObjects(SceneManager* source,
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::invalidateScheme(const String& schemeName)
+bool ShaderGenerator::validateScheme(const String& schemeName) const
 {
-    OGRE_LOCK_AUTO_MUTEX;
+    if (auto scheme = getScheme(schemeName))
+    {
+        scheme->validate();
+        return true;
+    }
 
-    SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
-
-    if (itScheme != mSchemeEntriesMap.end())
-        itScheme->second->invalidate();
-
+    return false;
 }
 
 //-----------------------------------------------------------------------------
-bool ShaderGenerator::validateScheme(const String& schemeName)
+bool ShaderGenerator::validateMaterial(const String& schemeName, const String& materialName,
+                                       const String& groupName) const
 {
-    OGRE_LOCK_AUTO_MUTEX;
+    if (auto scheme = getScheme(schemeName))
+    {
+        scheme->validate(materialName, groupName);
+        return true;
+    }
 
-    SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
-
-    // No such scheme exists.
-    if (itScheme == mSchemeEntriesMap.end())
-        return false;
-
-    itScheme->second->validate();
-
-    return true;
+    return false;
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName)
+bool ShaderGenerator::validateMaterialIlluminationPasses(const String& schemeName, const String& materialName,
+                                                         const String& groupName) const
 {
-    OGRE_LOCK_AUTO_MUTEX;
+    if (auto scheme = getScheme(schemeName))
+    {
+        scheme->validateIlluminationPasses(materialName, groupName);
+        return true;
+    }
 
-    SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
-
-    if (itScheme != mSchemeEntriesMap.end())
-        itScheme->second->invalidate(materialName, groupName);
-}
-
-//-----------------------------------------------------------------------------
-bool ShaderGenerator::validateMaterial(const String& schemeName, const String& materialName, const String& groupName)
-{
-    OGRE_LOCK_AUTO_MUTEX;
-
-    SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
-
-    // No such scheme exists.
-    if (itScheme == mSchemeEntriesMap.end())
-        return false;
-
-    return itScheme->second->validate(materialName, groupName);
-}
-
-//-----------------------------------------------------------------------------
-void ShaderGenerator::invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName)
-{
-	OGRE_LOCK_AUTO_MUTEX;
-
-	SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
-
-	if(itScheme != mSchemeEntriesMap.end())
-		itScheme->second->invalidateIlluminationPasses(materialName, groupName);
-}
-
-//-----------------------------------------------------------------------------
-bool ShaderGenerator::validateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName)
-{
-	OGRE_LOCK_AUTO_MUTEX;
-
-	SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
-
-	// No such scheme exists.
-	if(itScheme == mSchemeEntriesMap.end())
-		return false;
-
-	return itScheme->second->validateIlluminationPasses(materialName, groupName);
+    return false;
 }
 
 //-----------------------------------------------------------------------------

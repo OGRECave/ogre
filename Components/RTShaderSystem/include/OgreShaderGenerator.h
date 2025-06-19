@@ -189,7 +189,7 @@ public:
     Tells if a given render state exists
     @param schemeName The scheme name to check.
     */
-    bool hasRenderState(const String& schemeName) const;
+    bool hasRenderState(const String& schemeName) const { return getScheme(schemeName); }
     
     /**
      Get render state of specific pass.
@@ -335,14 +335,18 @@ public:
     given scheme name.
     @param schemeName The scheme to invalidate.
     */
-    void invalidateScheme(const String& schemeName);
+    void invalidateScheme(const String& schemeName) const
+    {
+        if (auto scheme = getScheme(schemeName))
+            scheme->invalidate();
+    }
 
     /** 
     Validate a given scheme. This action will generate shader programs for all techniques of the
     given scheme name.
     @param schemeName The scheme to validate.
     */
-    bool validateScheme(const String& schemeName);
+    bool validateScheme(const String& schemeName) const;
     
     /** 
     Invalidate specific material scheme. This action will lead to shader regeneration of the technique belongs to the
@@ -351,7 +355,12 @@ public:
     @param materialName The material to invalidate.
     @param groupName The source group name. 
     */
-    void invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+    void invalidateMaterial(const String& schemeName, const String& materialName,
+                            const String& groupName OGRE_RESOURCE_GROUP_INIT) const
+    {
+        if (auto scheme = getScheme(schemeName))
+            scheme->invalidate(materialName, groupName);
+    }
 
     /// @overload
     void invalidateMaterial(const String& schemeName, const Material& mat)
@@ -366,10 +375,10 @@ public:
     @param materialName The material to validate.
     @param groupName The source group name. 
     */
-    bool validateMaterial(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+    bool validateMaterial(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT) const;
 
     /// @overload
-    void validateMaterial(const String& schemeName, const Material& mat)
+    void validateMaterial(const String& schemeName, const Material& mat) const
     {
         validateMaterial(schemeName, mat.getName(), mat.getGroup());
     }
@@ -381,16 +390,22 @@ public:
 	@param materialName The material to invalidate.
 	@param groupName The source group name.
 	*/
-    void invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+    void invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName,
+                                              const String& groupName OGRE_RESOURCE_GROUP_INIT) const
+    {
+        if (auto scheme = getScheme(schemeName))
+            scheme->invalidateIlluminationPasses(materialName, groupName);
+    }
 
-	/**
+        /**
 	Validate specific material scheme. This action will generate shader programs illumination passes of the technique of the
 	given scheme name.
 	@param schemeName The scheme to validate.
 	@param materialName The material to validate.
 	@param groupName The source group name.
 	*/
-	bool validateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName OGRE_RESOURCE_GROUP_INIT);
+    bool validateMaterialIlluminationPasses(const String& schemeName, const String& materialName,
+                                            const String& groupName OGRE_RESOURCE_GROUP_INIT) const;
 
     /** 
     Return custom material Serializer of the shader generator.
@@ -764,6 +779,8 @@ private:
 
     /** Destroy sub render state core extensions factories */
     void destroyBuiltinSRSFactories();
+
+    SGScheme* getScheme(const String& name) const;
 
     /** Create an instance of the SubRenderState based on script properties using the
     current sub render state factories.
