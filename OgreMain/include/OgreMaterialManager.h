@@ -222,7 +222,6 @@ namespace Ogre {
             - specular = ColourValue::Black
             - emissive = ColourValue::Black
             - shininess = 0 (not shiny)
-            - No texture unit settings (& hence no textures)
             - SourceBlendFactor = Ogre::SBF_ONE
             - DestBlendFactor = Ogre::SBF_ZERO (no blend, replace with new colour)
             - Depth buffer checking on
@@ -233,7 +232,7 @@ namespace Ogre {
             - Ambient lighting = ColourValue(0.5, 0.5, 0.5) (mid-grey)
             - Dynamic lighting enabled
             - Gourad shading mode
-            - Bilinear texture filtering
+            - No texture unit settings (& hence no textures)
         */
         virtual MaterialPtr getDefaultSettings(void) const { return mDefaultSettings; }
 
