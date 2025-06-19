@@ -1,4 +1,5 @@
 [![GitHub release](https://img.shields.io/github/release/ogrecave/ogre.svg)](https://github.com/OGRECave/ogre/releases/latest)
+[![CI Build](https://github.com/OGRECave/ogre/actions/workflows/ci-build.yml/badge.svg)](https://github.com/OGRECave/ogre/actions/workflows/ci-build.yml)
 [![Downloads](https://static.pepy.tech/badge/ogre-python)](https://pepy.tech/project/ogre-python)
 [![Join the chat at https://gitter.im/OGRECave/ogre](https://badges.gitter.im/OGRECave/ogre.svg)](https://gitter.im/OGRECave/ogre?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Patreon](https://img.shields.io/badge/patreon-donate-blue.svg)](https://www.patreon.com/ogre1)
@@ -84,12 +85,6 @@ We believe in the power of collaboration. Whether you're a seasoned developer or
 * **Ask a question** in our [Forums](http://forums.ogre3d.org/) or on [Gitter](https://gitter.im/OGRECave/ogre).
 * **Contribute to the engine** by creating a [pull request](https://github.com/OGRECave/ogre/pulls). We welcome everything from bug fixes and documentation to new features.
 * **Support the project** via [Patreon](https://www.patreon.com/ogre1) to help fund continued development.
-
-
-| Build | Status |
-|-------|-----------------|
-| Linux, OSX, Android, iOS | [![CI Build](https://github.com/OGRECave/ogre/actions/workflows/ci-build.yml/badge.svg)](https://github.com/OGRECave/ogre/actions/workflows/ci-build.yml) |
-| MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master) |
 
 ## Licensing
 OGRE is licensed under the **MIT License**. Please see the [full license documentation](Docs/License.md) for details.
