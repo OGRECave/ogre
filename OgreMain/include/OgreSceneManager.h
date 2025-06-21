@@ -3368,9 +3368,9 @@ namespace Ogre {
         /** Handle LOD events. */
         void _handleLodEvents();
 
-        IlluminationRenderStage _getCurrentRenderStage() {return mIlluminationStage;}
+        IlluminationRenderStage _getCurrentRenderStage() const {return mIlluminationStage;}
 
-        const AutoParamDataSource* _getAutoParamDataSource() { return mAutoParamDataSource.get(); }
+        const AutoParamDataSource* _getAutoParamDataSource() const { return mAutoParamDataSource.get(); }
     };
 
     /// Interface for visualising debugging the SceneManager state
