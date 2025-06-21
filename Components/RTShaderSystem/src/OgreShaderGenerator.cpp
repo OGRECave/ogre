@@ -723,10 +723,9 @@ static bool hasFixedFunctionPass(Technique* tech)
 static Technique* findSourceTechnique(const Material& mat, const String& srcTechniqueSchemeName, bool overProgrammable)
 {
     // Find the source technique
-    for (auto *t : mat.getTechniques())
+    for (auto *t : mat.getSupportedTechniques())
     {
-        if (t->getSchemeName() == srcTechniqueSchemeName && t->isSupported() &&
-            (hasFixedFunctionPass(t) || overProgrammable))
+        if (t->getSchemeName() == srcTechniqueSchemeName && (hasFixedFunctionPass(t) || overProgrammable))
         {
             return t;
         }
