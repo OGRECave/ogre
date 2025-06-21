@@ -3531,7 +3531,7 @@ namespace Ogre
             // create
             mCompositeMap = TextureManager::getSingleton().createManual(
                 mMaterialName + "/comp", _getDerivedResourceGroup(), 
-                TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, 0, PF_BYTE_RGBA, TU_STATIC);
+                TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, MIP_DEFAULT, PF_BYTE_RGBA);
 
             mCompositeMapSizeActual = mCompositeMap->getWidth();
 
