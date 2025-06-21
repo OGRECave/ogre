@@ -106,6 +106,7 @@ void ImGuiOverlay::ImGUIRenderable::createMaterial()
     TextureUnitState* mTexUnit = mPass->createTextureUnitState();
     mTexUnit->setTexture(mFontTex);
     mTexUnit->setTextureFiltering(TFO_NONE);
+    mTexUnit->setTextureAddressingMode(TAM_CLAMP);
 
     mMaterial->load();
     mMaterial->setLightingEnabled(false);
