@@ -4,6 +4,10 @@
 // SPDX-License-Identifier: MIT
 
 #include "OgreBullet.h"
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+#include "OgreTerrain.h"
+#include "OgreTerrainGroup.h"
+#endif
 
 namespace Ogre
 {
@@ -96,6 +100,37 @@ btCompoundShape* createCompoundShape()
 {
 	return new btCompoundShape;
 }
+
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+/// create height field collider
+btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain, struct HeightFieldData *data)
+{
+    int i;
+    uint16 size = terrain->getSize();
+    float *heightData = terrain->getHeightData();
+    /* need to flip terrain data */
+
+    data->terrainHeights = new float[size * size];
+    for (i = 0; i < size; i++) {
+        memcpy(data->terrainHeights + size * i,
+            heightData + size * (size - i - 1),
+            sizeof(float) * size);
+    }
+    Real minHeight = terrain->getMinHeight();
+    Real maxHeight = terrain->getMaxHeight();
+    data->bodyPosition = terrain->getPosition();
+    Real worldSize = terrain->getWorldSize();
+    float scaled = worldSize / (size - 1);
+    btVector3 localScale(scaled, 1.0f, scaled);
+    btHeightfieldTerrainShape *shape = new btHeightfieldTerrainShape((int)size, (int)size,
+                                        data->terrainHeights, 1, minHeight, maxHeight,
+                                        1, PHY_FLOAT, true);
+    data->bodyPosition.y += (maxHeight + minHeight) / 2.0f;
+    shape->setUseDiamondSubdivision(true);
+    shape->setLocalScaling(localScale);
+    return shape;
+}
+#endif
 
 struct EntityCollisionListener
 {
@@ -299,6 +334,49 @@ btRigidBody* DynamicsWorld::addKinematicRigidBody(Entity* ent, ColliderType ct, 
     rb->setActivationState(DISABLE_DEACTIVATION);
     return rb;
 }
+
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+class TerrainRigidBody: public RigidBody
+{
+    HeightFieldData hfdata;
+public:
+    TerrainRigidBody(btCollisionObject* btBody, btCollisionWorld* btWorld, const HeightFieldData &data)
+        : RigidBody(btBody, btWorld), hfdata(data) {}
+    ~TerrainRigidBody()
+    {
+        delete hfdata.terrainHeights;
+    }
+};
+btRigidBody* DynamicsWorld::addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group, int mask)
+{
+    Terrain* terrain = terrainGroup->getTerrain(x, y);
+    OgreAssert(terrain && terrain->getHeightData() && terrain->isLoaded(), "invalid terrain supplied");
+    return addTerrainRigidBody(terrain, group, mask);
+}
+btRigidBody* DynamicsWorld::addTerrainRigidBody(Terrain* terrain, int group, int mask)
+{
+    btVector3 inertia(0, 0, 0);
+    HeightFieldData hfdata;
+    OgreAssert(terrain && terrain->getHeightData() && terrain->isLoaded(), "invalid terrain supplied");
+    btHeightfieldTerrainShape* shape = createHeightfieldTerrainShape(terrain, &hfdata);
+    /* FIXME: destroy this node when terrain chunk is destroyed */
+    SceneNode* node =
+        terrain->getSceneManager()->getRootSceneNode()->createChildSceneNode(hfdata.bodyPosition, Quaternion::IDENTITY);
+    RigidBodyState* state = new RigidBodyState(node);
+    auto rb = new btRigidBody(0, state, shape, inertia);
+    getBtWorld()->addRigidBody(rb, group, mask);
+    rb->setUserPointer(new EntityCollisionListener{nullptr, nullptr});
+
+    // transfer ownership to node
+    auto objWrapper = std::make_shared<TerrainRigidBody>(rb, mBtWorld, hfdata);
+    node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
+    rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+    rb->getWorldTransform().setOrigin(convert(hfdata.bodyPosition));
+    rb->getWorldTransform().setRotation(convert(Quaternion::IDENTITY));
+
+    return rb;
+}
+#endif
 
 btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType ct, int group, int mask)
 {

@@ -12,9 +12,12 @@
 #include "Ogre.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
+#include "BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 
 namespace Ogre
 {
+class TerrainGroup;
+class Terrain;
 namespace Bullet
 {
 
@@ -81,6 +84,19 @@ _OgreBulletExport btBvhTriangleMeshShape* createTrimeshCollider(const Entity* en
 _OgreBulletExport btConvexHullShape* createConvexHullCollider(const Entity* ent);
 /// create compound shape
 _OgreBulletExport btCompoundShape* createCompoundShape();
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+/// height field data
+struct HeightFieldData {
+    /** the position for a center of the shape, i.e. where to place btRigidBody
+     *  or a child of btCompoundShape */
+    Vector3 bodyPosition;
+    /** a heightfield pointer to be freed when
+     * btHeightfieldTerrainShape is freed */
+    float *terrainHeights;
+};
+/// create height field collider
+_OgreBulletExport btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain, struct HeightFieldData *data);
+#endif
 
 struct _OgreBulletExport CollisionListener
 {
@@ -166,6 +182,17 @@ public:
     btRigidBody* addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener = nullptr,
                               int group = 1, int mask = -1);
     btRigidBody* addKinematicRigidBody(Entity* ent, ColliderType ct, int group = 1, int mask = -1);
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+    /** Add static body for Ogre terrain
+     * @param terrainGroup the TerrainGroup of the terrain
+     * @param x x coordinate of the terrain slot
+     * @param y y coordinate of the terrain slot
+     * @param group the collision group
+     * @param mask the collision mask
+     */
+    btRigidBody* addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group = 1, int mask = -1);
+    btRigidBody* addTerrainRigidBody(Terrain* terrain, int group = 1, int mask = -1);
+#endif
     void attachRigidBody(btRigidBody *rigidBody, Entity *ent, CollisionListener* listener = nullptr,
                               int group = 1, int mask = -1);
     btDynamicsWorld* getBtWorld() const { return static_cast<btDynamicsWorld*>(mBtWorld); }
