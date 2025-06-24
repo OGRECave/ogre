@@ -101,10 +101,11 @@ btCompoundShape* createCompoundShape()
 	return new btCompoundShape;
 }
 
-#ifdef OGRE_BUILD_COMPONENT_TERRAIN
 /// create height field collider
 btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain, struct HeightFieldData *data)
 {
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+    OgreAssert(terrain && terrain->getHeightData() && terrain->isLoaded(), "invalid terrain supplied");
     int i;
     uint16 size = terrain->getSize();
     float *heightData = terrain->getHeightData();
@@ -129,8 +130,12 @@ btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain,
     shape->setUseDiamondSubdivision(true);
     shape->setLocalScaling(localScale);
     return shape;
-}
+#else
+    OgreAssert(false, "OGRE must be built with the Terrain component");
+    return nullptr;
 #endif
+}
+
 
 struct EntityCollisionListener
 {
@@ -335,7 +340,6 @@ btRigidBody* DynamicsWorld::addKinematicRigidBody(Entity* ent, ColliderType ct, 
     return rb;
 }
 
-#ifdef OGRE_BUILD_COMPONENT_TERRAIN
 class TerrainRigidBody: public RigidBody
 {
     HeightFieldData hfdata;
@@ -349,15 +353,16 @@ public:
 };
 btRigidBody* DynamicsWorld::addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group, int mask)
 {
-    Terrain* terrain = terrainGroup->getTerrain(x, y);
-    OgreAssert(terrain && terrain->getHeightData() && terrain->isLoaded(), "invalid terrain supplied");
+    Terrain* terrain = nullptr;
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
+    terrain = terrainGroup->getTerrain(x, y);
+#endif
     return addTerrainRigidBody(terrain, group, mask);
 }
 btRigidBody* DynamicsWorld::addTerrainRigidBody(Terrain* terrain, int group, int mask)
 {
     btVector3 inertia(0, 0, 0);
     HeightFieldData hfdata;
-    OgreAssert(terrain && terrain->getHeightData() && terrain->isLoaded(), "invalid terrain supplied");
     btHeightfieldTerrainShape* shape = createHeightfieldTerrainShape(terrain, &hfdata);
     /* FIXME: destroy this node when terrain chunk is destroyed */
     SceneNode* node =
@@ -376,7 +381,6 @@ btRigidBody* DynamicsWorld::addTerrainRigidBody(Terrain* terrain, int group, int
 
     return rb;
 }
-#endif
 
 btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType ct, int group, int mask)
 {
