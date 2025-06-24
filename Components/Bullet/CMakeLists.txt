@@ -3,6 +3,9 @@ set(HEADER_FILES
   ${PROJECT_BINARY_DIR}/include/OgreBulletExports.h)
 
 add_library(OgreBullet ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} src/OgreBullet.cpp)
+if (OGRE_BUILD_COMPONENT_TERRAIN)
+  target_link_libraries(OgreBullet PUBLIC OgreTerrain)
+endif()
 target_link_libraries(OgreBullet PUBLIC OgreMain)
 target_include_directories(OgreBullet PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
