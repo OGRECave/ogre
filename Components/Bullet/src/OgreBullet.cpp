@@ -361,12 +361,13 @@ btRigidBody* DynamicsWorld::addTerrainRigidBody(TerrainGroup* terrainGroup, long
 }
 btRigidBody* DynamicsWorld::addTerrainRigidBody(Terrain* terrain, int group, int mask)
 {
+#ifdef OGRE_BUILD_COMPONENT_TERRAIN
     btVector3 inertia(0, 0, 0);
     HeightFieldData hfdata;
     btHeightfieldTerrainShape* shape = createHeightfieldTerrainShape(terrain, &hfdata);
     /* FIXME: destroy this node when terrain chunk is destroyed */
-    SceneNode* node =
-        terrain->getSceneManager()->getRootSceneNode()->createChildSceneNode(hfdata.bodyPosition, Quaternion::IDENTITY);
+    Ogre::Vector3 positionOffset = hfdata.bodyPosition - terrain->getPosition();
+    SceneNode* node = terrain->_getRootSceneNode()->createChildSceneNode(positionOffset, Quaternion::IDENTITY);
     RigidBodyState* state = new RigidBodyState(node);
     auto rb = new btRigidBody(0, state, shape, inertia);
     getBtWorld()->addRigidBody(rb, group, mask);
@@ -380,6 +381,10 @@ btRigidBody* DynamicsWorld::addTerrainRigidBody(Terrain* terrain, int group, int
     rb->getWorldTransform().setRotation(convert(Quaternion::IDENTITY));
 
     return rb;
+#else
+    OgreAssert(false, "OGRE must be built with the Terrain component");
+    return nullptr;
+#endif
 }
 
 btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType ct, int group, int mask)

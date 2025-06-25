@@ -190,6 +190,11 @@ public:
      * @param mask the collision mask
      */
     btRigidBody* addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group = 1, int mask = -1);
+    /** Add static body for Ogre terrain
+     * @param terrain the terrain
+     * @param group the collision group
+     * @param mask the collision mask
+     */
     btRigidBody* addTerrainRigidBody(Terrain* terrain, int group = 1, int mask = -1);
 
     void attachRigidBody(btRigidBody *rigidBody, Entity *ent, CollisionListener* listener = nullptr,
