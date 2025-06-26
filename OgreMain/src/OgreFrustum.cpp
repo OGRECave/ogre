@@ -101,6 +101,16 @@ namespace Ogre {
     void Frustum::setNearClipDistance(float nearPlane)
     {
         OgreAssert(nearPlane > 0, "Invalid clip distance");
+
+        if(mFrustumExtentsManuallySet && mNearDist != nearPlane)
+        {
+            auto ratio = nearPlane / mNearDist;
+            mExtents.left *= ratio;
+            mExtents.right *= ratio;
+            mExtents.top *= ratio;
+            mExtents.bottom *= ratio;
+        }
+
         mNearDist = nearPlane;
         invalidateFrustum();
     }
