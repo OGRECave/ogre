@@ -84,7 +84,7 @@ class _Application(Ogre.Bites.ApplicationContext):
             rgm.addResourceLocation(".", "FileSystem", Ogre.RGN_DEFAULT, True)
 
         for loc in user_resource_locations:
-            rgm.addResourceLocation(loc, "FileSystem", Ogre.RGN_DEFAULT)
+            rgm.addResourceLocation(str(loc), "FileSystem", Ogre.RGN_DEFAULT)
 
     def oneTimeConfig(self):
         self.getRoot().restoreConfig()
