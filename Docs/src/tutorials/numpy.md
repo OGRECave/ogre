@@ -1,9 +1,54 @@
-# Working with NumPy {#working-with-numpy}
+# Working with Python {#working-with-numpy}
 
-Ogre includes a Python component which automatically generates Python bindings from the C++ headers.
-However, with Python, you most likely do not only want to just use Ogre, but connect it to other components.
-For this, the Component uses standard python protocols, that offer exposing the API in a pythonic way.
-In this tutorial, we will look how %Ogre integrates with numpy.
+%Ogre features a %Python component that automatically generates bindings from the C++ headers. This allows you to use Ogre in your %Python code with an API that largely mirrors the C++ API, meaning you can often refer to the existing C++ documentation and tutorials.
+
+Beyond this direct mapping, the bindings also support standard %Python protocols. This enables a more "pythonic" workflow, especially when integrating with other libraries like NumPy.
+
+Additionally, %Ogre provides a high-level API called HighPy, designed for convenience and rapid development by abstracting away many of the engine's lower-level details.
+
+@tableofcontents
+
+# HighPy: A High-Level API {#python-highpy}
+
+The HighPy module transforms %Ogre into a lightweight %Python renderer. As its name suggests, HighPy provides a high-level API that lets you get started quickly, even without extensive prior knowledge of the %Ogre internals.
+
+For instance, rendering a mesh is as simple as:
+```py
+import Ogre.HighPy as ohi
+
+# Add the path to your mesh files
+ohi.user_resource_locations.add("your/meshes/path")
+
+# Create a window and display the mesh
+ohi.window_create("ohi_world", (800, 600))
+ohi.mesh_show("ohi_world", "DamagedHelmet.glb", position=(0, 0, -3))
+
+# Start the rendering loop
+while ohi.window_draw("ohi_world") != 27: pass
+```
+
+Want to display a background image? It's just one line:
+```py
+ohi.imshow("ohi_world", "image.png")
+```
+
+Integrating an ImGui-based user interface is also straightforward. Simply define a callback and enable ImGui for your window:
+
+```py
+import Ogre.ImGui as ImGui
+
+def ui_callback():
+    ImGui.ShowDemoWindow()
+
+ohi.window_use_imgui("ohi_world", ui_callback)
+```
+
+For all details, please refer to the Python.HighPy module documentation.
+
+# NumPy Interoperability {#python-numpy}
+
+The %Python bindings support the standard python protocols.
+In this tutorial, we will look how we can advantage of this to achieve numpy Interoperability in a pythonic way.
 
 @note this tutorial can be [run live in Google Colab here](https://colab.research.google.com/github/OGRECave/ogre/blob/master/Samples/Python/numpy_sample.ipynb).
 
@@ -44,10 +89,12 @@ Now we can store the image to disk using pyplot.
 
 ![](numpy_final.png)
 
-## Background Threads {#python-background-threads}
+# Running Background Threads {#python-background-threads}
 
-By default, the Python bindings do not release the GIL (Global Interpreter Lock) during rendering, which means that no other Python code can run in parallel.
-This is usually not a problem and constantly re-acquiring the GIL would reduce performance. However, this means that the following code will not work:
+By default, the Python bindings do not release the GIL (Global Interpreter Lock) during rendering.
+This design choice prioritizes performance by avoiding the overhead of constantly re-acquiring the GIL. However, it means that other Python threads will be blocked and unable to run concurrently with the rendering loop.
+
+For example, the following code will not work as you might expect:
 
 ```py
 import threading
@@ -61,4 +108,5 @@ root.startRendering()
 ```
 
 The "printer" Thread will be blocked until the rendering is finished.
-To allow background threads to run, you can use `root.allowPyThread()`, which will release the GIL during swapping, while rendering is waiting for vsync.
+
+To enable background threads to run, you can call `root.allowPyThread()`. This will instruct Ogre to release the GIL while waiting for vsync, allowing other Python threads to run during this idle time.
