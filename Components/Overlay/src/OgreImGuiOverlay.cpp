@@ -87,7 +87,7 @@ void ImGuiOverlay::initialise()
 //-----------------------------------------------------------------------------------
 void ImGuiOverlay::_findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp)
 {
-    if (!mVisible)
+    if (!mInitialised)
         return;
 
     mRenderable._update();
@@ -200,6 +200,10 @@ void ImGuiOverlay::ImGUIRenderable::_update()
         mMaterial->load(); // Support for adding lights run time
     }
 
+    ImGui::Render();
+    ImDrawData* draw_data = ImGui::GetDrawData();
+    updateVertexData(draw_data);
+
     RenderSystem* rSys = Root::getSingleton().getRenderSystem();
 
     // Construct projection matrix, taking texel offset corrections in account (important for DirectX9)
@@ -226,18 +230,15 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
     // Instruct ImGui to Render() and process the resulting CmdList-s
     // Adopted from https://bitbucket.org/ChaosCreator/imgui-ogre2.1-binding
     // ... Commentary on OGRE forums: http://www.ogre3d.org/forums/viewtopic.php?f=5&t=89081#p531059
-    ImGui::Render();
-    ImDrawData* draw_data = ImGui::GetDrawData();
     int vpWidth = vp->getActualWidth();
     int vpHeight = vp->getActualHeight();
 
     TextureUnitState* tu = mMaterial->getBestTechnique()->getPass(0)->getTextureUnitState(0);
 
-    updateVertexData(draw_data);
-
     mRenderOp.indexData->indexStart = 0;
     mRenderOp.vertexData->vertexStart = 0;
 
+    ImDrawData* draw_data = ImGui::GetDrawData();
     for (int i = 0; i < draw_data->CmdListsCount; ++i)
     {
         const ImDrawList* draw_list = draw_data->CmdLists[i];
@@ -255,10 +256,9 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
             // Clamp bounds to viewport dimensions
             scissor = scissor.intersect(Rect(0, 0, vpWidth, vpHeight));
 
-            if (drawCmd->TextureId)
+            if (auto handle = drawCmd->GetTexID())
             {
-                auto handle = (ResourceHandle)drawCmd->TextureId;
-                auto tex = static_pointer_cast<Texture>(TextureManager::getSingleton().getByHandle(handle));
+                auto tex = static_pointer_cast<Texture>(TextureManager::getSingleton().getByHandle((ResourceHandle)handle));
                 if (tex)
                 {
                     rsys->_setTexture(0, true, tex);
@@ -273,7 +273,7 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
 
             rsys->_render(mRenderOp);
 
-            if (drawCmd->TextureId)
+            if (drawCmd->GetTexID())
             {
                 // reset to pass state
                 rsys->_setTexture(0, true, mFontTex);
