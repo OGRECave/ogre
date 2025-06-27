@@ -34,7 +34,7 @@ public:
         auto imguiOverlay = mContext->initialiseImGui();
 
         float vpScale = OverlayManager::getSingleton().getPixelRatio();
-        ImGui::GetIO().FontGlobalScale = std::round(vpScale); // default font does not work with fractional scaling
+        ImGui::GetStyle().FontScaleMain = vpScale;
 
         imguiOverlay->setZOrder(300);
         imguiOverlay->show();
