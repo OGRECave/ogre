@@ -39,6 +39,18 @@
     $1 = true; // actual check in the typemap
 }
 
+%typemap(in) ImTextureRef {
+    size_t argp;
+    int res = SWIG_AsVal_size_t($input, &argp);
+    if(SWIG_IsOK(res))
+        $1 = $ltype((ImTextureID)argp);
+    else
+        %argument_fail(SWIG_TypeError, "size_t", $symname, $argnum);
+}
+%typecheck(SWIG_TYPECHECK_POINTER) ImTextureRef {
+    $1 = true; // actual check in the typemap
+}
+
 %typemap(in) float[4], float[3], float[2] {
     void* argp;
     int res = SWIG_ConvertPtr($input, &argp, $descriptor(ImVec4*), $disown);
