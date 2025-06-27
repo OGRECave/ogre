@@ -26,6 +26,10 @@
 // not needed in high level languages
 %ignore ImGuiTextBuffer;
 
+#ifdef SWIGCSHARP
+%ignore ImDrawFlags_InvalidMask_;
+#endif
+
 #ifdef SWIGPYTHON
 %typemap(in) ImTextureID {
     size_t argp;
