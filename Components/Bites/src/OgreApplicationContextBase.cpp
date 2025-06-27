@@ -306,7 +306,7 @@ void ApplicationContextBase::runRenderingSettingsDialog()
     float vpScale = getDisplayDPI()/96;
     Ogre::OverlayManager::getSingleton().setPixelRatio(vpScale);
     auto overlay = initialiseImGui();
-    ImGui::GetIO().FontGlobalScale = std::round(vpScale); // default font does not work with fractional scaling
+    ImGui::GetStyle().FontScaleMain = std::round(vpScale); // default font does not work with fractional scaling
     overlay->show();
 
     addInputListener(getImGuiInputListener());
