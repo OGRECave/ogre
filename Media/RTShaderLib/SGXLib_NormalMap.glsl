@@ -70,7 +70,7 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 
 #ifndef POM_LAYER_COUNT
 	//Simple parallax mapping
-	float height = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
+	float height = 1.0 - texture2D(normalHeightMap, newTexCoord).a;
 
 	#ifndef TERRAIN_PARALLAX_MAPPING
 		vec2 p = eyeVec.xy / eyeVec.z * (height * heightScale);
@@ -92,7 +92,7 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 	vec2 parallaxShift = (eyeVec.xy) * heightScale;
 	vec2 deltaTexCoords = parallaxShift / float(POM_LAYER_COUNT);
 
-	float currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
+	float currentDepthMapValue = 1.0 - texture2D(normalHeightMap, newTexCoord).a;
 
 	//Loop through layers and break early if match found.
 	for (int currentLayerId = 0; currentLayerId < POM_LAYER_COUNT; currentLayerId++)
@@ -101,7 +101,7 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 		newTexCoord -= deltaTexCoords;
 
 		// get depthmap value at current texture coordinates
-		currentDepthMapValue = 1.0f - texture2D(normalHeightMap, newTexCoord).a;
+		currentDepthMapValue = 1.0 - texture2D(normalHeightMap, newTexCoord).a;
 
 		//Break if layer height matched
 		if (currentLayerDepth > currentDepthMapValue)
@@ -116,7 +116,7 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 
 	// get depth after and before collision for linear interpolation
 	float afterDepth  = currentDepthMapValue - currentLayerDepth;
-	float beforeDepth = (1.0f - texture2D(normalHeightMap, prevTexCoords).a) - currentLayerDepth + layerDepth;
+	float beforeDepth = (1.0 - texture2D(normalHeightMap, prevTexCoords).a) - currentLayerDepth + layerDepth;
 
 	// interpolation of texture coordinates
 	float weight = afterDepth / (afterDepth - beforeDepth);
