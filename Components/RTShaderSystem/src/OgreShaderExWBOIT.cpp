@@ -24,6 +24,11 @@ int WBOIT::getExecutionOrder() const { return FFP_POST_PROCESS; }
 
 bool WBOIT::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
+    // requires GLES3
+    if (ShaderGenerator::getSingleton().getTargetLanguage() == "glsles" &&
+        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es"))
+        return false;
+
     dstPass->setTransparentSortingEnabled(false);
     dstPass->setSeparateSceneBlending(SBF_ONE, SBF_ONE, SBF_ZERO, SBF_ONE_MINUS_SOURCE_ALPHA);
     return true;

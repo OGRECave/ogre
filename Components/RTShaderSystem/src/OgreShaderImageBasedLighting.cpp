@@ -49,6 +49,12 @@ bool ImageBasedLighting::preAddToRenderState(const RenderState* renderState, Pas
 {
     if (!srcPass->getLightingEnabled())
         return false;
+
+    // requires GLES3
+    if (ShaderGenerator::getSingleton().getTargetLanguage() == "glsles" &&
+        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es"))
+        return false;
+
     // generate with ./cmgen --size=64 --ibl-dfg-multiscatter --ibl-dfg=dfgLUTmultiscatter.dds
     // see https://github.com/google/filament/blob/78554d231947bae965492eb5c47ad24a8d4a426e/filament/CMakeLists.txt#L510
     auto tus = dstPass->createTextureUnitState("dfgLUTmultiscatter.dds");
