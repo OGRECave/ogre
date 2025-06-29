@@ -124,6 +124,7 @@ bool TerrainSurface::preAddToRenderState(const RenderState* renderState, Pass* s
 
     SamplerPtr clampSampler = TextureManager::getSingleton().createSampler();
     clampSampler->setAddressingMode(TAM_CLAMP);
+    clampSampler->setFiltering(FT_MIP, FO_NONE);
 
     auto tu = dstPass->createTextureUnitState();
     tu->setTexture(mTerrain->getTerrainNormalMap());
