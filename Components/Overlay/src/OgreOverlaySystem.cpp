@@ -127,7 +127,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OverlaySystem::renderQueueStarted(uint8 queueGroupId, const String& cameraName, bool& skipThisInvocation)
     {
-        if(queueGroupId == Ogre::RENDER_QUEUE_OVERLAY)
+        if(queueGroupId == Ogre::RENDER_QUEUE_BACKGROUND)
         {
             Ogre::Viewport* vp = Ogre::Root::getSingletonPtr()->getRenderSystem()->_getViewport();
             if(vp != NULL)
