@@ -51,6 +51,8 @@ namespace Ogre {
     _OgreExport extern const String MSN_DEFAULT;
     /// Material scheme of the shader generator
     _OgreExport extern const String MSN_SHADERGEN;
+    /// Material scheme for shadow casters
+    _OgreExport extern const String MSN_SHADOWCASTER;
 
     /** Class for managing Material settings for %Ogre.
 
