@@ -104,7 +104,7 @@ namespace Ogre
                 String targName = StringUtil::format("Ogre/ShadowTexture%zu", mCount++);
                 TexturePtr shadowTex = TextureManager::getSingleton().createManual(
                     targName, RGN_INTERNAL, config.type, config.width, config.height, config.depth, 0, config.format,
-                    TU_RENDERTARGET, NULL, false, config.fsaa);
+                    TU_RENDERTARGET | config.extraFlags, NULL, false, config.fsaa);
                 OgreAssert(shadowTex, "Unsupported shadow texture configuration");
                 // Ensure texture loaded
                 shadowTex->load();

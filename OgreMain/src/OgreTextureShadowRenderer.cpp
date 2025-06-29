@@ -480,6 +480,36 @@ void SceneManager::TextureShadowRenderer::destroyShadowTextures(void)
     mShadowTextureConfigDirty = true;
 }
 //---------------------------------------------------------------------
+void SceneManager::TextureShadowRenderer::prepareTexCam(Camera* texCam, Camera* cam, Viewport* vp, Light* light,
+                                                        size_t j)
+{
+    // Associate main view camera as LOD camera
+    texCam->setLodCamera(cam);
+    // set base
+    if (light->getType() != Light::LT_POINT)
+    {
+#ifdef OGRE_NODELESS_POSITIONING
+        texCam->getParentSceneNode()->setDirection(light->getDerivedDirection(), Node::TS_WORLD);
+#else
+        texCam->getParentSceneNode()->setOrientation(light->getParentNode()->_getDerivedOrientation());
+#endif
+    }
+    if (light->getType() != Light::LT_DIRECTIONAL)
+        texCam->getParentSceneNode()->setPosition(light->getDerivedPosition());
+
+    // update shadow cam - light mapping
+    ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find(texCam);
+    assert(camLightIt != mShadowCamLightMapping.end());
+    camLightIt->second = light;
+
+    if (!light->getCustomShadowCameraSetup())
+        mDefaultShadowCameraSetup->getShadowCamera(mSceneManager, cam, vp, light, texCam, j);
+    else
+        light->getCustomShadowCameraSetup()->getShadowCamera(mSceneManager, cam, vp, light, texCam, j);
+
+    // Fire shadow caster update, callee can alter camera settings
+    fireShadowTexturesPreCaster(light, texCam, j);
+}
 void SceneManager::TextureShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
     // create shadow textures if needed
@@ -547,20 +577,6 @@ void SceneManager::TextureShadowRenderer::prepareShadowTextures(Camera* cam, Vie
             // rebind camera, incase another SM in use which has switched to its cam
             shadowView->setCamera(texCam);
 
-            // Associate main view camera as LOD camera
-            texCam->setLodCamera(cam);
-            // set base
-            if (light->getType() != Light::LT_POINT)
-            {
-#ifdef OGRE_NODELESS_POSITIONING
-                texCam->getParentSceneNode()->setDirection(light->getDerivedDirection(), Node::TS_WORLD);
-#else
-                texCam->getParentSceneNode()->setOrientation(light->getParentNode()->_getDerivedOrientation());
-#endif
-            }
-            if (light->getType() != Light::LT_DIRECTIONAL)
-                texCam->getParentSceneNode()->setPosition(light->getDerivedPosition());
-
             // also update culling camera
             auto cullCam = dynamic_cast<Camera*>(texCam->getCullingFrustum());
             cullCam->_notifyViewport(shadowView);
@@ -573,23 +589,27 @@ void SceneManager::TextureShadowRenderer::prepareShadowTextures(Camera* cam, Vie
             // Set the viewport visibility flags
             shadowView->setVisibilityMask(light->getLightMask() & vp->getVisibilityMask());
 
-            // update shadow cam - light mapping
-            ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
-            assert(camLightIt != mShadowCamLightMapping.end());
-            camLightIt->second = light;
+            bool allLayers = shadowTex->getUsage() & TU_TARGET_ALL_LAYERS;
+            size_t layers = std::max(shadowTex->getDepth(), shadowTex->getNumFaces());
 
-            if (!light->getCustomShadowCameraSetup())
-                mDefaultShadowCameraSetup->getShadowCamera(mSceneManager, cam, vp, light, texCam, j);
-            else
-                light->getCustomShadowCameraSetup()->getShadowCamera(mSceneManager, cam, vp, light, texCam, j);
-
-            // Fire shadow caster update, callee can alter camera settings
-            fireShadowTexturesPreCaster(light, texCam, j);
+            prepareTexCam(texCam, cam, vp, light, j);
+            if(allLayers && layers <= textureCountPerLight)
+            {
+                std::vector<const Camera*> cams = {texCam};
+                j++;
+                for(; j < layers; ++j)
+                {
+                    texCam = *(++ci); // next camera
+                    texCam->_notifyViewport(shadowView);
+                    prepareTexCam(texCam, cam, vp, light, j);
+                    cams.push_back(texCam);
+                }
+                mSceneManager->setVPRTCameras(cams);
+            }
 
             // Update target
             shadowRTT->update();
 
-            size_t layers = std::max(shadowTex->getDepth(), shadowTex->getNumFaces());
             if((j + 1) >= layers)
                 ++si; // next shadow texture
             ++ci; // next camera
