@@ -2470,7 +2470,8 @@ void SceneManager::setViewport(Viewport* vp)
     // Set the active material scheme for this viewport
     MaterialManager::getSingleton().setActiveScheme(vp->getMaterialScheme());
 
-    mSchemeInstancingData = mDestRenderSystem->getSchemeInstancingData(vp->getMaterialScheme());
+    auto instancingScheme = mIlluminationStage == IRS_RENDER_TO_TEXTURE ? MSN_SHADOWCASTER : vp->getMaterialScheme();
+    mSchemeInstancingData = mDestRenderSystem->getSchemeInstancingData(instancingScheme);
 }
 //---------------------------------------------------------------------
 void SceneManager::showBoundingBoxes(bool bShow)

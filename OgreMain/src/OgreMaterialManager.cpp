@@ -32,6 +32,7 @@ THE SOFTWARE.
 namespace Ogre {
     const String MSN_DEFAULT = "Default";
     const String MSN_SHADERGEN = "ShaderGeneratorDefaultScheme";
+    const String MSN_SHADOWCASTER = "ShadowCaster";
 
     //-----------------------------------------------------------------------
     template<> MaterialManager* Singleton<MaterialManager>::msSingleton = 0;
