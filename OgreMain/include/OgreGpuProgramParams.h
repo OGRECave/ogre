@@ -715,6 +715,8 @@ namespace Ogre {
                 matrices.
             */
             ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX,
+            /// For layered rendering: The current world, view & projection matrices concatenated
+            ACT_WORLDVIEWPROJ_MATRIX_ARRAY,
 
             // render target related values
             /** -1 if requires texture flipping, +1 otherwise. It's useful when you bypassed

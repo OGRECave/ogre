@@ -77,7 +77,6 @@ void ShaderExInstancedViewports::copyFrom(const SubRenderState& rhs)
     // Copy all settings that affect this sub render state output code.
     mViewportGrid = rhsInstancedViewports.mViewportGrid;
     mMonitorsCountChanged = rhsInstancedViewports.mMonitorsCountChanged;
-    mCameras = rhsInstancedViewports.mCameras;
     mLayeredTarget = rhsInstancedViewports.mLayeredTarget;
     mSchemeName = rhsInstancedViewports.mSchemeName;
 }
@@ -92,9 +91,6 @@ bool ShaderExInstancedViewports::preAddToRenderState( const RenderState* renderS
 
 bool ShaderExInstancedViewports::createCpuSubPrograms(ProgramSet* programSet)
 {
-    OgreAssert(mCameras.size() == mViewportGrid.x * mViewportGrid.y,
-               "Number of cameras must match the number of viewports");
-
     Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
@@ -117,8 +113,14 @@ bool ShaderExInstancedViewports::createCpuSubPrograms(ProgramSet* programSet)
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
 
-    mPSInMonitorsCount = psProgram->resolveParameter(GCT_FLOAT2, "monitorsCount");
-    mVSInMatrixArray = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, GPV_GLOBAL, "matrixArray", numMonitors);
+    if (mLayeredTarget)
+    {
+        mVSInMatrixArray = vsProgram->resolveParameter(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX_ARRAY, numMonitors);
+    }
+    else
+    {
+        mVSInMatrixArray = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, GPV_GLOBAL, "matrixArray", numMonitors);
+    }
 
     // Resolve vertex shader output position in projective space.
     auto positionIn = vsMain->resolveInputParameter(Parameter::SPC_POSITION_OBJECT_SPACE);
@@ -146,6 +148,8 @@ bool ShaderExInstancedViewports::createCpuSubPrograms(ProgramSet* programSet)
         return true;
     }
 
+    mPSInMonitorsCount = psProgram->resolveParameter(GCT_FLOAT2, "monitorsCount");
+
     // Output monitor index.
     vstage.assign(vsInMonitorIndex, vsOutMonitorIndex);
 
@@ -162,6 +166,9 @@ bool ShaderExInstancedViewports::createCpuSubPrograms(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 void ShaderExInstancedViewports::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList)
 {
+    if(mLayeredTarget)
+        return; // using autoconstant
+
     if (mMonitorsCountChanged)
     {
         mPSInMonitorsCount->setGpuParameter(mViewportGrid);
@@ -179,12 +186,10 @@ void ShaderExInstancedViewports::updateGpuProgramsParams(Renderable* rend, const
     for (int x = 0 ; x < monitorCount.x ; x++)
         for (int y = 0 ; y < monitorCount.y ; y++)
         {
-            auto cam = mCameras[camIdx++];
-            auto worldViewMatrix = source->getViewMatrix(cam) * source->getWorldMatrix();
-            auto projectionMatrix = source->getProjectionMatrix(cam);
+            auto worldViewProjectionMatrix = source->getWorldViewProjMatrix(camIdx++);
 
             shift.setTrans(Vector3((2*x - 1)/monitorCount[0], (2*y - 1)/monitorCount[1], 0));
-            matrixArray.push_back(shift * projectionMatrix * worldViewMatrix);
+            matrixArray.push_back(shift * worldViewProjectionMatrix);
         }
 
     // Update the matrix array
@@ -197,12 +202,6 @@ void ShaderExInstancedViewports::setParameter(const String& name, const Any& val
     if (name == "viewportGrid")
     {
         setMonitorsCount(any_cast<Vector2>(value));
-        return;
-    }
-
-    if (name == "cameras")
-    {
-        mCameras = any_cast<std::vector<Camera*>>(value);
         return;
     }
 

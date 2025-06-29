@@ -1105,7 +1105,7 @@ void Sample_ShaderSystem::createInstancedViewports()
         mSceneMgr->setSkyBox(false, "");
     }
 
-    std::vector<Camera*> cameras = {mCamera};
+    std::vector<const Camera*> cameras = {mCamera};
     for (int i = 0; i < 3; i++)
     {
         auto cam = mSceneMgr->createCamera(StringUtil::format("InstancedCamera%d", i));
@@ -1115,9 +1115,10 @@ void Sample_ShaderSystem::createInstancedViewports()
         cameras.push_back(cam);
     }
 
+    mSceneMgr->setVPRTCameras(cameras);
+
     mInstancedViewportsSubRenderState = mShaderGenerator->createSubRenderState("SGX_InstancedViewports");
     mInstancedViewportsSubRenderState->setParameter("viewportGrid", Vector2(2, 2));
-    mInstancedViewportsSubRenderState->setParameter("cameras", cameras);
     Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::MSN_SHADERGEN);
     renderState->addTemplateSubRenderState(mInstancedViewportsSubRenderState);
 

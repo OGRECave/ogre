@@ -57,7 +57,7 @@ namespace Ogre {
          mLodCameraPositionDirty(true),
          mLodCameraPositionObjectSpaceDirty(true),
          mCurrentRenderable(0),
-         mCurrentCamera(0), 
+         mCurrentCamera(0),
          mCameraRelativeRendering(false),
          mCurrentLightList(0),
          mCurrentRenderTarget(0),
@@ -142,6 +142,10 @@ namespace Ogre {
         mCameraPositionDirty = true;
         mLodCameraPositionObjectSpaceDirty = true;
         mLodCameraPositionDirty = true;
+    }
+    void AutoParamDataSource::setCameraArray(const std::vector<const Camera*> cameras)
+    {
+        mCameraArray = cameras;
     }
     //-----------------------------------------------------------------------------
     void AutoParamDataSource::setCurrentLightList(const LightList* ll)
@@ -356,7 +360,7 @@ namespace Ogre {
         }
         else
         {
-            proj = mCurrentCamera->getProjectionMatrixWithRSDepth();
+            proj = cam->getProjectionMatrixWithRSDepth();
         }
 
         if (mCurrentRenderTarget && mCurrentRenderTarget->requiresTextureFlipping())
@@ -399,6 +403,18 @@ namespace Ogre {
             mWorldViewProjMatrixDirty = false;
         }
         return mWorldViewProjMatrix;
+    }
+    Matrix4 AutoParamDataSource::getWorldViewProjMatrix(size_t index) const
+    {
+        if (index >= mCameraArray.size())
+        {
+            return Matrix4::IDENTITY;
+        }
+
+        // dont bother caching this, as it invalidates per object
+        const auto& projectionMatrix = getProjectionMatrix(mCameraArray[index]);
+        const auto& viewMatrix = getViewMatrix(mCameraArray[index]);
+        return projectionMatrix * viewMatrix * getWorldMatrix();
     }
     //-----------------------------------------------------------------------------
     const Affine3& AutoParamDataSource::getInverseWorldMatrix(void) const

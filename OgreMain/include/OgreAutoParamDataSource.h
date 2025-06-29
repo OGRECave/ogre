@@ -116,6 +116,7 @@ namespace Ogre {
 
         const Renderable* mCurrentRenderable;
         const Camera* mCurrentCamera;
+        std::vector<const Camera*> mCameraArray;
         bool mCameraRelativeRendering;
         Vector3 mCameraRelativePosition;
         const LightList* mCurrentLightList;
@@ -136,6 +137,7 @@ namespace Ogre {
         void setWorldMatrices(const Affine3* m, size_t count);
         /** Updates the current camera */
         void setCurrentCamera(const Camera* cam, bool useCameraRelative);
+        void setCameraArray(const std::vector<const Camera*> cameras);
         /** Sets the light list that should be used, and it's base index from the global list */
         void setCurrentLightList(const LightList* ll);
         /** Sets the current texture projector for a index */
@@ -169,6 +171,7 @@ namespace Ogre {
         const Matrix4& getProjectionMatrix(void) const;
         Matrix4 getProjectionMatrix(const Camera* cam) const;
         const Matrix4& getWorldViewProjMatrix(void) const;
+        Matrix4 getWorldViewProjMatrix(size_t index) const;
         const Affine3& getWorldViewMatrix(void) const;
         const Affine3& getInverseWorldMatrix(void) const;
         const Affine3& getInverseWorldViewMatrix(void) const;
