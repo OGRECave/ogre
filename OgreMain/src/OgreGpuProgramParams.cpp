@@ -68,6 +68,7 @@ namespace Ogre
         AutoConstantDefinition(ACT_INVERSE_WORLDVIEWPROJ_MATRIX,       "inverse_worldviewproj_matrix",      16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_TRANSPOSE_WORLDVIEWPROJ_MATRIX,     "transpose_worldviewproj_matrix",    16, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX, "inverse_transpose_worldviewproj_matrix", 16, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_WORLDVIEWPROJ_MATRIX_ARRAY,          "worldviewproj_matrix_array",        16, ET_REAL, ACDT_INT),
 
         AutoConstantDefinition(ACT_RENDER_TARGET_FLIPPING,          "render_target_flipping",         1, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_VERTEX_WINDING,          "vertex_winding",         1, ET_REAL, ACDT_NONE),
@@ -1120,6 +1121,7 @@ namespace Ogre
         case ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX:
         case ACT_NORMAL_MATRIX:
         case ACT_WORLDVIEWPROJ_MATRIX:
+        case ACT_WORLDVIEWPROJ_MATRIX_ARRAY:
         case ACT_INVERSE_WORLDVIEWPROJ_MATRIX:
         case ACT_TRANSPOSE_WORLDVIEWPROJ_MATRIX:
         case ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX:
@@ -1970,6 +1972,13 @@ namespace Ogre
                     break;
                 case ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX:
                     _writeRawConstant(ac.physicalIndex, source->getInverseTransposeWorldViewProjMatrix(),ac.elementCount);
+                    break;
+                case ACT_WORLDVIEWPROJ_MATRIX_ARRAY:
+                    for (size_t l = 0; l < ac.data; ++l)
+                    {
+                        _writeRawConstant(ac.physicalIndex + l*sizeof(Matrix4),
+                                          source->getWorldViewProjMatrix(l),ac.elementCount);
+                    }
                     break;
                 case ACT_CAMERA_POSITION_OBJECT_SPACE:
                     _writeRawConstant(ac.physicalIndex, source->getCameraPositionObjectSpace(), ac.elementCount);

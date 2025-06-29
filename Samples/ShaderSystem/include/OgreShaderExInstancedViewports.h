@@ -99,8 +99,6 @@ protected:
 
     Vector2                 mViewportGrid;
     bool                    mMonitorsCountChanged;
-
-    std::vector<Camera*>    mCameras;
 };
 
 

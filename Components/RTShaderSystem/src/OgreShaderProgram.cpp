@@ -124,6 +124,7 @@ static bool isArray(GpuProgramParameters::AutoConstantType autoType)
     case GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY:
     case GpuProgramParameters::ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY:
     case GpuProgramParameters::ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY:
+    case GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX_ARRAY:
         return true;
     default:
         return false;

@@ -3371,6 +3371,11 @@ namespace Ogre {
         IlluminationRenderStage _getCurrentRenderStage() const {return mIlluminationStage;}
 
         const AutoParamDataSource* _getAutoParamDataSource() const { return mAutoParamDataSource.get(); }
+
+        void setVPRTCameras(const std::vector<const Camera*>& cameras) const
+        {
+            mAutoParamDataSource->setCameraArray(cameras);
+        }
     };
 
     /// Interface for visualising debugging the SceneManager state
