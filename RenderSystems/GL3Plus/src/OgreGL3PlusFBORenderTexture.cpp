@@ -38,10 +38,10 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
 
     GL3PlusFBORenderTexture::GL3PlusFBORenderTexture(
-        GL3PlusFBOManager *manager, const String &name,
+        const String &name,
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
         GLRenderTexture(name, target, writeGamma, fsaa),
-        mFB(manager, fsaa)
+        mFB(fsaa)
     {
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
@@ -454,7 +454,7 @@ namespace Ogre {
     GL3PlusFBORenderTexture *GL3PlusFBOManager::createRenderTexture(const String &name,
                                                                     const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
-        GL3PlusFBORenderTexture *retval = new GL3PlusFBORenderTexture(this, name, target, writeGamma, fsaa);
+        GL3PlusFBORenderTexture *retval = new GL3PlusFBORenderTexture(name, target, writeGamma, fsaa);
         return retval;
     }
 

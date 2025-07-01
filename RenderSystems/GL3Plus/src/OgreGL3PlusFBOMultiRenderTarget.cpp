@@ -30,9 +30,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre {
 
-    GL3PlusFBOMultiRenderTarget::GL3PlusFBOMultiRenderTarget(GL3PlusFBOManager *manager, const String &name):
+    GL3PlusFBOMultiRenderTarget::GL3PlusFBOMultiRenderTarget(const String &name):
         MultiRenderTarget(name),
-        fbo(manager, 0 /* TODO: multisampling on MRTs? */)
+        fbo(0 /* TODO: multisampling on MRTs? */)
     {
     }
 

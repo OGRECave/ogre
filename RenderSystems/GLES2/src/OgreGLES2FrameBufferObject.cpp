@@ -39,8 +39,8 @@ THE SOFTWARE.
 namespace Ogre {
 
 //-----------------------------------------------------------------------------
-GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager* manager, uint fsaa)
-    : GLFrameBufferObjectCommon(fsaa, *manager)
+GLES2FrameBufferObject::GLES2FrameBufferObject( uint fsaa)
+    : GLFrameBufferObjectCommon(fsaa)
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         GLint oldfb = 0;
@@ -52,7 +52,18 @@ GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager* manager, uint fs
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
-        mNumSamples = std::min(mNumSamples, manager->getMaxFSAASamples());
+        // Check multisampling if supported
+        if(rs->hasMinGLVersion(3, 0))
+        {
+            // Check samples supported
+            GLint maxSamples;
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamples));
+            mNumSamples = std::min(mNumSamples, maxSamples);
+        }
+        else
+        {
+            mNumSamples = 0;
+        }
 
         // Will we need a second FBO to do multisampling?
         if (mNumSamples)

@@ -41,7 +41,7 @@ namespace Ogre {
     class _OgreGLES2Export GLES2FrameBufferObject : public GLFrameBufferObjectCommon
     {
     public:
-        GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa);
+        GLES2FrameBufferObject(uint fsaa);
         ~GLES2FrameBufferObject();
         
         bool bind(bool recreateIfNeeded) override;

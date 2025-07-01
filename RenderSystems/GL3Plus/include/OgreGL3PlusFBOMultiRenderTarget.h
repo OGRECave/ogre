@@ -40,7 +40,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusFBOMultiRenderTarget : public MultiRenderTarget, public GLRenderTarget
     {
     public:
-        GL3PlusFBOMultiRenderTarget(GL3PlusFBOManager *manager, const String &name);
+        GL3PlusFBOMultiRenderTarget(const String &name);
         ~GL3PlusFBOMultiRenderTarget();
 
         void getCustomAttribute( const String& name, void *pData ) override;

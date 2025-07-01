@@ -644,7 +644,7 @@ namespace Ogre {
     MultiRenderTarget* GL3PlusRenderSystem::createMultiRenderTarget(const String & name)
     {
         MultiRenderTarget* retval =
-            new GL3PlusFBOMultiRenderTarget(static_cast<GL3PlusFBOManager*>(mRTTManager), name);
+            new GL3PlusFBOMultiRenderTarget(name);
         attachRenderTarget(*retval);
         return retval;
     }

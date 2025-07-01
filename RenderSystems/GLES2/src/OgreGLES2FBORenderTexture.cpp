@@ -39,10 +39,10 @@ THE SOFTWARE.
 namespace Ogre {
 
 //-----------------------------------------------------------------------------    
-    GLES2FBORenderTexture::GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name,
+    GLES2FBORenderTexture::GLES2FBORenderTexture(const String &name,
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
-        GLRenderTexture(name, target, writeGamma, std::min(manager->getMaxFSAASamples(), (int)fsaa)),
-        mFB(manager, mFSAA)
+        GLRenderTexture(name, target, writeGamma, fsaa),
+        mFB(fsaa)
     {
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
@@ -492,7 +492,7 @@ namespace Ogre {
     GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name, 
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
-        GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(this, name, target, writeGamma, fsaa);
+        GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(name, target, writeGamma, fsaa);
         return retval;
     }
 

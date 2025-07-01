@@ -44,7 +44,7 @@ namespace Ogre {
     class _OgreGLExport GLFBORenderTexture: public GLRenderTexture
     {
     public:
-        GLFBORenderTexture(GLFBOManager *manager, const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+        GLFBORenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
 
         void getCustomAttribute(const String& name, void* pData) override;
 

@@ -37,10 +37,10 @@ THE SOFTWARE.
 namespace Ogre {
 
 //-----------------------------------------------------------------------------    
-    GLFBORenderTexture::GLFBORenderTexture(GLFBOManager *manager, const String &name,
+    GLFBORenderTexture::GLFBORenderTexture(const String &name,
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
         GLRenderTexture(name, target, writeGamma, fsaa),
-        mFB(manager, fsaa)
+        mFB(fsaa)
     {
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
@@ -473,7 +473,7 @@ static const uchar depthBits[] =
     GLFBORenderTexture *GLFBOManager::createRenderTexture(const String &name, 
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
-        GLFBORenderTexture *retval = new GLFBORenderTexture(this, name, target, writeGamma, fsaa);
+        GLFBORenderTexture *retval = new GLFBORenderTexture(name, target, writeGamma, fsaa);
         return retval;
     }
     //---------------------------------------------------------------------

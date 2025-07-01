@@ -1109,7 +1109,7 @@ namespace Ogre {
         if (!fboMgr)
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "MultiRenderTarget is not supported");
 
-        MultiRenderTarget *retval = new GLFBOMultiRenderTarget(fboMgr, name);
+        MultiRenderTarget *retval = new GLFBOMultiRenderTarget(name);
         attachRenderTarget( *retval );
         return retval;
     }

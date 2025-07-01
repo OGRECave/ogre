@@ -39,8 +39,8 @@ THE SOFTWARE.
 namespace Ogre {
 
 //-----------------------------------------------------------------------------
-GLFrameBufferObject::GLFrameBufferObject(GLFBOManager* manager, uint fsaa)
-    : GLFrameBufferObjectCommon(fsaa, *manager)
+GLFrameBufferObject::GLFrameBufferObject(uint fsaa)
+    : GLFrameBufferObjectCommon(fsaa)
 {
     // Generate framebuffer object
     glGenFramebuffersEXT(1, &mFB);

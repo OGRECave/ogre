@@ -35,9 +35,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    GLFBOMultiRenderTarget::GLFBOMultiRenderTarget(GLFBOManager *manager, const String &name):
+    GLFBOMultiRenderTarget::GLFBOMultiRenderTarget(const String &name):
         MultiRenderTarget(name),
-        fbo(manager, 0 /* TODO: multisampling on MRTs? */)
+        fbo(0 /* TODO: multisampling on MRTs? */)
     {
     }
 

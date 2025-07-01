@@ -42,7 +42,7 @@ namespace Ogre {
     class _OgreGLES2Export GLES2FBORenderTexture: public GLRenderTexture MANAGED_RESOURCE
     {
     public:
-        GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+        GLES2FBORenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
         
         void getCustomAttribute(const String& name, void* pData) override;
 
