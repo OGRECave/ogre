@@ -30,21 +30,21 @@ THE SOFTWARE.
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGLDepthBufferCommon.h"
-#include "OgreGL3PlusStateCacheManager.h"
-#include "OgreGLRenderSystemCommon.h"
+#include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
 #include <sstream>
 
 namespace Ogre {
 
 GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, uint fsaa)
-    : GLFrameBufferObjectCommon(fsaa, *manager), mManager(manager)
+    : GLFrameBufferObjectCommon(fsaa, *manager)
 {
     // Generate framebuffer object
     OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
     // Check samples supported
-    mManager->getStateCacheManager()->bindGLFrameBuffer(GL_FRAMEBUFFER, mFB);
+    auto rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
+    rs->_getStateCacheManager()->bindGLFrameBuffer(GL_FRAMEBUFFER, mFB);
 
     GLint maxSamples;
     OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
@@ -63,8 +63,8 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, u
     
     GL3PlusFrameBufferObject::~GL3PlusFrameBufferObject()
     {
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
+        mRTTManager->releaseRenderBuffer(mDepth);
+        mRTTManager->releaseRenderBuffer(mStencil);
         // Delete framebuffer object
         if(mContext && mFB)
         {
@@ -81,8 +81,8 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, u
         assert(mContext == (static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem()))->_getCurrentContext());
 
         // Release depth and stencil, if they were bound
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
+        mRTTManager->releaseRenderBuffer(mDepth);
+        mRTTManager->releaseRenderBuffer(mStencil);
 
         releaseMultisampleColourBuffer();
 
@@ -106,7 +106,8 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, u
         ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
         // Bind simple buffer to add colour attachments
-        mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mFB );
+        auto rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
+        rs->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mFB );
 
         // Bind all attachment points to frame buffer
         for(unsigned int x = 0; x < maxSupportedMRTs; ++x)
@@ -140,7 +141,7 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, u
         if (mMultisampleFB && !PixelUtil::isDepth(getFormat()))
         {
             // Bind multisample buffer
-            mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mMultisampleFB );
+            rs->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mMultisampleFB );
 
             // Create AA render buffer (colour)
             // note, this can be shared too because we blit it to the final FBO
@@ -187,7 +188,7 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, u
         OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
         // Bind main buffer
-        mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
+        rs->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
 
         switch(status)
         {
@@ -208,7 +209,7 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, u
     
     bool GL3PlusFrameBufferObject::bind(bool recreateIfNeeded)
     {
-        GLRenderSystemCommon* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+        auto rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
         GLContext* currentContext = rs->_getCurrentContext();
         if(mContext && mContext != currentContext) // FBO is unusable with current context, destroy it
         {
@@ -230,7 +231,7 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, u
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
             
             // Check samples supported
-            mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mFB );
+            rs->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mFB );
             
             GLint maxSamples;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
@@ -252,7 +253,7 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, u
         }
 
         if(mContext)
-	        mManager->getStateCacheManager()->bindGLFrameBuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB);
+	        rs->_getStateCacheManager()->bindGLFrameBuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB);
 
         return mContext != 0;
     }
@@ -261,18 +262,19 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager* manager, u
     {
         if (mMultisampleFB)
         {
+            auto rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
             GLint oldfb = 0;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
             // Blit from multisample buffer to final buffer, triggers resolve
             uint32 width = mColour[0].buffer->getWidth();
             uint32 height = mColour[0].buffer->getHeight();
-            mManager->getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, mMultisampleFB );
-            mManager->getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, mFB );
+            rs->_getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, mMultisampleFB );
+            rs->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, mFB );
 
             OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
             // Unbind
-            mManager->getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, oldfb );
+            rs->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, oldfb );
         }
     }
 

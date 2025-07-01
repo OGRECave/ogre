@@ -40,7 +40,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------
 GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager* manager, uint fsaa)
-    : GLFrameBufferObjectCommon(fsaa, *manager), mManager(manager)
+    : GLFrameBufferObjectCommon(fsaa, *manager)
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         GLint oldfb = 0;
@@ -71,8 +71,8 @@ GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager* manager, uint fs
     
     GLES2FrameBufferObject::~GLES2FrameBufferObject()
     {
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
+        mRTTManager->releaseRenderBuffer(mDepth);
+        mRTTManager->releaseRenderBuffer(mStencil);
         // Delete framebuffer object
         if(mContext && mFB)
         {
@@ -87,9 +87,9 @@ GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager* manager, uint fs
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2FrameBufferObject::notifyOnContextLost()
     {
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
-        mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        mRTTManager->releaseRenderBuffer(mDepth);
+        mRTTManager->releaseRenderBuffer(mStencil);
+        mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer);
         
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mFB));
         
@@ -114,8 +114,8 @@ GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager* manager, uint fs
         assert(mContext == rs->_getCurrentContext());
         
         // Release depth and stencil, if they were bound
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
+        mRTTManager->releaseRenderBuffer(mDepth);
+        mRTTManager->releaseRenderBuffer(mStencil);
 
         releaseMultisampleColourBuffer();
 

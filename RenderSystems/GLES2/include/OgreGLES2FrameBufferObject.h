@@ -58,8 +58,6 @@ namespace Ogre {
         void attachDepthBuffer( DepthBuffer *depthBuffer );
         void detachDepthBuffer();
         
-        GLES2FBOManager *getManager() { return mManager; }
-        
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         /** See AndroidResource. */
         void notifyOnContextLost();
@@ -69,8 +67,6 @@ namespace Ogre {
 #endif
         
     private:
-        GLES2FBOManager *mManager;
-
         void initialise() override;
     };
 

@@ -138,11 +138,6 @@ namespace Ogre {
         }
     }
 
-    GL3PlusStateCacheManager* GL3PlusFBOManager::getStateCacheManager()
-    {
-        return mRenderSystem->_getStateCacheManager();
-    }
-
     void GL3PlusFBOManager::_createTempFramebuffer(GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
     {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &fb));
