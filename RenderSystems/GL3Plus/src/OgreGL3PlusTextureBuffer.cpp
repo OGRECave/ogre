@@ -84,13 +84,14 @@ namespace Ogre {
             if (parent->getUsage() & TU_TARGET_ALL_LAYERS)
             {
                 mTarget = GL_TEXTURE_2D; // will bind the whole texture to FBO
+                depth = 1;
                 if(face > 0) // only one rendertarget for all layers
                     return;
             }
 
             // Create render target for each slice
-            mSliceTRT.reserve(mDepth);
-            for(uint32 zoffset=0; zoffset<mDepth; ++zoffset)
+            mSliceTRT.reserve(depth);
+            for(uint32 zoffset=0; zoffset<depth; ++zoffset)
             {
                 String name = getNameForRenderTexture(parent->getName(), zoffset + face);
                 GLSurfaceDesc surface;

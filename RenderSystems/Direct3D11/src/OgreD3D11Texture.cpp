@@ -691,8 +691,6 @@ namespace Ogre
         , mDevice(device)
     {
         mName = name;
-        if(buffer->getParentTexture()->getUsage() & TU_TARGET_ALL_LAYERS && mZOffset > 0)
-            return; // ignore zoffset if we are rendering to all layers
         rebind(buffer);
     }
     //---------------------------------------------------------------------

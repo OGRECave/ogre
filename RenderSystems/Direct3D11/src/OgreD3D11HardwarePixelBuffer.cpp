@@ -73,13 +73,14 @@ namespace Ogre {
         {
             if (parentTexture->getUsage() & TU_TARGET_ALL_LAYERS)
             {
+                depth = 1;
                 if(face > 0) // only one rendertarget for all layers
                     return;
             }
 
             // Create render target for each slice
-            mSliceTRT.reserve(mDepth);
-            for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
+            mSliceTRT.reserve(depth);
+            for(size_t zoffset=0; zoffset<depth; ++zoffset)
             {
                 String name = getNameForRenderTexture(parentTexture->getName(), zoffset + face);
                 RenderTexture *trt = new D3D11RenderTexture(name, this, zoffset, mDevice);
