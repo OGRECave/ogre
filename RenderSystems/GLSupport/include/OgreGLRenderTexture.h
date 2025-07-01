@@ -54,7 +54,7 @@ namespace Ogre {
     class _OgreGLExport GLFrameBufferObjectCommon
     {
     public:
-        GLFrameBufferObjectCommon(int32 fsaa, GLRTTManager&);
+        GLFrameBufferObjectCommon(int32 fsaa);
         virtual ~GLFrameBufferObjectCommon();
 
         /** Bind FrameBufferObject. Attempt to bind on incompatible GL context will cause FBO destruction and optional recreation.

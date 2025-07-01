@@ -660,7 +660,7 @@ namespace Ogre {
     MultiRenderTarget* GLES2RenderSystem::createMultiRenderTarget(const String & name)
     {
         MultiRenderTarget* retval =
-            new GLES2FBOMultiRenderTarget(static_cast<GLES2FBOManager*>(mRTTManager), name);
+            new GLES2FBOMultiRenderTarget(name);
         attachRenderTarget(*retval);
         return retval;
     }

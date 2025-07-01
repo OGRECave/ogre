@@ -40,7 +40,7 @@ namespace Ogre {
     class _OgreGLES2Export GLES2FBOMultiRenderTarget : public MultiRenderTarget, public GLRenderTarget
     {
     public:
-        GLES2FBOMultiRenderTarget(GLES2FBOManager *manager, const String &name);
+        GLES2FBOMultiRenderTarget(const String &name);
         ~GLES2FBOMultiRenderTarget();
 
         void getCustomAttribute( const String& name, void *pData ) override;

@@ -37,7 +37,7 @@ namespace Ogre {
     class _OgreGLExport GLFBOMultiRenderTarget : public MultiRenderTarget, public GLRenderTarget
     {
     public:
-        GLFBOMultiRenderTarget(GLFBOManager *manager, const String &name);
+        GLFBOMultiRenderTarget(const String &name);
         ~GLFBOMultiRenderTarget();
 
         void getCustomAttribute( const String& name, void *pData ) override;
