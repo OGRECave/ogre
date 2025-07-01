@@ -77,8 +77,6 @@ namespace Ogre {
                                                              const GLSurfaceDesc &target, bool writeGamma, uint fsaa) override;
 
         GLSurfaceDesc createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa) override;
-
-        GL3PlusStateCacheManager* getStateCacheManager();
     private:
         GL3PlusRenderSystem* mRenderSystem;
 

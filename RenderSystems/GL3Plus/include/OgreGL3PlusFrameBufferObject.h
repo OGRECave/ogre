@@ -33,9 +33,6 @@ THE SOFTWARE.
 #include "OgreGLContext.h"
 
 namespace Ogre {
-    
-    class GL3PlusFBOManager;
-
     /** Frame Buffer Object abstraction.
     */
     class _OgreGL3PlusExport GL3PlusFrameBufferObject : public GLFrameBufferObjectCommon
@@ -57,11 +54,7 @@ namespace Ogre {
         */
         void attachDepthBuffer( DepthBuffer *depthBuffer );
         void detachDepthBuffer();
-
-        GL3PlusFBOManager *getManager() { return mManager; }
     private:
-        GL3PlusFBOManager *mManager;
-
         void initialise() override;
     };
 

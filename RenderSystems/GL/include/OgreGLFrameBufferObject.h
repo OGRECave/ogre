@@ -54,11 +54,7 @@ namespace Ogre {
         */
         void attachDepthBuffer( DepthBuffer *depthBuffer );
         void detachDepthBuffer();
-        
-        GLFBOManager *getManager() { return mManager; }
     private:
-        GLFBOManager *mManager;
-
         void initialise() override;
     };
 

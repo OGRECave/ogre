@@ -40,7 +40,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------
 GLFrameBufferObject::GLFrameBufferObject(GLFBOManager* manager, uint fsaa)
-    : GLFrameBufferObjectCommon(fsaa, *manager), mManager(manager)
+    : GLFrameBufferObjectCommon(fsaa, *manager)
 {
     // Generate framebuffer object
     glGenFramebuffersEXT(1, &mFB);
@@ -68,8 +68,8 @@ GLFrameBufferObject::GLFrameBufferObject(GLFBOManager* manager, uint fsaa)
     }
     GLFrameBufferObject::~GLFrameBufferObject()
     {
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
+        mRTTManager->releaseRenderBuffer(mDepth);
+        mRTTManager->releaseRenderBuffer(mStencil);
         // Delete framebuffer object
         glDeleteFramebuffersEXT(1, &mFB);        
         if (mMultisampleFB)
@@ -79,8 +79,8 @@ GLFrameBufferObject::GLFrameBufferObject(GLFBOManager* manager, uint fsaa)
     void GLFrameBufferObject::initialise()
     {
         // Release depth and stencil, if they were bound
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
+        mRTTManager->releaseRenderBuffer(mDepth);
+        mRTTManager->releaseRenderBuffer(mStencil);
         releaseMultisampleColourBuffer();
 
         // First buffer must be bound
