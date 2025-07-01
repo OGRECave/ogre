@@ -436,7 +436,8 @@ void SceneManager::TextureShadowRenderer::ensureShadowTexturesCreated()
             for(uint32 i = 1; i < shadowTex->getDepth(); i++) // first target handled above
             {
                 String camName = StringUtil::format("%sCam%d", shadowTex->getName().c_str(), i);
-                setupRenderTarget(camName, shadowTex->getBuffer()->getRenderTarget(i), depthBufferId);
+                auto rtidx = shadowTex->getUsage() & TU_TARGET_ALL_LAYERS ? 0 : i;
+                setupRenderTarget(camName, shadowTex->getBuffer()->getRenderTarget(rtidx), depthBufferId);
             }
 
             // Get null shadow texture
