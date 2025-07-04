@@ -90,7 +90,10 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #ifdef OGRE_VERTEX_SHADER
 #define MAIN_DECLARATION out float4 gl_Position : POSITION)
 #else
-#define MAIN_DECLARATION in float4 gl_FragCoord : POSITION, out float4 gl_FragColor : COLOR)
+#   if OGRE_HLSL > 3
+#   define VPOS POSITION
+#   endif
+#define MAIN_DECLARATION in float4 gl_FragCoord : VPOS, out float4 gl_FragColor : COLOR)
 #endif
 
 #define IN(decl, sem) in decl : sem,
