@@ -180,7 +180,8 @@ namespace Ogre
     RenderTexture *HardwarePixelBuffer::getRenderTarget(size_t zoffset) const
     {
         assert(mUsage & TU_RENDERTARGET);
-        return mSliceTRT.at(zoffset);
+        OgreAssert(zoffset < mSliceTRT.size(), "out of range");
+        return mSliceTRT[zoffset];
     }
     //-----------------------------------------------------------------------------    
 
