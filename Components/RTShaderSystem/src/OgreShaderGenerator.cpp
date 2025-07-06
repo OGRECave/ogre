@@ -930,6 +930,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
             dstMat.removeTechnique(ti);
         }
     }
+    dstMat.prepare(); // ensure supported techniques are compiled, after removing techniques
 
     //
     // Clone the render states from source to destination
