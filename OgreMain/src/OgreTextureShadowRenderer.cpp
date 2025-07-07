@@ -427,17 +427,11 @@ void SceneManager::TextureShadowRenderer::ensureShadowTexturesCreated()
         for (auto& shadowTex : mShadowTextures)
         {
             uint16 depthBufferId = mShadowTextureConfigList[__i].depthBufferPoolId;
-            for(uint32 i = 0; i < shadowTex->getNumFaces(); i++)
-            {
-                // Camera names are local to SM
-                String camName = StringUtil::format("%sCam%d", shadowTex->getName().c_str(), i);
-                setupRenderTarget(camName, shadowTex->getBuffer(i)->getRenderTarget(), depthBufferId);
-            }
-            for(uint32 i = 1; i < shadowTex->getDepth(); i++) // first target handled above
+            for(uint32 i = 0; i < shadowTex->getNumLayers(); i++)
             {
                 String camName = StringUtil::format("%sCam%d", shadowTex->getName().c_str(), i);
                 auto rtidx = shadowTex->getUsage() & TU_TARGET_ALL_LAYERS ? 0 : i;
-                setupRenderTarget(camName, shadowTex->getBuffer()->getRenderTarget(rtidx), depthBufferId);
+                setupRenderTarget(camName, shadowTex->getRenderTarget(rtidx), depthBufferId);
             }
 
             // Get null shadow texture

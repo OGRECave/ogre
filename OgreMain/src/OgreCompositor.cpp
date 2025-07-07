@@ -313,7 +313,7 @@ RenderTarget* Compositor::getRenderTarget(const String& name, int slice)
     // try simple texture
     GlobalTextureMap::iterator i = mGlobalTextures.find(name);
     if(i != mGlobalTextures.end())
-        return i->second->getBuffer(slice)->getRenderTarget();
+        return i->second->getRenderTarget(slice);
 
     // try MRTs
     GlobalMRTMap::iterator mi = mGlobalMRTs.find(name);
