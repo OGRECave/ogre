@@ -161,11 +161,6 @@ namespace Ogre {
         return getNumFaces() * PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
     }
     //--------------------------------------------------------------------------
-    uint32 Texture::getNumFaces(void) const
-    {
-        return getTextureType() == TEX_TYPE_CUBE_MAP ? 6 : 1;
-    }
-    //--------------------------------------------------------------------------
     void Texture::_loadImages( const ConstImagePtrList& images )
     {
         OgreAssert(!images.empty(), "Cannot load empty vector of images");
@@ -402,6 +397,15 @@ namespace Ogre {
             }
         }
     }
+
+    RenderTarget* Texture::getRenderTarget(size_t slice, size_t mipmap)
+    {
+        if(mTextureType == TEX_TYPE_CUBE_MAP)
+            return getBuffer(slice, mipmap)->getRenderTarget();
+
+        return getBuffer(0, mipmap)->getRenderTarget(slice);
+    }
+
     const HardwarePixelBufferSharedPtr& Texture::getBuffer(size_t face, size_t mipmap)
     {
         OgreAssert(face < getNumFaces(), "out of range");
