@@ -368,10 +368,6 @@ namespace Ogre {
         CompositionTechnique::TextureDefinition*
         resolveTexReference(const CompositionTechnique::TextureDefinition* texDef);
 
-        /** Get RenderTarget for a named local texture.
-        */
-        RenderTarget *getTargetForTex(const String &name, int slice);
-        
         /** Get source texture name for a named local texture.
         @param name
             The local name of the texture as given to it in the compositor.
