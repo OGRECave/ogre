@@ -477,7 +477,7 @@ void CompositorInstance::_compileTargetOperations(CompiledState &compiledState)
     /// Texture targets
     for (CompositionTargetPass *target : mTechnique->getTargetPasses())
     {        
-        TargetOperation ts(getTargetForTex(target->getOutputName(), target->getOutputSlice()));
+        TargetOperation ts(getRenderTarget(target->getOutputName(), target->getOutputSlice()));
         /// Set "only initial" flag, visibilityMask and lodBias according to CompositionTargetPass.
         ts.onlyInitial = target->getOnlyInitial();
         ts.visibilityMask = target->getVisibilityMask();
@@ -946,12 +946,6 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
     // will not be released here
     CompositorManager::getSingleton().freePooledTextures(true);
 }
-//---------------------------------------------------------------------
-RenderTarget* CompositorInstance::getRenderTarget(const String& name, int slice)
-{
-    return getTargetForTex(name, slice);
-}
-
 CompositionTechnique::TextureDefinition*
 CompositorInstance::resolveTexReference(const CompositionTechnique::TextureDefinition* texDef)
 {
@@ -992,7 +986,7 @@ CompositorInstance::resolveTexReference(const CompositionTechnique::TextureDefin
 }
 
 //-----------------------------------------------------------------------
-RenderTarget *CompositorInstance::getTargetForTex(const String &name, int slice)
+RenderTarget *CompositorInstance::getRenderTarget(const String &name, int slice)
 {
     // try simple texture
     LocalTextureMap::iterator i = mLocalTextures.find(name);
