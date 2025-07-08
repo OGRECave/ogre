@@ -17,6 +17,7 @@ material Examples/Frost
 			texture_unit 1
 			{
 				colour_op modulate
+				filtering linear linear none
 			}
 		}
 	}
