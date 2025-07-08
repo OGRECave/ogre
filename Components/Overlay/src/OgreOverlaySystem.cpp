@@ -125,18 +125,16 @@ namespace Ogre {
         OGRE_DELETE mFontManager;
     }
     //---------------------------------------------------------------------
-    void OverlaySystem::renderQueueStarted(uint8 queueGroupId, const String& cameraName, bool& skipThisInvocation)
+    void OverlaySystem::preRenderQueues()
     {
-        if(queueGroupId == Ogre::RENDER_QUEUE_OVERLAY)
+        // this should really have been "postFindVisibleObjects", but changing it now will break too much existing code..
+        Ogre::Viewport* vp = Ogre::Root::getSingletonPtr()->getRenderSystem()->_getViewport();
+        if(vp != NULL)
         {
-            Ogre::Viewport* vp = Ogre::Root::getSingletonPtr()->getRenderSystem()->_getViewport();
-            if(vp != NULL)
+            Ogre::SceneManager* sceneMgr = vp->getCamera()->getSceneManager();
+            if (vp->getOverlaysEnabled() && sceneMgr->_getCurrentRenderStage() != Ogre::SceneManager::IRS_RENDER_TO_TEXTURE)
             {
-                Ogre::SceneManager* sceneMgr = vp->getCamera()->getSceneManager();
-                if (vp->getOverlaysEnabled() && sceneMgr->_getCurrentRenderStage() != Ogre::SceneManager::IRS_RENDER_TO_TEXTURE)
-                {
-                    OverlayManager::getSingleton()._queueOverlaysForRendering(vp->getCamera(), sceneMgr->getRenderQueue(), vp);
-                }
+                OverlayManager::getSingleton()._queueOverlaysForRendering(vp->getCamera(), sceneMgr->getRenderQueue(), vp);
             }
         }
     }
