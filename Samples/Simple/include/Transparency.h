@@ -96,12 +96,13 @@ protected:
         if(!mTrayMgr)
             return;
 
-        // OIT compositor (disabled)
-        auto& cm = CompositorManager::getSingleton();
-        cm.addCompositor(mViewport, "WBOIT");
-
         // GUI
         mTrayMgr->showCursor();
+
+        // OIT compositor (disabled)
+        auto& cm = CompositorManager::getSingleton();
+        if(!cm.addCompositor(mViewport, "WBOIT"))
+            return; // not supported
 
         auto oitMat = Ogre::MaterialManager::getSingleton().getByName("Examples/WaterStream/OIT");
         oitMat->load();
