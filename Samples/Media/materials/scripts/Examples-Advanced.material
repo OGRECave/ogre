@@ -512,12 +512,14 @@ material Examples/FresnelReflectionRefraction
 			{
 				content_type compositor Fresnel reflection
 				tex_address_mode clamp
+				filtering linear linear none
 			}
 			// Refraction
 			texture_unit
 			{
 				content_type compositor Fresnel refraction
 				tex_address_mode clamp
+				filtering linear linear none
 			}
 		}
 		
