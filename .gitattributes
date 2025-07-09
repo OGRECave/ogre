@@ -1,1 +1,1 @@
-Tests/Media/** text eol=lf
+Tests/Media/misc/ArchiveTest/*.txt text eol=lf
