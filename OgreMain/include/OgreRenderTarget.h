@@ -33,12 +33,10 @@ THE SOFTWARE.
 #include "OgrePixelFormat.h"
 #include "OgreHeaderPrefix.h"
 
-/* Define the number of priority groups for the render system's render targets. */
-#ifndef OGRE_NUM_RENDERTARGET_GROUPS
-    #define OGRE_NUM_RENDERTARGET_GROUPS 10
-    #define OGRE_DEFAULT_RT_GROUP 4
-    #define OGRE_REND_TO_TEX_RT_GROUP 2
-#endif
+/// @deprecated
+#define OGRE_REND_TO_TEX_RT_GROUP Ogre::RenderTarget::TP_REND_TO_TEX
+/// @deprecated
+#define OGRE_DEFAULT_RT_GROUP Ogre::RenderTarget::TP_DEFAULT
 
 namespace Ogre {
 
@@ -84,6 +82,12 @@ namespace Ogre {
             FB_FRONT,
             FB_BACK,
             FB_AUTO
+        };
+
+        enum TargetPriorityGroup
+        {
+            TP_REND_TO_TEX = 2,
+            TP_DEFAULT = 4,
         };
 
         RenderTarget();
