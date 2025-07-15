@@ -198,6 +198,11 @@ void IntegratedPSSM3::setParameter(const String& name, const Any& value)
         mDebug = any_cast<bool>(value);
         return;
     }
+    else if (name == "array_texture")
+    {
+        mUseArrayTexture = any_cast<bool>(value);
+        return;
+    }
 
     SubRenderState::setParameter(name, value);
 }
