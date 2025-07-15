@@ -219,8 +219,11 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()
 {
-    mTextureAtlasFactory = OGRE_NEW TextureAtlasSamplerFactory;
-    mShaderGenerator->addSubRenderStateFactory(mTextureAtlasFactory);
+    mTextureAtlasFactory.reset(new TextureAtlasSamplerFactory);
+    mShaderGenerator->addSubRenderStateFactory(mTextureAtlasFactory.get());
+
+    mInstancedViewportsFactory.reset(new ShaderExInstancedViewportsFactory);
+    mShaderGenerator->addSubRenderStateFactory(mInstancedViewportsFactory.get());
 
     // Setup default effects values.
     mCurLightingModel       = SSLM_PerPixelLighting;
@@ -919,12 +922,18 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::unloadResources()
 {
-    if (mTextureAtlasFactory != NULL)
+    if (mTextureAtlasFactory)
     {
         mTextureAtlasFactory->destroyAllInstances();
-        mShaderGenerator->removeSubRenderStateFactory(mTextureAtlasFactory);
-        OGRE_DELETE mTextureAtlasFactory;
-        mTextureAtlasFactory = NULL;
+        mShaderGenerator->removeSubRenderStateFactory(mTextureAtlasFactory.get());
+        mTextureAtlasFactory.reset();
+    }
+
+    if (mInstancedViewportsFactory)
+    {
+        mInstancedViewportsFactory->destroyAllInstances();
+        mShaderGenerator->removeSubRenderStateFactory(mInstancedViewportsFactory.get());
+        mInstancedViewportsFactory.reset();
     }
 }
 
@@ -1071,34 +1080,15 @@ void Sample_ShaderSystem::destroyInstancedViewports()
     mShaderGenerator->invalidateScheme(Ogre::MSN_SHADERGEN);
     mShaderGenerator->validateScheme(Ogre::MSN_SHADERGEN);
 
-    destroyInstancedViewportsFactory();
-
     for (int i = 0; i < 3; i++)
     {
         mSceneMgr->destroyCamera(StringUtil::format("InstancedCamera%d", i));
     }
 }
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::destroyInstancedViewportsFactory()
-{
-    if (mInstancedViewportsFactory != NULL)
-    {
-        mInstancedViewportsFactory->destroyAllInstances();
-        mShaderGenerator->removeSubRenderStateFactory(mInstancedViewportsFactory);
-        delete mInstancedViewportsFactory;
-        mInstancedViewportsFactory = NULL;
-    }
-}
-//-----------------------------------------------------------------------
 
 void Sample_ShaderSystem::createInstancedViewports()
 {
-    if (mInstancedViewportsFactory == NULL)
-    {
-        mInstancedViewportsFactory = OGRE_NEW ShaderExInstancedViewportsFactory;    
-        mShaderGenerator->addSubRenderStateFactory(mInstancedViewportsFactory);
-    }
-
     if (Root::getSingletonPtr()->getRenderSystem()->getName().find("Direct3D9") != String::npos)
     {
         mSceneMgr->getManualObject("TextureAtlasObject")->getParentSceneNode()->setVisible(false);

@@ -156,7 +156,6 @@ protected:
 
     void createInstancedViewports();
     void destroyInstancedViewports();
-    void destroyInstancedViewportsFactory();
 
     /** Pick the target object. */
     void pickTargetObject( const MouseButtonEvent &evt );
@@ -186,7 +185,7 @@ protected:
     SelectMenu*                         mShadowMenu;            // The shadow type menu.
     bool                                mPerPixelFogEnable;     // When true the RTSS will do per pixel fog calculations.
     bool                                mSpecularEnable;        // The current specular state.  
-    RTShader::SubRenderStateFactory*    mTextureAtlasFactory;
+    std::unique_ptr<RTShader::SubRenderStateFactory>    mTextureAtlasFactory;
     RTShader::SubRenderState*           mInstancedViewportsSubRenderState;// todo - doc
     bool                                mInstancedViewportsEnable;      // todo - doc
     InfiniteFrustum                     mInfiniteFrustum;               // todo - doc
@@ -194,7 +193,7 @@ protected:
     std::vector<Entity *>              mLotsOfModelsEntities;          // todo - doc       
     std::vector<SceneNode *>           mLotsOfModelsNodes;             // todo - doc  
     int                                 mNumberOfModelsAdded;           // todo - doc   
-    RTShader::SubRenderStateFactory *   mInstancedViewportsFactory;     // todo - doc
+    std::unique_ptr<RTShader::SubRenderStateFactory>   mInstancedViewportsFactory;     // todo - doc
 
     RTShader::SubRenderState*           mReflectionMapSubRS;    // The reflection map sub render state.
     RTShader::LayeredBlending*          mLayerBlendSubRS;       // The layer blending sub render state.
