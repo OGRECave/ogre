@@ -41,6 +41,3 @@ control = Fade Exponent, fadeExp, GPU_FRAGMENT, 0, 20, 0
 control = Water Color (r), waterColor, GPU_FRAGMENT, 0, 1, 0
 control = Water Color (g), waterColor, GPU_FRAGMENT, 0, 1, 1
 control = Water Color (b), waterColor, GPU_FRAGMENT, 0, 1, 2
-
-
-
