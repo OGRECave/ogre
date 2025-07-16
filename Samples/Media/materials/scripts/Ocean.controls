@@ -1,0 +1,46 @@
+[Ocean2]
+material = Ocean2_HLSL_GLSL
+control = Wavelet Scale, BumpScale, GPU_VERTEX, 0, 2, 0
+control = Texture Scale X, textureScale, GPU_VERTEX, 0, 40, 0
+control = Texture Scale Y, textureScale, GPU_VERTEX, 0, 40, 1
+control = Wavelet Speed X, bumpSpeed, GPU_VERTEX, -0.1, 0.1, 0
+control = Wavelet Speed Y, bumpSpeed, GPU_VERTEX, -0.1, 0.1, 1
+control = Wave Frequency, waveFreq, GPU_VERTEX, 0, 0.05, 0
+control = Wave Amplitude, waveAmp, GPU_VERTEX, 0, 25, 0
+
+control = Deep Color [Red], deepColor, GPU_FRAGMENT, 0, 1, 0
+control = Deep Color [Green], deepColor, GPU_FRAGMENT, 0, 1, 1
+control = Deep Color [Blue], deepColor, GPU_FRAGMENT, 0, 1, 2
+
+control = Shallow Color [Red], shallowColor, GPU_FRAGMENT, 0, 1, 0
+control = Shallow Color [Green], shallowColor, GPU_FRAGMENT, 0, 1, 1
+control = Shallow Color [Blue], shallowColor, GPU_FRAGMENT, 0, 1, 2
+
+control = Reflection Color [Red], reflectionColor, GPU_FRAGMENT, 0, 1, 0
+control = Reflection Color [Green], reflectionColor, GPU_FRAGMENT, 0, 1, 1
+control = Reflection Color [Blue], reflectionColor, GPU_FRAGMENT, 0, 1, 2
+
+control = Reflection Amount, reflectionAmount, GPU_FRAGMENT, 0, 1, 0
+control = Reflection Blur, reflectionBlur, GPU_FRAGMENT, 0, 8, 0
+control = Water Amount, waterAmount, GPU_FRAGMENT, 0, 1, 0
+control = Fresnel Power, fresnelPower, GPU_FRAGMENT, 0, 10, 0
+control = Fresnel Bias, fresnelBias, GPU_FRAGMENT, 0, 1, 0
+control = HDR Mulitplier, hdrMultiplier, GPU_FRAGMENT, 0, 2, 0
+
+[Ocean1]
+material = OceanHLSL_GLSL
+control = scale x, scale, GPU_VERTEX, 0, 0.1, 0
+control = scale y, scale, GPU_VERTEX, 0, 0.1, 1
+control = scale z, scale, GPU_VERTEX, 0, 0.1, 2
+control = Wave Speed X, waveSpeed, GPU_VERTEX, 0, 1, 0
+control = Wave Speed Y, waveSpeed, GPU_VERTEX, 0, 1, 1
+control = Noise Speed, noiseSpeed, GPU_VERTEX, 0, 1, 0
+
+control = Fade Bias, fadeBias, GPU_FRAGMENT, 0, 1, 0
+control = Fade Exponent, fadeExp, GPU_FRAGMENT, 0, 20, 0
+control = Water Color (r), waterColor, GPU_FRAGMENT, 0, 1, 0
+control = Water Color (g), waterColor, GPU_FRAGMENT, 0, 1, 1
+control = Water Color (b), waterColor, GPU_FRAGMENT, 0, 1, 2
+
+
+
