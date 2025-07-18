@@ -592,6 +592,12 @@ namespace Ogre
         else
             imageViewCi.subresourceRange.layerCount = numSlices;
 
+        if(mUsage & TU_TARGET_ALL_LAYERS)
+        {
+            imageViewCi.subresourceRange.baseArrayLayer = 0;
+            imageViewCi.subresourceRange.layerCount = getNumLayers();
+        }
+
         VkImageViewUsageCreateInfo flagRestriction = {VK_STRUCTURE_TYPE_IMAGE_VIEW_USAGE_CREATE_INFO};
         if( textureManager->canRestrictImageViewUsage() && isUav() )
         {
