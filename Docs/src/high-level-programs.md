@@ -106,10 +106,10 @@ For modularity %Ogre supports the non-standard <tt>\#include <something.glsl></t
 Vertex attributes must be declared in the shader, for the vertex data bound to it by Ogre.
 
 ```cpp
-// legacy GLSL syntax
+// GL2 compatible syntax; attribute data is bound by attribute name
 attribute vec4 vertex;
 
-// modern GLSL syntax with explicit layout qualifier
+// Attribute data bound by explicit location (requires GL3+)
 layout(location = 0) in vec4 vertex;
 ```
 
@@ -143,14 +143,16 @@ To bind samplers to texture unit indices from the material scripts, you can eith
 set the sampler via a `int` type named parameter.
 
 ```cpp
-// modern (GL4.2+) syntax with explicit binding
+// Explicit binding location (requires OpenGL 4.2+)
 layout(binding = 0) uniform sampler2D diffuseMap;
 
-// legacy syntax
+// Compatible syntax; binding is managed via the material script
 uniform sampler2D diffuseMap;
 ```
 
-Binding the sampler in material script:
+@note as we cannot detect the presence of explicit binding, you must add the `has_sampler_binding true` option to the program definition, so your locations are not overriden
+
+Binding the sampler in material script is done as:
 
 ```cpp
 material exampleGLSLTexturing
