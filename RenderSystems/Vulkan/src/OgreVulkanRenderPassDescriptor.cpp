@@ -55,6 +55,7 @@ namespace Ogre
     {
         uint32 hash = FastHash((const char*)mColour, mNumColourEntries * sizeof(mColour[0]));
         hash = HashCombine(hash, mDepth);
+        hash = HashCombine(hash, mSlice);
 
         VulkanFrameBufferDescMap &frameBufferDescMap = mRenderSystem->_getFrameBufferDescMap();
         VulkanFrameBufferDescMap::iterator newItor = frameBufferDescMap.find( hash );
@@ -254,7 +255,7 @@ namespace Ogre
         VulkanTextureGpu *texture = mDepth;
         VkImage texName =
             texture->getMsaaTextureName() ? texture->getMsaaTextureName() : texture->getFinalTextureName();
-        return texture->_createView(0, 1, 0, 1u, texName);
+        return texture->_createView(0, 1, mSlice, 1, texName);
     }
     //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::setupFbo( VulkanFrameBufferDescValue &fboDesc )
