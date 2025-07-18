@@ -1039,7 +1039,9 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
         // Set camera window clipping planes (if any)
         if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
         {
+            OGRE_IGNORE_DEPRECATED_BEGIN
             mDestRenderSystem->setClipPlanes(camera->isWindowSet() ? camera->getWindowPlanes() : PlaneList());
+            OGRE_IGNORE_DEPRECATED_END
         }
 
         // Prepare render queue for receiving new objects
@@ -2962,7 +2964,9 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     // Set camera window clipping planes (if any)
     if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
     {
+        OGRE_IGNORE_DEPRECATED_BEGIN
         mDestRenderSystem->setClipPlanes(camera->isWindowSet() ? camera->getWindowPlanes() : PlaneList());
+        OGRE_IGNORE_DEPRECATED_END
     }
     mCameraInProgress = context->camera;
     mDestRenderSystem->_beginFrame();
