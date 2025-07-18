@@ -269,6 +269,7 @@ namespace Ogre
         uint32 numColourAttachments = 0u;
         uint32 windowAttachmentIdx = std::numeric_limits<uint32>::max();
         bool usesResolveAttachments = false;
+        uint32 layers = 1;
 
         // 1 per MRT
         // 1 per MRT MSAA resolve
@@ -286,6 +287,9 @@ namespace Ogre
 
             if( mColour[i]->getFormat() == PF_UNKNOWN )
                 continue;
+
+            if (mColour[i]->getUsage() & TU_TARGET_ALL_LAYERS)
+                layers = mColour[i]->getNumLayers();
 
             OGRE_ASSERT_HIGH( dynamic_cast<VulkanTextureGpu *>( mColour[i] ) );
             VulkanTextureGpu *textureVulkan = static_cast<VulkanTextureGpu *>( mColour[i] );
@@ -314,6 +318,9 @@ namespace Ogre
             else
                 depthAttachRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
             ++attachmentIdx;
+
+            if (mDepth->getUsage() & TU_TARGET_ALL_LAYERS)
+                layers = mDepth->getNumLayers();
         }
 
         VkSubpassDescription subpass = {VK_PIPELINE_BIND_POINT_GRAPHICS};
@@ -371,7 +378,7 @@ namespace Ogre
         fbCreateInfo.pAttachments = fboDesc.mImageViews;
         fbCreateInfo.width = mTargetWidth;
         fbCreateInfo.height = mTargetHeight;
-        fbCreateInfo.layers = 1u;
+        fbCreateInfo.layers = layers;
 
         const size_t numFramebuffers = std::max<size_t>( fboDesc.mWindowImageViews.size(), 1u );
         fboDesc.mFramebuffers.resize( numFramebuffers );
