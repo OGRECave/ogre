@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgreDepthBuffer.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreRoot.h"
 #include "OgreHardwarePixelBuffer.h"
@@ -82,6 +83,7 @@ namespace Ogre
     void TerrainMaterialGenerator::_renderCompositeMap(size_t size, 
         const Rect& rect, const MaterialPtr& mat, const TexturePtr& destCompositeMap)
     {
+        RenderSystem* rSys = Root::getSingleton().getRenderSystem();
         if (!mCompositeMapSM)
         {
             // dedicated SceneManager
@@ -99,7 +101,6 @@ namespace Ogre
             mLightNode = mCompositeMapSM->getRootSceneNode()->createChildSceneNode();
             mLightNode->attachObject(mCompositeMapLight);
 
-            RenderSystem* rSys = Root::getSingleton().getRenderSystem();
             Real hOffset = rSys->getHorizontalTexelOffset() / (Real)size;
             Real vOffset = rSys->getVerticalTexelOffset() / (Real)size;
 
@@ -137,22 +138,19 @@ namespace Ogre
             RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
             // don't render all the time, only on demand
             rtt->setAutoUpdated(false);
+            // we dont need depth
+            rtt->setDepthBufferPool(DepthBuffer::POOL_NO_DEPTH);
             Viewport* vp = rtt->addViewport(mCompositeMapCam);
             // don't render overlays
             vp->setOverlaysEnabled(false);
 
         }
 
-        // calculate the area we need to update
-        Real vpleft = (Real)rect.left / (Real)size;
-        Real vptop = (Real)rect.top / (Real)size;
-        Real vpright = (Real)rect.right / (Real)size;
-        Real vpbottom = (Real)rect.bottom / (Real)size;
-
         RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
-        mCompositeMapCam->setWindow(vpleft, vptop, vpright, vpbottom);
-
+        rSys->_setRenderTarget(rtt);
+        rSys->setScissorTest(true, rect);
         rtt->update();
+        rSys->setScissorTest(false);
 
         // We have an RTT, we want to copy the results into a regular texture
         // That's because in non-update scenarios we don't want to keep an RTT
