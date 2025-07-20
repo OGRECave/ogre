@@ -972,7 +972,7 @@ namespace OgreBites
 #endif
             mTitleLabel = mTrayMgr->createLabel(TL_LEFT, "SampleTitle", "");
             mDescBox = mTrayMgr->createTextBox(TL_LEFT, "SampleInfo", "Sample Info", infoWidth, 208);
-            mCategoryMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "CategoryMenu", u8"\uf013 Select Category", infoWidth, 10);
+            mCategoryMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "CategoryMenu", "Select Category", infoWidth, 10);
             mSampleMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "SampleMenu", "Select Sample", infoWidth, 10);
             mSampleSlider = mTrayMgr->createThickSlider(TL_LEFT, "SampleSlider", "Slide Samples", infoWidth, 80, 0, 0, 0);
 
