@@ -402,7 +402,9 @@ namespace Ogre
 #ifdef HAVE_FREETYPE
         FT_Face face = static_cast<FT_Face>(_face);
 #else
+        float vpScale = OverlayManager::getSingleton().getPixelRatio();
         stbtt_fontinfo* font = static_cast<stbtt_fontinfo*>(_face);
+        float scale = stbtt_ScaleForPixelHeight(font, vpScale * mTtfSize * mTtfResolution / 64);
 #endif
 
         for (const CodePointRange& range : mCodePointRangeList)
