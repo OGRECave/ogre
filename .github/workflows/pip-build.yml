@@ -23,7 +23,7 @@ jobs:
         pip3 install twine
         python -m twine upload --repository pypi *.whl
   windows:
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       matrix:
         pyver: ['3.10', '3.12']
@@ -31,7 +31,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: ilammy/msvc-dev-cmd@v1
       with:
-        toolset: 14.1
+        toolset: 14.2
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.pyver }}
