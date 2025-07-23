@@ -35,7 +35,7 @@ namespace Ogre
     RenderTexture::RenderTexture(HardwarePixelBuffer *buffer, uint32 zoffset):
         mBuffer(buffer), mZOffset(zoffset)
     {
-        mPriority = OGRE_REND_TO_TEX_RT_GROUP;
+        mPriority = TP_REND_TO_TEX;
         mWidth = mBuffer->getWidth();
         mHeight = mBuffer->getHeight();
 
@@ -62,7 +62,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     MultiRenderTarget::MultiRenderTarget(const String &name)
     {
-        mPriority = OGRE_REND_TO_TEX_RT_GROUP;
+        mPriority = TP_REND_TO_TEX;
         mName = name;
         /// Width and height is unknown with no targets attached
         mWidth = mHeight = 0;
