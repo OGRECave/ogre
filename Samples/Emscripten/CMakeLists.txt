@@ -1,4 +1,4 @@
-set(MEDIA_DIR ${CMAKE_BINARY_DIR}/bin/media/)
+set(MEDIA_DIR ${CMAKE_BINARY_DIR}/bin/media)
 
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
 set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. -s EXPORTED_FUNCTIONS=\"[ '_passAssetAsArrayBuffer', '_clearScene', '_main']\" -s USE_SDL=2 -s MAX_WEBGL_VERSION=2")
@@ -22,7 +22,7 @@ file(COPY
     "${CMAKE_SOURCE_DIR}/Samples/Media/materials/textures/rockwall.tga"
     "${CMAKE_SOURCE_DIR}/Media/packs/SdkTrays.zip"
     "${CMAKE_SOURCE_DIR}/Samples/Media/packs/Sinbad.zip"
-    DESTINATION ${MEDIA_DIR})
+    DESTINATION ${MEDIA_DIR}/)
 
 file(COPY
     "${CMAKE_SOURCE_DIR}/Media/RTShaderLib"
