@@ -331,14 +331,13 @@ protected:
         Real ty = ((sin(sines[2]) + sin(sines[3])) / 4 + 0.5 ) * (float)(COMPLEXITY-2) + 1 ;
         waterMesh->push(tx,ty, -headDepth);
         Real step = PLANE_SIZE / COMPLEXITY ;
-        headNode->resetToInitialState();
-        headNode->scale(3,3,3);
+        headNode->setScale(3,3,3);
         Vector3 newPos = Vector3(step*tx, headDepth, step*ty);
         Vector3 diffPos = newPos - oldPos ;
         Quaternion headRotation = Vector3::UNIT_Z.getRotationTo(diffPos);
         oldPos = newPos ;
-        headNode->translate(newPos);
-        headNode->rotate(headRotation);
+        headNode->setPosition(newPos);
+        headNode->setOrientation(headRotation);
     }
     
 public:
