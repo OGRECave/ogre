@@ -177,13 +177,6 @@ namespace Ogre {
         */
         virtual void updateFromParentImpl(void) const;
     private:
-        /// The position to use as a base for keyframe animation
-        Vector3 mInitialPosition;
-        /// The orientation to use as a base for keyframe animation
-        Quaternion mInitialOrientation;
-        /// The scale to use as a base for keyframe animation
-        Vector3 mInitialScale;
-
         /** Node listener - only one allowed (no list) for size & performance reasons. */
         Listener* mListener;
 
@@ -560,28 +553,6 @@ namespace Ogre {
         */
         Listener* getListener(void) const { return mListener; }
         
-
-        /** Sets the current transform of this node to be the 'initial state' ie that
-            position / orientation / scale to be used as a basis for delta values used
-            in keyframe animation.
-
-            You never need to call this method unless you plan to animate this node. If you do
-            plan to animate it, call this method once you've loaded the node with it's base state,
-            ie the state on which all keyframes are based.
-        @par
-            If you never call this method, the initial state is the identity transform, ie do nothing.
-        */
-        void setInitialState(void);
-
-        /** Resets the position / orientation / scale of this node to it's initial state, see setInitialState for more info. */
-        void resetToInitialState(void);
-
-        /** Gets the initial position of this node, see setInitialState for more info. 
-
-            Also resets the cumulative animation weight used for blending.
-        */
-        const Vector3& getInitialPosition(void) const { return mInitialPosition; }
-        
         /** Gets the local position, relative to this node, of the given world-space position */
         Vector3 convertWorldToLocalPosition( const Vector3 &worldPos );
 
@@ -602,12 +573,6 @@ namespace Ogre {
         /** Gets the world orientation of an orientation in the node local space
             useful for simple transforms that don't require a child node.*/
         Quaternion convertLocalToWorldOrientation( const Quaternion &localOrientation );
-
-        /** Gets the initial orientation of this node, see setInitialState for more info. */
-        const Quaternion& getInitialOrientation(void) const { return mInitialOrientation; }
-
-        /** Gets the initial position of this node, see setInitialState for more info. */
-        const Vector3& getInitialScale(void) const { return mInitialScale; }
 
         /** Helper function, get the squared view depth.  */
         Real getSquaredViewDepth(const Camera* cam) const;

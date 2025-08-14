@@ -2198,8 +2198,7 @@ void SceneManager::_applySceneAnimations(void)
         // Reset any nodes involved
         for (const auto& it : anim->_getNodeTrackList())
         {
-            if (Node* nd = it.second->getAssociatedNode())
-                nd->resetToInitialState();
+            it.second->resetToInitialState();
         }
 
         for (const auto& it : anim->_getNumericTrackList())

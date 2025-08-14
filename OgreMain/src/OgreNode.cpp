@@ -47,9 +47,6 @@ namespace Ogre {
         mDerivedOrientation(Quaternion::IDENTITY),
         mDerivedPosition(Vector3::ZERO),
         mDerivedScale(Vector3::UNIT_SCALE),
-        mInitialPosition(Vector3::ZERO),
-        mInitialOrientation(Quaternion::IDENTITY),
-        mInitialScale(Vector3::UNIT_SCALE),
         mListener(0)
     {
         needUpdate();
@@ -589,22 +586,6 @@ namespace Ogre {
         mScale.z *= z;
         needUpdate();
 
-    }
-    //-----------------------------------------------------------------------
-    void Node::setInitialState(void)
-    {
-        mInitialPosition = mPosition;
-        mInitialOrientation = mOrientation;
-        mInitialScale = mScale;
-    }
-    //-----------------------------------------------------------------------
-    void Node::resetToInitialState(void)
-    {
-        mPosition = mInitialPosition;
-        mOrientation = mInitialOrientation;
-        mScale = mInitialScale;
-
-        needUpdate();
     }
     //-----------------------------------------------------------------------
     struct NodeNameExists {
