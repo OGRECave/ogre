@@ -223,21 +223,18 @@ void DotSceneLoader::processNodes(pugi::xml_node& XMLNode)
     if (auto pElement = XMLNode.child("position"))
     {
         mAttachNode->setPosition(parseVector3(pElement));
-        mAttachNode->setInitialState();
     }
 
     // Process rotation (?)
     if (auto pElement = XMLNode.child("rotation"))
     {
         mAttachNode->setOrientation(parseQuaternion(pElement));
-        mAttachNode->setInitialState();
     }
 
     // Process scale (?)
     if (auto pElement = XMLNode.child("scale"))
     {
         mAttachNode->setScale(parseVector3(pElement));
-        mAttachNode->setInitialState();
     }
 }
 
@@ -456,21 +453,18 @@ void DotSceneLoader::processNode(pugi::xml_node& XMLNode, SceneNode* pParent)
     if (auto pElement = XMLNode.child("position"))
     {
         pNode->setPosition(parseVector3(pElement));
-        pNode->setInitialState();
     }
 
     // Process rotation (?)
     if (auto pElement = XMLNode.child("rotation"))
     {
         pNode->setOrientation(parseQuaternion(pElement));
-        pNode->setInitialState();
     }
 
     // Process scale (?)
     if (auto pElement = XMLNode.child("scale"))
     {
         pNode->setScale(parseVector3(pElement));
-        pNode->setInitialState();
     }
 
     // Process lookTarget (?)
@@ -934,6 +928,7 @@ void DotSceneLoader::processNodeAnimation(pugi::xml_node& XMLNode, SceneNode* pP
 
     // create a track to animate the camera's node
     NodeAnimationTrack* track = anim->createNodeTrack(0, pParent);
+    pParent->setInitialState();
 
     // Process keyframes (*)
     for (auto pElement : XMLNode.children("keyframe"))
