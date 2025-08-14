@@ -33,11 +33,13 @@ namespace Ogre {
     Bone::Bone(unsigned short handle, Skeleton* creator) 
         : Node(), mCreator(creator), mHandle(handle), mManuallyControlled(false)
     {
+        setInitialState();
     }
     //---------------------------------------------------------------------
     Bone::Bone(const String& name, unsigned short handle, Skeleton* creator) 
         : Node(name), mCreator(creator), mHandle(handle), mManuallyControlled(false)
     {
+        setInitialState();
     }
     //---------------------------------------------------------------------
     Bone::~Bone()
@@ -77,6 +79,22 @@ namespace Ogre {
     void Bone::reset(void)
     {
         resetToInitialState();
+    }
+    //-----------------------------------------------------------------------
+    void Bone::setInitialState(void)
+    {
+        mInitialPosition = mPosition;
+        mInitialOrientation = mOrientation;
+        mInitialScale = mScale;
+    }
+    //-----------------------------------------------------------------------
+    void Bone::resetToInitialState(void)
+    {
+        mPosition = mInitialPosition;
+        mOrientation = mInitialOrientation;
+        mScale = mInitialScale;
+
+        needUpdate();
     }
     //---------------------------------------------------------------------
     void Bone::setManuallyControlled(bool manuallyControlled) 

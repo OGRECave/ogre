@@ -360,8 +360,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle, Node* targetNode)
         : AnimationTrack(parent, handle), mSplineBuildNeeded(false), mUseShortestRotationPath(true),
-          mTargetNode(targetNode), mSplines(0)
-
+          mTargetNode(targetNode), mSplines(0), mInitialPosition(Vector3::ZERO),
+          mInitialOrientation(Quaternion::IDENTITY), mInitialScale(Vector3::UNIT_SCALE)
     {
     }
     //---------------------------------------------------------------------
@@ -680,6 +680,23 @@ namespace Ogre {
             kf->setScale(kf->getScale() * (Vector3::UNIT_SCALE / base->getScale()));
         }
             
+    }
+    void NodeAnimationTrack::setInitialState(void)
+    {
+        OgreAssert(mTargetNode, "Target node must be set before calling setInitialState");
+        mInitialPosition = mTargetNode->getPosition();
+        mInitialOrientation = mTargetNode->getOrientation();
+        mInitialScale = mTargetNode->getScale();
+    }
+    //-----------------------------------------------------------------------
+    void NodeAnimationTrack::resetToInitialState(void) const
+    {
+        if (!mTargetNode)
+            return;
+
+        mTargetNode->setPosition(mInitialPosition);
+        mTargetNode->setOrientation(mInitialOrientation);
+        mTargetNode->setScale(mInitialScale);
     }
     //--------------------------------------------------------------------------
     VertexAnimationTrack::VertexAnimationTrack(Animation* parent,
