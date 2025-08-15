@@ -928,7 +928,7 @@ void DotSceneLoader::processNodeAnimation(pugi::xml_node& XMLNode, SceneNode* pP
 
     // create a track to animate the camera's node
     NodeAnimationTrack* track = anim->createNodeTrack(0, pParent);
-    pParent->setInitialState();
+    track->setInitialState();
 
     // Process keyframes (*)
     for (auto pElement : XMLNode.children("keyframe"))

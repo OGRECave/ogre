@@ -92,6 +92,26 @@ namespace Ogre
         */
         void reset(void);
 
+        /** Sets the current transform of this Bone to be the 'initial state' ie that
+            position / orientation / scale to be used as a basis for delta values used
+            in keyframe animation.
+
+            If you never call this method, the initial state is the identity transform, ie do nothing.
+        */
+        void setInitialState(void);
+
+        /** Gets the initial position of this Bone, see setInitialState for more info.
+
+            Also resets the cumulative animation weight used for blending.
+        */
+        const Vector3& getInitialPosition(void) const { return mInitialPosition; }
+
+        /** Gets the initial orientation of this Bone, see setInitialState for more info. */
+        const Quaternion& getInitialOrientation(void) const { return mInitialOrientation; }
+
+        /** Gets the initial position of this Bone, see setInitialState for more info. */
+        const Vector3& getInitialScale(void) const { return mInitialScale; }
+
         /** Sets whether or not this bone is manually controlled. 
 
             Manually controlled bones can be altered by the application at runtime, 
@@ -135,6 +155,13 @@ namespace Ogre
 
         /// Pointer back to creator, for child creation (not smart ptr so child does not preserve parent)
         Skeleton* mCreator;
+
+        /// The position to use as a base for keyframe animation
+        Vector3 mInitialPosition;
+        /// The orientation to use as a base for keyframe animation
+        Quaternion mInitialOrientation;
+        /// The scale to use as a base for keyframe animation
+        Vector3 mInitialScale;
 
         /// The inversed derived scale of the bone in the binding pose
         Vector3 mBindDerivedInverseScale;
