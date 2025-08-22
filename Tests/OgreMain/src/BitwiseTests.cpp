@@ -46,6 +46,7 @@ TEST(BitwiseTests,FixedPointConversion)
 
     EXPECT_EQ(Bitwise::fixedToFloat(0xFF, 8), 1.0f);
     EXPECT_EQ(Bitwise::fixedToFloat(0x00, 8), 0.0f);
+    EXPECT_EQ(Bitwise::fixedToFloat(0xFF, 0), 0.0f);
 
     EXPECT_EQ(Bitwise::floatToFixed(1.0f, 8), (unsigned int)0xFF);
     EXPECT_EQ(Bitwise::floatToFixed(0.0f, 8), (unsigned int)0x00);
