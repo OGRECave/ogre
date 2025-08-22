@@ -351,7 +351,7 @@ public:
         delete hfdata.terrainHeights;
     }
 };
-btRigidBody* DynamicsWorld::addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group, int mask)
+btRigidBody* DynamicsWorld::addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group, int mask, bool debugDraw)
 {
     Terrain* terrain = nullptr;
 #ifdef OGRE_BUILD_COMPONENT_TERRAIN
@@ -359,7 +359,7 @@ btRigidBody* DynamicsWorld::addTerrainRigidBody(TerrainGroup* terrainGroup, long
 #endif
     return addTerrainRigidBody(terrain, group, mask);
 }
-btRigidBody* DynamicsWorld::addTerrainRigidBody(Terrain* terrain, int group, int mask)
+btRigidBody* DynamicsWorld::addTerrainRigidBody(Terrain* terrain, int group, int mask, bool debugDraw)
 {
 #ifdef OGRE_BUILD_COMPONENT_TERRAIN
     btVector3 inertia(0, 0, 0);
@@ -377,6 +377,8 @@ btRigidBody* DynamicsWorld::addTerrainRigidBody(Terrain* terrain, int group, int
     auto objWrapper = std::make_shared<TerrainRigidBody>(rb, mBtWorld, hfdata);
     node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
     rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+    if (!debugDraw)
+        rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
     rb->getWorldTransform().setOrigin(convert(hfdata.bodyPosition));
     rb->getWorldTransform().setRotation(convert(Quaternion::IDENTITY));
 
