@@ -246,7 +246,7 @@ namespace Ogre {
          */
         static inline float fixedToFloat(unsigned value, unsigned int bits)
         {
-            return (float)value/(float)((1<<bits)-1);
+            return bits ? (float)value/(float)((1<<bits)-1) : 0.0f;
         }
 
         /**
