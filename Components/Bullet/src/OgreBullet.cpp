@@ -943,6 +943,8 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
 
     mCurrentPosition = mGhostObject->getWorldTransform().getOrigin();
 
+    mIsOnFloor = false;
+
     /* Narrow phase supports btCollisionShape already */
     for (int i = 0; i < mGhostObject->getOverlappingPairCache()->getNumOverlappingPairs(); i++)
     {
@@ -984,6 +986,11 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
                     //	m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
 
                     //}
+		    btVector3 touchingNormal = pt.m_normalWorldOnB;
+                    if (touchingNormal.y() > 0 && (
+                        touchingNormal.y() > Ogre::Math::Abs(touchingNormal.x()) ||
+                        touchingNormal.y() > Ogre::Math::Abs(touchingNormal.z())))
+                            mIsOnFloor = true;
                     mCurrentPosition += pt.m_normalWorldOnB * directionSign * dist * btScalar(0.2);
                     penetration = true;
                 }
@@ -1084,7 +1091,7 @@ void KinematicMotionSimple::setupCollisionShapes(btCollisionObject* body)
 }
 KinematicMotionSimple::KinematicMotionSimple(btPairCachingGhostObject* ghostObject, Node* node)
     : btActionInterface(), mGhostObject(ghostObject), mMaxPenetrationDepth(0.0f),
-      mNode(node)
+      mNode(node), mIsOnFloor(false)
 {
     btTransform nodeXform;
     nodeXform.setRotation(convert(node->getOrientation()));
