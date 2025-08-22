@@ -149,6 +149,7 @@ class _OgreBulletExport KinematicMotionSimple : public btActionInterface
     btManifoldArray mManifoldArray;
     btScalar mMaxPenetrationDepth;
     Node* mNode;
+    bool mIsOnFloor;
     virtual bool needsCollision(const btCollisionObject* body0, const btCollisionObject* body1);
     void preStep(btCollisionWorld* collisionWorld);
     void playerStep(btCollisionWorld* collisionWorld, btScalar dt);
@@ -160,6 +161,7 @@ public:
     bool recoverFromPenetration(btCollisionWorld* collisionWorld);
     virtual void updateAction(btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;
     virtual void debugDraw(btIDebugDraw* debugDrawer) override;
+    bool isOnFloor() const { return mIsOnFloor; }
 };
 /// simplified wrapper with automatic memory management
 class _OgreBulletExport DynamicsWorld : public CollisionWorld
