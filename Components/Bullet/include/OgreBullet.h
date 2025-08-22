@@ -188,14 +188,16 @@ public:
      * @param y y coordinate of the terrain slot
      * @param group the collision group
      * @param mask the collision mask
+     * @param debugDraw allow debug drawing
      */
-    btRigidBody* addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group = 1, int mask = -1);
+    btRigidBody* addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group = 1, int mask = -1, bool debugDraw = false);
     /** Add static body for Ogre terrain
      * @param terrain the terrain
      * @param group the collision group
      * @param mask the collision mask
+     * @param debugDraw allow debug drawing
      */
-    btRigidBody* addTerrainRigidBody(Terrain* terrain, int group = 1, int mask = -1);
+    btRigidBody* addTerrainRigidBody(Terrain* terrain, int group = 1, int mask = -1, bool debugDraw = false);
 
     void attachRigidBody(btRigidBody *rigidBody, Entity *ent, CollisionListener* listener = nullptr,
                               int group = 1, int mask = -1);
