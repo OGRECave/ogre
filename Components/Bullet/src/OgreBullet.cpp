@@ -943,6 +943,8 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
 
     mCurrentPosition = mGhostObject->getWorldTransform().getOrigin();
 
+    mManifolds = 0;
+
     /* Narrow phase supports btCollisionShape already */
     for (int i = 0; i < mGhostObject->getOverlappingPairCache()->getNumOverlappingPairs(); i++)
     {
@@ -965,6 +967,7 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
         if (collisionPair->m_algorithm)
             collisionPair->m_algorithm->getAllContactManifolds(mManifoldArray);
 
+        mManifolds += mManifoldArray.size();
         for (int j = 0; j < mManifoldArray.size(); j++)
         {
             btPersistentManifold* manifold = mManifoldArray[j];
@@ -993,6 +996,7 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
     btTransform newTrans = mGhostObject->getWorldTransform();
     newTrans.setOrigin(mCurrentPosition);
     mGhostObject->setWorldTransform(newTrans);
+    mIsPenetrating = penetration;
     return penetration;
 }
 bool KinematicMotionSimple::needsCollision(const btCollisionObject* body0, const btCollisionObject* body1)
@@ -1084,7 +1088,7 @@ void KinematicMotionSimple::setupCollisionShapes(btCollisionObject* body)
 }
 KinematicMotionSimple::KinematicMotionSimple(btPairCachingGhostObject* ghostObject, Node* node)
     : btActionInterface(), mGhostObject(ghostObject), mMaxPenetrationDepth(0.0f),
-      mNode(node)
+      mNode(node), mIsPenetrating(false), mManifolds(0)
 {
     btTransform nodeXform;
     nodeXform.setRotation(convert(node->getOrientation()));
