@@ -1085,7 +1085,8 @@ void KinematicMotionSimple::setupCollisionShapes(btCollisionObject* body)
     OgreAssert(mCollisionShapes.size() > 0, "No collision shapes");
 }
 KinematicMotionSimple::KinematicMotionSimple(btPairCachingGhostObject* ghostObject, Node* node)
-    : btActionInterface(), mGhostObject(ghostObject), mNode(node)
+    : btActionInterface(), mGhostObject(ghostObject), mMaxPenetrationDepth(0.0f),
+      mNode(node)
 {
     btTransform nodeXform;
     nodeXform.setRotation(convert(node->getOrientation()));
