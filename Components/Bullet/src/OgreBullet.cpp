@@ -953,13 +953,11 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
         btCollisionObject* obj0 = static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject);
         btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
 
-        /* TODO: implement filtering
-        if ((obj0 && !obj0->hasContactResponse()) || (obj1 && !obj1->hasContactResponse()))
-        {
-            std::cout << "No contact response\n";
+	/* Do not de-penetrate from objects which have no contact response setting.
+	 * However the body itself is de-penetrated regardless of this setting */
+	if ((obj0 != mGhostObject && !obj0->hasContactResponse()) ||
+            (obj1 != mGhostObject && !obj1->hasContactResponse()))
             continue;
-        }
-        */
 
         if (!needsCollision(obj0, obj1))
             continue;
