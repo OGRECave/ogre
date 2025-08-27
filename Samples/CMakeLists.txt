@@ -57,6 +57,10 @@ if (OGRE_BUILD_SAMPLES)
     list(REMOVE_ITEM SAMPLES_SOURCES ${BLACKLIST_CPP})
   endforeach()
 
+  if (NOT OGRE_BUILD_COMPONENT_TERRAIN)
+    list(REMOVE_ITEM SAMPLES_SOURCES ${PROJECT_SOURCE_DIR}/Samples/EndlessWorld/src/PerlinNoiseTerrainGenerator.cpp)
+  endif ()
+
   add_definitions(${OGRE_VISIBILITY_FLAGS})
   add_library(DefaultSamples ${OGRE_LIB_TYPE} 
               ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/DefaultSamplesPlugin.cpp
