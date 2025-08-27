@@ -340,7 +340,7 @@ public:
 
     
     /** Get auto constant int data of this parameter, in case it is auto constant parameter. */
-    uint32 getAutoConstantIntData() const { return isArray() ? getSize() : mAutoConstantIntData; }
+    uint32 getAutoConstantIntData() const { return isArray() ? static_cast<uint32>(getSize()) : mAutoConstantIntData; }
 
     /** Get auto constant real data of this parameter, in case it is auto constant parameter. */
     float getAutoConstantRealData() const { return mAutoConstantRealData; }
