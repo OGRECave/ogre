@@ -855,28 +855,27 @@ namespace Ogre
         m[2][2] = fZ2*fOneMinusCos+fCos;
     }
     //-----------------------------------------------------------------------
-    bool Matrix3::ToEulerAnglesXYZ (Radian& rfYAngle, Radian& rfPAngle,
-        Radian& rfRAngle) const
+    bool Matrix3::ToEulerAnglesXYZ(Radian& xAngle, Radian& yAngle, Radian& zAngle) const
     {
         // rot =  cy*cz          -cy*sz           sy
         //        cz*sx*sy+cx*sz  cx*cz-sx*sy*sz -cy*sx
         //       -cx*cz*sy+sx*sz  cz*sx+cx*sy*sz  cx*cy
 
-        rfPAngle = Radian(Math::ASin(m[0][2]));
-        if ( rfPAngle < Radian(Math::HALF_PI) )
+        yAngle = Radian(Math::ASin(m[0][2]));
+        if ( yAngle < Radian(Math::HALF_PI) )
         {
-            if ( rfPAngle > Radian(-Math::HALF_PI) )
+            if ( yAngle > Radian(-Math::HALF_PI) )
             {
-                rfYAngle = Math::ATan2(-m[1][2],m[2][2]);
-                rfRAngle = Math::ATan2(-m[0][1],m[0][0]);
+                xAngle = Math::ATan2(-m[1][2],m[2][2]);
+                zAngle = Math::ATan2(-m[0][1],m[0][0]);
                 return true;
             }
             else
             {
                 // WARNING.  Not a unique solution.
                 Radian fRmY = Math::ATan2(m[1][0],m[1][1]);
-                rfRAngle = Radian(0.0);  // any angle works
-                rfYAngle = rfRAngle - fRmY;
+                zAngle = Radian(0.0);  // any angle works
+                xAngle = zAngle - fRmY;
                 return false;
             }
         }
@@ -884,34 +883,33 @@ namespace Ogre
         {
             // WARNING.  Not a unique solution.
             Radian fRpY = Math::ATan2(m[1][0],m[1][1]);
-            rfRAngle = Radian(0.0);  // any angle works
-            rfYAngle = fRpY - rfRAngle;
+            zAngle = Radian(0.0);  // any angle works
+            xAngle = fRpY - zAngle;
             return false;
         }
     }
     //-----------------------------------------------------------------------
-    bool Matrix3::ToEulerAnglesXZY (Radian& rfYAngle, Radian& rfPAngle,
-        Radian& rfRAngle) const
+    bool Matrix3::ToEulerAnglesXZY(Radian& xAngle, Radian& zAngle, Radian& yAngle) const
     {
         // rot =  cy*cz          -sz              cz*sy
         //        sx*sy+cx*cy*sz  cx*cz          -cy*sx+cx*sy*sz
         //       -cx*sy+cy*sx*sz  cz*sx           cx*cy+sx*sy*sz
 
-        rfPAngle = Math::ASin(-m[0][1]);
-        if ( rfPAngle < Radian(Math::HALF_PI) )
+        zAngle = Math::ASin(-m[0][1]);
+        if ( zAngle < Radian(Math::HALF_PI) )
         {
-            if ( rfPAngle > Radian(-Math::HALF_PI) )
+            if ( zAngle > Radian(-Math::HALF_PI) )
             {
-                rfYAngle = Math::ATan2(m[2][1],m[1][1]);
-                rfRAngle = Math::ATan2(m[0][2],m[0][0]);
+                xAngle = Math::ATan2(m[2][1],m[1][1]);
+                yAngle = Math::ATan2(m[0][2],m[0][0]);
                 return true;
             }
             else
             {
                 // WARNING.  Not a unique solution.
                 Radian fRmY = Math::ATan2(-m[2][0],m[2][2]);
-                rfRAngle = Radian(0.0);  // any angle works
-                rfYAngle = rfRAngle - fRmY;
+                yAngle = Radian(0.0);  // any angle works
+                xAngle = yAngle - fRmY;
                 return false;
             }
         }
@@ -919,34 +917,33 @@ namespace Ogre
         {
             // WARNING.  Not a unique solution.
             Radian fRpY = Math::ATan2(-m[2][0],m[2][2]);
-            rfRAngle = Radian(0.0);  // any angle works
-            rfYAngle = fRpY - rfRAngle;
+            yAngle = Radian(0.0);  // any angle works
+            xAngle = fRpY - yAngle;
             return false;
         }
     }
     //-----------------------------------------------------------------------
-    bool Matrix3::ToEulerAnglesYXZ (Radian& rfYAngle, Radian& rfPAngle,
-        Radian& rfRAngle) const
+    bool Matrix3::ToEulerAnglesYXZ(Radian& yAngle, Radian& xAngle, Radian& zAngle) const
     {
         // rot =  cy*cz+sx*sy*sz  cz*sx*sy-cy*sz  cx*sy
         //        cx*sz           cx*cz          -sx
         //       -cz*sy+cy*sx*sz  cy*cz*sx+sy*sz  cx*cy
 
-        rfPAngle = Math::ASin(-m[1][2]);
-        if ( rfPAngle < Radian(Math::HALF_PI) )
+        xAngle = Math::ASin(-m[1][2]);
+        if ( xAngle < Radian(Math::HALF_PI) )
         {
-            if ( rfPAngle > Radian(-Math::HALF_PI) )
+            if ( xAngle > Radian(-Math::HALF_PI) )
             {
-                rfYAngle = Math::ATan2(m[0][2],m[2][2]);
-                rfRAngle = Math::ATan2(m[1][0],m[1][1]);
+                yAngle = Math::ATan2(m[0][2],m[2][2]);
+                zAngle = Math::ATan2(m[1][0],m[1][1]);
                 return true;
             }
             else
             {
                 // WARNING.  Not a unique solution.
                 Radian fRmY = Math::ATan2(-m[0][1],m[0][0]);
-                rfRAngle = Radian(0.0);  // any angle works
-                rfYAngle = rfRAngle - fRmY;
+                zAngle = Radian(0.0);  // any angle works
+                yAngle = zAngle - fRmY;
                 return false;
             }
         }
@@ -954,34 +951,33 @@ namespace Ogre
         {
             // WARNING.  Not a unique solution.
             Radian fRpY = Math::ATan2(-m[0][1],m[0][0]);
-            rfRAngle = Radian(0.0);  // any angle works
-            rfYAngle = fRpY - rfRAngle;
+            zAngle = Radian(0.0);  // any angle works
+            yAngle = fRpY - zAngle;
             return false;
         }
     }
     //-----------------------------------------------------------------------
-    bool Matrix3::ToEulerAnglesYZX (Radian& rfYAngle, Radian& rfPAngle,
-        Radian& rfRAngle) const
+    bool Matrix3::ToEulerAnglesYZX(Radian& yAngle, Radian& zAngle, Radian& xAngle) const
     {
         // rot =  cy*cz           sx*sy-cx*cy*sz  cx*sy+cy*sx*sz
         //        sz              cx*cz          -cz*sx
         //       -cz*sy           cy*sx+cx*sy*sz  cx*cy-sx*sy*sz
 
-        rfPAngle = Math::ASin(m[1][0]);
-        if ( rfPAngle < Radian(Math::HALF_PI) )
+        zAngle = Math::ASin(m[1][0]);
+        if ( zAngle < Radian(Math::HALF_PI) )
         {
-            if ( rfPAngle > Radian(-Math::HALF_PI) )
+            if ( zAngle > Radian(-Math::HALF_PI) )
             {
-                rfYAngle = Math::ATan2(-m[2][0],m[0][0]);
-                rfRAngle = Math::ATan2(-m[1][2],m[1][1]);
+                yAngle = Math::ATan2(-m[2][0],m[0][0]);
+                xAngle = Math::ATan2(-m[1][2],m[1][1]);
                 return true;
             }
             else
             {
                 // WARNING.  Not a unique solution.
                 Radian fRmY = Math::ATan2(m[2][1],m[2][2]);
-                rfRAngle = Radian(0.0);  // any angle works
-                rfYAngle = rfRAngle - fRmY;
+                xAngle = Radian(0.0);  // any angle works
+                yAngle = xAngle - fRmY;
                 return false;
             }
         }
@@ -989,34 +985,33 @@ namespace Ogre
         {
             // WARNING.  Not a unique solution.
             Radian fRpY = Math::ATan2(m[2][1],m[2][2]);
-            rfRAngle = Radian(0.0);  // any angle works
-            rfYAngle = fRpY - rfRAngle;
+            xAngle = Radian(0.0);  // any angle works
+            yAngle = fRpY - xAngle;
             return false;
         }
     }
     //-----------------------------------------------------------------------
-    bool Matrix3::ToEulerAnglesZXY (Radian& rfYAngle, Radian& rfPAngle,
-        Radian& rfRAngle) const
+    bool Matrix3::ToEulerAnglesZXY(Radian& zAngle, Radian& xAngle, Radian& yAngle) const
     {
         // rot =  cy*cz-sx*sy*sz -cx*sz           cz*sy+cy*sx*sz
         //        cz*sx*sy+cy*sz  cx*cz          -cy*cz*sx+sy*sz
         //       -cx*sy           sx              cx*cy
 
-        rfPAngle = Math::ASin(m[2][1]);
-        if ( rfPAngle < Radian(Math::HALF_PI) )
+        xAngle = Math::ASin(m[2][1]);
+        if ( xAngle < Radian(Math::HALF_PI) )
         {
-            if ( rfPAngle > Radian(-Math::HALF_PI) )
+            if ( xAngle > Radian(-Math::HALF_PI) )
             {
-                rfYAngle = Math::ATan2(-m[0][1],m[1][1]);
-                rfRAngle = Math::ATan2(-m[2][0],m[2][2]);
+                zAngle = Math::ATan2(-m[0][1],m[1][1]);
+                yAngle = Math::ATan2(-m[2][0],m[2][2]);
                 return true;
             }
             else
             {
                 // WARNING.  Not a unique solution.
                 Radian fRmY = Math::ATan2(m[0][2],m[0][0]);
-                rfRAngle = Radian(0.0);  // any angle works
-                rfYAngle = rfRAngle - fRmY;
+                yAngle = Radian(0.0);  // any angle works
+                zAngle = yAngle - fRmY;
                 return false;
             }
         }
@@ -1024,34 +1019,33 @@ namespace Ogre
         {
             // WARNING.  Not a unique solution.
             Radian fRpY = Math::ATan2(m[0][2],m[0][0]);
-            rfRAngle = Radian(0.0);  // any angle works
-            rfYAngle = fRpY - rfRAngle;
+            yAngle = Radian(0.0);  // any angle works
+            zAngle = fRpY - yAngle;
             return false;
         }
     }
     //-----------------------------------------------------------------------
-    bool Matrix3::ToEulerAnglesZYX (Radian& rfYAngle, Radian& rfPAngle,
-        Radian& rfRAngle) const
+    bool Matrix3::ToEulerAnglesZYX(Radian& zAngle, Radian& yAngle, Radian& xAngle) const
     {
         // rot =  cy*cz           cz*sx*sy-cx*sz  cx*cz*sy+sx*sz
         //        cy*sz           cx*cz+sx*sy*sz -cz*sx+cx*sy*sz
         //       -sy              cy*sx           cx*cy
 
-        rfPAngle = Math::ASin(-m[2][0]);
-        if ( rfPAngle < Radian(Math::HALF_PI) )
+        yAngle = Math::ASin(-m[2][0]);
+        if ( yAngle < Radian(Math::HALF_PI) )
         {
-            if ( rfPAngle > Radian(-Math::HALF_PI) )
+            if ( yAngle > Radian(-Math::HALF_PI) )
             {
-                rfYAngle = Math::ATan2(m[1][0],m[0][0]);
-                rfRAngle = Math::ATan2(m[2][1],m[2][2]);
+                zAngle = Math::ATan2(m[1][0],m[0][0]);
+                xAngle = Math::ATan2(m[2][1],m[2][2]);
                 return true;
             }
             else
             {
                 // WARNING.  Not a unique solution.
                 Radian fRmY = Math::ATan2(-m[0][1],m[0][2]);
-                rfRAngle = Radian(0.0);  // any angle works
-                rfYAngle = rfRAngle - fRmY;
+                xAngle = Radian(0.0);  // any angle works
+                zAngle = xAngle - fRmY;
                 return false;
             }
         }
@@ -1059,127 +1053,121 @@ namespace Ogre
         {
             // WARNING.  Not a unique solution.
             Radian fRpY = Math::ATan2(-m[0][1],m[0][2]);
-            rfRAngle = Radian(0.0);  // any angle works
-            rfYAngle = fRpY - rfRAngle;
+            xAngle = Radian(0.0);  // any angle works
+            zAngle = fRpY - xAngle;
             return false;
         }
     }
     //-----------------------------------------------------------------------
-    void Matrix3::FromEulerAnglesXYZ (const Radian& fYAngle, const Radian& fPAngle,
-        const Radian& fRAngle)
+    void Matrix3::FromEulerAnglesXYZ(const Radian& xAngle, const Radian& yAngle, const Radian& zAngle)
     {
         Real fCos, fSin;
 
-        fCos = Math::Cos(fYAngle);
-        fSin = Math::Sin(fYAngle);
+        fCos = Math::Cos(xAngle);
+        fSin = Math::Sin(xAngle);
         Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
 
-        fCos = Math::Cos(fPAngle);
-        fSin = Math::Sin(fPAngle);
+        fCos = Math::Cos(yAngle);
+        fSin = Math::Sin(yAngle);
         Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
 
-        fCos = Math::Cos(fRAngle);
-        fSin = Math::Sin(fRAngle);
+        fCos = Math::Cos(zAngle);
+        fSin = Math::Sin(zAngle);
         Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
 
         *this = kXMat*(kYMat*kZMat);
     }
     //-----------------------------------------------------------------------
-    void Matrix3::FromEulerAnglesXZY (const Radian& fYAngle, const Radian& fPAngle,
-        const Radian& fRAngle)
+    void Matrix3::FromEulerAnglesXZY(const Radian& xAngle, const Radian& zAngle, const Radian& yAngle)
     {
         Real fCos, fSin;
 
-        fCos = Math::Cos(fYAngle);
-        fSin = Math::Sin(fYAngle);
+        fCos = Math::Cos(xAngle);
+        fSin = Math::Sin(xAngle);
         Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
 
-        fCos = Math::Cos(fPAngle);
-        fSin = Math::Sin(fPAngle);
+        fCos = Math::Cos(zAngle);
+        fSin = Math::Sin(zAngle);
         Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
 
-        fCos = Math::Cos(fRAngle);
-        fSin = Math::Sin(fRAngle);
+        fCos = Math::Cos(yAngle);
+        fSin = Math::Sin(yAngle);
         Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
 
         *this = kXMat*(kZMat*kYMat);
     }
     //-----------------------------------------------------------------------
-    void Matrix3::FromEulerAnglesYXZ (const Radian& fYAngle, const Radian& fPAngle,
-        const Radian& fRAngle)
+    void Matrix3::FromEulerAnglesYXZ(const Radian& yAngle, const Radian& xAngle, const Radian& zAngle)
     {
         Real fCos, fSin;
 
-        fCos = Math::Cos(fYAngle);
-        fSin = Math::Sin(fYAngle);
+        fCos = Math::Cos(yAngle);
+        fSin = Math::Sin(yAngle);
         Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
 
-        fCos = Math::Cos(fPAngle);
-        fSin = Math::Sin(fPAngle);
+        fCos = Math::Cos(xAngle);
+        fSin = Math::Sin(xAngle);
         Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
 
-        fCos = Math::Cos(fRAngle);
-        fSin = Math::Sin(fRAngle);
+        fCos = Math::Cos(zAngle);
+        fSin = Math::Sin(zAngle);
         Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
 
         *this = kYMat*(kXMat*kZMat);
     }
     //-----------------------------------------------------------------------
-    void Matrix3::FromEulerAnglesYZX (const Radian& fYAngle, const Radian& fPAngle,
-        const Radian& fRAngle)
+    void Matrix3::FromEulerAnglesYZX(const Radian& yAngle, const Radian& zAngle, const Radian& xAngle)
     {
         Real fCos, fSin;
 
-        fCos = Math::Cos(fYAngle);
-        fSin = Math::Sin(fYAngle);
+        fCos = Math::Cos(yAngle);
+        fSin = Math::Sin(yAngle);
         Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
 
-        fCos = Math::Cos(fPAngle);
-        fSin = Math::Sin(fPAngle);
+        fCos = Math::Cos(zAngle);
+        fSin = Math::Sin(zAngle);
         Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
 
-        fCos = Math::Cos(fRAngle);
-        fSin = Math::Sin(fRAngle);
+        fCos = Math::Cos(xAngle);
+        fSin = Math::Sin(xAngle);
         Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
 
         *this = kYMat*(kZMat*kXMat);
     }
     //-----------------------------------------------------------------------
-    void Matrix3::FromEulerAnglesZXY (const Radian& fYAngle, const Radian& fPAngle,
-        const Radian& fRAngle)
+    void Matrix3::FromEulerAnglesZXY(const Radian& zAngle, const Radian& xAngle, const Radian& yAngle)
     {
         Real fCos, fSin;
 
-        fCos = Math::Cos(fYAngle);
-        fSin = Math::Sin(fYAngle);
+        fCos = Math::Cos(zAngle);
+        fSin = Math::Sin(zAngle);
         Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
 
-        fCos = Math::Cos(fPAngle);
-        fSin = Math::Sin(fPAngle);
+        fCos = Math::Cos(xAngle);
+        fSin = Math::Sin(xAngle);
         Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
 
-        fCos = Math::Cos(fRAngle);
-        fSin = Math::Sin(fRAngle);
+        fCos = Math::Cos(yAngle);
+        fSin = Math::Sin(yAngle);
         Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
 
         *this = kZMat*(kXMat*kYMat);
     }
     //-----------------------------------------------------------------------
-    void Matrix3::FromEulerAnglesZYX (const Radian& fYAngle, const Radian& fPAngle,
-        const Radian& fRAngle)
+    void Matrix3::FromEulerAnglesZYX(const Radian& zAngle, const Radian& yAngle, const Radian& xAngle)
     {
         Real fCos, fSin;
 
-        fCos = Math::Cos(fYAngle);
-        fSin = Math::Sin(fYAngle);
+        fCos = Math::Cos(zAngle);
+        fSin = Math::Sin(zAngle);
         Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
 
-        fCos = Math::Cos(fPAngle);
-        fSin = Math::Sin(fPAngle);
+        fCos = Math::Cos(yAngle);
+        fSin = Math::Sin(yAngle);
         Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
 
-        fCos = Math::Cos(fRAngle);
-        fSin = Math::Sin(fRAngle);
+        fCos = Math::Cos(xAngle);
+        fSin = Math::Sin(xAngle);
         Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
 
         *this = kZMat*(kYMat*kXMat);

@@ -244,18 +244,18 @@ namespace Ogre
             @note The matrix to be decomposed must be orthonormal.
             @{
         */
-        bool ToEulerAnglesXYZ(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
-        bool ToEulerAnglesXZY(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
-        bool ToEulerAnglesYXZ(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
-        bool ToEulerAnglesYZX(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
-        bool ToEulerAnglesZXY(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
-        bool ToEulerAnglesZYX(Radian& rfYAngle, Radian& rfPAngle, Radian& rfRAngle) const;
-        void FromEulerAnglesXYZ (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
-        void FromEulerAnglesXZY (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
-        void FromEulerAnglesYXZ (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
-        void FromEulerAnglesYZX (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
-        void FromEulerAnglesZXY (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
-        void FromEulerAnglesZYX (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
+        bool ToEulerAnglesXYZ(Radian& xAngle, Radian& yAngle, Radian& zAngle) const;
+        bool ToEulerAnglesXZY(Radian& xAngle, Radian& zAngle, Radian& yAngle) const;
+        bool ToEulerAnglesYXZ(Radian& yAngle, Radian& xAngle, Radian& zAngle) const;
+        bool ToEulerAnglesYZX(Radian& yAngle, Radian& zAngle, Radian& xAngle) const;
+        bool ToEulerAnglesZXY(Radian& zAngle, Radian& xAngle, Radian& yAngle) const;
+        bool ToEulerAnglesZYX(Radian& zAngle, Radian& yAngle, Radian& xAngle) const;
+        void FromEulerAnglesXYZ(const Radian& xAngle, const Radian& yAngle, const Radian& zAngle);
+        void FromEulerAnglesXZY(const Radian& xAngle, const Radian& zAngle, const Radian& yAngle);
+        void FromEulerAnglesYXZ(const Radian& yAngle, const Radian& xAngle, const Radian& zAngle);
+        void FromEulerAnglesYZX(const Radian& yAngle, const Radian& zAngle, const Radian& xAngle);
+        void FromEulerAnglesZXY(const Radian& zAngle, const Radian& xAngle, const Radian& yAngle);
+        void FromEulerAnglesZYX(const Radian& zAngle, const Radian& yAngle, const Radian& xAngle);
         /// @}
         /// Eigensolver, matrix must be symmetric
         void EigenSolveSymmetric (Real afEigenvalue[3],
