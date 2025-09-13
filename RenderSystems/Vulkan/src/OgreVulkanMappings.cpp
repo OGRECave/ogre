@@ -279,25 +279,6 @@ namespace Ogre
         return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
     }
     //-----------------------------------------------------------------------------------
-    VkImageViewType VulkanMappings::get( TextureType textureType )
-    {
-        switch( textureType )
-        {
-        // clang-format off
-        case TEX_TYPE_1D:          return VK_IMAGE_VIEW_TYPE_1D;
-        //case TextureTypes::Type1DArray:     return VK_IMAGE_VIEW_TYPE_1D_ARRAY;
-        case TEX_TYPE_2D:          return VK_IMAGE_VIEW_TYPE_2D;
-        case TEX_TYPE_2D_ARRAY:     return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-        case TEX_TYPE_CUBE_MAP:        return VK_IMAGE_VIEW_TYPE_CUBE;
-        //case TextureTypes::TypeCubeArray:   return VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
-        case TEX_TYPE_3D:          return VK_IMAGE_VIEW_TYPE_3D;
-            // clang-format on
-        case TEX_TYPE_EXTERNAL_OES:
-            break;
-        }
-        return VK_IMAGE_VIEW_TYPE_2D;
-    }
-    //-----------------------------------------------------------------------------------
     VkFormat VulkanMappings::get( PixelFormat pf, bool hwGamma )
     {
         // clang-format off
