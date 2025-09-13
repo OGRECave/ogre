@@ -509,6 +509,7 @@ namespace Ogre
         {
         case TEX_TYPE_1D:          return VK_IMAGE_TYPE_1D;
         case TEX_TYPE_2D:          return VK_IMAGE_TYPE_2D;
+        case TEX_TYPE_2D_MULTISAMPLE: return VK_IMAGE_TYPE_2D;
         case TEX_TYPE_2D_ARRAY:    return VK_IMAGE_TYPE_2D;
         case TEX_TYPE_CUBE_MAP:    return VK_IMAGE_TYPE_2D;
         case TEX_TYPE_3D:          return VK_IMAGE_TYPE_3D;
@@ -526,6 +527,7 @@ namespace Ogre
         {
         case TEX_TYPE_1D:          return VK_IMAGE_VIEW_TYPE_1D;
         case TEX_TYPE_2D:          return VK_IMAGE_VIEW_TYPE_2D;
+        case TEX_TYPE_2D_MULTISAMPLE: return VK_IMAGE_VIEW_TYPE_2D;
         case TEX_TYPE_2D_ARRAY:    return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
         case TEX_TYPE_CUBE_MAP:    return VK_IMAGE_VIEW_TYPE_CUBE;
         case TEX_TYPE_3D:          return VK_IMAGE_VIEW_TYPE_3D;

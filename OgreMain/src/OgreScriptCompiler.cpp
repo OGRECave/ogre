@@ -1058,6 +1058,7 @@ namespace Ogre
         mIds["unlimited"] = ID_UNLIMITED;
         mIds["2darray"] = ID_2DARRAY; // deprecated and undocumented
         mIds["2d_array"] = ID_2DARRAY;
+        mIds["2d_ms"] = ID_2DMS;
         mIds["alpha"] = ID_ALPHA;
         mIds["gamma"] = ID_GAMMA;
         mIds["anim_texture"] = ID_ANIM_TEXTURE;

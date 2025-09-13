@@ -162,12 +162,10 @@ namespace Ogre {
                                 size, &tmpdata[0]);
                         }
                         break;
+                    case TEX_TYPE_2D_MULTISAMPLE:
                     case TEX_TYPE_EXTERNAL_OES:
-                        OGRE_EXCEPT(
-                            Exception::ERR_RENDERINGAPI_ERROR,
-                            "Attempt to create mipmaps for unsupported TEX_TYPE_EXTERNAL_OES, should never happen",
-                            "GLTexture::createInternalResourcesImpl"
-                        );
+                        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                                    "Attempt to allocate storage for unsupported format");
                         break;
                 };
                 if(width>1)
@@ -210,12 +208,10 @@ namespace Ogre {
                                 format, datatype, 0);
                         }
                         break;
+                    case TEX_TYPE_2D_MULTISAMPLE:
                     case TEX_TYPE_EXTERNAL_OES:
-                        OGRE_EXCEPT(
-                            Exception::ERR_RENDERINGAPI_ERROR,
-                            "Attempt to create mipmaps for unsupported TEX_TYPE_EXTERNAL_OES, should never happen",
-                            "GLTexture::createInternalResourcesImpl"
-                        );
+                        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                                    "Attempt to allocate storage for unsupported format");
                         break;
                 };
                 if(width>1)
