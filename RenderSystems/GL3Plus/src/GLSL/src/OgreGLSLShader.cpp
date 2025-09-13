@@ -92,6 +92,7 @@ namespace Ogre {
         case GL_IMAGE_2D: //TODO should be its own type?
         case GL_IMAGE_2D_RECT:
         case GL_SAMPLER_2D:
+        case GL_SAMPLER_2D_MULTISAMPLE:
         case GL_SAMPLER_2D_RECT:    // TODO: Move these to a new type??
         case GL_INT_SAMPLER_2D_RECT:
         case GL_UNSIGNED_INT_SAMPLER_2D_RECT:

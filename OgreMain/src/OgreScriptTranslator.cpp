@@ -4639,6 +4639,9 @@ namespace Ogre{
                             case ID_2DARRAY:
                                 type = TEX_TYPE_2D_ARRAY;
                                 break;
+                            case ID_2DMS:
+                                type = TEX_TYPE_2D_MULTISAMPLE;
+                                break;
                             case ID_SCOPE_LOCAL:
                                 scope = CompositionTechnique::TS_LOCAL;
                                 break;

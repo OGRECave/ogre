@@ -110,8 +110,10 @@ namespace Ogre {
         TEX_TYPE_CUBE_MAP = 4,
         /// 2D texture array
         TEX_TYPE_2D_ARRAY = 5,
+        /// 2D texture with multiple samples per pixel, allows manual MSAA resolve
+        TEX_TYPE_2D_MULTISAMPLE = 6,
         /// GLES2 only OES texture type
-        TEX_TYPE_EXTERNAL_OES = 6
+        TEX_TYPE_EXTERNAL_OES = 7
     };
 
     /** Enum identifying special mipmap numbers

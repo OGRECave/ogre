@@ -61,6 +61,7 @@ namespace Ogre {
         {
         case TEX_TYPE_1D:
             return GL_TEXTURE_1D;
+        default:
         case TEX_TYPE_2D:
             return GL_TEXTURE_2D;
         case TEX_TYPE_3D:
@@ -69,8 +70,8 @@ namespace Ogre {
             return GL_TEXTURE_CUBE_MAP;
         case TEX_TYPE_2D_ARRAY:
             return GL_TEXTURE_2D_ARRAY;
-        default:
-            return 0;
+        case TEX_TYPE_2D_MULTISAMPLE:
+            return GL_TEXTURE_2D_MULTISAMPLE;
         };
     }
 
@@ -223,6 +224,9 @@ namespace Ogre {
                 case TEX_TYPE_3D:
                     OGRE_CHECK_GL_ERROR(glTexStorage3D(texTarget, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
                     break;
+                case TEX_TYPE_2D_MULTISAMPLE:
+                    OGRE_CHECK_GL_ERROR(glTexStorage2DMultisample(texTarget, mFSAA, format, width, height, true));
+                    break;
                 case TEX_TYPE_EXTERNAL_OES:
                     OGRE_EXCEPT(
                         Exception::ERR_RENDERINGAPI_ERROR,
@@ -280,6 +284,10 @@ namespace Ogre {
                                                              width, height, 0,
                                                              originFormat, datatype, NULL));
                         }
+                        break;
+                    case TEX_TYPE_2D_MULTISAMPLE:
+                        OGRE_CHECK_GL_ERROR(
+                            glTexImage2DMultisample(texTarget, mFSAA, format, width, height, true));
                         break;
                     case TEX_TYPE_EXTERNAL_OES:
                         OGRE_EXCEPT(

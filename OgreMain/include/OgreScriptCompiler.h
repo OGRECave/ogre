@@ -694,6 +694,7 @@ namespace Ogre
             ID_3D,
             ID_CUBIC,
             ID_2DARRAY,
+            ID_2DMS,
             ID_UNLIMITED,
             ID_ALPHA,
             ID_GAMMA,

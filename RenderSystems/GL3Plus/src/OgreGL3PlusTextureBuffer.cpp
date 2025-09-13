@@ -97,8 +97,9 @@ namespace Ogre {
                 GLSurfaceDesc surface;
                 surface.buffer = this;
                 surface.zoffset = zoffset;
+                auto fsaa = parent->getTextureType() == TEX_TYPE_2D_MULTISAMPLE ? 0 : parent->getFSAA();
                 RenderTexture* trt = GL3PlusRTTManager::getSingleton().createRenderTexture(
-                    name, surface, parent->isHardwareGammaEnabled(), parent->getFSAA());
+                    name, surface, parent->isHardwareGammaEnabled(), fsaa);
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
             }
@@ -472,6 +473,7 @@ namespace Ogre {
         {
         case GL_TEXTURE_1D:
         case GL_TEXTURE_2D:
+        case GL_TEXTURE_2D_MULTISAMPLE:
         case GL_TEXTURE_RECTANGLE:
             OGRE_CHECK_GL_ERROR(glFramebufferTexture(which, attachment,
                                                      mTextureID, mLevel));

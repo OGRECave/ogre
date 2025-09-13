@@ -592,6 +592,7 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
             break;
         OGRE_FALLTHROUGH;
     case TEX_TYPE_2D:
+    case TEX_TYPE_2D_MULTISAMPLE:
         curParams.mTextureSamplerType = GCT_SAMPLER2D;
         curParams.mVSInTextureCoordinateType = GCT_FLOAT2;
         break;
