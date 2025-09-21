@@ -147,8 +147,9 @@ namespace Ogre {
                 GLSurfaceDesc surface;
                 surface.buffer = this;
                 surface.zoffset = zoffset;
+                surface.numSamples = parent->getFSAA();
                 RenderTexture* trt = GLRTTManager::getSingleton().createRenderTexture(
-                    name, surface, parent->isHardwareGammaEnabled(), parent->getFSAA());
+                    name, surface, parent->isHardwareGammaEnabled());
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
             }

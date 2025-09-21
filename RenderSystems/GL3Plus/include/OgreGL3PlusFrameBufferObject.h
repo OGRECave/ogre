@@ -38,7 +38,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusFrameBufferObject : public GLFrameBufferObjectCommon
     {
     public:
-        GL3PlusFrameBufferObject(uint fsaa);
+        GL3PlusFrameBufferObject();
         ~GL3PlusFrameBufferObject();
 
         bool bind(bool recreateIfNeeded) override;

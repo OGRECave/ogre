@@ -39,7 +39,7 @@ namespace Ogre {
     class _OgreGLExport GLPBRenderTexture: public GLRenderTexture
     {
     public:
-        GLPBRenderTexture(GLPBRTTManager *manager, const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+        GLPBRenderTexture(GLPBRTTManager *manager, const String &name, const GLSurfaceDesc &target, bool writeGamma);
         virtual ~GLPBRenderTexture();
         
         void getCustomAttribute(const String& name, void* pData) override;
@@ -59,7 +59,7 @@ namespace Ogre {
         virtual ~GLPBRTTManager();
 
         RenderTexture *createRenderTexture(const String &name,
-            const GLSurfaceDesc &target, bool writeGamma, uint fsaa) override;
+            const GLSurfaceDesc &target, bool writeGamma) override;
         
          /** @copydoc GLRTTManager::checkFormat
         */

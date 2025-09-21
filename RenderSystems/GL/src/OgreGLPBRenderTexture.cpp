@@ -37,8 +37,8 @@ THE SOFTWARE.
 namespace Ogre {
 //-----------------------------------------------------------------------------  
     GLPBRenderTexture::GLPBRenderTexture(GLPBRTTManager *manager, const String &name, 
-        const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
-        GLRenderTexture(name, target, writeGamma, fsaa),
+        const GLSurfaceDesc &target, bool writeGamma):
+        GLRenderTexture(name, target, writeGamma),
         mManager(manager)
     {
         mPBFormat = PixelUtil::getComponentType(target.buffer->getFormat());
@@ -88,9 +88,9 @@ namespace Ogre {
     }
 
     RenderTexture *GLPBRTTManager::createRenderTexture(const String &name, 
-        const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
+        const GLSurfaceDesc &target, bool writeGamma)
     {
-        return new GLPBRenderTexture(this, name, target, writeGamma, fsaa);
+        return new GLPBRenderTexture(this, name, target, writeGamma);
     }
     
     bool GLPBRTTManager::checkFormat(PixelFormat format) 

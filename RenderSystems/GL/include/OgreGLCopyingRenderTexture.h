@@ -40,7 +40,7 @@ namespace Ogre {
     {
     public:
         GLCopyingRenderTexture(GLCopyingRTTManager *manager, const String &name, const GLSurfaceDesc &target, 
-            bool writeGamma, uint fsaa);
+            bool writeGamma);
         
         void getCustomAttribute(const String& name, void* pData) override;
 
@@ -53,8 +53,8 @@ namespace Ogre {
     class _OgreGLExport GLCopyingRTTManager: public GLRTTManager
     {
     public:
-        RenderTexture *createRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa) override {
-            return new GLCopyingRenderTexture(this, name, target, writeGamma, fsaa);
+        RenderTexture *createRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma) override {
+            return new GLCopyingRenderTexture(this, name, target, writeGamma);
         }
 
         bool checkFormat(PixelFormat format) {

@@ -39,9 +39,8 @@ namespace Ogre {
 
     GL3PlusFBORenderTexture::GL3PlusFBORenderTexture(
         const String &name,
-        const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
-        GLRenderTexture(name, target, writeGamma, fsaa),
-        mFB(fsaa)
+        const GLSurfaceDesc &target, bool writeGamma):
+        GLRenderTexture(name, target, writeGamma)
     {
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
@@ -49,6 +48,7 @@ namespace Ogre {
         // Get attributes
         mWidth = mFB.getWidth();
         mHeight = mFB.getHeight();
+        mFSAA = mFB.getFSAA();
     }
 
     void GL3PlusFBORenderTexture::getCustomAttribute(const String& name, void* pData)
@@ -452,9 +452,9 @@ namespace Ogre {
     }
 
     GL3PlusFBORenderTexture *GL3PlusFBOManager::createRenderTexture(const String &name,
-                                                                    const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
+                                                                    const GLSurfaceDesc &target, bool writeGamma)
     {
-        GL3PlusFBORenderTexture *retval = new GL3PlusFBORenderTexture(name, target, writeGamma, fsaa);
+        GL3PlusFBORenderTexture *retval = new GL3PlusFBORenderTexture(name, target, writeGamma);
         return retval;
     }
 

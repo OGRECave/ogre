@@ -40,9 +40,8 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------    
     GLES2FBORenderTexture::GLES2FBORenderTexture(const String &name,
-        const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
-        GLRenderTexture(name, target, writeGamma, fsaa),
-        mFB(fsaa)
+        const GLSurfaceDesc &target, bool writeGamma):
+        GLRenderTexture(name, target, writeGamma)
     {
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
@@ -50,6 +49,7 @@ namespace Ogre {
         // Get attributes
         mWidth = mFB.getWidth();
         mHeight = mFB.getHeight();
+        mFSAA = mFB.getFSAA();
     }
     
     void GLES2FBORenderTexture::getCustomAttribute(const String& name, void* pData)
@@ -490,9 +490,9 @@ namespace Ogre {
     }
 
     GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name, 
-        const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
+        const GLSurfaceDesc &target, bool writeGamma)
     {
-        GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(name, target, writeGamma, fsaa);
+        GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(name, target, writeGamma);
         return retval;
     }
 

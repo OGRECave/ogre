@@ -42,7 +42,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusFBORenderTexture : public GLRenderTexture
     {
     public:
-        GL3PlusFBORenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+        GL3PlusFBORenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma);
 
         void getCustomAttribute(const String& name, void* pData) override;
 
@@ -74,7 +74,7 @@ namespace Ogre {
         /** Create a texture rendertarget object
          */
         GL3PlusFBORenderTexture *createRenderTexture(const String &name,
-                                                             const GLSurfaceDesc &target, bool writeGamma, uint fsaa) override;
+                                                             const GLSurfaceDesc &target, bool writeGamma) override;
 
         GLSurfaceDesc createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa) override;
     private:

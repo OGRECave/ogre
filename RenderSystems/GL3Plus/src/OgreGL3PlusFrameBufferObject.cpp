@@ -36,30 +36,10 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(uint fsaa)
-    : GLFrameBufferObjectCommon(fsaa)
+GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
+    : GLFrameBufferObjectCommon()
 {
-    // Generate framebuffer object
-    OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
-
-    // Check samples supported
-    auto rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
-    rs->_getStateCacheManager()->bindGLFrameBuffer(GL_FRAMEBUFFER, mFB);
-
-    GLint maxSamples;
-    OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
-    mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
-
-    // Will we need a second FBO to do multisampling?
-    if (mNumSamples)
-    {
-        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-    }
-    else
-    {
-        mMultisampleFB = 0;
-    }
-    }
+}
     
     GL3PlusFrameBufferObject::~GL3PlusFrameBufferObject()
     {

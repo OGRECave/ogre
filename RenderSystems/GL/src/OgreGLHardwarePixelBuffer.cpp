@@ -147,7 +147,8 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent
             GLSurfaceDesc surface;
             surface.buffer = this;
             surface.zoffset = zoffset;
-            RenderTexture *trt = GLRTTManager::getSingleton().createRenderTexture(name, surface, mHwGamma, parent->getFSAA());
+            surface.numSamples = parent->getFSAA();
+            RenderTexture *trt = GLRTTManager::getSingleton().createRenderTexture(name, surface, mHwGamma);
             mSliceTRT.push_back(trt);
             Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
         }

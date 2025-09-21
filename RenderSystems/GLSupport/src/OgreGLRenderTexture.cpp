@@ -40,13 +40,9 @@ namespace Ogre {
 
     template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = NULL;
 
-    GLFrameBufferObjectCommon::GLFrameBufferObjectCommon(int32 fsaa)
-        : mFB(0), mMultisampleFB(0), mNumSamples(fsaa), mRTTManager(GLRTTManager::getSingletonPtr())
+    GLFrameBufferObjectCommon::GLFrameBufferObjectCommon()
+        : mContext(NULL), mFB(0), mMultisampleFB(0), mNumSamples(0), mRTTManager(GLRTTManager::getSingletonPtr())
     {
-        auto* rs = static_cast<GLRenderSystemCommon*>(
-            Root::getSingleton().getRenderSystem());
-        mContext = rs->_getCurrentContext();
-
         // Initialise state
         mDepth.buffer = 0;
         mStencil.buffer = 0;
@@ -68,7 +64,16 @@ namespace Ogre {
         mColour[attachment] = target;
         // Re-initialise
         if(mColour[0].buffer)
+        {
+            if(mColour[1].buffer)
+            {
+                mColour[0].numSamples = 0;
+                mContext = 0; // force re-init - e.g. when adding depth to MRT
+            }
+            mNumSamples = mColour[0].numSamples;
+            bind(true);
             initialise();
+        }
     }
 
     void GLFrameBufferObjectCommon::unbindSurface(size_t attachment)
@@ -273,12 +278,10 @@ namespace Ogre {
 
     GLRenderTexture::GLRenderTexture(const String &name,
                                                const GLSurfaceDesc &target,
-                                               bool writeGamma,
-                                               uint fsaa)
+                                               bool writeGamma)
         : RenderTexture(target.buffer, target.zoffset)
     {
         mName = name;
         mHwGamma = writeGamma;
-        mFSAA = fsaa;
     }
 }
