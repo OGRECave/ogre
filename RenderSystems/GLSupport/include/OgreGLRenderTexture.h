@@ -48,8 +48,9 @@ namespace Ogre {
         uint32 zoffset;
         uint numSamples;
         uint16 poolId;
+        uint8 mrtIndex;
 
-        GLSurfaceDesc() : buffer(0), zoffset(0), numSamples(0), poolId(0) {}
+        GLSurfaceDesc() : buffer(0), zoffset(0), numSamples(0), poolId(0), mrtIndex(0) {}
     };
 
     /// Frame Buffer Object abstraction
@@ -104,7 +105,7 @@ namespace Ogre {
         uint32 mMultisampleFB;
         int32 mNumSamples;
         GLRTTManager* mRTTManager;
-        GLSurfaceDesc mMultisampleColourBuffer;
+        GLSurfaceDesc mMultisampleColourBuffer[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         uint16 mPoolId = RBP_DEFAULT;
 
         /** Initialise object (find suitable depth and stencil format).
@@ -115,7 +116,7 @@ namespace Ogre {
             - Not all bound surfaces have the same internal format
         */
         virtual void initialise() = 0;
-        void requestRenderBuffer(unsigned format, uint32 width, uint32 height);
+        void createAndBindRenderBuffer(unsigned format, uint32 width, uint32 height, uint8 mrtIndex = 0);
     };
 
     /** Base class for GL Render Textures
@@ -180,7 +181,8 @@ namespace Ogre {
 
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
          */
-        GLSurfaceDesc requestRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa, uint16 poolId);
+        GLSurfaceDesc requestRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa, uint16 poolId,
+                                          uint mrtIndex = 0);
 
         /** Creates a new render buffer. Caller takes ownership.
          */

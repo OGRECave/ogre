@@ -52,6 +52,8 @@ namespace Ogre {
         /// Override so we can attach the depth buffer to the FBO
         bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
         void _detachDepthBuffer() override;
+
+        void swapBuffers() override { fbo.swapBuffers(); }
     private:
         void bindSurfaceImpl(size_t attachment, RenderTexture *target) override;
         void unbindSurfaceImpl(size_t attachment) override;

@@ -81,7 +81,7 @@ GLFrameBufferObject::GLFrameBufferObject(uint fsaa)
         // Release depth and stencil, if they were bound
         mRTTManager->releaseRenderBuffer(mDepth);
         mRTTManager->releaseRenderBuffer(mStencil);
-        mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer[0]);
 
         // First buffer must be bound
         if(!mColour[0].buffer)
@@ -139,16 +139,7 @@ GLFrameBufferObject::GLFrameBufferObject(uint fsaa)
         {
             // Bind multisample buffer
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mMultisampleFB);
-
-            // Create AA render buffer (colour)
-            // note, this can be shared too because we blit it to the final FBO
-            // right after the render is finished
-            requestRenderBuffer(format, width, height);
-
-            // Attach it, because we won't be attaching below and non-multisample has
-            // actually been attached to other FBO
-            mMultisampleColourBuffer.buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0_EXT, 
-                mMultisampleColourBuffer.zoffset);
+            createAndBindRenderBuffer(format, width, height);
         }
 
         // Depth buffer is not handled here anymore.
