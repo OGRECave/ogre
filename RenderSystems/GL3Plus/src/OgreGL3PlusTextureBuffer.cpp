@@ -97,9 +97,9 @@ namespace Ogre {
                 GLSurfaceDesc surface;
                 surface.buffer = this;
                 surface.zoffset = zoffset;
-                auto fsaa = parent->getTextureType() == TEX_TYPE_2D_MULTISAMPLE ? 0 : parent->getFSAA();
+                surface.numSamples = parent->getTextureType() == TEX_TYPE_2D_MULTISAMPLE ? 0 : parent->getFSAA();
                 RenderTexture* trt = GL3PlusRTTManager::getSingleton().createRenderTexture(
-                    name, surface, parent->isHardwareGammaEnabled(), fsaa);
+                    name, surface, parent->isHardwareGammaEnabled());
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
             }

@@ -32,8 +32,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     GLES2FBOMultiRenderTarget::GLES2FBOMultiRenderTarget(const String &name):
-        MultiRenderTarget(name),
-        fbo(0 /* TODO: multisampling on MRTs? */)
+        MultiRenderTarget(name)
     {
     }
     GLES2FBOMultiRenderTarget::~GLES2FBOMultiRenderTarget()

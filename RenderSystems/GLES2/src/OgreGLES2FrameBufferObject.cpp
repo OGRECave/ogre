@@ -39,46 +39,9 @@ THE SOFTWARE.
 namespace Ogre {
 
 //-----------------------------------------------------------------------------
-GLES2FrameBufferObject::GLES2FrameBufferObject( uint fsaa)
-    : GLFrameBufferObjectCommon(fsaa)
-{
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        GLint oldfb = 0;
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
-#endif
-        GLES2RenderSystem* rs = getGLES2RenderSystem();
-        mContext = rs->_getCurrentContext();
-        
-        // Generate framebuffer object
-        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
-
-        // Check multisampling if supported
-        if(rs->hasMinGLVersion(3, 0))
-        {
-            // Check samples supported
-            GLint maxSamples;
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamples));
-            mNumSamples = std::min(mNumSamples, maxSamples);
-        }
-        else
-        {
-            mNumSamples = 0;
-        }
-
-        // Will we need a second FBO to do multisampling?
-        if (mNumSamples)
-        {
-            OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-        }
-        else
-        {
-            mMultisampleFB = 0;
-        }
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
-#endif
-    }
+GLES2FrameBufferObject::GLES2FrameBufferObject()
+    : GLFrameBufferObjectCommon()
+{}
     
     GLES2FrameBufferObject::~GLES2FrameBufferObject()
     {
@@ -273,7 +236,20 @@ GLES2FrameBufferObject::GLES2FrameBufferObject( uint fsaa)
             
             // Generate framebuffer object
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
-            
+
+            // Check if multisampling supported
+            if(rs->hasMinGLVersion(3, 0))
+            {
+                // Check samples supported
+                GLint maxSamples;
+                OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamples));
+                mNumSamples = std::min(mNumSamples, maxSamples);
+            }
+            else
+            {
+                mNumSamples = 0;
+            }
+
             // Will we need a second FBO to do multisampling?
             if (mNumSamples)
             {

@@ -36,8 +36,8 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------  
     GLCopyingRenderTexture::GLCopyingRenderTexture(GLCopyingRTTManager *manager, 
-        const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
-        GLRenderTexture(name, target, writeGamma, fsaa)
+        const String &name, const GLSurfaceDesc &target, bool writeGamma):
+        GLRenderTexture(name, target, writeGamma)
     {
     }
     void GLCopyingRenderTexture::getCustomAttribute(const String& name, void* pData)

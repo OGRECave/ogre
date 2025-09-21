@@ -40,8 +40,12 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------
 GLFrameBufferObject::GLFrameBufferObject(uint fsaa)
-    : GLFrameBufferObjectCommon(fsaa)
+    : GLFrameBufferObjectCommon()
 {
+    auto* rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+    mContext = rs->_getCurrentContext();
+
+    mNumSamples = fsaa;
     // Generate framebuffer object
     glGenFramebuffersEXT(1, &mFB);
     // check multisampling
@@ -60,10 +64,6 @@ GLFrameBufferObject::GLFrameBufferObject(uint fsaa)
     if (mNumSamples)
     {
         glGenFramebuffersEXT(1, &mMultisampleFB);
-    }
-    else
-    {
-        mMultisampleFB = 0;
     }
     }
     GLFrameBufferObject::~GLFrameBufferObject()

@@ -44,7 +44,7 @@ namespace Ogre {
     class _OgreGLExport GLFBORenderTexture: public GLRenderTexture
     {
     public:
-        GLFBORenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+        GLFBORenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma);
 
         void getCustomAttribute(const String& name, void* pData) override;
 
@@ -83,7 +83,7 @@ namespace Ogre {
         void getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat) override;
 
         GLFBORenderTexture *createRenderTexture(const String &name,
-            const GLSurfaceDesc &target, bool writeGamma, uint fsaa) override;
+            const GLSurfaceDesc &target, bool writeGamma) override;
 
         GLSurfaceDesc createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa) override;
 

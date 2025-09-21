@@ -54,7 +54,7 @@ namespace Ogre {
     class _OgreGLExport GLFrameBufferObjectCommon
     {
     public:
-        GLFrameBufferObjectCommon(int32 fsaa);
+        GLFrameBufferObjectCommon();
         virtual ~GLFrameBufferObjectCommon();
 
         /** Bind FrameBufferObject. Attempt to bind on incompatible GL context will cause FBO destruction and optional recreation.
@@ -127,7 +127,7 @@ namespace Ogre {
     class _OgreGLExport GLRenderTexture : public RenderTexture, public GLRenderTarget
     {
     public:
-        GLRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+        GLRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma);
         bool requiresTextureFlipping() const override { return true; }
 
         static const String CustomAttributeString_FBO;
@@ -145,7 +145,7 @@ namespace Ogre {
 
         /** Create a texture rendertarget object
          */
-        virtual RenderTexture *createRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa) = 0;
+        virtual RenderTexture *createRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma) = 0;
 
         /** Release a render buffer. Ignore silently if surface.buffer is 0.
          */

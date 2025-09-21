@@ -38,15 +38,16 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------    
     GLFBORenderTexture::GLFBORenderTexture(const String &name,
-        const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
-        GLRenderTexture(name, target, writeGamma, fsaa),
-        mFB(fsaa)
+        const GLSurfaceDesc &target, bool writeGamma):
+        GLRenderTexture(name, target, writeGamma),
+        mFB(target.numSamples)
     {
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
         // Get attributes
         mWidth = mFB.getWidth();
         mHeight = mFB.getHeight();
+        mFSAA = mFB.getFSAA();
     }
 
     void GLFBORenderTexture::getCustomAttribute(const String& name, void* pData)
@@ -471,9 +472,9 @@ static const uchar depthBits[] =
     }
 
     GLFBORenderTexture *GLFBOManager::createRenderTexture(const String &name, 
-        const GLSurfaceDesc &target, bool writeGamma, uint fsaa)
+        const GLSurfaceDesc &target, bool writeGamma)
     {
-        GLFBORenderTexture *retval = new GLFBORenderTexture(name, target, writeGamma, fsaa);
+        GLFBORenderTexture *retval = new GLFBORenderTexture(name, target, writeGamma);
         return retval;
     }
     //---------------------------------------------------------------------
