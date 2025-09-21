@@ -126,15 +126,11 @@ namespace Ogre {
 #define READ_NAME(member) {                                 \
     uint16 length = 0;                                      \
     cacheMicrocode->read(&length, sizeof(uint16));          \
-    curItem.member = "";                                    \
-    if(length > 0)                                          \
-    {                                                       \
-        char* str = new char[length + 1];                   \
-        cacheMicrocode->read(str, length);                  \
-        str[length] = '\0';                                 \
-        curItem.member = str;                               \
-    }                                                       \
-        }
+    char* str = new char[length + 1];                       \
+    cacheMicrocode->read(str, length);                      \
+    str[length] = '\0';                                     \
+    curItem.member = str;                                   \
+    }
 
 #define READ_NAME2(member) {                                 \
     uint16 length = 0;                                      \
