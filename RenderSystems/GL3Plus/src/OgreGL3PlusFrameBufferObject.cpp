@@ -63,8 +63,8 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
         // Release depth and stencil, if they were bound
         mRTTManager->releaseRenderBuffer(mDepth);
         mRTTManager->releaseRenderBuffer(mStencil);
-        mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer);
-
+        for(int i = 0; i < OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i)
+            mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer[i]);
         // First buffer must be bound
         if(!mColour[0].buffer)
         {
@@ -81,7 +81,6 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
         // Store basic stats
         uint32 width = mColour[0].buffer->getWidth();
         uint32 height = mColour[0].buffer->getHeight();
-        GLuint format = mColour[0].buffer->getGLFormat();
         ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
         // Bind simple buffer to add colour attachments
@@ -116,20 +115,17 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
             }
         }
 
-        if (mMultisampleFB && !PixelUtil::isDepth(getFormat()))
+        if (mMultisampleFB)
         {
             // Bind multisample buffer
             rs->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, mMultisampleFB );
 
-            // Create AA render buffer (colour)
-            // note, this can be shared too because we blit it to the final FBO
-            // right after the render is finished
-            requestRenderBuffer(format, width, height);
-
-            // Attach it, because we won't be attaching below and non-multisample has
-            // actually been attached to other FBO
-            mMultisampleColourBuffer.buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0, 
-                mMultisampleColourBuffer.zoffset);
+            for(unsigned int x = 0; x < maxSupportedMRTs; ++x)
+            {
+                if(!mColour[x].buffer)
+                    continue;
+                createAndBindRenderBuffer(mColour[x].buffer->getGLFormat(), width, height, x);
+            }
         }
 
         // Depth buffer is not handled here anymore.
@@ -248,7 +244,15 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
             rs->_getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, mMultisampleFB );
             rs->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, mFB );
 
-            OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+            for(unsigned int x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+            {
+                if(!mColour[x].buffer)
+                    continue;
+                OGRE_CHECK_GL_ERROR(glReadBuffer((GL_COLOR_ATTACHMENT0 + x)));
+                OGRE_CHECK_GL_ERROR(glDrawBuffer((GL_COLOR_ATTACHMENT0 + x)));
+                OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+            }
+
             // Unbind
             rs->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, oldfb );
         }
