@@ -63,9 +63,18 @@ private:
     void setupControls();
     // SdkSample UI
     void itemSelected(SelectMenu* menu) override;
+    void buttonHit(Button* button) override;
+    // Custom UI
+    void refreshMeshStat();
+
+    // The heavy lifting
+    void performReload();
 
     std::map<String, MeshInfo> mSelectableMeshes;
     SelectMenu* mMeshMenu;
+    Label* mMeshStatLabel;
+    Button * mReloadBtn;
+    Timer mTimer;
 };
 
 #endif // _Sample_ThreadedResourcePrep_H_

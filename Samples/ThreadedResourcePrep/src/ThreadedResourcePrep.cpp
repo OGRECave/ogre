@@ -14,6 +14,8 @@ same license as the rest of the engine.
 
 #include "ThreadedResourcePrep.h"
 
+#include <sstream>
+
 Sample_ThreadedResourcePrep::Sample_ThreadedResourcePrep()
 {
     mInfo["Title"] = "Threaded Resource Prep";
@@ -100,12 +102,20 @@ void Sample_ThreadedResourcePrep::setupControls()
 {
     mTrayMgr->showCursor();
 
+    const float BOTTOM_W = 370;
+
     // create a menu to choose the model displayed
-    mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", 370, 290, 10);
+    mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", BOTTOM_W, 290, 10);
     for (const auto& p : mSelectableMeshes)
     {
         mMeshMenu->addItem(p.first);
     }
+    mMeshMenu->selectItem(0);
+
+    mMeshStatLabel = mTrayMgr->createLabel(TL_BOTTOM, "MeshStat", "", BOTTOM_W);
+    refreshMeshStat();
+
+    mReloadBtn = mTrayMgr->createButton(TL_BOTTOM, "ReloadBtn", "Reload!", BOTTOM_W/2);
 }
 
 void Sample_ThreadedResourcePrep::itemSelected(SelectMenu* menu)
@@ -115,7 +125,43 @@ void Sample_ThreadedResourcePrep::itemSelected(SelectMenu* menu)
         // focus camera
         SceneNode* camnode = mCameraMan->getCamera();
         camnode->lookAt(mSelectableMeshes[mMeshMenu->getSelectedItem()].sceneNode->getPosition(), Node::TS_WORLD);
+
+        refreshMeshStat();
     }
 }
 
+void Sample_ThreadedResourcePrep::refreshMeshStat()
+{
+    MeshInfo& mi = mSelectableMeshes[mMeshMenu->getSelectedItem()];
+    std::stringstream buf;
+    buf << "Reloads: " << mi.totalReloads << ", Avg. time: " << mi.avgReloadTime << " (Last: " << mi.lastReloadTime << ")";
+    mMeshStatLabel->setCaption(buf.str());
+}
 
+void Sample_ThreadedResourcePrep::performReload()
+{
+    MeshInfo& mi = mSelectableMeshes[mMeshMenu->getSelectedItem()];
+
+    // Sync unload
+    mi.sceneNode->destroyAllObjects();
+    mi.entity = nullptr;
+    mi.mesh->unload();
+
+    // Sync load
+    long long start = mTimer.getMilliseconds();
+    mi.mesh->load();
+    mi.entity = mSceneMgr->createEntity(mi.mesh);
+    mi.sceneNode->attachObject(mi.entity);
+    long long end = mTimer.getMilliseconds();
+
+    mi.recordReloadTime(static_cast<double>(end - start) * 0.001);
+}
+
+void Sample_ThreadedResourcePrep::buttonHit(Button* button)
+{
+    if (button == mReloadBtn)
+    {
+        performReload();
+        refreshMeshStat();
+    }
+}
