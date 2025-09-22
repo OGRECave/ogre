@@ -28,6 +28,7 @@ struct MeshInfo
     // Each resource has dedicated spot, so they can appear in any order.
     String meshName;
     Vector3 meshScale;
+    Degree meshYaw;
     SceneNode* sceneNode = nullptr;
 
     // Only used when mesh is currently loaded
@@ -58,8 +59,10 @@ private:
     void cleanupContent() override;
     // Custom setup
     void setupSelectableMeshes();
-    void defineSelectableMesh(String name, Vector3 pos, Vector3 scale);
+    void defineSelectableMesh(String name, Vector3 pos, Vector3 scale, Degree yaw);
     void setupControls();
+    // SdkSample UI
+    void itemSelected(SelectMenu* menu) override;
 
     std::map<String, MeshInfo> mSelectableMeshes;
     SelectMenu* mMeshMenu;

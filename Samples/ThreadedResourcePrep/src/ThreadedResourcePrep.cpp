@@ -31,8 +31,11 @@ void Sample_ThreadedResourcePrep::setupContent()
     // set background
     mViewport->setBackgroundColour(ColourValue(0.9f, 0.9f, 0.7f));
 
-    // use full ambient lighting
-    mSceneMgr->setAmbientLight(ColourValue(1.f, 1.f, 1.f));
+    // set lights
+    mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.4));
+    Light* light = mSceneMgr->createLight();
+    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(2000, 1000, -1000))->attachObject(light);
+    light->setDiffuseColour(0.9, 0.9, 0.9);
 
     // create a floor mesh resource
     MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -47,7 +50,10 @@ void Sample_ThreadedResourcePrep::setupContent()
     setupSelectableMeshes();
     setupControls();
 
-    mCameraMan->setStyle(CS_FREELOOK);
+    mCameraMan->setStyle(CS_MANUAL);
+    SceneNode* camnode = mCameraMan->getCamera();
+    camnode->setPosition(Vector3(0,45,80));
+    camnode->lookAt(Vector3(0,0,0), Node::TS_WORLD);
 }
 
 void Sample_ThreadedResourcePrep::cleanupContent()
@@ -55,33 +61,39 @@ void Sample_ThreadedResourcePrep::cleanupContent()
     MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 
-void Sample_ThreadedResourcePrep::defineSelectableMesh(String name, Vector3 pos, Vector3 scale)
+void Sample_ThreadedResourcePrep::defineSelectableMesh(String name, Vector3 pos, Vector3 scale, Degree yaw)
 {
-    // Start with all meshes in scene
+    // Fill mesh info
     MeshInfo mi;
     mi.sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
     mi.meshName = name;
     mi.meshScale = scale;
+    mi.meshYaw = yaw;
+
+    // Start with all meshes in scene
     mi.mesh = MeshManager::getSingleton().load(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     mi.entity = mSceneMgr->createEntity(mi.mesh);
     mi.sceneNode->attachObject(mi.entity);
     mi.sceneNode->scale(scale);
+    mi.sceneNode->yaw(yaw);
 
     mSelectableMeshes[name] = mi;
 }
 
 void Sample_ThreadedResourcePrep::setupSelectableMeshes()
 {
-    // Each has dedicated spot so they can appear in any order.
-    // We only want meshes with associated materials - common case.
-    defineSelectableMesh("ogrehead.mesh",Vector3(0,3,0), Vector3(0.1, 0.1, 0.1));
-    defineSelectableMesh("knot.mesh",Vector3(0,5,-10), Vector3(0.04, 0.04, 0.04));
-    defineSelectableMesh("spine.mesh",Vector3(-11,0.5,-10), Vector3(0.1, 0.1, 0.1));
-    defineSelectableMesh("ninja.mesh",Vector3(-25,0.5,-30), Vector3(0.1, 0.1, 0.1));
-    defineSelectableMesh("robot.mesh",Vector3(24,0.5,-32), Vector3(0.1, 0.1, 0.1));
-    defineSelectableMesh("Sinbad.mesh",Vector3(30,3,-32), Vector3(1, 1, 1));
-    defineSelectableMesh("Sword.mesh",Vector3(33,3,-30), Vector3(1, 1, 1));
-    defineSelectableMesh("dragon.mesh",Vector3(0,15,-40), Vector3(0.1, 0.1, 0.1));
+    // Each mesh has dedicated spot so they can appear in any order.
+    // We only want meshes with associated materials (the common case).
+
+    defineSelectableMesh("ogrehead.mesh",Vector3(0,3,0), Vector3(0.3, 0.3, 0.3), Degree(0));
+    defineSelectableMesh("penguin.mesh",Vector3(10,3,0), Vector3(0.1, 0.1, 0.1), Degree(0));
+    defineSelectableMesh("knot.mesh",Vector3(0,5,-10), Vector3(0.04, 0.04, 0.04), Degree(0));
+    defineSelectableMesh("spine.mesh",Vector3(-11,0.5,-10), Vector3(0.1, 0.1, 0.1), Degree(0));
+    defineSelectableMesh("ninja.mesh",Vector3(-25,0.5,5), Vector3(0.05, 0.05, 0.05), Degree(180));
+    defineSelectableMesh("robot.mesh",Vector3(24,0.5,-32), Vector3(0.1, 0.1, 0.1), Degree(-90));
+    defineSelectableMesh("Sinbad.mesh",Vector3(30,5,5), Vector3(1, 1, 1), Degree(-25));
+    defineSelectableMesh("Sword.mesh",Vector3(33,3,10), Vector3(1, 1, 1), Degree(80));
+    defineSelectableMesh("dragon.mesh",Vector3(-15,25,-25), Vector3(0.1, 0.1, 0.1), Degree(200));
 }
 
 void Sample_ThreadedResourcePrep::setupControls()
@@ -93,6 +105,16 @@ void Sample_ThreadedResourcePrep::setupControls()
     for (const auto& p : mSelectableMeshes)
     {
         mMeshMenu->addItem(p.first);
+    }
+}
+
+void Sample_ThreadedResourcePrep::itemSelected(SelectMenu* menu)
+{
+    if (menu == mMeshMenu)
+    {
+        // focus camera
+        SceneNode* camnode = mCameraMan->getCamera();
+        camnode->lookAt(mSelectableMeshes[mMeshMenu->getSelectedItem()].sceneNode->getPosition(), Node::TS_WORLD);
     }
 }
 
