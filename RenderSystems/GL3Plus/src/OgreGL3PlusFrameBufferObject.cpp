@@ -137,7 +137,6 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(uint fsaa)
             }
         }
 
-        // Now deal with depth / stencil
         if (mMultisampleFB && !PixelUtil::isDepth(getFormat()))
         {
             // Bind multisample buffer
@@ -152,8 +151,6 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(uint fsaa)
             // actually been attached to other FBO
             mMultisampleColourBuffer.buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0, 
                 mMultisampleColourBuffer.zoffset);
-
-            // depth & stencil will be dealt with below
         }
 
         // Depth buffer is not handled here anymore.
