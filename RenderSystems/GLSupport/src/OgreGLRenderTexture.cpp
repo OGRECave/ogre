@@ -192,13 +192,22 @@ namespace Ogre {
         return PF_BYTE_RGBA; // native endian
     }
 
+    static uint32 getKey(unsigned format, uint32 width, uint32 height, uint fsaa)
+    {
+        uint32 key = HashCombine(0, format);
+        key = HashCombine(key, width);
+        key = HashCombine(key, height);
+        key = HashCombine(key, fsaa);
+        return key;
+    }
+
     GLSurfaceDesc GLRTTManager::requestRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
     {
         GLSurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
         if (format != 0)
         {
-            RBFormat key(format, width, height, fsaa);
+            uint32 key = getKey(format, width, height, fsaa);
             RenderBufferMap::iterator it = mRenderBufferMap.find(key);
             if (it != mRenderBufferMap.end())
             {
@@ -224,7 +233,7 @@ namespace Ogre {
     {
         if(surface.buffer == 0)
             return;
-        RBFormat key(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(), surface.numSamples);
+        uint32 key = getKey(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(), surface.numSamples);
         RenderBufferMap::iterator it = mRenderBufferMap.find(key);
         if(it != mRenderBufferMap.end())
         {

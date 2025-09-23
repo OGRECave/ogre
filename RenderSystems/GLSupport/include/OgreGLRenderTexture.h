@@ -218,44 +218,6 @@ namespace Ogre {
             same size and format. This can save a lot of memory when a large amount of rendertargets
             are used.
         */
-        struct RBFormat
-        {
-            RBFormat(uint inFormat, size_t inWidth, size_t inHeight, uint fsaa)
-                : format(inFormat), width(inWidth), height(inHeight), samples(fsaa)
-            {
-            }
-            RBFormat() {}
-            uint format;
-            size_t width;
-            size_t height;
-            uint samples;
-            // Overloaded comparison operator for usage in map
-            bool operator < (const RBFormat &other) const
-            {
-                if(format < other.format)
-                {
-                    return true;
-                }
-                else if(format == other.format)
-                {
-                    if(width < other.width)
-                    {
-                        return true;
-                    }
-                    else if(width == other.width)
-                    {
-                        if(height < other.height)
-                            return true;
-                        else if (height == other.height)
-                        {
-                            if (samples < other.samples)
-                                return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        };
         struct RBRef
         {
             RBRef() {}
@@ -263,7 +225,7 @@ namespace Ogre {
             GLHardwarePixelBufferCommon* buffer;
             size_t refcount;
         };
-        typedef std::map<RBFormat, RBRef> RenderBufferMap;
+        typedef std::unordered_map<uint32, RBRef> RenderBufferMap;
         RenderBufferMap mRenderBufferMap;
     };
 
