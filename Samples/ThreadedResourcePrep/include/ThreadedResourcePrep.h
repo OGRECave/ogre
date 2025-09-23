@@ -19,6 +19,7 @@ same license as the rest of the engine.
 #include "SamplePlugin.h"
 
 #include <Ogre.h>
+#include <deque>
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -34,8 +35,10 @@ struct MeshInfo
     // Only used when mesh is currently loaded
     MeshPtr mesh;
     Entity* entity = nullptr;
+};
 
-    // Stats
+struct Stats
+{
     int totalReloads = 0;
     float lastReloadTime = 0.f;
     float avgReloadTime = 0.f;
@@ -45,6 +48,13 @@ struct MeshInfo
         totalReloads++;
         lastReloadTime = reloadTime;
         avgReloadTime = (totalReloads == 1) ? reloadTime : avgReloadTime * 0.5 + reloadTime * 0.5;
+    }
+
+    void resetStats()
+    {
+        totalReloads = 0;
+        lastReloadTime = 0;
+        avgReloadTime = 0;
     }
 };
 
@@ -64,17 +74,24 @@ private:
     // SdkSample UI
     void itemSelected(SelectMenu* menu) override;
     void buttonHit(Button* button) override;
+    void sliderMoved(Slider* slider) override;
     // Custom UI
-    void refreshMeshStat();
+    void refreshStatsUi();
+    void refreshMeshUi();
 
     // The heavy lifting
     void performReload();
+    static void forceUnloadAllDependentResources(MeshPtr& mesh);
+    static void forceUnloadAllDependentTextures(Pass* pass);
 
-    std::map<String, MeshInfo> mSelectableMeshes;
+    std::deque<MeshInfo> mMeshQueue;
     SelectMenu* mMeshMenu;
     Label* mMeshStatLabel;
-    Button * mReloadBtn;
+    Button* mReloadBtn;
+    Slider* mBulkSlider;
+    size_t mBulkSize = 0;
     Timer mTimer;
+    Stats mStats;
 };
 
 #endif // _Sample_ThreadedResourcePrep_H_

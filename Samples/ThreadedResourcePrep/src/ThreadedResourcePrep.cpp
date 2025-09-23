@@ -15,6 +15,7 @@ same license as the rest of the engine.
 #include "ThreadedResourcePrep.h"
 
 #include <sstream>
+#include <iomanip>
 
 Sample_ThreadedResourcePrep::Sample_ThreadedResourcePrep()
 {
@@ -36,8 +37,8 @@ void Sample_ThreadedResourcePrep::setupContent()
     // set lights
     mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.4));
     Light* light = mSceneMgr->createLight();
-    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(2000, 1000, -1000))->attachObject(light);
-    light->setDiffuseColour(0.9, 0.9, 0.9);
+    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(200, 100, 100))->attachObject(light);
+    light->setDiffuseColour(0.9, 0.9, 0.95);
 
     // create a floor mesh resource
     MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -79,7 +80,7 @@ void Sample_ThreadedResourcePrep::defineSelectableMesh(String name, Vector3 pos,
     mi.sceneNode->scale(scale);
     mi.sceneNode->yaw(yaw);
 
-    mSelectableMeshes[name] = mi;
+    mMeshQueue.push_back(mi);
 }
 
 void Sample_ThreadedResourcePrep::setupSelectableMeshes()
@@ -87,15 +88,24 @@ void Sample_ThreadedResourcePrep::setupSelectableMeshes()
     // Each mesh has dedicated spot so they can appear in any order.
     // We only want meshes with associated materials (the common case).
 
-    defineSelectableMesh("ogrehead.mesh",Vector3(0,3,0), Vector3(0.3, 0.3, 0.3), Degree(0));
-    defineSelectableMesh("penguin.mesh",Vector3(10,3,0), Vector3(0.1, 0.1, 0.1), Degree(0));
-    defineSelectableMesh("knot.mesh",Vector3(0,5,-10), Vector3(0.04, 0.04, 0.04), Degree(0));
-    defineSelectableMesh("spine.mesh",Vector3(-11,0.5,-10), Vector3(0.1, 0.1, 0.1), Degree(0));
-    defineSelectableMesh("ninja.mesh",Vector3(-25,0.5,5), Vector3(0.05, 0.05, 0.05), Degree(180));
-    defineSelectableMesh("robot.mesh",Vector3(24,0.5,-32), Vector3(0.1, 0.1, 0.1), Degree(-90));
+    defineSelectableMesh("ogrehead.mesh",Vector3(0,3,0), Vector3(0.2, 0.2, 0.2), Degree(0));
+    defineSelectableMesh("facial.mesh",Vector3(10,3,-15), Vector3(0.1, 0.1, 0.1), Degree(0));
+    defineSelectableMesh("penguin.mesh",Vector3(12,3,0), Vector3(0.1, 0.1, 0.1), Degree(0));
+    defineSelectableMesh("knot.mesh",Vector3(-14,5,16), Vector3(0.04, 0.04, 0.04), Degree(0));
+    defineSelectableMesh("spine.mesh",Vector3(-11,0.5,0), Vector3(0.1, 0.1, 0.1), Degree(0));
+    defineSelectableMesh("ninja.mesh",Vector3(-25,0.5,5), Vector3(0.05, 0.05, 0.05), Degree(205));
+    defineSelectableMesh("jaiqua.mesh",Vector3(-20,0.5,-5), Vector3(0.5, 0.5, 0.5), Degree(180));
+    defineSelectableMesh("fish.mesh",Vector3(20,0.5,-5), Vector3(1, 1, 1), Degree(0));
+    defineSelectableMesh("robot.mesh",Vector3(-20,0.5,-2), Vector3(0.1, 0.1, 0.1), Degree(-85));
     defineSelectableMesh("Sinbad.mesh",Vector3(30,5,5), Vector3(1, 1, 1), Degree(-25));
-    defineSelectableMesh("Sword.mesh",Vector3(33,3,10), Vector3(1, 1, 1), Degree(80));
-    defineSelectableMesh("dragon.mesh",Vector3(-15,25,-25), Vector3(0.1, 0.1, 0.1), Degree(200));
+    defineSelectableMesh("Sword.mesh",Vector3(11,5,18), Vector3(1, 1, 1), Degree(75));
+    defineSelectableMesh("Barrel.mesh",Vector3(12,2,18), Vector3(1, 1, 1), Degree(0));
+    defineSelectableMesh("DamagedHelmet.mesh",Vector3(22,1.5,18), Vector3(4, 4, 4), Degree(0));
+    defineSelectableMesh("dragon.mesh",Vector3(-5,30,10), Vector3(0.1, 0.1, 0.1), Degree(216));
+    defineSelectableMesh("razor.mesh",Vector3(15,25,10), Vector3(0.1, 0.1, 0.1), Degree(-16));
+    defineSelectableMesh("sibenik.mesh",Vector3(0,0,-35), Vector3(0.5, 0.5, 0.5), Degree(180));
+    defineSelectableMesh("geosphere4500.mesh",Vector3(40,0,-25), Vector3(0.01, 0.01, 0.01), Degree(180));
+    defineSelectableMesh("geosphere8000.mesh",Vector3(-40,0,-25), Vector3(0.01, 0.01, 0.01), Degree(180));
 }
 
 void Sample_ThreadedResourcePrep::setupControls()
@@ -106,55 +116,110 @@ void Sample_ThreadedResourcePrep::setupControls()
 
     // create a menu to choose the model displayed
     mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", BOTTOM_W, 290, 10);
-    for (const auto& p : mSelectableMeshes)
-    {
-        mMeshMenu->addItem(p.first);
-    }
-    mMeshMenu->selectItem(0);
 
     mMeshStatLabel = mTrayMgr->createLabel(TL_BOTTOM, "MeshStat", "", BOTTOM_W);
-    refreshMeshStat();
+    refreshStatsUi();
 
     mReloadBtn = mTrayMgr->createButton(TL_BOTTOM, "ReloadBtn", "Reload!", BOTTOM_W/2);
+
+    mBulkSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "BulkSlider", "Meshes in bulk", 200, 50, 1, (Real)mMeshQueue.size(), (int)mMeshQueue.size());
+
+    refreshMeshUi(); // Initial fill of mesh menu
+    mMeshMenu->selectItem(0); // Initial selection (CAUTION: invokes callbacks!)
 }
 
 void Sample_ThreadedResourcePrep::itemSelected(SelectMenu* menu)
 {
     if (menu == mMeshMenu)
     {
+        // Find selected mesh by name (account for "<in bulk>" in name)
+        StringVector toks = Ogre::StringUtil::split(mMeshMenu->getSelectedItem());
+        auto selectedMeshItor = std::find_if (mMeshQueue.begin(), mMeshQueue.end(),
+            [&toks](MeshInfo& mi)
+            {
+                return mi.meshName == toks[0];
+            });
+
         // focus camera
         SceneNode* camnode = mCameraMan->getCamera();
-        camnode->lookAt(mSelectableMeshes[mMeshMenu->getSelectedItem()].sceneNode->getPosition(), Node::TS_WORLD);
+        camnode->lookAt(selectedMeshItor->sceneNode->getPosition(), Node::TS_WORLD);
 
-        refreshMeshStat();
+        // Move selected item to front of queue
+        MeshInfo mi = *selectedMeshItor;
+        mMeshQueue.erase(selectedMeshItor);
+        mMeshQueue.push_front(mi);
+        refreshMeshUi();
+
+        mStats.resetStats();
+        refreshStatsUi();
     }
 }
 
-void Sample_ThreadedResourcePrep::refreshMeshStat()
+void Sample_ThreadedResourcePrep::sliderMoved(Slider* slider)
 {
-    MeshInfo& mi = mSelectableMeshes[mMeshMenu->getSelectedItem()];
+    if (slider == mBulkSlider)
+    {
+        size_t bulkSize = (size_t)mBulkSlider->getValue();
+        if (bulkSize != mBulkSize)
+        {
+            mBulkSize = bulkSize;
+            mReloadBtn->setCaption("Reload " + StringConverter::toString((int)mBulkSlider->getValue()) + " mesh(es)");
+            refreshMeshUi();
+        }
+    }
+}
+
+void Sample_ThreadedResourcePrep::refreshStatsUi()
+{
     std::stringstream buf;
-    buf << "Reloads: " << mi.totalReloads << ", Avg. time: " << mi.avgReloadTime << " (Last: " << mi.lastReloadTime << ")";
+    buf << "Reloads: " << mStats.totalReloads 
+        << ", Avg. time: " << std::setprecision(3) << mStats.avgReloadTime 
+        << " (Last: " << std::setprecision(3) << mStats.lastReloadTime << ")";
     mMeshStatLabel->setCaption(buf.str());
+}
+
+void Sample_ThreadedResourcePrep::refreshMeshUi()
+{
+    mMeshMenu->clearItems();
+    
+    for (size_t i=0; i<mMeshQueue.size(); i++)
+    {
+        if (i < mBulkSize)
+        {
+            mMeshMenu->addItem(mMeshQueue[i].meshName + " <in bulk>");
+        }
+        else
+        {
+            mMeshMenu->addItem(mMeshQueue[i].meshName);
+        }
+    }
 }
 
 void Sample_ThreadedResourcePrep::performReload()
 {
-    MeshInfo& mi = mSelectableMeshes[mMeshMenu->getSelectedItem()];
+    for (size_t i = 0; i < mBulkSize; i++)
+    {
+        MeshInfo& mi = mMeshQueue[i];
 
-    // Sync unload
-    mi.sceneNode->destroyAllObjects();
-    mi.entity = nullptr;
-    mi.mesh->unload();
+        // Sync unload
+        mi.sceneNode->destroyAllObjects();
+        mi.entity = nullptr;
+        forceUnloadAllDependentResources(mi.mesh);
+        mi.mesh->unload();
+    }
 
     // Sync load
     long long start = mTimer.getMilliseconds();
-    mi.mesh->load();
-    mi.entity = mSceneMgr->createEntity(mi.mesh);
-    mi.sceneNode->attachObject(mi.entity);
+    for (size_t i = 0; i < mBulkSize; i++)
+    {
+        MeshInfo& mi = mMeshQueue[i];
+        mi.mesh->load();
+        mi.entity = mSceneMgr->createEntity(mi.mesh);
+        mi.sceneNode->attachObject(mi.entity);
+    }
     long long end = mTimer.getMilliseconds();
 
-    mi.recordReloadTime(static_cast<double>(end - start) * 0.001);
+    mStats.recordReloadTime(static_cast<double>(end - start) * 0.001);
 }
 
 void Sample_ThreadedResourcePrep::buttonHit(Button* button)
@@ -162,6 +227,39 @@ void Sample_ThreadedResourcePrep::buttonHit(Button* button)
     if (button == mReloadBtn)
     {
         performReload();
-        refreshMeshStat();
+        refreshStatsUi();
+    }
+}
+
+void Sample_ThreadedResourcePrep::forceUnloadAllDependentTextures(Pass* pass)
+{
+    for (TextureUnitState* tus: pass->getTextureUnitStates())
+    {
+        for (size_t iFrame = 0; iFrame < tus->getNumFrames(); iFrame++)
+        {
+            TexturePtr tex = Ogre::TextureManager::getSingleton().getByName(tus->getFrameTextureName(iFrame));
+            if (tex)
+            {
+                tex->unload();
+            }
+        }
+    }
+}
+
+void Sample_ThreadedResourcePrep::forceUnloadAllDependentResources(MeshPtr& mesh)
+{
+    for (SubMesh* submesh: mesh->getSubMeshes())
+    {
+        if (submesh->getMaterial())
+        {
+            for (Technique* teq: submesh->getMaterial()->getSupportedTechniques())
+            {
+                for (Pass* pass: teq->getPasses())
+                {
+                    forceUnloadAllDependentTextures(pass);
+                }
+            }
+            submesh->getMaterial()->unload();
+        }
     }
 }
