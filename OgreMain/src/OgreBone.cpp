@@ -33,11 +33,13 @@ namespace Ogre {
     Bone::Bone(unsigned short handle, Skeleton* creator) 
         : Node(), mCreator(creator), mHandle(handle), mManuallyControlled(false)
     {
+        setInitialState();
     }
     //---------------------------------------------------------------------
     Bone::Bone(const String& name, unsigned short handle, Skeleton* creator) 
         : Node(name), mCreator(creator), mHandle(handle), mManuallyControlled(false)
     {
+        setInitialState();
     }
     //---------------------------------------------------------------------
     Bone::~Bone()
@@ -73,10 +75,21 @@ namespace Ogre {
         mBindDerivedInverseScale = Vector3::UNIT_SCALE / _getDerivedScale();
         mBindDerivedInverseOrientation = _getDerivedOrientation().Inverse();
     }
-    //---------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    void Bone::setInitialState(void)
+    {
+        mInitialPosition = mPosition;
+        mInitialOrientation = mOrientation;
+        mInitialScale = mScale;
+    }
+    //-----------------------------------------------------------------------
     void Bone::reset(void)
     {
-        resetToInitialState();
+        mPosition = mInitialPosition;
+        mOrientation = mInitialOrientation;
+        mScale = mInitialScale;
+
+        needUpdate();
     }
     //---------------------------------------------------------------------
     void Bone::setManuallyControlled(bool manuallyControlled) 
