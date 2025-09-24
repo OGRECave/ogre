@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     RenderTarget::RenderTarget()
-        : mPriority(OGRE_DEFAULT_RT_GROUP)
+        : mPriority(TP_DEFAULT)
         , mDepthBufferPoolId(DepthBuffer::POOL_DEFAULT)
         , mDepthBuffer(0)
         , mActive(true)
