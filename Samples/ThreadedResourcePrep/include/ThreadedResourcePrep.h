@@ -80,7 +80,8 @@ private:
     void refreshMeshUi();
 
     // The heavy lifting
-    void performReload();
+    void performSyncUnload();
+    void performSyncLoad();
     static void forceUnloadAllDependentResources(MeshPtr& mesh);
     static void forceUnloadAllDependentTextures(Pass* pass);
 
@@ -88,8 +89,9 @@ private:
     SelectMenu* mMeshMenu;
     Label* mMeshStatLabel;
     Button* mReloadBtn;
-    Slider* mBulkSlider;
-    size_t mBulkSize = 0;
+    Button* mUnloadBtn;
+    Slider* mBatchSlider;
+    size_t mBatchSize = 0;
     Timer mTimer;
     Stats mStats;
 };

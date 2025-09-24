@@ -64,11 +64,13 @@ void Sample_ThreadedResourcePrep::cleanupContent()
     MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 
+const Vector3 TIGHTEN_SPOTS(0.7, 1, 0.7);
+
 void Sample_ThreadedResourcePrep::defineSelectableMesh(String name, Vector3 pos, Vector3 scale, Degree yaw)
 {
     // Fill mesh info
     MeshInfo mi;
-    mi.sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
+    mi.sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos * TIGHTEN_SPOTS);
     mi.meshName = name;
     mi.meshScale = scale;
     mi.meshYaw = yaw;
@@ -86,16 +88,17 @@ void Sample_ThreadedResourcePrep::defineSelectableMesh(String name, Vector3 pos,
 void Sample_ThreadedResourcePrep::setupSelectableMeshes()
 {
     // Each mesh has dedicated spot so they can appear in any order.
-    // We only want meshes with associated materials (the common case).
+    // We prefer meshes with associated materials (the common case).
 
+    defineSelectableMesh("sibenik.mesh",Vector3(0,0,-35), Vector3(0.5, 0.5, 0.5), Degree(180));
     defineSelectableMesh("ogrehead.mesh",Vector3(0,3,0), Vector3(0.2, 0.2, 0.2), Degree(0));
-    defineSelectableMesh("facial.mesh",Vector3(10,3,-15), Vector3(0.1, 0.1, 0.1), Degree(0));
+    defineSelectableMesh("facial.mesh",Vector3(-35,3,-1), Vector3(0.1, 0.1, 0.1), Degree(0));
     defineSelectableMesh("penguin.mesh",Vector3(12,3,0), Vector3(0.1, 0.1, 0.1), Degree(0));
     defineSelectableMesh("knot.mesh",Vector3(-14,5,16), Vector3(0.04, 0.04, 0.04), Degree(0));
     defineSelectableMesh("spine.mesh",Vector3(-11,0.5,0), Vector3(0.1, 0.1, 0.1), Degree(0));
     defineSelectableMesh("ninja.mesh",Vector3(-25,0.5,5), Vector3(0.05, 0.05, 0.05), Degree(205));
-    defineSelectableMesh("jaiqua.mesh",Vector3(-20,0.5,-5), Vector3(0.5, 0.5, 0.5), Degree(180));
-    defineSelectableMesh("fish.mesh",Vector3(20,0.5,-5), Vector3(1, 1, 1), Degree(0));
+    defineSelectableMesh("jaiqua.mesh",Vector3(-23,0.5,-9), Vector3(0.5, 0.5, 0.5), Degree(180));
+    defineSelectableMesh("fish.mesh",Vector3(-2,0.5,20), Vector3(1, 1, 1), Degree(0));
     defineSelectableMesh("robot.mesh",Vector3(-20,0.5,-2), Vector3(0.1, 0.1, 0.1), Degree(-85));
     defineSelectableMesh("Sinbad.mesh",Vector3(30,5,5), Vector3(1, 1, 1), Degree(-25));
     defineSelectableMesh("Sword.mesh",Vector3(11,5,18), Vector3(1, 1, 1), Degree(75));
@@ -103,7 +106,7 @@ void Sample_ThreadedResourcePrep::setupSelectableMeshes()
     defineSelectableMesh("DamagedHelmet.mesh",Vector3(22,1.5,18), Vector3(4, 4, 4), Degree(0));
     defineSelectableMesh("dragon.mesh",Vector3(-5,30,10), Vector3(0.1, 0.1, 0.1), Degree(216));
     defineSelectableMesh("razor.mesh",Vector3(15,25,10), Vector3(0.1, 0.1, 0.1), Degree(-16));
-    defineSelectableMesh("sibenik.mesh",Vector3(0,0,-35), Vector3(0.5, 0.5, 0.5), Degree(180));
+    // these have no material but are big - good for the benchmark
     defineSelectableMesh("geosphere4500.mesh",Vector3(40,0,-25), Vector3(0.01, 0.01, 0.01), Degree(180));
     defineSelectableMesh("geosphere8000.mesh",Vector3(-40,0,-25), Vector3(0.01, 0.01, 0.01), Degree(180));
 }
@@ -113,6 +116,7 @@ void Sample_ThreadedResourcePrep::setupControls()
     mTrayMgr->showCursor();
 
     const float BOTTOM_W = 370;
+    const float TOPLEFT_W = 200;
 
     // create a menu to choose the model displayed
     mMeshMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Mesh", "Mesh", BOTTOM_W, 290, 10);
@@ -122,10 +126,15 @@ void Sample_ThreadedResourcePrep::setupControls()
 
     mReloadBtn = mTrayMgr->createButton(TL_BOTTOM, "ReloadBtn", "Reload!", BOTTOM_W/2);
 
-    mBulkSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "BulkSlider", "Meshes in bulk", 200, 50, 1, (Real)mMeshQueue.size(), (int)mMeshQueue.size());
+    mBatchSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "BatchSlider", "Batch length", TOPLEFT_W, 50, 1, (Real)mMeshQueue.size(), (int)mMeshQueue.size());
 
-    refreshMeshUi(); // Initial fill of mesh menu
-    mMeshMenu->selectItem(0); // Initial selection (CAUTION: invokes callbacks!)
+    mUnloadBtn = mTrayMgr->createButton(TL_TOPLEFT, "UnloadBtn", "Unload batch", TOPLEFT_W);
+
+    mBatchSlider->setValue((Real)mMeshQueue.size(), /* notifyListener: */false);
+    mBatchSize = mMeshQueue.size();
+
+    refreshMeshUi();
+    mMeshMenu->selectItem(0, /* notifyListener: */false);
 }
 
 void Sample_ThreadedResourcePrep::itemSelected(SelectMenu* menu)
@@ -157,14 +166,15 @@ void Sample_ThreadedResourcePrep::itemSelected(SelectMenu* menu)
 
 void Sample_ThreadedResourcePrep::sliderMoved(Slider* slider)
 {
-    if (slider == mBulkSlider)
+    if (slider == mBatchSlider)
     {
-        size_t bulkSize = (size_t)mBulkSlider->getValue();
-        if (bulkSize != mBulkSize)
+        size_t bulkSize = (size_t)mBatchSlider->getValue();
+        if (bulkSize != mBatchSize)
         {
-            mBulkSize = bulkSize;
-            mReloadBtn->setCaption("Reload " + StringConverter::toString((int)mBulkSlider->getValue()) + " mesh(es)");
+            mBatchSize = bulkSize;
             refreshMeshUi();
+            mStats.resetStats();
+            refreshStatsUi();
         }
     }
 }
@@ -184,33 +194,38 @@ void Sample_ThreadedResourcePrep::refreshMeshUi()
     
     for (size_t i=0; i<mMeshQueue.size(); i++)
     {
-        if (i < mBulkSize)
+        if (i < mBatchSize)
         {
-            mMeshMenu->addItem(mMeshQueue[i].meshName + " <in bulk>");
+            mMeshMenu->addItem(mMeshQueue[i].meshName + " (in batch)");
         }
         else
         {
             mMeshMenu->addItem(mMeshQueue[i].meshName);
         }
     }
+
+    mReloadBtn->setCaption("Reload " + StringConverter::toString((int)mBatchSlider->getValue()) + " mesh(es)");
 }
 
-void Sample_ThreadedResourcePrep::performReload()
+void Sample_ThreadedResourcePrep::performSyncUnload()
 {
-    for (size_t i = 0; i < mBulkSize; i++)
+    // Sync unload
+    for (size_t i = 0; i < mBatchSize; i++)
     {
         MeshInfo& mi = mMeshQueue[i];
 
-        // Sync unload
         mi.sceneNode->destroyAllObjects();
         mi.entity = nullptr;
         forceUnloadAllDependentResources(mi.mesh);
         mi.mesh->unload();
     }
+}
 
+void Sample_ThreadedResourcePrep::performSyncLoad()
+{
     // Sync load
     long long start = mTimer.getMilliseconds();
-    for (size_t i = 0; i < mBulkSize; i++)
+    for (size_t i = 0; i < mBatchSize; i++)
     {
         MeshInfo& mi = mMeshQueue[i];
         mi.mesh->load();
@@ -226,8 +241,13 @@ void Sample_ThreadedResourcePrep::buttonHit(Button* button)
 {
     if (button == mReloadBtn)
     {
-        performReload();
+        performSyncUnload();
+        performSyncLoad();
         refreshStatsUi();
+    }
+    else if (button == mUnloadBtn)
+    {
+        performSyncUnload();
     }
 }
 
