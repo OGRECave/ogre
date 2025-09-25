@@ -139,7 +139,7 @@ namespace Ogre
             // don't render all the time, only on demand
             rtt->setAutoUpdated(false);
             // we dont need depth
-            rtt->setDepthBufferPool(DepthBuffer::POOL_NO_DEPTH);
+            rtt->setDepthBufferPool(RBP_NONE);
             Viewport* vp = rtt->addViewport(mCompositeMapCam);
             // don't render overlays
             vp->setOverlaysEnabled(false);

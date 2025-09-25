@@ -235,7 +235,7 @@ void Compositor::createGlobalTextures()
             rendTarget->setAutoUpdated( false );
 
             //Set DepthBuffer pool for sharing
-            if(rendTarget->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH)
+            if(rendTarget->getDepthBufferPool() != RBP_NONE)
                 rendTarget->setDepthBufferPool( def->depthBufferId );
         }
     }

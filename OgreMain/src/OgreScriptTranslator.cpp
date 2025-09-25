@@ -4575,7 +4575,7 @@ namespace Ogre{
                         bool hwGammaWrite = false;
                         uint32 fsaa = 1;
                         auto type = TEX_TYPE_2D;
-                        uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
+                        uint16 depthBufferId = RBP_DEFAULT;
                         CompositionTechnique::TextureScope scope = CompositionTechnique::TS_LOCAL;
                         Ogre::PixelFormatList formats;
 

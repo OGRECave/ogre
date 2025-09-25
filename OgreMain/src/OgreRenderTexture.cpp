@@ -40,7 +40,7 @@ namespace Ogre
         mHeight = mBuffer->getHeight();
 
         if(PixelUtil::isDepth(mBuffer->getFormat()))
-            mDepthBufferPoolId = DepthBuffer::POOL_NO_DEPTH;
+            mDepthBufferPoolId = RBP_NONE;
     }
     RenderTexture::~RenderTexture()
     {
@@ -70,7 +70,7 @@ namespace Ogre
     void MultiRenderTarget::bindSurface(size_t attachment, RenderTexture* target)
     {
         if(PixelUtil::isDepth(target->suggestPixelFormat()))
-            setDepthBufferPool(DepthBuffer::POOL_NO_DEPTH); // unbinds any previously bound depth render buffer
+            setDepthBufferPool(RBP_NONE); // unbinds any previously bound depth render buffer
 
         for (size_t i = mBoundSurfaces.size(); i <= attachment; ++i)
         {

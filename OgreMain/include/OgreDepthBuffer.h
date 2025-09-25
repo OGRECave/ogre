@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef __DepthBuffer_H__
 #define __DepthBuffer_H__
 
+#include "OgreCommon.h"
 #include "OgrePrerequisites.h"
 #include "OgreHeaderPrefix.h"
 
@@ -75,11 +76,12 @@ namespace Ogre
     class _OgreExport DepthBuffer : public RenderSysAlloc
     {
     public:
+        /// @deprecated use #RenderBufferPool instead
         enum PoolId
         {
-            POOL_NO_DEPTH       = 0,
-            POOL_MANUAL_USAGE   = 0,
-            POOL_DEFAULT        = 1
+            POOL_NO_DEPTH       = RBP_NONE,
+            POOL_MANUAL_USAGE   = RBP_NONE,
+            POOL_DEFAULT        = RBP_DEFAULT
         };
 
         DepthBuffer(uint16 poolId, uint32 width, uint32 height, uint32 fsaa, bool manual);

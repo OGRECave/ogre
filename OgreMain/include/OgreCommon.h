@@ -129,6 +129,15 @@ namespace Ogre {
         TAM_BORDER
     };
 
+    /// Strategies for allocating and managing render buffers.
+    enum RenderBufferPool : uint16
+    {
+        /// No automatic allocation. Use this when the buffer is not needed, or when it will be managed explicitly by the user.
+        RBP_NONE    = 0,
+        /// Automatically allocated and managed from the default shared pool (pool ID = 1)
+        RBP_DEFAULT = 1
+    };
+
     /** %Light shading modes. */
     enum ShadeOptions : uint8
     {

@@ -738,7 +738,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
 
 void CompositorInstance::setupRenderTarget(RenderTarget* rendTarget, uint16 depthBufferId)
 {
-    if(rendTarget->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH)
+    if(rendTarget->getDepthBufferPool() != RBP_NONE)
     {
         //Set DepthBuffer pool for sharing
         rendTarget->setDepthBufferPool( depthBufferId );
