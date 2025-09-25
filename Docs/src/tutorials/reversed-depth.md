@@ -70,7 +70,7 @@ As we only render a full-screen quad to our main window, we should tell %Ogre th
 We do this as:
 ```cpp
 Ogre::RenderWindow* rwin = getRenderWindow();
-rwin->setDepthBufferPool(Ogre::DepthBuffer::POOL_NO_DEPTH);
+rwin->setDepthBufferPool(Ogre::RBP_NONE);
 ```
 
 @note If you are reading depth values in your shader, you can test for the `OGRE_REVERSED_Z` define, to discover whether reversed depth is enabled.

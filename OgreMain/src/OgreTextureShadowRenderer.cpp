@@ -364,7 +364,7 @@ void SceneManager::TextureShadowRenderer::renderTextureShadowReceiverQueueGroupO
 void SceneManager::TextureShadowRenderer::setupRenderTarget(const String& camName, RenderTarget* rendTarget,
                                                             uint16 depthBufferId)
 {
-    if (rendTarget->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH)
+    if (rendTarget->getDepthBufferPool() != RBP_NONE)
     {
         rendTarget->setDepthBufferPool(depthBufferId);
     }

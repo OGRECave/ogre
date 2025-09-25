@@ -509,7 +509,7 @@ namespace Ogre {
     void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )
     {
         uint16 poolId = renderTarget->getDepthBufferPool();
-        if( poolId == DepthBuffer::POOL_NO_DEPTH )
+        if( poolId == RBP_NONE )
             return; //RenderTarget explicitly requested no depth buffer
 
         //Find a depth buffer in the pool
