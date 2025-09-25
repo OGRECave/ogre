@@ -14,9 +14,6 @@ same license as the rest of the engine.
 
 #include "ThreadedResourcePrep.h"
 
-#include <sstream>
-#include <iomanip>
-
 Sample_ThreadedResourcePrep::Sample_ThreadedResourcePrep()
 {
     mInfo["Title"] = "Threaded Resource Prep";
@@ -82,7 +79,7 @@ void Sample_ThreadedResourcePrep::defineSelectableMesh(String name, Vector3 pos,
     mi.meshYaw = yaw;
 
     // Start with all meshes in scene
-    mi.mesh = MeshManager::getSingleton().load(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    mi.mesh = MeshManager::getSingleton().load(name, RGN_DEFAULT);
     mi.mesh->addListener(this);
     mi.entity = mSceneMgr->createEntity(mi.mesh);
     mi.sceneNode->attachObject(mi.entity);
@@ -190,11 +187,9 @@ void Sample_ThreadedResourcePrep::sliderMoved(Slider* slider)
 
 void Sample_ThreadedResourcePrep::refreshStatsUi()
 {
-    std::stringstream buf;
-    buf << "Reloads: " << mStats.totalReloads 
-        << ", Avg. time: " << std::setprecision(3) << mStats.avgReloadTime 
-        << " (Last: " << std::setprecision(3) << mStats.lastReloadTime << ")";
-    mMeshStatLabel->setCaption(buf.str());
+    mMeshStatLabel->setCaption(
+        StringUtil::format("Reloads: %d, Avg. time: %.3f (Last: %.3f)",
+            mStats.totalReloads, mStats.avgReloadTime, mStats.lastReloadTime));
 }
 
 void Sample_ThreadedResourcePrep::refreshMeshUi()
@@ -213,7 +208,7 @@ void Sample_ThreadedResourcePrep::refreshMeshUi()
         }
     }
 
-    mReloadBtn->setCaption("Reload " + StringConverter::toString((int)mBatchSlider->getValue()) + " mesh(es)");
+    mReloadBtn->setCaption(StringUtil::format("Reload %d mesh(es)", (int)mBatchSlider->getValue()));
 }
 
 void Sample_ThreadedResourcePrep::performSyncUnload()
@@ -237,6 +232,9 @@ void Sample_ThreadedResourcePrep::performSyncPrep()
     {
         loadMeshOnQueue(i);
     }
+
+    mStats.recordReloadTime(static_cast<double>(mLoadingTotalMillis) * 0.001);
+    refreshStatsUi();
 }
 
 void Sample_ThreadedResourcePrep::loadMeshOnQueue(size_t i)
@@ -287,6 +285,7 @@ void Sample_ThreadedResourcePrep::preparingComplete(Resource* resource)
         mUnloadBtn->getOverlayElement()->setVisible(true);
         mReloadBtn->getOverlayElement()->setVisible(true);
         mStats.recordReloadTime(static_cast<double>(mLoadingTotalMillis) * 0.001);
+        refreshStatsUi();
     }
 }
 
@@ -304,8 +303,6 @@ void Sample_ThreadedResourcePrep::buttonHit(Button* button)
         {
             performSyncPrep();
         }
-        mStats.recordReloadTime(static_cast<double>(mLoadingTotalMillis) * 0.001);
-        refreshStatsUi();
     }
     else if (button == mUnloadBtn)
     {
