@@ -58,7 +58,7 @@ struct Stats
     }
 };
 
-class _OgreSampleClassExport Sample_ThreadedResourcePrep : public SdkSample
+class _OgreSampleClassExport Sample_ThreadedResourcePrep : public SdkSample, public Resource::Listener
 {
 public:
     Sample_ThreadedResourcePrep();
@@ -75,25 +75,36 @@ private:
     void itemSelected(SelectMenu* menu) override;
     void buttonHit(Button* button) override;
     void sliderMoved(Slider* slider) override;
+    void checkBoxToggled(CheckBox* box) override;
     // Custom UI
     void refreshStatsUi();
     void refreshMeshUi();
 
     // The heavy lifting
     void performSyncUnload();
-    void performSyncLoad();
+    void performSyncPrep();
+    void loadMeshOnQueue(size_t i);
+    void performThreadedPrep();
     static void forceUnloadAllDependentResources(MeshPtr& mesh);
     static void forceUnloadAllDependentTextures(Pass* pass);
+
+    // Resource listener
+    void preparingComplete(Resource*) override;
 
     std::deque<MeshInfo> mMeshQueue;
     SelectMenu* mMeshMenu;
     Label* mMeshStatLabel;
+    Stats mStats;
     Button* mReloadBtn;
     Button* mUnloadBtn;
     Slider* mBatchSlider;
     size_t mBatchSize = 0;
     Timer mTimer;
-    Stats mStats;
+    CheckBox* mThreadedMeshChk;
+
+    // accumulators of `loadMeshOnQueue()`:
+    long long mLoadingTotalMillis;
+    size_t mNumLoadedMeshes;
 };
 
 #endif // _Sample_ThreadedResourcePrep_H_
