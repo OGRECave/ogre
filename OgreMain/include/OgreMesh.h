@@ -937,6 +937,12 @@ namespace Ogre {
         UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
         /// @overload
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
+
+        /** Copy out the raw data fetched from disk after resource preparation completes (state `LOADSTATE_PREPARED`).
+        * For advanced users only - you can manually parse the mesh data to retrieve linked resources (materials & skeleton).
+        * @returns Mesh file data if in state `LOADSTATE_PREPARED`, otherwise null.
+        */
+        DataStreamPtr copyPreparedMeshFileData();
     };
 
     /** A way of recording the way each LODs is recorded this Mesh. */

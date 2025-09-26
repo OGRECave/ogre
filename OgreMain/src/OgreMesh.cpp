@@ -2362,5 +2362,16 @@ namespace Ogre {
             if (s->vertexData)
                 s->vertexData->convertVertexElement(semantic, dstType);
     }
+
+    DataStreamPtr Mesh::copyPreparedMeshFileData()
+    {
+        DataStreamPtr ret;
+        if (mLoadingState == Resource::LoadingState::LOADSTATE_PREPARED)
+        {
+            ret = DataStreamPtr(new MemoryDataStream(mFreshFromDisk));
+            mFreshFromDisk->seek(0);
+        }
+        return ret;
+    }
 }
 
