@@ -526,7 +526,6 @@ namespace Ogre {
 
             if( newDepthBuffer )
             {
-                newDepthBuffer->_setPoolId( poolId );
                 mDepthBufferPool[poolId].push_back( newDepthBuffer );
 
                 bAttached = renderTarget->attachDepthBuffer( newDepthBuffer );

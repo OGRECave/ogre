@@ -1164,7 +1164,7 @@ namespace Ogre
             mDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &depthStencilView));
 
         //Create the abstract container
-        D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this, depthStencilView,
+        D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( renderTarget->getDepthBufferPool(), this, depthStencilView,
                                                 descDepth.Width, descDepth.Height,
                                                 descDepth.SampleDesc.Count, descDepth.SampleDesc.Quality,
                                                 false );
@@ -1609,7 +1609,7 @@ namespace Ogre
             //Retrieve depth buffer
             D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
 
-            if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH && !depthBuffer )
+            if( target->getDepthBufferPool() != RBP_NONE && !depthBuffer )
             {
                 //Depth is automatically managed and there is no depth buffer attached to this RT
                 //or the Current D3D device doesn't match the one this Depth buffer was created

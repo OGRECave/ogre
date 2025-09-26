@@ -183,13 +183,12 @@ namespace Ogre {
             initialiseFromRenderSystemCapabilities(mCurrentCapabilities, (RenderTarget *) win);
         }
 
-        if ( win->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH )
+        if ( win->getDepthBufferPool() != RBP_NONE )
         {
             // Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
             // Only Copy does, but Copy means only one depth buffer...
-            auto *depthBuffer = new TinyDepthBuffer( DepthBuffer::POOL_DEFAULT,
-                                                                      win->getWidth(), win->getHeight(),
-                                                                      win->getFSAA(), true );
+            auto* depthBuffer =
+                new TinyDepthBuffer(win->getDepthBufferPool(), win->getWidth(), win->getHeight(), win->getFSAA(), true);
 
             mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
 
@@ -203,7 +202,7 @@ namespace Ogre {
     DepthBuffer* TinyRenderSystem::_createDepthBufferFor( RenderTarget *rt )
     {
         // No "custom-quality" multisample for now in GL
-        return new TinyDepthBuffer(0, rt->getWidth(), rt->getHeight(), rt->getFSAA(), false);
+        return new TinyDepthBuffer(rt->getDepthBufferPool(), rt->getWidth(), rt->getHeight(), rt->getFSAA(), false);
     }
 
     MultiRenderTarget* TinyRenderSystem::createMultiRenderTarget(const String & name)
@@ -454,8 +453,7 @@ namespace Ogre {
         // Check the depth buffer status
         auto *depthBuffer = target->getDepthBuffer();
 
-        if ( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-                (!depthBuffer) )
+        if (target->getDepthBufferPool() != RBP_NONE && !depthBuffer)
         {
             // Depth is automatically managed and there is no depth buffer attached to this RT
             // or the Current context doesn't match the one this Depth buffer was created with

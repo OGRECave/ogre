@@ -9,11 +9,11 @@
 
 namespace Ogre
 {
-GLDepthBufferCommon::GLDepthBufferCommon(uint16 poolId, GLRenderSystemCommon* renderSystem,
-                                         GLContext* creatorContext, GLHardwarePixelBufferCommon* depth,
+GLDepthBufferCommon::GLDepthBufferCommon(GLRenderSystemCommon* renderSystem, GLContext* creatorContext,
+                                         GLHardwarePixelBufferCommon* depth,
                                          GLHardwarePixelBufferCommon* stencil, const RenderTarget* target,
                                          bool manual)
-    : DepthBuffer(poolId, target->getWidth(), target->getHeight(), target->getFSAA(), manual),
+    : DepthBuffer(target->getDepthBufferPool(), target->getWidth(), target->getHeight(), target->getFSAA(), manual),
       mCreatorContext(creatorContext), mDepthBuffer(depth), mStencilBuffer(stencil),
       mRenderSystem(renderSystem)
 {
