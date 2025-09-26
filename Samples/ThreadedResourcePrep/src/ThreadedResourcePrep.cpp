@@ -242,6 +242,7 @@ void Sample_ThreadedResourcePrep::loadMeshOnQueue(size_t i)
     long long startMillis = mTimer.getMilliseconds();
 
     MeshInfo& mi = mMeshQueue[i];
+
     mi.mesh->load();
     mi.entity = mSceneMgr->createEntity(mi.mesh);
     mi.sceneNode->attachObject(mi.entity);
@@ -273,6 +274,21 @@ void Sample_ThreadedResourcePrep::preparingComplete(Resource* resource)
         MeshInfo& mi = mMeshQueue[i];
         if (mi.meshName == resource->getName())
         {
+            //"##### BEGIN TEST of the early analyzer #####\n";
+
+            if (mi.mesh->getLoadingState() != Resource::LOADSTATE_PREPARED)
+            {
+                Ogre::LogManager::getSingleton().stream() << "[ThreadedResourcePrep]" << mi.meshName << " is not in LOADSTATE_PREPARED, but: " << mi.mesh->getLoadingState();
+            }
+            else
+            {
+                EarlyMeshAnalyzer analyzer;
+                analyzer.discoverLinkedResources(mi.mesh);
+                Ogre::LogManager::getSingleton().stream() << "[ThreadedResourcePrep]" << mi.meshName << ": skeletons:" << analyzer.skeletonNames.size() << ", materials:" << analyzer.materialNames.size();
+            }
+
+            // "##### END TEST of the early analyzer #####\n";
+
             loadMeshOnQueue(i);
             break;
         }
@@ -349,5 +365,136 @@ void Sample_ThreadedResourcePrep::forceUnloadAllDependentResources(MeshPtr& mesh
             }
             submesh->getMaterial()->unload();
         }
+    }
+}
+
+EarlyMeshAnalyzer::EarlyMeshAnalyzer()
+{
+    mVersion = "[MeshSerializer_v1.100]"; // see `MeshSerializerImpl::MeshSerializerImpl()`
+}
+
+enum EearlyMeshChunkID // see internal header 'OgreMeshFileFormat.h'
+{
+    M_HEADER                = 0x1000,
+    M_MESH                  = 0x3000,
+    M_SUBMESH               = 0x4000,
+    M_GEOMETRY              = 0x5000,
+    M_MESH_SKELETON_LINK    = 0x6000,
+    M_MESH_BONE_ASSIGNMENT  = 0x7000,
+    M_MESH_LOD_LEVEL        = 0x8000,
+    M_MESH_BOUNDS           = 0x9000,
+    M_SUBMESH_NAME_TABLE    = 0xA000,
+    M_EDGE_LISTS            = 0xB000,
+    M_POSES                 = 0xC000,
+    M_ANIMATIONS            = 0xD000,
+    M_TABLE_EXTREMES        = 0xE000,
+};
+
+void EarlyMeshAnalyzer::discoverLinkedResources(MeshPtr& mesh)
+{
+    // Materials and skeleton aren't known until the mesh is `load()`-ed.
+    // `MeshSerializerImpl` takes care of properly parsing the binary mesh format.
+    // To find the info early, we're on our own.
+    DataStreamPtr stream = mesh->copyPreparedMeshFileData();
+    stream->seek(0);
+
+    // ----- see `MeshSerializerImpl::importMesh()` -----
+    determineEndianness(stream);
+    readFileHeader(stream);
+    pushInnerChunk(stream);
+
+    unsigned short streamID = readChunk(stream);
+    while(!stream->eof())
+    {
+        switch (streamID)
+        {
+        case M_MESH:
+            readMesh(stream);
+            break;
+        }
+
+        streamID = readChunk(stream);
+    }
+
+    popInnerChunk(stream);
+}
+
+/// stream overhead = ID + size
+const long MSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
+
+void EarlyMeshAnalyzer::readMesh(DataStreamPtr& stream)
+{
+    // ----- see `MeshSerializerImpl::readMesh()` -----
+    readBools(stream, &skeletallyAnimated, 1);
+
+    // Find all substreams
+    if (!stream->eof())
+    {
+        pushInnerChunk(stream);
+        unsigned short streamID = readChunk(stream);
+        while(!stream->eof() &&
+            (streamID == M_GEOMETRY ||
+                streamID == M_SUBMESH ||
+                streamID == M_MESH_SKELETON_LINK ||
+                streamID == M_MESH_BONE_ASSIGNMENT ||
+                streamID == M_MESH_LOD_LEVEL ||
+                streamID == M_MESH_BOUNDS ||
+                streamID == M_SUBMESH_NAME_TABLE ||
+                streamID == M_EDGE_LISTS ||
+                streamID == M_POSES ||
+                streamID == M_ANIMATIONS ||
+                streamID == M_TABLE_EXTREMES))
+        {
+            size_t dataStartPos = stream->tell();
+            switch(streamID)
+            {
+            case M_GEOMETRY:
+                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                break;
+            case M_SUBMESH:
+                materialNames.push_back(readString(stream)); // see `MeshSerializerImpl::readSubMesh()`
+                stream->skip(mCurrentstreamLen - (MSTREAM_OVERHEAD_SIZE + (stream->tell() - dataStartPos)));
+                break;
+            case M_MESH_SKELETON_LINK:
+                skeletonNames.push_back(readString(stream)); // see `MeshSerializerImpl::readSkeletonLink()`
+                break;
+            case M_MESH_BONE_ASSIGNMENT:
+                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                break;
+            case M_MESH_LOD_LEVEL:
+                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                break;
+            case M_MESH_BOUNDS:
+                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                break;
+            case M_SUBMESH_NAME_TABLE:
+                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                break;
+            case M_EDGE_LISTS:
+                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                break;
+            case M_POSES:
+                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                break;
+            case M_ANIMATIONS:
+                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                break;
+            case M_TABLE_EXTREMES:
+                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                break;
+            }
+
+            if (!stream->eof())
+            {
+                streamID = readChunk(stream);
+            }
+
+        }
+        if (!stream->eof())
+        {
+            // Backpedal back to start of stream
+            backpedalChunkHeader(stream);
+        }
+        popInnerChunk(stream);
     }
 }
