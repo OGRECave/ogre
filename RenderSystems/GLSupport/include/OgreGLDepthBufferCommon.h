@@ -25,7 +25,7 @@ namespace Ogre
     class GLDepthBufferCommon : public DepthBuffer
     {
     public:
-        GLDepthBufferCommon(uint16 poolId, GLRenderSystemCommon* renderSystem, GLContext* creatorContext,
+        GLDepthBufferCommon(GLRenderSystemCommon* renderSystem, GLContext* creatorContext,
                             GLHardwarePixelBufferCommon* depth, GLHardwarePixelBufferCommon* stencil,
                             const RenderTarget* target, bool isManual);
 

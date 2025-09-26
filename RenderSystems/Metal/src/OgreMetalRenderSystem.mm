@@ -448,7 +448,7 @@ namespace Ogre
             }
         }
 
-        DepthBuffer *retVal = new MetalDepthBuffer( 0, this, renderTarget->getWidth(),
+        DepthBuffer *retVal = new MetalDepthBuffer( renderTarget->getDepthBufferPool(), this, renderTarget->getWidth(),
                                                     renderTarget->getHeight(),
                                                     renderTarget->getFSAA(),
                                                     depthFormat, false,
@@ -1095,10 +1095,10 @@ namespace Ogre
 
             MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>( target->getDepthBuffer() );
 
-            if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH && !depthBuffer )
+            if (target->getDepthBufferPool() != RBP_NONE && !depthBuffer)
             {
                 // Depth is automatically managed and there is no depth buffer attached to this RT
-                setDepthBufferFor( target );
+                setDepthBufferFor(target);
             }
 
             depthBuffer = static_cast<MetalDepthBuffer*>( target->getDepthBuffer() );

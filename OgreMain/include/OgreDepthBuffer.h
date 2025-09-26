@@ -87,9 +87,8 @@ namespace Ogre
         DepthBuffer(uint16 poolId, uint32 width, uint32 height, uint32 fsaa, bool manual);
         virtual ~DepthBuffer();
 
-        /** Sets the pool id in which this DepthBuffer lives.
-            Note this will detach any render target from this depth buffer */
-        void _setPoolId( uint16 poolId );
+        /// @deprecated do not use
+        OGRE_DEPRECATED void _setPoolId( uint16 poolId );
 
         /// Gets the pool id in which this DepthBuffer lives
         virtual uint16 getPoolId() const;

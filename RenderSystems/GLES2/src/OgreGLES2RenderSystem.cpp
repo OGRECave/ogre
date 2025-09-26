@@ -611,12 +611,11 @@ namespace Ogre {
                 mCurrentContext->setInitialized();
         }
 
-        if( win->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH )
+        if( win->getDepthBufferPool() != RBP_NONE )
         {
             // Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
             GLContext *windowContext = dynamic_cast<GLRenderTarget*>(win)->getContext();
-            auto depthBuffer =
-                new GLDepthBufferCommon(DepthBuffer::POOL_DEFAULT, this, windowContext, 0, 0, win, true);
+            auto depthBuffer = new GLDepthBufferCommon(this, windowContext, 0, 0, win, true);
 
             mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
 
@@ -650,7 +649,7 @@ namespace Ogre {
                                                        fbo->getHeight(), fbo->getFSAA() );
             }
 
-            return new GLDepthBufferCommon(0, this, mCurrentContext, depthBuffer, stencilBuffer,
+            return new GLDepthBufferCommon(this, mCurrentContext, depthBuffer, stencilBuffer,
                                            renderTarget, false);
         }
 
@@ -1476,7 +1475,7 @@ namespace Ogre {
             // Check the FBO's depth buffer status
             auto depthBuffer = static_cast<GLDepthBufferCommon*>(target->getDepthBuffer());
 
-            if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+            if( target->getDepthBufferPool() != RBP_NONE &&
                 (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
             {
                 // Depth is automatically managed and there is no depth buffer attached to this RT
@@ -1651,7 +1650,7 @@ namespace Ogre {
         _destroyDepthBuffer(win);
 
         auto depthBuffer =
-            new GLDepthBufferCommon(DepthBuffer::POOL_DEFAULT, this, mMainContext, 0, 0, win, true);
+            new GLDepthBufferCommon(this, mMainContext, 0, 0, win, true);
 
         mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
         win->attachDepthBuffer( depthBuffer );
