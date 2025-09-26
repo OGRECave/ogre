@@ -133,6 +133,7 @@ void Sample_ThreadedResourcePrep::setupControls()
     mBatchSlider = mTrayMgr->createThickSlider(TL_TOPLEFT, "BatchSlider", "Batch length", TOPLEFT_W, 50, 1, (Real)mMeshQueue.size(), (int)mMeshQueue.size());
 
     mThreadedMeshChk = mTrayMgr->createCheckBox(TL_TOPLEFT, "ThrMeshChk", "Bg. mesh prep", TOPLEFT_W);
+    mThreadedAllChk = mTrayMgr->createCheckBox(TL_TOPLEFT, "ThrAllChk", "Bg. all prep", TOPLEFT_W);
 
     mUnloadBtn = mTrayMgr->createButton(TL_TOPLEFT, "UnloadBtn", "Unload batch", TOPLEFT_W);
 
@@ -232,9 +233,6 @@ void Sample_ThreadedResourcePrep::performSyncPrep()
     {
         loadMeshOnQueue(i);
     }
-
-    mStats.recordReloadTime(static_cast<double>(mLoadingTotalMillis) * 0.001);
-    refreshStatsUi();
 }
 
 void Sample_ThreadedResourcePrep::loadMeshOnQueue(size_t i)
@@ -249,16 +247,32 @@ void Sample_ThreadedResourcePrep::loadMeshOnQueue(size_t i)
 
     mLoadingTotalMillis += mTimer.getMilliseconds() - startMillis;
     mNumLoadedMeshes++;
+
+    if (mNumLoadedMeshes == mBatchSize)
+    {
+        // We're done!
+        setThreadingUiVisible(true);
+        mStats.recordReloadTime(static_cast<double>(mLoadingTotalMillis) * 0.001);
+        refreshStatsUi();
+    }
+}
+
+void Sample_ThreadedResourcePrep::setThreadingUiVisible(bool vis)
+{
+    // mBatchSize must remain unchanged until all meshes are spawned!
+    mBatchSlider->getOverlayElement()->setVisible(vis);
+    // No [*load] button must be pressed while working.
+    mUnloadBtn->getOverlayElement()->setVisible(vis);
+    mReloadBtn->getOverlayElement()->setVisible(vis);
+    // mThreadedAllChk must remain unchanged while working
+    mThreadedAllChk->getOverlayElement()->setVisible(vis);
 }
 
 void Sample_ThreadedResourcePrep::performThreadedPrep()
 {
     mNumLoadedMeshes = 0;
-    // mBatchSize must remain unchanged until all meshes are spawned!
-    mBatchSlider->getOverlayElement()->setVisible(false);
-    // No [*load] button must be pressed while working.
-    mUnloadBtn->getOverlayElement()->setVisible(false);
-    mReloadBtn->getOverlayElement()->setVisible(false);
+    mPreppers.clear();
+    setThreadingUiVisible(false);
 
     for (size_t i = 0; i < mBatchSize; i++)
     {
@@ -274,35 +288,63 @@ void Sample_ThreadedResourcePrep::preparingComplete(Resource* resource)
         MeshInfo& mi = mMeshQueue[i];
         if (mi.meshName == resource->getName())
         {
-            //"##### BEGIN TEST of the early analyzer #####\n";
-
-            if (mi.mesh->getLoadingState() != Resource::LOADSTATE_PREPARED)
+            if (!mThreadedAllChk->isChecked())
             {
-                Ogre::LogManager::getSingleton().stream() << "[ThreadedResourcePrep]" << mi.meshName << " is not in LOADSTATE_PREPARED, but: " << mi.mesh->getLoadingState();
+                loadMeshOnQueue(i);
             }
             else
             {
-                EarlyMeshAnalyzer analyzer;
-                analyzer.discoverLinkedResources(mi.mesh);
-                Ogre::LogManager::getSingleton().stream() << "[ThreadedResourcePrep]" << mi.meshName << ": skeletons:" << analyzer.skeletonNames.size() << ", materials:" << analyzer.materialNames.size();
+                requestLinkedResourcesThreadedPrep(i);
             }
-
-            // "##### END TEST of the early analyzer #####\n";
-
-            loadMeshOnQueue(i);
             break;
         }
     }
+}
 
-    if (mNumLoadedMeshes == mBatchSize)
+void Sample_ThreadedResourcePrep::requestLinkedResourcesThreadedPrep(size_t i)
+{
+    MeshInfo& mi = mMeshQueue[i];
+    if (mi.mesh->getLoadingState() != Resource::LOADSTATE_PREPARED)
     {
-        // We're done!
-        mBatchSlider->getOverlayElement()->setVisible(true);
-        mUnloadBtn->getOverlayElement()->setVisible(true);
-        mReloadBtn->getOverlayElement()->setVisible(true);
-        mStats.recordReloadTime(static_cast<double>(mLoadingTotalMillis) * 0.001);
-        refreshStatsUi();
+        Ogre::LogManager::getSingleton().stream() << "[ThreadedResourcePrep]" << mi.meshName << " is not in LOADSTATE_PREPARED, but: " << mi.mesh->getLoadingState();
+        return;
     }
+
+    EarlyMeshAnalyzer analyzer;
+    analyzer.discoverLinkedResources(mi.mesh);
+    Ogre::LogManager::getSingleton().stream() << "[ThreadedResourcePrep]" << mi.meshName << ": skeletons:" << analyzer.skeletonNames.size() << ", materials:" << analyzer.materialNames.size();
+
+    LinkedResourcePrepper* prepper = new LinkedResourcePrepper(i, this);
+    for (String const& skeletonName: analyzer.skeletonNames)
+    {
+        prepper->hookResource(Ogre::SkeletonManager::getSingleton().getResourceByName(skeletonName));
+    }
+    for (String const& materialName: analyzer.materialNames)
+    {
+        MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(materialName);
+        if (mat)
+        {
+            for (Technique* teq: mat->getSupportedTechniques())
+            {
+                for (Pass* pass: teq->getPasses())
+                {
+                    for (TextureUnitState* tus: pass->getTextureUnitStates())
+                    {
+                        for (size_t iFrame = 0; iFrame < tus->getNumFrames(); iFrame++)
+                        {
+                            TexturePtr tex = Ogre::TextureManager::getSingleton().getByName(tus->getFrameTextureName(iFrame));
+                            if (tex)
+                            {
+                                prepper->hookResource(tex);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    prepper->startPreparing();
+    mPreppers.push_back(std::unique_ptr<LinkedResourcePrepper>(prepper));
 }
 
 void Sample_ThreadedResourcePrep::buttonHit(Button* button)
@@ -328,7 +370,7 @@ void Sample_ThreadedResourcePrep::buttonHit(Button* button)
 
 void Sample_ThreadedResourcePrep::checkBoxToggled(CheckBox* box)
 {
-    if (box == mThreadedMeshChk)
+    if (box == mThreadedMeshChk || box == mThreadedAllChk)
     {
         mStats.resetStats();
         refreshStatsUi();
@@ -396,7 +438,6 @@ void EarlyMeshAnalyzer::discoverLinkedResources(MeshPtr& mesh)
     // `MeshSerializerImpl` takes care of properly parsing the binary mesh format.
     // To find the info early, we're on our own.
     DataStreamPtr stream = mesh->copyPreparedMeshFileData();
-    stream->seek(0);
 
     // ----- see `MeshSerializerImpl::importMesh()` -----
     determineEndianness(stream);
@@ -496,5 +537,52 @@ void EarlyMeshAnalyzer::readMesh(DataStreamPtr& stream)
             backpedalChunkHeader(stream);
         }
         popInnerChunk(stream);
+    }
+}
+
+
+LinkedResourcePrepper::LinkedResourcePrepper(size_t queuePos, Sample_ThreadedResourcePrep* goal):
+    mQueuePos(queuePos),
+    mGoal(goal)
+{
+}
+
+LinkedResourcePrepper::~LinkedResourcePrepper()
+{
+    for (ResourcePtr& resource: mHookedResources)
+    {
+        resource->removeListener(this);
+    }
+}
+
+void LinkedResourcePrepper::hookResource(ResourcePtr resource)
+{
+    resource->addListener(this);
+    mHookedResources.push_back(resource);
+}
+
+void LinkedResourcePrepper::startPreparing()
+{
+    if (mHookedResources.size() == 0)
+    {
+        // Nothing to do
+        mGoal->loadMeshOnQueue(mQueuePos);
+        return;
+    }
+
+    mNumPrepared = 0;
+    for (ResourcePtr& resource: mHookedResources)
+    {
+        ResourceBackgroundQueue::getSingleton().prepare(resource);
+    }
+}
+
+// Resource listener
+void LinkedResourcePrepper::preparingComplete(Resource*)
+{
+    mNumPrepared++;
+    if (mNumPrepared == mHookedResources.size())
+    {
+        mGoal->loadMeshOnQueue(mQueuePos);
     }
 }

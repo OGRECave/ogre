@@ -24,6 +24,8 @@ same license as the rest of the engine.
 using namespace Ogre;
 using namespace OgreBites;
 
+class Sample_ThreadedResourcePrep;
+
 struct MeshInfo
 {
     // Each resource has dedicated spot, so they can appear in any order.
@@ -74,10 +76,31 @@ protected:
     void readMesh(DataStreamPtr& stream);
 };
 
+class LinkedResourcePrepper: public Resource::Listener
+{
+public:
+    LinkedResourcePrepper(size_t queuePos, Sample_ThreadedResourcePrep* goal);
+    ~LinkedResourcePrepper();
+
+    void hookResource(ResourcePtr resource);
+    void startPreparing();
+
+    // Resource listener
+    void preparingComplete(Resource*) override;
+
+private:
+    size_t mQueuePos = 0;
+    std::vector<Ogre::ResourcePtr> mHookedResources;
+    Sample_ThreadedResourcePrep* mGoal = nullptr;
+    size_t mNumPrepared = 0; // accumulator
+};
+
 class _OgreSampleClassExport Sample_ThreadedResourcePrep : public SdkSample, public Resource::Listener
 {
 public:
     Sample_ThreadedResourcePrep();
+
+    void loadMeshOnQueue(size_t i);
 
 private:
     // SdkSample setup
@@ -95,19 +118,21 @@ private:
     // Custom UI
     void refreshStatsUi();
     void refreshMeshUi();
+    void setThreadingUiVisible(bool vis);
 
     // The heavy lifting
     void performSyncUnload();
     void performSyncPrep();
-    void loadMeshOnQueue(size_t i);
     void performThreadedPrep();
     static void forceUnloadAllDependentResources(MeshPtr& mesh);
     static void forceUnloadAllDependentTextures(Pass* pass);
+    void requestLinkedResourcesThreadedPrep(size_t i);
 
     // Resource listener
     void preparingComplete(Resource*) override;
 
     std::deque<MeshInfo> mMeshQueue;
+    std::vector<std::unique_ptr<LinkedResourcePrepper>> mPreppers;
     SelectMenu* mMeshMenu;
     Label* mMeshStatLabel;
     Stats mStats;
@@ -117,6 +142,7 @@ private:
     size_t mBatchSize = 0;
     Timer mTimer;
     CheckBox* mThreadedMeshChk;
+    CheckBox* mThreadedAllChk;
 
     // accumulators of `loadMeshOnQueue()`:
     long long mLoadingTotalMillis;
