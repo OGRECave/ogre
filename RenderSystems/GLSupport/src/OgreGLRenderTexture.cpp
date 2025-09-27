@@ -54,8 +54,7 @@ namespace Ogre {
 
     GLFrameBufferObjectCommon::~GLFrameBufferObjectCommon()
     {
-        if (!mOwnedMultisampleColourBuffer)
-            mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer);
     }
 
     void GLFrameBufferObjectCommon::bindSurface(size_t attachment, const GLSurfaceDesc &target)
@@ -83,38 +82,6 @@ namespace Ogre {
         // Re-initialise if buffer 0 still bound
         if(mColour[0].buffer)
             initialise();
-    }
-
-    void GLFrameBufferObjectCommon::determineFBOBufferSharingAllowed(RenderTarget& target)
-    {
-        if (mNumSamples == 0)
-        {
-            // Only the multisampled buffer would be shared
-            return;
-        }
-
-        bool sharingRenderBufferIsAllowed = true;
-        for (unsigned short i = 0; i < target.getNumViewports(); ++i)
-        {
-            if (!target.getViewport(i)->getClearEveryFrame())
-            {
-                // When there's at least one viewport that doesn't clear every frame,
-                // sharing the render buffer is not allowed.
-                // The shared buffer could contain data from other multisampled FBO's which wouldn't be cleared.
-                sharingRenderBufferIsAllowed = false;
-                break;
-            }
-        }
-        setAllowRenderBufferSharing(sharingRenderBufferIsAllowed);
-    }
-
-    void GLFrameBufferObjectCommon::setAllowRenderBufferSharing(bool allowRenderBufferSharing)
-    {
-        if(mAllowRenderBufferSharing!=allowRenderBufferSharing)
-        {
-            mAllowRenderBufferSharing = allowRenderBufferSharing;
-            initialise();
-        }
     }
 
     uint32 GLFrameBufferObjectCommon::getWidth() const
@@ -197,37 +164,40 @@ namespace Ogre {
         return PF_BYTE_RGBA; // native endian
     }
 
-    static uint32 getKey(unsigned format, uint32 width, uint32 height, uint fsaa)
+    static uint32 getKey(unsigned format, uint32 width, uint32 height, uint fsaa, uint16 poolId)
     {
         uint32 key = HashCombine(0, format);
         key = HashCombine(key, width);
         key = HashCombine(key, height);
         key = HashCombine(key, fsaa);
+        key = HashCombine(key, poolId);
         return key;
     }
 
-    GLSurfaceDesc GLRTTManager::requestRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
+    GLSurfaceDesc GLRTTManager::requestRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa, uint16 poolId)
     {
         GLSurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
         if (format != 0)
         {
-            uint32 key = getKey(format, width, height, fsaa);
+            uint32 key = getKey(format, width, height, fsaa, poolId);
             RenderBufferMap::iterator it = mRenderBufferMap.find(key);
             if (it != mRenderBufferMap.end())
             {
                 retval.buffer = it->second.buffer;
-                retval.zoffset = 0;
-                retval.numSamples = fsaa;
                 // Increase refcount
                 ++it->second.refcount;
             }
             else
             {
                 // New one
-                retval = createNewRenderBuffer(format, width, height, fsaa);
+                retval.buffer = createNewRenderBuffer(format, width, height, fsaa);
                 mRenderBufferMap[key] = retval.buffer;
             }
+
+            retval.zoffset = 0;
+            retval.numSamples = fsaa;
+            retval.poolId = poolId;
         }
         // std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width <<
         // "x" << height << " :" << retval.buffer << std::endl;
@@ -238,7 +208,8 @@ namespace Ogre {
     {
         if(surface.buffer == 0)
             return;
-        uint32 key = getKey(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(), surface.numSamples);
+        uint32 key = getKey(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(),
+                            surface.numSamples, surface.poolId);
         RenderBufferMap::iterator it = mRenderBufferMap.find(key);
         if(it != mRenderBufferMap.end())
         {
@@ -255,25 +226,9 @@ namespace Ogre {
         }
     }
 
-    void GLFrameBufferObjectCommon::releaseMultisampleColourBuffer()
+    void GLFrameBufferObjectCommon::requestRenderBuffer(unsigned format, uint32 width, uint32 height)
     {
-        if (mOwnedMultisampleColourBuffer)
-            mOwnedMultisampleColourBuffer.reset();
-        else
-        {
-            mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer);
-        }
-    }
-
-    void GLFrameBufferObjectCommon::initialiseMultisampleColourBuffer(unsigned format, uint32 width, uint32 height)
-    {
-        if (mAllowRenderBufferSharing)
-            mMultisampleColourBuffer = mRTTManager->requestRenderBuffer(format, width, height, mNumSamples);
-        else
-        {
-            mMultisampleColourBuffer = mRTTManager->createNewRenderBuffer(format, width, height, mNumSamples);
-            mOwnedMultisampleColourBuffer.reset(mMultisampleColourBuffer.buffer);
-        }
+        mMultisampleColourBuffer = mRTTManager->requestRenderBuffer(format, width, height, mNumSamples, mPoolId);
     }
 
     GLRenderTexture::GLRenderTexture(const String &name,

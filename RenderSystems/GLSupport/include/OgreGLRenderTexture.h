@@ -29,6 +29,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #ifndef __GLRENDERTEXTURE_H__
 #define __GLRENDERTEXTURE_H__
 
+#include "OgreCommon.h"
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreRenderTexture.h"
 #include "OgreSingleton.h"
@@ -46,8 +47,9 @@ namespace Ogre {
         GLHardwarePixelBufferCommon *buffer;
         uint32 zoffset;
         uint numSamples;
+        uint16 poolId;
 
-        GLSurfaceDesc() : buffer(0), zoffset(0), numSamples(0) {}
+        GLSurfaceDesc() : buffer(0), zoffset(0), numSamples(0), poolId(0) {}
     };
 
     /// Frame Buffer Object abstraction
@@ -69,14 +71,6 @@ namespace Ogre {
         */
         void unbindSurface(size_t attachment);
 
-        /** Determines and sets mAllowRenderBufferSharing based on given render target properties
-         */
-        void determineFBOBufferSharingAllowed(RenderTarget&);
-
-        /** Sets mAllowRenderBufferSharing, triggers re-initialization if value is different
-         */
-        void setAllowRenderBufferSharing(bool);
-
         /// Accessors
         int32 getFSAA() const { return mNumSamples; }
         uint32 getWidth() const;
@@ -92,6 +86,13 @@ namespace Ogre {
         const GLSurfaceDesc &getSurface(size_t attachment) const { return mColour[attachment]; }
 
         void notifyContextDestroyed(GLContext* context) { if(mContext == context) { mContext = 0; mFB = 0; mMultisampleFB = 0; } }
+
+        void setRenderTargetPool(uint16 poolId)
+        {
+            // 0 means no-depth, which we dont care about here
+            mPoolId = std::max(uint16(1), poolId);
+        }
+
     protected:
         GLSurfaceDesc mDepth;
         GLSurfaceDesc mStencil;
@@ -104,11 +105,7 @@ namespace Ogre {
         int32 mNumSamples;
         GLRTTManager* mRTTManager;
         GLSurfaceDesc mMultisampleColourBuffer;
-        bool mAllowRenderBufferSharing = true;
-        // mMultisampleColourBuffer.buffer is either shared through caching, or owned,
-        // if owned, mOwnedMultisampleColourBuffer contains mMultisampleColourBuffer.buffer
-        // otherwise, mOwnedMultisampleColourBuffer == nullptr
-        std::unique_ptr<GLHardwarePixelBufferCommon> mOwnedMultisampleColourBuffer;
+        uint16 mPoolId = RBP_DEFAULT;
 
         /** Initialise object (find suitable depth and stencil format).
             Must be called every time the bindings change.
@@ -118,8 +115,7 @@ namespace Ogre {
             - Not all bound surfaces have the same internal format
         */
         virtual void initialise() = 0;
-        void releaseMultisampleColourBuffer();
-        void initialiseMultisampleColourBuffer(unsigned format, uint32 width, uint32 height);
+        void requestRenderBuffer(unsigned format, uint32 width, uint32 height);
     };
 
     /** Base class for GL Render Textures
@@ -184,13 +180,14 @@ namespace Ogre {
 
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
          */
-        GLSurfaceDesc requestRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa);
+        GLSurfaceDesc requestRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa, uint16 poolId);
 
         /** Creates a new render buffer. Caller takes ownership.
          */
-        virtual GLSurfaceDesc createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
+        virtual GLHardwarePixelBufferCommon* createNewRenderBuffer(unsigned format, uint32 width, uint32 height,
+                                                                   uint fsaa)
         {
-            return {};
+            return NULL;
         }
 
     protected:

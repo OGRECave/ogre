@@ -63,8 +63,7 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
         // Release depth and stencil, if they were bound
         mRTTManager->releaseRenderBuffer(mDepth);
         mRTTManager->releaseRenderBuffer(mStencil);
-
-        releaseMultisampleColourBuffer();
+        mRTTManager->releaseRenderBuffer(mMultisampleColourBuffer);
 
         // First buffer must be bound
         if(!mColour[0].buffer)
@@ -125,7 +124,7 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
             // Create AA render buffer (colour)
             // note, this can be shared too because we blit it to the final FBO
             // right after the render is finished
-            initialiseMultisampleColourBuffer(format, width, height);
+            requestRenderBuffer(format, width, height);
 
             // Attach it, because we won't be attaching below and non-multisample has
             // actually been attached to other FBO

@@ -43,6 +43,7 @@ namespace Ogre {
         const GLSurfaceDesc &target, bool writeGamma):
         GLRenderTexture(name, target, writeGamma)
     {
+        mFB.setRenderTargetPool(mDepthBufferPoolId);
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
 
@@ -500,7 +501,6 @@ namespace Ogre {
     {
         if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
         {
-            fbo->determineFBOBufferSharingAllowed(*target);
             fbo->bind(true);
         }
         else
@@ -515,13 +515,8 @@ namespace Ogre {
         }
     }
 
-    GLSurfaceDesc GLES2FBOManager::createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
+    GLHardwarePixelBufferCommon* GLES2FBOManager::createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
     {
-        GLSurfaceDesc retval;
-        auto* rb = OGRE_NEW GLES2RenderBuffer(format, width, height, fsaa);
-        retval.buffer = rb;
-        retval.zoffset = 0;
-        retval.numSamples = fsaa;
-        return retval;
+        return new GLES2RenderBuffer(format, width, height, fsaa);
     }
 }

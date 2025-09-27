@@ -1505,7 +1505,6 @@ namespace Ogre {
             */
             if(auto fbo = gltarget->getFBO())
             {
-                fbo->determineFBOBufferSharingAllowed(*target);
                 fbo->bind(true);
             }
             else

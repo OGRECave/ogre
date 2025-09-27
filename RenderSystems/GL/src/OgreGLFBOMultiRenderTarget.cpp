@@ -50,6 +50,7 @@ namespace Ogre {
         /// Check if the render target is in the rendertarget->FBO map
         auto fbobj = dynamic_cast<GLRenderTarget*>(target)->getFBO();
         assert(fbobj);
+        fbo.setRenderTargetPool(mDepthBufferPoolId);
         fbo.bindSurface(attachment, fbobj->getSurface(0));
 
         // Set width and height
