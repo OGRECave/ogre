@@ -483,7 +483,6 @@ static const uchar depthBits[] =
         /// Check if the render target is in the rendertarget->FBO map
         if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
         {
-            fbo->determineFBOBufferSharingAllowed(*target);
             fbo->bind(true);
         }
         else
@@ -491,13 +490,9 @@ static const uchar depthBits[] =
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
-    GLSurfaceDesc GLFBOManager::createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
+    GLHardwarePixelBufferCommon* GLFBOManager::createNewRenderBuffer(unsigned format, uint32 width, uint32 height,
+                                                                     uint fsaa)
     {
-        GLSurfaceDesc retval;
-        auto* rb = new GLRenderBuffer(format, width, height, fsaa);
-        retval.buffer = rb;
-        retval.zoffset = 0;
-        retval.numSamples = fsaa;
-        return retval;
+        return new GLRenderBuffer(format, width, height, fsaa);
     }
 }

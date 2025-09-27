@@ -76,7 +76,9 @@ namespace Ogre {
         GL3PlusFBORenderTexture *createRenderTexture(const String &name,
                                                              const GLSurfaceDesc &target, bool writeGamma) override;
 
-        GLSurfaceDesc createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa) override;
+        GLHardwarePixelBufferCommon* createNewRenderBuffer(unsigned format, uint32 width, uint32 height,
+                                                           uint fsaa) override;
+
     private:
         GL3PlusRenderSystem* mRenderSystem;
 

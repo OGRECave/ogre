@@ -42,6 +42,7 @@ namespace Ogre {
         const GLSurfaceDesc &target, bool writeGamma):
         GLRenderTexture(name, target, writeGamma)
     {
+        mFB.setRenderTargetPool(mDepthBufferPoolId);
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
 
@@ -458,14 +459,9 @@ namespace Ogre {
         return retval;
     }
 
-    GLSurfaceDesc GL3PlusFBOManager::createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)
+    GLHardwarePixelBufferCommon* GL3PlusFBOManager::createNewRenderBuffer(unsigned format, uint32 width, uint32 height,
+                                                                          uint fsaa)
     {
-        GLSurfaceDesc retval;
-        auto* rb = new GL3PlusRenderBuffer(format, width, height, fsaa);
-        retval.buffer = rb;
-        retval.zoffset = 0;
-        retval.numSamples = fsaa;
-        return retval;
+        return new GL3PlusRenderBuffer(format, width, height, fsaa);
     }
-
 }

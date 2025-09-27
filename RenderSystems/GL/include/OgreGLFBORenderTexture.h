@@ -85,7 +85,8 @@ namespace Ogre {
         GLFBORenderTexture *createRenderTexture(const String &name,
             const GLSurfaceDesc &target, bool writeGamma) override;
 
-        GLSurfaceDesc createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa) override;
+        GLHardwarePixelBufferCommon* createNewRenderBuffer(unsigned format, uint32 width, uint32 height,
+                                                           uint fsaa) override;
 
         /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
         */
