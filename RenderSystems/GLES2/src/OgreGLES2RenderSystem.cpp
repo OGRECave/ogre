@@ -339,6 +339,8 @@ namespace Ogre {
             glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers);
             rsc->setNumMultiRenderTargets(
                 std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
+
+            rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
         }
         else
         {
