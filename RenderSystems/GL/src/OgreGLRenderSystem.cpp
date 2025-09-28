@@ -1025,18 +1025,6 @@ namespace Ogre {
                 mCurrentContext->setInitialized();
         }
 
-        if( win->getDepthBufferPool() != RBP_NONE)
-        {
-            //Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
-            //Only Copy does, but Copy means only one depth buffer...
-            GLContext *windowContext = dynamic_cast<GLRenderTarget*>(win)->getContext();;
-
-            auto depthBuffer = new GLDepthBufferCommon(this, windowContext, 0, 0, win, true);
-            mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
-
-            win->attachDepthBuffer( depthBuffer );
-        }
-
         return win;
     }
     //---------------------------------------------------------------------
@@ -1110,53 +1098,6 @@ namespace Ogre {
         MultiRenderTarget *retval = new GLFBOMultiRenderTarget(name);
         attachRenderTarget( *retval );
         return retval;
-    }
-
-    //-----------------------------------------------------------------------
-    void GLRenderSystem::destroyRenderWindow(const String& name)
-    {
-        // Find it to remove from list.
-        RenderTarget* pWin = detachRenderTarget(name);
-        OgreAssert(pWin, "unknown RenderWindow name");
-
-        GLContext *windowContext = dynamic_cast<GLRenderTarget*>(pWin)->getContext();
-    
-        //1 Window <-> 1 Context, should be always true
-        assert( windowContext );
-
-        bool bFound = false;
-        //Find the depth buffer from this window and remove it.
-        DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
-        DepthBufferMap::iterator enMap = mDepthBufferPool.end();
-
-        while( itMap != enMap && !bFound )
-        {
-            DepthBufferVec::iterator itor = itMap->second.begin();
-            DepthBufferVec::iterator end  = itMap->second.end();
-
-            while( itor != end )
-            {
-                //A DepthBuffer with no depth & stencil pointers is a dummy one,
-                //look for the one that matches the same GL context
-                auto depthBuffer = static_cast<GLDepthBufferCommon*>(*itor);
-                GLContext *glContext = depthBuffer->getGLContext();
-
-                if( glContext == windowContext &&
-                    (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
-                {
-                    bFound = true;
-
-                    delete *itor;
-                    itMap->second.erase( itor );
-                    break;
-                }
-                ++itor;
-            }
-
-            ++itMap;
-        }
-
-        delete pWin;
     }
 
     //---------------------------------------------------------------------
