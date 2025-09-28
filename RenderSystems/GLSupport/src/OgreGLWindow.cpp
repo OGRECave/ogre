@@ -43,6 +43,8 @@ GLWindow::GLWindow() : mContext(0)
     mHidden = false;
     mVisible = false;
     mVSync = false;
+
+    mDepthBufferPoolId = RBP_NONE;
 }
 
 //-------------------------------------------------------------------------------------------------//

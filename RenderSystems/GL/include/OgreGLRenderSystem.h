@@ -169,9 +169,6 @@ namespace Ogre {
         DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget ) override;
 
         MultiRenderTarget * createMultiRenderTarget(const String & name) override;
-        
-
-        void destroyRenderWindow(const String& name) override;
 
         void setNormaliseNormals(bool normalise) override;
 

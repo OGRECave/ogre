@@ -139,9 +139,6 @@ namespace Ogre {
         /// @copydoc RenderSystem::createMultiRenderTarget
         MultiRenderTarget * createMultiRenderTarget(const String & name) override;
 
-
-        void destroyRenderWindow(const String& name) override;
-
         // -----------------------------
         // Low-level overridden members
         // -----------------------------

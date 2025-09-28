@@ -162,6 +162,15 @@ namespace Ogre {
             refreshConfig();
     }
 
+    //-----------------------------------------------------------------------
+    void GLRenderSystemCommon::destroyRenderWindow(const String& name)
+    {
+        // Find it to remove from list.
+        RenderTarget* pWin = detachRenderTarget(name);
+        OgreAssert(pWin, "unknown RenderWindow name");
+        delete pWin;
+    }
+
     bool GLRenderSystemCommon::checkExtension(const String& ext) const
     {
         return mExtensionList.find(ext) != mExtensionList.end() || mGLSupport->checkExtension(ext);

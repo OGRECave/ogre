@@ -136,8 +136,6 @@ namespace Ogre {
             MultiRenderTarget * createMultiRenderTarget(const String & name) override;
 
 
-            void destroyRenderWindow(const String& name) override;
-
             // -----------------------------
             // Low-level overridden members
             // -----------------------------
@@ -214,8 +212,6 @@ namespace Ogre {
             /// @copydoc RenderSystem::_setAlphaRejectSettings
             void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage ) override;
 
-            void _destroyDepthBuffer(RenderTarget* pRenderWnd);
-        
             /// @copydoc RenderSystem::beginProfileEvent
             void beginProfileEvent( const String &eventName ) override;
             

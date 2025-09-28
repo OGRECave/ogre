@@ -88,6 +88,8 @@ namespace Ogre {
         */
         void setConfigOption(const String &name, const String &value) override;
 
+        void destroyRenderWindow(const String& name) override;
+
         virtual ~GLRenderSystemCommon() {}
 
         /** @copydoc RenderTarget::copyContentsToMemory */
