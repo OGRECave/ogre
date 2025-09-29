@@ -54,7 +54,7 @@ namespace Ogre
     */
 
     typedef std::vector<DepthBuffer*> DepthBufferVec;
-    typedef std::map< uint16, DepthBufferVec > DepthBufferMap;
+    typedef std::map< uint32, DepthBufferVec > DepthBufferMap;
     typedef std::map< String, RenderTarget * > RenderTargetMap;
     typedef std::multimap<uchar, RenderTarget * > RenderTargetPriorityMap;
 
