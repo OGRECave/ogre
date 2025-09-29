@@ -152,6 +152,7 @@ class _OgreBulletExport KinematicMotionSimple : public btActionInterface
     bool mIsOnFloor;
     bool mIsPenetrating;
     int mManifolds;
+    bool mAllowManualNarrowPhase;
     virtual bool needsCollision(const btCollisionObject* body0, const btCollisionObject* body1);
     void preStep(btCollisionWorld* collisionWorld);
     void playerStep(btCollisionWorld* collisionWorld, btScalar dt);
@@ -166,6 +167,15 @@ public:
     bool isOnFloor() const { return mIsOnFloor; }
     bool isPenetrating() const { return mIsPenetrating; }
     int getManifolds() const { return mManifolds; }
+    /** Enable manual narrow phase
+     * @param enable if enabled
+    */
+    void enableManualNarrowPhase(bool enable)
+    {
+        mAllowManualNarrowPhase = enable;
+    }
+    /** Report manual narrow phase enabled status */
+    bool isManualNarrowPhaseEnabled() const { return mAllowManualNarrowPhase; }
 };
 /// simplified wrapper with automatic memory management
 class _OgreBulletExport DynamicsWorld : public CollisionWorld
