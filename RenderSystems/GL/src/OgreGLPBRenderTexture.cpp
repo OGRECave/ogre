@@ -42,6 +42,7 @@ namespace Ogre {
         mManager(manager)
     {
         mPBFormat = PixelUtil::getComponentType(target.buffer->getFormat());
+        mDepthBufferPoolId = RBP_NONE; // not poolable
         
         mManager->requestPBuffer(mPBFormat, mWidth, mHeight);
     }

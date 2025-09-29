@@ -39,6 +39,7 @@ namespace Ogre {
         const String &name, const GLSurfaceDesc &target, bool writeGamma):
         GLRenderTexture(name, target, writeGamma)
     {
+        mDepthBufferPoolId = RBP_NONE; // not poolable
     }
     void GLCopyingRenderTexture::getCustomAttribute(const String& name, void* pData)
     {
