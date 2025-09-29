@@ -888,6 +888,28 @@ void DebugDrawer::drawLine(const btVector3& from, const btVector3& to, const btV
     mLines.colour(col);
 }
 
+struct DeepPenetrationContactResultCallback : public btManifoldResult
+{
+    DeepPenetrationContactResultCallback(const btCollisionObjectWrapper* body0Wrap,
+                                         const btCollisionObjectWrapper* body1Wrap)
+        : btManifoldResult(body0Wrap, body1Wrap), mPenetrationDistance(0)
+    {
+    }
+    float mPenetrationDistance;
+    btVector3 mNormal, mPoint;
+    void reset() { mPenetrationDistance = 0.0f; }
+    bool hasHit() { return mPenetrationDistance < 0.0f; }
+    void addContactPoint(const btVector3& normalOnBInWorld, const btVector3& pointInWorldOnB, btScalar depth) override
+    {
+        if (mPenetrationDistance > depth)
+        {
+            const bool isSwapped = m_manifoldPtr->getBody0() != m_body0Wrap->getCollisionObject();
+            mPenetrationDistance = depth;
+            mPoint = isSwapped ? (pointInWorldOnB + (normalOnBInWorld * depth)) : pointInWorldOnB;
+            mNormal = isSwapped ? normalOnBInWorld * -1 : normalOnBInWorld;
+        }
+    }
+};
 /* Taken from btKinematicCharacterController */
 bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWorld)
 {
@@ -902,6 +924,7 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
     btVector3 minAabb, maxAabb;
     bool shapes_found = false;
     btTransform bodyPosition = mGhostObject->getWorldTransform();
+    btDispatcher* dispatch = collisionWorld->getDispatcher();
 
     /* This is taken from Godot to implement btCompoundShape here */
     for (int kinIndex = 0; kinIndex < (int)mCollisionShapes.size(); kinIndex++)
@@ -935,13 +958,12 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
     {
         return false;
     }
-    collisionWorld->getBroadphase()->setAabb(mGhostObject->getBroadphaseHandle(), minAabb, maxAabb,
-                                             collisionWorld->getDispatcher());
+    collisionWorld->getBroadphase()->setAabb(mGhostObject->getBroadphaseHandle(), minAabb, maxAabb, dispatch);
 
     bool penetration = false;
 
-    collisionWorld->getDispatcher()->dispatchAllCollisionPairs(
-        mGhostObject->getOverlappingPairCache(), collisionWorld->getDispatchInfo(), collisionWorld->getDispatcher());
+    dispatch->dispatchAllCollisionPairs(mGhostObject->getOverlappingPairCache(), collisionWorld->getDispatchInfo(),
+                                        dispatch);
 
     mCurrentPosition = mGhostObject->getWorldTransform().getOrigin();
 
@@ -958,9 +980,9 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
         btCollisionObject* obj0 = static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject);
         btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
 
-	/* Do not de-penetrate from objects which have no contact response setting.
-	 * However the body itself is de-penetrated regardless of this setting */
-	if ((obj0 != mGhostObject && !obj0->hasContactResponse()) ||
+        /* Do not de-penetrate from objects which have no contact response setting.
+         * However the body itself is de-penetrated regardless of this setting */
+        if ((obj0 != mGhostObject && !obj0->hasContactResponse()) ||
             (obj1 != mGhostObject && !obj1->hasContactResponse()))
             continue;
 
@@ -971,32 +993,52 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
             collisionPair->m_algorithm->getAllContactManifolds(mManifoldArray);
 
         mManifolds += mManifoldArray.size();
-        for (int j = 0; j < mManifoldArray.size(); j++)
+        if (mManifoldArray.size() == 0 && mAllowManualNarrowPhase)
         {
-            btPersistentManifold* manifold = mManifoldArray[j];
-            btScalar directionSign = manifold->getBody0() == mGhostObject ? btScalar(-1.0) : btScalar(1.0);
-            for (int p = 0; p < manifold->getNumContacts(); p++)
+            /* Manual narrow phase: because Bullet does not collide ghosts by default */
+            btCollisionObjectWrapper obA(NULL, obj0->getCollisionShape(), obj0, obj0->getWorldTransform(), -1, i);
+            btCollisionObjectWrapper obB(NULL, obj1->getCollisionShape(), obj1, obj1->getWorldTransform(), -1, 0);
+            btCollisionAlgorithm* algorithm = dispatch->findAlgorithm(&obA, &obB, NULL, BT_CONTACT_POINT_ALGORITHMS);
+            DeepPenetrationContactResultCallback contactPointResult(&obA, &obB);
+
+            algorithm->processCollision(&obA, &obB, collisionWorld->getDispatchInfo(), &contactPointResult);
+            algorithm->~btCollisionAlgorithm();
+            dispatch->freeCollisionAlgorithm(algorithm);
+            if (contactPointResult.hasHit())
             {
-                const btManifoldPoint& pt = manifold->getContactPoint(p);
-
-                btScalar dist = pt.getDistance();
-
-                if (dist < -mMaxPenetrationDepth)
+                btVector3 touchingNormal = contactPointResult.mNormal;
+                mCurrentPosition += touchingNormal * contactPointResult.mPenetrationDistance * btScalar(0.2);
+                penetration = true;
+            }
+        }
+        else
+        {
+            for (int j = 0; j < mManifoldArray.size(); j++)
+            {
+                btPersistentManifold* manifold = mManifoldArray[j];
+                btScalar directionSign = manifold->getBody0() == mGhostObject ? btScalar(-1.0) : btScalar(1.0);
+                for (int p = 0; p < manifold->getNumContacts(); p++)
                 {
-                    // TODO: cause problems on slopes, not sure if it is needed
-                    // if (dist < maxPen)
-                    //{
-                    //	maxPen = dist;
-                    //	m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
+                    const btManifoldPoint& pt = manifold->getContactPoint(p);
 
-                    //}
-		    btVector3 touchingNormal = pt.m_normalWorldOnB;
-                    if (touchingNormal.y() > 0 && (
-                        touchingNormal.y() > Ogre::Math::Abs(touchingNormal.x()) ||
-                        touchingNormal.y() > Ogre::Math::Abs(touchingNormal.z())))
+                    btScalar dist = pt.getDistance();
+
+                    if (dist < -mMaxPenetrationDepth)
+                    {
+                        // TODO: cause problems on slopes, not sure if it is needed
+                        // if (dist < maxPen)
+                        //{
+                        //	maxPen = dist;
+                        //	m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
+
+                        //}
+                        btVector3 touchingNormal = pt.m_normalWorldOnB;
+                        if (touchingNormal.y() > 0 && (touchingNormal.y() > Ogre::Math::Abs(touchingNormal.x()) ||
+                                                       touchingNormal.y() > Ogre::Math::Abs(touchingNormal.z())))
                             mIsOnFloor = true;
-                    mCurrentPosition += pt.m_normalWorldOnB * directionSign * dist * btScalar(0.2);
-                    penetration = true;
+                        mCurrentPosition += pt.m_normalWorldOnB * directionSign * dist * btScalar(0.2);
+                        penetration = true;
+                    }
                 }
             }
         }
@@ -1096,7 +1138,8 @@ void KinematicMotionSimple::setupCollisionShapes(btCollisionObject* body)
 }
 KinematicMotionSimple::KinematicMotionSimple(btPairCachingGhostObject* ghostObject, Node* node)
     : btActionInterface(), mGhostObject(ghostObject), mMaxPenetrationDepth(0.0f),
-      mNode(node), mIsOnFloor(false), mIsPenetrating(false), mManifolds(0)
+      mNode(node), mIsOnFloor(false), mIsPenetrating(false), mManifolds(0),
+      mAllowManualNarrowPhase(false)
 {
     btTransform nodeXform;
     nodeXform.setRotation(convert(node->getOrientation()));
