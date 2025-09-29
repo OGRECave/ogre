@@ -508,9 +508,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )
     {
-        uint16 poolId = renderTarget->getDepthBufferPool();
-        if( poolId == RBP_NONE )
+        uint16 poolNum = renderTarget->getDepthBufferPool();
+        if( poolNum == RBP_NONE )
             return; //RenderTarget explicitly requested no depth buffer
+
+        uint32 poolId = HashCombine(0, poolNum);
+        poolId = HashCombine(poolId, renderTarget->getFSAA());
+
+        if(!getCapabilities()->hasCapability(RSC_RTT_INDEPENDENT_BUFFER_SIZE))
+        {
+            //Depth buffer must be EXACT same size as RT
+            poolId = HashCombine(poolId, renderTarget->getWidth());
+            poolId = HashCombine(poolId, renderTarget->getHeight());
+        }
 
         //Find a depth buffer in the pool
         bool bAttached = false;
