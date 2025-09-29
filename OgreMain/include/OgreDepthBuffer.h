@@ -65,7 +65,7 @@ namespace Ogre
         some APIs (ie. OpenGL w/ FBO) don't allow using
         the main depth buffer for offscreen RTTs. When this flag is set, the depth buffer can be
         shared between the main window and an RTT.
-        - #RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL:
+        - #RSC_RTT_INDEPENDENT_BUFFER_SIZE:
         When this flag isn't set, the depth buffer can only be shared across RTTs who have the EXACT
         same resolution. When it's set, it can be shared with RTTs as long as they have a
         resolution less or equal than the depth buffer's.

@@ -163,12 +163,13 @@ namespace Ogre
         RSC_CAN_GET_COMPILED_SHADER_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
         /// Supports HW gamma, both in the framebuffer and as texture.
         RSC_HW_GAMMA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 13),
-        /// Supports using the MAIN depth buffer for RTTs. D3D 9&10, OGL w/FBO support unknown
-        /// (undefined behavior?), OGL w/ copy supports it
+        /// @deprecated do not use
         RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 14),
-        /// Supports attaching a depth buffer to an RTT that has width & height less or equal than RTT's.
+        /// Supports attaching a buffer to a render target that is smaller than the buffer.
         /// Otherwise must be of _exact_ same resolution. D3D 9, OGL 3.0 (not 2.0, not D3D10)
-        RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 15),
+        RSC_RTT_INDEPENDENT_BUFFER_SIZE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 15),
+        /// @deprecated use RSC_RTT_INDEPENDENT_BUFFER_SIZE
+        RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL = RSC_RTT_INDEPENDENT_BUFFER_SIZE,
         /// Supports using vertex buffers for instance data
         RSC_VERTEX_BUFFER_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 16),
         /// Supports mesh and task programs
