@@ -92,7 +92,6 @@ namespace Ogre {
         mIsFullScreen = fullScreen;
         mClosed = false;        
         mDisplayFrequency = 0;
-        mDepthBufferPoolId = DepthBuffer::POOL_DEFAULT;
         mColourDepth = mIsFullScreen? 32 : GetDeviceCaps(GetDC(0), BITSPIXEL);
         int left = -1; // Defaults to screen center
         int top = -1; // Defaults to screen center
@@ -123,8 +122,8 @@ namespace Ogre {
 
             if ((opt = miscParams->find("depthBuffer")) != end)
             {
-                mDepthBufferPoolId = StringConverter::parseBool(opt->second) ?
-                                                DepthBuffer::POOL_DEFAULT : DepthBuffer::POOL_NO_DEPTH;
+                LogManager::getSingleton().logWarning(
+                    "Win32Window::create(): depthBuffer option is not supported on OpenGL.");
             }
 
             if ((opt = miscParams->find("vsync")) != end)
