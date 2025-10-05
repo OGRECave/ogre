@@ -54,8 +54,9 @@ public:
         mLastCamPos = camPos;
 
         std::vector<float> distances(mIndices.size());
+        Vector3f camDir(-mCamera->getDerivedDirection());
         for (size_t i = 0; i < mIndices.size(); ++i)
-            distances[i] = mPositions[i].dotProduct(camPos); // project on camera vector
+            distances[i] = mPositions[i].dotProduct(camDir); // project on camera vector
 
         // argsort
         std::sort(mIndices.begin(), mIndices.end(), [&distances](int a, int b) { return distances[a] < distances[b]; });
