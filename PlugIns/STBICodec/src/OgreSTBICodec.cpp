@@ -122,7 +122,7 @@ namespace Ogre {
             format != PF_L8 && format != PF_R8)
         {   
             format = Ogre::PF_A8B8G8R8;
-            size_t tempDataSize = image->getSize();
+            size_t tempDataSize = PixelUtil::getMemorySize(image->getWidth(), image->getHeight(), 1, format);
             tempData = OGRE_ALLOC_T(unsigned char, tempDataSize, Ogre::MEMCATEGORY_GENERAL);
             Ogre::PixelBox pbOut(image->getPixelBox(), format, tempData);
             PixelUtil::bulkPixelConversion(image->getPixelBox(), pbOut);
