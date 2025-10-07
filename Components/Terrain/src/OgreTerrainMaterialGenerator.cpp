@@ -143,13 +143,15 @@ namespace Ogre
             Viewport* vp = rtt->addViewport(mCompositeMapCam);
             // don't render overlays
             vp->setOverlaysEnabled(false);
-
+            vp->setClearEveryFrame(false);
         }
 
         RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
         rSys->_setRenderTarget(rtt);
         rSys->setScissorTest(true, rect);
+        auto oldVP = rSys->_getViewport();
         rtt->update();
+        rSys->_setViewport(oldVP); // D3D9 requires restoring the old one
         rSys->setScissorTest(false);
 
         // We have an RTT, we want to copy the results into a regular texture
