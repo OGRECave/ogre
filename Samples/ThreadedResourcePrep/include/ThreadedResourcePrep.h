@@ -63,10 +63,11 @@ struct Stats
 // Materials and skeleton linked from mesh file aren't known until the mesh is `load()`-ed.
 // `MeshSerializerImpl` takes care of properly parsing the binary mesh format.
 // To find the resources early (so we can `prepare()` them in time), we're on our own.
-struct EarlyMeshAnalyzer: public Serializer
+struct LinkedResourceFinder: public Serializer
 {
-    EarlyMeshAnalyzer();
-    void discoverLinkedResources(MeshPtr& mesh);
+    LinkedResourceFinder();
+    void discoverLinkedResourcesEarly(MeshPtr& mesh); //!< Separately loads the mesh from disk and analyzes by hand.
+    void gatherLinkedResourcesPostLoad(MeshPtr& mesh); //!< Analyzes using OGRE API.
 
     StringVector materialNames;
     StringVector skeletonNames;
@@ -101,6 +102,7 @@ public:
     Sample_ThreadedResourcePrep();
 
     void loadMeshOnQueue(size_t i);
+    void loadMeshOnQueueInAdvance(size_t i);
 
 private:
     // SdkSample setup
@@ -143,6 +145,7 @@ private:
     Timer mTimer;
     CheckBox* mThreadedMeshChk;
     CheckBox* mThreadedAllChk;
+    CheckBox* mEarlyDiscoveryChk;
 
     // accumulators of `loadMeshOnQueue()`:
     long long mLoadingTotalMillis;

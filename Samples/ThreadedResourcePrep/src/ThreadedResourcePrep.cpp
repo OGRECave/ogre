@@ -19,6 +19,7 @@ Sample_ThreadedResourcePrep::Sample_ThreadedResourcePrep()
     mInfo["Title"] = "Threaded Resource Prep";
     mInfo["Description"] = "Showcases and benchmarks background resource queue";
     mInfo["Category"] = "Unsorted";
+    mInfo["Thumbnail"] = "thumb_bgprep.png";
 }
 
 void Sample_ThreadedResourcePrep::setupContent()
@@ -134,6 +135,7 @@ void Sample_ThreadedResourcePrep::setupControls()
 
     mThreadedMeshChk = mTrayMgr->createCheckBox(TL_TOPLEFT, "ThrMeshChk", "Bg. mesh prep", TOPLEFT_W);
     mThreadedAllChk = mTrayMgr->createCheckBox(TL_TOPLEFT, "ThrAllChk", "Bg. all prep", TOPLEFT_W);
+    mEarlyDiscoveryChk = mTrayMgr->createCheckBox(TL_TOPLEFT, "EarlyDiscovChk", "Early discovery", TOPLEFT_W);
 
     mUnloadBtn = mTrayMgr->createButton(TL_TOPLEFT, "UnloadBtn", "Unload batch", TOPLEFT_W);
 
@@ -257,6 +259,17 @@ void Sample_ThreadedResourcePrep::loadMeshOnQueue(size_t i)
     }
 }
 
+void Sample_ThreadedResourcePrep::loadMeshOnQueueInAdvance(size_t i)
+{
+    long long startMillis = mTimer.getMilliseconds();
+
+    MeshInfo& mi = mMeshQueue[i];
+
+    mi.mesh->load();
+
+    mLoadingTotalMillis += mTimer.getMilliseconds() - startMillis;
+}
+
 void Sample_ThreadedResourcePrep::setThreadingUiVisible(bool vis)
 {
     // mBatchSize must remain unchanged until all meshes are spawned!
@@ -310,8 +323,16 @@ void Sample_ThreadedResourcePrep::requestLinkedResourcesThreadedPrep(size_t i)
         return;
     }
 
-    EarlyMeshAnalyzer analyzer;
-    analyzer.discoverLinkedResources(mi.mesh);
+    LinkedResourceFinder analyzer;
+    if (mEarlyDiscoveryChk->isChecked())
+    {
+        analyzer.discoverLinkedResourcesEarly(mi.mesh);
+    }
+    else
+    {
+        loadMeshOnQueueInAdvance(i);
+        analyzer.gatherLinkedResourcesPostLoad(mi.mesh);
+    }
     Ogre::LogManager::getSingleton().stream() << "[ThreadedResourcePrep]" << mi.meshName << ": skeletons:" << analyzer.skeletonNames.size() << ", materials:" << analyzer.materialNames.size();
 
     LinkedResourcePrepper* prepper = new LinkedResourcePrepper(i, this);
@@ -370,7 +391,7 @@ void Sample_ThreadedResourcePrep::buttonHit(Button* button)
 
 void Sample_ThreadedResourcePrep::checkBoxToggled(CheckBox* box)
 {
-    if (box == mThreadedMeshChk || box == mThreadedAllChk)
+    if (box == mThreadedMeshChk || box == mThreadedAllChk || box == mEarlyDiscoveryChk)
     {
         mStats.resetStats();
         refreshStatsUi();
@@ -410,7 +431,7 @@ void Sample_ThreadedResourcePrep::forceUnloadAllDependentResources(MeshPtr& mesh
     }
 }
 
-EarlyMeshAnalyzer::EarlyMeshAnalyzer()
+LinkedResourceFinder::LinkedResourceFinder()
 {
     mVersion = "[MeshSerializer_v1.100]"; // see `MeshSerializerImpl::MeshSerializerImpl()`
 }
@@ -432,12 +453,29 @@ enum EearlyMeshChunkID // see internal header 'OgreMeshFileFormat.h'
     M_TABLE_EXTREMES        = 0xE000,
 };
 
-void EarlyMeshAnalyzer::discoverLinkedResources(MeshPtr& mesh)
+void LinkedResourceFinder::gatherLinkedResourcesPostLoad(MeshPtr& mesh)
+{
+    // this is just convenience to use the same dispatch code later on.
+
+    if (mesh->hasSkeleton())
+    {
+        skeletallyAnimated=true;
+        skeletonNames.push_back(mesh->getSkeletonName());
+    }
+
+    for (SubMesh* submesh: mesh->getSubMeshes())
+    {
+        materialNames.push_back(submesh->getMaterialName());
+    }
+}
+
+void LinkedResourceFinder::discoverLinkedResourcesEarly(MeshPtr& mesh)
 {
     // Materials and skeleton aren't known until the mesh is `load()`-ed.
     // `MeshSerializerImpl` takes care of properly parsing the binary mesh format.
     // To find the info early, we're on our own.
-    DataStreamPtr stream = mesh->copyPreparedMeshFileData();
+    // Even if the mesh is prepared, there's no way to get the buffered data - we must load it ourselves.
+    DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton().openResource(mesh->getName(), mesh->getGroup(), mesh.get());
 
     // ----- see `MeshSerializerImpl::importMesh()` -----
     determineEndianness(stream);
@@ -463,7 +501,7 @@ void EarlyMeshAnalyzer::discoverLinkedResources(MeshPtr& mesh)
 /// stream overhead = ID + size
 const long MSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
 
-void EarlyMeshAnalyzer::readMesh(DataStreamPtr& stream)
+void LinkedResourceFinder::readMesh(DataStreamPtr& stream)
 {
     // ----- see `MeshSerializerImpl::readMesh()` -----
     readBools(stream, &skeletallyAnimated, 1);
