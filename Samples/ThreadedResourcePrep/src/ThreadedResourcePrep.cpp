@@ -48,6 +48,13 @@ void Sample_ThreadedResourcePrep::setupContent()
     floor->setCastShadows(false);
     mSceneMgr->getRootSceneNode()->attachObject(floor);
 
+    // add a particle system to better feel the FPS spikes when reloading.
+    ParticleSystem* psys = mSceneMgr->createParticleSystem("Particles", "Examples/PurpleFountain");
+    psys->setKeepParticlesInLocalSpace(true);
+    SceneNode* pnode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,5,-35));
+    pnode->attachObject(psys);
+    pnode->setScale(Vector3(0.5,0.1, 0.5));
+
     setupSelectableMeshes();
     setupControls();
 
@@ -136,6 +143,7 @@ void Sample_ThreadedResourcePrep::setupControls()
     mThreadedMeshChk = mTrayMgr->createCheckBox(TL_TOPLEFT, "ThrMeshChk", "Bg. mesh prep", TOPLEFT_W);
     mThreadedAllChk = mTrayMgr->createCheckBox(TL_TOPLEFT, "ThrAllChk", "Bg. all prep", TOPLEFT_W);
     mEarlyDiscoveryChk = mTrayMgr->createCheckBox(TL_TOPLEFT, "EarlyDiscovChk", "Early discovery", TOPLEFT_W);
+    mThrEarlyDiscoveryChk = mTrayMgr->createCheckBox(TL_TOPLEFT, "ThrEarlyDiscovChk", " ^ +Threaded", TOPLEFT_W);
 
     mUnloadBtn = mTrayMgr->createButton(TL_TOPLEFT, "UnloadBtn", "Unload batch", TOPLEFT_W);
 
@@ -314,6 +322,11 @@ void Sample_ThreadedResourcePrep::preparingComplete(Resource* resource)
     }
 }
 
+void Sample_ThreadedResourcePrep::addPrepper(LinkedResourcePrepper* prepperPtr)
+{
+    mPreppers.push_back(std::unique_ptr<LinkedResourcePrepper>(prepperPtr));
+}
+
 void Sample_ThreadedResourcePrep::requestLinkedResourcesThreadedPrep(size_t i)
 {
     MeshInfo& mi = mMeshQueue[i];
@@ -326,7 +339,25 @@ void Sample_ThreadedResourcePrep::requestLinkedResourcesThreadedPrep(size_t i)
     LinkedResourceFinder analyzer;
     if (mEarlyDiscoveryChk->isChecked())
     {
-        analyzer.discoverLinkedResourcesEarly(mi.mesh);
+        if (mThrEarlyDiscoveryChk->isChecked())
+        {
+            Root::getSingleton().getWorkQueue()->addTask([i, &mi, analyzer, this]()
+                {
+                     LinkedResourceFinder bgAnalyzer;
+                     bgAnalyzer.discoverLinkedResourcesEarly(mi.mesh);
+                     LinkedResourcePrepper* prepper = new LinkedResourcePrepper(i, this, bgAnalyzer);
+                     prepper->startPreparing();
+                     Root::getSingleton().getWorkQueue()->addMainThreadTask([this, prepper]()
+                         {
+                             this->addPrepper(prepper);
+                         });
+                });
+            return;
+        }
+        else
+        {
+            analyzer.discoverLinkedResourcesEarly(mi.mesh);
+        }
     }
     else
     {
@@ -335,37 +366,9 @@ void Sample_ThreadedResourcePrep::requestLinkedResourcesThreadedPrep(size_t i)
     }
     Ogre::LogManager::getSingleton().stream() << "[ThreadedResourcePrep]" << mi.meshName << ": skeletons:" << analyzer.skeletonNames.size() << ", materials:" << analyzer.materialNames.size();
 
-    LinkedResourcePrepper* prepper = new LinkedResourcePrepper(i, this);
-    for (String const& skeletonName: analyzer.skeletonNames)
-    {
-        prepper->hookResource(Ogre::SkeletonManager::getSingleton().getResourceByName(skeletonName));
-    }
-    for (String const& materialName: analyzer.materialNames)
-    {
-        MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(materialName);
-        if (mat)
-        {
-            for (Technique* teq: mat->getSupportedTechniques())
-            {
-                for (Pass* pass: teq->getPasses())
-                {
-                    for (TextureUnitState* tus: pass->getTextureUnitStates())
-                    {
-                        for (size_t iFrame = 0; iFrame < tus->getNumFrames(); iFrame++)
-                        {
-                            TexturePtr tex = Ogre::TextureManager::getSingleton().getByName(tus->getFrameTextureName(iFrame));
-                            if (tex)
-                            {
-                                prepper->hookResource(tex);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    LinkedResourcePrepper* prepper = new LinkedResourcePrepper(i, this, analyzer);
     prepper->startPreparing();
-    mPreppers.push_back(std::unique_ptr<LinkedResourcePrepper>(prepper));
+    addPrepper(prepper);
 }
 
 void Sample_ThreadedResourcePrep::buttonHit(Button* button)
@@ -391,7 +394,7 @@ void Sample_ThreadedResourcePrep::buttonHit(Button* button)
 
 void Sample_ThreadedResourcePrep::checkBoxToggled(CheckBox* box)
 {
-    if (box == mThreadedMeshChk || box == mThreadedAllChk || box == mEarlyDiscoveryChk)
+    if (box == mThreadedMeshChk || box == mThreadedAllChk || box == mEarlyDiscoveryChk || box == mThrEarlyDiscoveryChk)
     {
         mStats.resetStats();
         refreshStatsUi();
@@ -579,10 +582,38 @@ void LinkedResourceFinder::readMesh(DataStreamPtr& stream)
 }
 
 
-LinkedResourcePrepper::LinkedResourcePrepper(size_t queuePos, Sample_ThreadedResourcePrep* goal):
+LinkedResourcePrepper::LinkedResourcePrepper(size_t queuePos, Sample_ThreadedResourcePrep* goal, LinkedResourceFinder& analyzer):
     mQueuePos(queuePos),
     mGoal(goal)
 {
+    for (String const& skeletonName: analyzer.skeletonNames)
+    {
+        hookResource(Ogre::SkeletonManager::getSingleton().getResourceByName(skeletonName));
+    }
+    for (String const& materialName: analyzer.materialNames)
+    {
+        MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(materialName);
+        if (mat)
+        {
+            for (Technique* teq: mat->getSupportedTechniques())
+            {
+                for (Pass* pass: teq->getPasses())
+                {
+                    for (TextureUnitState* tus: pass->getTextureUnitStates())
+                    {
+                        for (size_t iFrame = 0; iFrame < tus->getNumFrames(); iFrame++)
+                        {
+                            TexturePtr tex = Ogre::TextureManager::getSingleton().getByName(tus->getFrameTextureName(iFrame));
+                            if (tex)
+                            {
+                                hookResource(tex);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 LinkedResourcePrepper::~LinkedResourcePrepper()
@@ -603,8 +634,14 @@ void LinkedResourcePrepper::startPreparing()
 {
     if (mHookedResources.size() == 0)
     {
-        // Nothing to do
-        mGoal->loadMeshOnQueue(mQueuePos);
+        // No resources to load -> nobody to invoke `preparingComplete()` -> we must request loading mesh now.
+        // because this function is invocable on background, finish using mainThreadTask
+        Sample_ThreadedResourcePrep* goalPtr = mGoal;
+        size_t queuePos = mQueuePos;
+        Root::getSingleton().getWorkQueue()->addMainThreadTask([goalPtr, queuePos]()
+            {
+                goalPtr->loadMeshOnQueue(queuePos);
+            });
         return;
     }
 

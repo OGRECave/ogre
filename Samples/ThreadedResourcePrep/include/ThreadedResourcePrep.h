@@ -80,7 +80,7 @@ protected:
 class LinkedResourcePrepper: public Resource::Listener
 {
 public:
-    LinkedResourcePrepper(size_t queuePos, Sample_ThreadedResourcePrep* goal);
+    LinkedResourcePrepper(size_t queuePos, Sample_ThreadedResourcePrep* goal, LinkedResourceFinder& analyzer);
     ~LinkedResourcePrepper();
 
     void hookResource(ResourcePtr resource);
@@ -103,6 +103,7 @@ public:
 
     void loadMeshOnQueue(size_t i);
     void loadMeshOnQueueInAdvance(size_t i);
+    void addPrepper(LinkedResourcePrepper* prepperPtr);
 
 private:
     // SdkSample setup
@@ -146,6 +147,7 @@ private:
     CheckBox* mThreadedMeshChk;
     CheckBox* mThreadedAllChk;
     CheckBox* mEarlyDiscoveryChk;
+    CheckBox* mThrEarlyDiscoveryChk;
 
     // accumulators of `loadMeshOnQueue()`:
     long long mLoadingTotalMillis;
