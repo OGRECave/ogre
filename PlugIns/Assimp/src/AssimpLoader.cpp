@@ -1129,7 +1129,6 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
     // prime pointers to vertex related data
     aiVector3D* vec = mesh->mVertices;
     aiVector3D* norm = mesh->mNormals;
-    aiVector3D* uv = mesh->mTextureCoords[0];
     aiVector3D* tang = mesh->mTangents;
     aiColor4D *col = mesh->mColors[0];
 
@@ -1174,13 +1173,16 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
         offset += declaration->addElement(source, offset, VET_FLOAT3, VES_NORMAL).getSize();
     }
 
-    if (uv)
+    for (int uvindex = 0; uvindex < AI_MAX_NUMBER_OF_TEXTURECOORDS; uvindex++)
     {
+        aiVector3D* uv = mesh->mTextureCoords[uvindex];
+        if (!uv)
+            break;
         if (!mQuietMode)
         {
             LogManager::getSingleton().logMessage(StringUtil::format("%d uvs", mesh->mNumVertices));
         }
-        offset += declaration->addElement(source, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES).getSize();
+        offset += declaration->addElement(source, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, uvindex).getSize();
     }
 
     if (tang)
@@ -1249,11 +1251,13 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
         }
 
         // uvs
-        if (uv)
+        for (int uvindex = 0; uvindex < AI_MAX_NUMBER_OF_TEXTURECOORDS; uvindex++)
         {
+            aiVector3D* uv = mesh->mTextureCoords[uvindex];
+            if (!uv)
+                break;
             *vdata++ = uv->x;
             *vdata++ = uv->y;
-            uv++;
         }
 
         if(tang)
