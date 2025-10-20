@@ -1256,8 +1256,8 @@ bool AssimpLoader::createSubMesh(const String& name, int index, const aiNode* pN
             aiVector3D* uv = mesh->mTextureCoords[uvindex];
             if (!uv)
                 break;
-            *vdata++ = uv->x;
-            *vdata++ = uv->y;
+            *vdata++ = uv[i].x;
+            *vdata++ = uv[i].y;
         }
 
         if(tang)
