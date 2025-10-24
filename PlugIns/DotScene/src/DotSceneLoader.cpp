@@ -130,7 +130,7 @@ struct DotSceneCodec : public Codec
 
 } // namespace
 
-DotSceneLoader::DotSceneLoader() : mSceneMgr(0), mBackgroundColour(ColourValue::Black) {}
+DotSceneLoader::DotSceneLoader() : mSceneMgr(0), mBackgroundColour(ColourValue::Black), mItemPrefix("") {}
 
 DotSceneLoader::~DotSceneLoader() {}
 
@@ -140,6 +140,18 @@ void DotSceneLoader::load(DataStreamPtr& stream, const String& groupName, SceneN
     mSceneMgr = rootNode->getCreator();
 
     pugi::xml_document XMLDoc; // character type defaults to char
+
+    auto optsAny = rootNode->getUserObjectBindings().getUserAny("_DotSceneLoaderOptions");
+    if (optsAny.has_value())
+    {
+        std::map<Ogre::String, Ogre::Any> options = any_cast<std::map<Ogre::String, Ogre::Any>>(optsAny);
+        if (options.find("namePrefix") != options.end())
+        {
+            Ogre::Any optionValue = options["namePrefix"];
+            if (optionValue.has_value())
+                mItemPrefix = Ogre::any_cast<Ogre::String>(optionValue);
+        }
+    }
 
     auto result = XMLDoc.load_buffer(stream->getAsString().c_str(), stream->size());
     if (!result)
@@ -442,9 +454,9 @@ void DotSceneLoader::processNode(pugi::xml_node& XMLNode, SceneNode* pParent)
     {
         // Provide the name
         if (pParent)
-            pNode = pParent->createChildSceneNode(name);
+            pNode = pParent->createChildSceneNode(mItemPrefix + name);
         else
-            pNode = mAttachNode->createChildSceneNode(name);
+            pNode = mAttachNode->createChildSceneNode(mItemPrefix + name);
     }
 
     // Process other attributes
@@ -605,59 +617,64 @@ void DotSceneLoader::processEntity(pugi::xml_node& XMLNode, SceneNode* pParent)
     // Process attributes
     String name = getAttrib(XMLNode, "name");
 
-    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Entity: " + name, LML_TRIVIAL);
+    LogManager::getSingleton().logMessage("[DotSceneLoader] Processing Entity: " + mItemPrefix + name, LML_TRIVIAL);
 
     String meshFile = getAttrib(XMLNode, "meshFile");
-	String staticGeometry = getAttrib(XMLNode, "static");
-	String instancedManager = getAttrib(XMLNode, "instanced");
-	String material = getAttrib(XMLNode, "material");
+    String staticGeometry = getAttrib(XMLNode, "static");
+    String instancedManager = getAttrib(XMLNode, "instanced");
+    String material = getAttrib(XMLNode, "material");
     bool castShadows = getAttribBool(XMLNode, "castShadows", true);
     bool visible = getAttribBool(XMLNode, "visible", true);
 
     // Create the entity
-	MovableObject* pEntity = 0;
+    MovableObject* pEntity = 0;
 
     try
     {
-		// If the Entity is instanced then the creation path is different
-		if (!instancedManager.empty())
-		{
-			LogManager::getSingleton().logMessage("[DotSceneLoader] Adding entity: " + name + " to Instance Manager: " + instancedManager, LML_TRIVIAL);
+        // If the Entity is instanced then the creation path is different
+        if (!instancedManager.empty())
+        {
+            LogManager::getSingleton().logMessage(
+                "[DotSceneLoader] Adding entity: " + name + " to Instance Manager: " + instancedManager, LML_TRIVIAL);
 
-			// Load the Mesh to get the material name of the first submesh
-			Ogre::MeshPtr mesh = MeshManager::getSingletonPtr()->load(meshFile, m_sGroupName);
+            // Load the Mesh to get the material name of the first submesh
+            Ogre::MeshPtr mesh = MeshManager::getSingletonPtr()->load(meshFile, m_sGroupName);
 
-			// Get the material name of the entity
-			if(!material.empty())
-				pEntity = mSceneMgr->createInstancedEntity(material, instancedManager);
-			else
-				pEntity = mSceneMgr->createInstancedEntity(mesh->getSubMesh(0)->getMaterialName(), instancedManager);
+            // Get the material name of the entity
+            if (!material.empty())
+                pEntity = mSceneMgr->createInstancedEntity(material, instancedManager);
+            else
+                pEntity = mSceneMgr->createInstancedEntity(mesh->getSubMesh(0)->getMaterialName(), instancedManager);
 
-			pParent->attachObject(static_cast<InstancedEntity*>(pEntity));
-		}
-		else
-		{
-			pEntity = mSceneMgr->createEntity(name, meshFile, m_sGroupName);
+            pParent->attachObject(static_cast<InstancedEntity*>(pEntity));
+        }
+        else
+        {
+            pEntity = mSceneMgr->createEntity(mItemPrefix + name, meshFile, m_sGroupName);
 
-			static_cast<Entity*>(pEntity)->setCastShadows(castShadows);
-			static_cast<Entity*>(pEntity)->setVisible(visible);
+            static_cast<Entity*>(pEntity)->setCastShadows(castShadows);
+            static_cast<Entity*>(pEntity)->setVisible(visible);
 
-			if (!material.empty())
-				static_cast<Entity*>(pEntity)->setMaterialName(material);
+            if (!material.empty())
+                static_cast<Entity*>(pEntity)->setMaterialName(material);
 
-			// If the Entity belongs to a Static Geometry group then it doesn't get attached to a node
-			// * TODO * : Clean up nodes without attached entities or children nodes? (should be done afterwards if the hierarchy is being processed)
-			if (!staticGeometry.empty())
-			{
-				LogManager::getSingleton().logMessage("[DotSceneLoader] Adding entity: " + name + " to Static Group: " + staticGeometry, LML_TRIVIAL);
-				mSceneMgr->getStaticGeometry(staticGeometry)->addEntity(static_cast<Entity*>(pEntity), pParent->_getDerivedPosition(), pParent->_getDerivedOrientation(), pParent->_getDerivedScale());
-			}
-			else
-			{
-				LogManager::getSingleton().logMessage("[DotSceneLoader] pParent->attachObject(): " + name, LML_TRIVIAL);
-				pParent->attachObject(static_cast<Entity*>(pEntity));
-			}
-		}
+            // If the Entity belongs to a Static Geometry group then it doesn't get attached to a node
+            // * TODO * : Clean up nodes without attached entities or children nodes? (should be done afterwards
+            // if the hierarchy is being processed)
+            if (!staticGeometry.empty())
+            {
+                LogManager::getSingleton().logMessage(
+                    "[DotSceneLoader] Adding entity: " + name + " to Static Group: " + staticGeometry, LML_TRIVIAL);
+                mSceneMgr->getStaticGeometry(staticGeometry)
+                    ->addEntity(static_cast<Entity*>(pEntity), pParent->_getDerivedPosition(),
+                                pParent->_getDerivedOrientation(), pParent->_getDerivedScale());
+            }
+            else
+            {
+                LogManager::getSingleton().logMessage("[DotSceneLoader] pParent->attachObject(): " + name, LML_TRIVIAL);
+                pParent->attachObject(static_cast<Entity*>(pEntity));
+            }
+        }
     }
     catch (const Exception& e)
     {
