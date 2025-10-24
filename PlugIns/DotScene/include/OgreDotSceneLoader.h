@@ -84,8 +84,8 @@ class _OgreDotScenePluginExport DotScenePlugin : public Plugin
 {
     const String& getName() const override;
 
-    void install() override {}
-    void initialise() override;
+    void install() override;
+    void initialise() override {}
     void shutdown() override;
     void uninstall() override {}
 private:
