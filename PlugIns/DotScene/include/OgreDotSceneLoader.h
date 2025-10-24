@@ -78,6 +78,7 @@ protected:
     Ogre::SceneNode* mAttachNode;
     Ogre::String m_sGroupName;
     Ogre::ColourValue mBackgroundColour;
+    Ogre::String mItemPrefix;
 };
 
 class _OgreDotScenePluginExport DotScenePlugin : public Plugin
