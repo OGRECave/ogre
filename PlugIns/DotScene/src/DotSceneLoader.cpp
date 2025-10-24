@@ -1120,7 +1120,8 @@ const Ogre::String& DotScenePlugin::getName() const {
     return name;
 }
 
-void DotScenePlugin::initialise() {
+void DotScenePlugin::install()
+{
     mCodec = new DotSceneCodec();
     Codec::registerCodec(mCodec);
 }
