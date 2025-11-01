@@ -157,6 +157,10 @@ class _OgreBulletExport KinematicMotionSimple : public btActionInterface
     int mManifolds;
     bool mAllowManualNarrowPhase;
     bool mVelocityMotion;
+    float mStepHeight;
+    float mCurrentStepOffset;
+    float mVerticalOffset;
+    btVector3 mUp;
     virtual bool needsCollision(const btCollisionObject* body0, const btCollisionObject* body1);
     void preStep(btCollisionWorld* collisionWorld);
     void playerStep(btCollisionWorld* collisionWorld, btScalar dt);
@@ -168,6 +172,7 @@ class _OgreBulletExport KinematicMotionSimple : public btActionInterface
                    btCollisionWorld::ClosestConvexResultCallback& callback, float margin = 0.0f);
     void updateTargetPositionBasedOnCollision(bool current, btVector3& targetPosition, const btVector3& hitNormal,
                                               btScalar tangentMag = 1.0f, btScalar normalMag = 1.0f);
+    void stepUp(btCollisionWorld* world, btScalar& verticalVelocity, bool interpolateUp);
     void stepForwardAndStrafe(bool current, btCollisionWorld* world, const btVector3& motion, float margin = 0.0f,
                               int iterations = 10);
 

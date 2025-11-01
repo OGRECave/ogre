@@ -1062,6 +1062,8 @@ void KinematicMotionSimple::playerStep(btCollisionWorld* collisionWorld, btScala
     {
         btVector3 currentPosition = convert(mNode->getPosition());
         btVector3 motion = currentPosition - mPreviousPosition;
+        float verticalVelocity = motion.y() * dt;
+        stepUp(collisionWorld, verticalVelocity, true);
         motion.setY(0);
         stepForwardAndStrafe(false, collisionWorld, motion);
     }
@@ -1260,6 +1262,96 @@ void KinematicMotionSimple::updateTargetPositionBasedOnCollision(bool current, b
     }
 }
 
+void KinematicMotionSimple::stepUp(btCollisionWorld* world, btScalar& verticalVelocity, bool interpolateUp)
+{
+    btScalar stepHeight = 0.0f;
+    if (verticalVelocity < 0.0)
+        stepHeight = mStepHeight;
+
+    // phase 1: up
+    btTransform start, end;
+
+    start.setIdentity();
+    end.setIdentity();
+
+    /* FIXME: Handle penetration properly */
+    start.setOrigin(mCurrentPosition);
+
+    btVector3 targetPosition = mCurrentPosition + mUp * stepHeight;
+    mCurrentPosition = targetPosition;
+
+    end.setOrigin(targetPosition);
+
+    start.setRotation(mCurrentOrientation);
+    end.setRotation(mCurrentOrientation);
+
+    btKinematicClosestNotMeConvexResultCallback callback(mGhostObject, -mUp,
+                                                         Ogre::Math::Cos(Ogre::Math::DegreesToRadians(30)));
+    callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
+    callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
+
+    sweepTest(world, start, end, callback);
+
+#if 0
+    if (m_useGhostObjectSweepTest)
+    {
+        m_ghostObject->convexSweepTest(m_convexShape, start, end, callback,
+                                       world->getDispatchInfo().m_allowedCcdPenetration);
+    }
+    else
+    {
+        world->convexSweepTest(m_convexShape, start, end, callback, world->getDispatchInfo().m_allowedCcdPenetration);
+    }
+#endif
+
+    if (callback.hasHit() && mGhostObject->hasContactResponse() &&
+        needsCollision(mGhostObject, callback.m_hitCollisionObject))
+    {
+        // Only modify the position if the hit was a slope and not a wall or ceiling.
+        if (callback.m_hitNormalWorld.dot(mUp) > 0.0)
+        {
+            // we moved up only a fraction of the step height
+            mCurrentStepOffset = stepHeight * callback.m_closestHitFraction;
+            if (interpolateUp == true)
+                mCurrentPosition.setInterpolate3(mCurrentPosition, targetPosition, callback.m_closestHitFraction);
+            else
+                mCurrentPosition = targetPosition;
+        }
+
+        btTransform& xform = mGhostObject->getWorldTransform();
+        xform.setOrigin(mCurrentPosition);
+        mGhostObject->setWorldTransform(xform);
+
+        // fix penetration if we hit a ceiling for example
+        int numPenetrationLoops = 0;
+        /* TODO: bool touchingContact = false; */
+        while (recoverFromPenetration(world))
+        {
+            numPenetrationLoops++;
+            /* TODO: touchingContact = true; */
+            if (numPenetrationLoops > 4)
+            {
+                // printf("character could not recover from penetration = %d\n", numPenetrationLoops);
+                break;
+            }
+        }
+        targetPosition = mGhostObject->getWorldTransform().getOrigin();
+        mCurrentPosition = targetPosition;
+
+        if (mVerticalOffset > 0)
+        {
+            mVerticalOffset = 0.0;
+            verticalVelocity = 0.0;
+            mCurrentStepOffset = mStepHeight;
+        }
+    }
+    else
+    {
+        mCurrentStepOffset = stepHeight;
+        mCurrentPosition = targetPosition;
+    }
+}
+
 void KinematicMotionSimple::stepForwardAndStrafe(bool current, btCollisionWorld* world, const btVector3& motion,
                                                  float margin, int iterations)
 {
@@ -1326,7 +1418,8 @@ void KinematicMotionSimple::stepForwardAndStrafe(bool current, btCollisionWorld*
 }
 KinematicMotionSimple::KinematicMotionSimple(btPairCachingGhostObject* ghostObject, Node* node)
     : btActionInterface(), mGhostObject(ghostObject), mMaxPenetrationDepth(0.0f), mNode(node), mIsOnFloor(false),
-      mIsPenetrating(false), mManifolds(0), mAllowManualNarrowPhase(false), mVelocityMotion(false)
+      mIsPenetrating(false), mManifolds(0), mAllowManualNarrowPhase(false), mVelocityMotion(false), mStepHeight(0.0f),
+      mCurrentStepOffset(0.0f), mVerticalOffset(0.0f), mUp(0.0f, 1.0f, 0.0f)
 {
     btTransform nodeXform;
     nodeXform.setIdentity();
