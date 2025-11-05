@@ -244,6 +244,8 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
             rs->_getStateCacheManager()->bindGLFrameBuffer( GL_READ_FRAMEBUFFER, mMultisampleFB );
             rs->_getStateCacheManager()->bindGLFrameBuffer( GL_DRAW_FRAMEBUFFER, mFB );
 
+            std::vector<GLenum> invalidateAttachments = { GL_DEPTH_ATTACHMENT };
+
             for(unsigned int x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
             {
                 if(!mColour[x].buffer)
@@ -251,6 +253,13 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
                 OGRE_CHECK_GL_ERROR(glReadBuffer((GL_COLOR_ATTACHMENT0 + x)));
                 OGRE_CHECK_GL_ERROR(glDrawBuffer((GL_COLOR_ATTACHMENT0 + x)));
                 OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+                invalidateAttachments.push_back(GL_COLOR_ATTACHMENT0 + x);
+            }
+
+            if (rs->hasMinGLVersion(4, 3))
+            {
+                OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, invalidateAttachments.size(),
+                                                            invalidateAttachments.data()));
             }
 
             // Unbind
