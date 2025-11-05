@@ -578,16 +578,7 @@ namespace Ogre {
             }
 
             // Initialise GL after the first window has been created
-            // TODO: fire this from emulation options, and don't duplicate Real and Current capabilities
-            mRealCapabilities = createRenderSystemCapabilities();
-
-            // use real capabilities if custom capabilities are not available
-            if (!mUseCustomCapabilities)
-                mCurrentCapabilities = mRealCapabilities;
-
-            fireEvent("RenderSystemCapabilitiesCreated");
-
-            initialiseFromRenderSystemCapabilities(mCurrentCapabilities, (RenderTarget *) win);
+            initialiseRenderSystemCapabilities((RenderTarget *) win);
 
             // Initialise the main context
             _oneTimeContextInitialization();
