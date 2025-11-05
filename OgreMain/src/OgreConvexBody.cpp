@@ -693,7 +693,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     std::ostream& operator<< ( std::ostream& strm, const ConvexBody& body )
     {
-        strm << "POLYGON INFO (" << body.getPolygonCount() << ")" << std::endl;
+        strm << "POLYGON INFO (" << body.getPolygonCount() << ")" << '\n';
 
         for ( size_t i = 0; i < body.getPolygonCount(); ++i )
         {
@@ -1112,10 +1112,10 @@ namespace Ogre
                     currentVertex   = vFirst;
 
                 #ifdef _DEBUG_INTERSECTION_LIST
-                    std::cout << "Plane: n=" << pl.normal << ", d=" << pl.d << std::endl;
-                    std::cout << "First inserted vertex: " << *next << std::endl;
-                    std::cout << "Second inserted vertex: " << *vSecond << std::endl;
-                    std::cout << "Third inserted vertex: " << *vFirst << std::endl;
+                    std::cout << "Plane: n=" << pl.normal << ", d=" << pl.d << '\n';
+                    std::cout << "First inserted vertex: " << *next << '\n';
+                    std::cout << "Second inserted vertex: " << *vSecond << '\n';
+                    std::cout << "Third inserted vertex: " << *vFirst << '\n';
                 #endif
                 }
                 // direction does not equal -> back side (walk cw)
@@ -1129,10 +1129,10 @@ namespace Ogre
                     currentVertex   = vNext;
 
                     #ifdef _DEBUG_INTERSECTION_LIST
-                        std::cout << "Plane: n=" << pl.normal << ", d=" << pl.d << std::endl;
-                        std::cout << "First inserted vertex: " << *vFirst << std::endl;
-                        std::cout << "Second inserted vertex: " << *vSecond << std::endl;
-                        std::cout << "Third inserted vertex: " << *next << std::endl;
+                        std::cout << "Plane: n=" << pl.normal << ", d=" << pl.d << '\n';
+                        std::cout << "First inserted vertex: " << *vFirst << '\n';
+                        std::cout << "Second inserted vertex: " << *vSecond << '\n';
+                        std::cout << "Third inserted vertex: " << *next << '\n';
                     #endif
                 }
 

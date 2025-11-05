@@ -151,7 +151,8 @@ namespace Ogre {
     void AutoParamDataSource::setCurrentLightList(const LightList* ll)
     {
         mCurrentLightList = ll;
-        for(size_t i = 0; i < ll->size() && i < OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i)
+        const size_t lightCount = std::min(ll->size(), size_t(OGRE_MAX_SIMULTANEOUS_LIGHTS));
+        for(size_t i = 0; i < lightCount; ++i)
         {
             mSpotlightViewProjMatrixDirty[i] = true;
             mSpotlightWorldViewProjMatrixDirty[i] = true;

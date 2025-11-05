@@ -255,7 +255,7 @@ namespace Ogre {
                 if (r.vendor == caps->getVendor())
                 {
                     errors << "Excluded GPU vendor: " << caps->vendorToString(r.vendor)
-                        << std::endl;
+                        << '\n';
                     return false;
                 }
 
@@ -265,7 +265,7 @@ namespace Ogre {
         if (includeRulesPresent && !includeRuleMatched)
         {
             errors << "Failed to match GPU vendor: " << includeRules.str( )
-                << std::endl;
+                << '\n';
             return false;
         }
 
@@ -288,7 +288,7 @@ namespace Ogre {
                 if (StringUtil::match(caps->getDeviceName(), r.devicePattern, r.caseSensitive))
                 {
                     errors << "Excluded GPU device: " << r.devicePattern
-                        << std::endl;
+                        << '\n';
                     return false;
                 }
 
@@ -298,7 +298,7 @@ namespace Ogre {
         if (includeRulesPresent && !includeRuleMatched)
         {
             errors << "Failed to match GPU device: " << includeRules.str( )
-                << std::endl;
+                << '\n';
             return false;
         }
 

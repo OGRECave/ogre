@@ -217,11 +217,11 @@ namespace Ogre
     //-----------------------------------------------------------------------
     std::ostream& operator<< ( std::ostream& strm, const Polygon& poly )
     {
-        strm << "NUM VERTICES: " << poly.getVertexCount() << std::endl;
+        strm << "NUM VERTICES: " << poly.getVertexCount() << '\n';
 
         for (size_t j = 0; j < poly.getVertexCount(); ++j )
         {
-            strm << "VERTEX " << j << ": " << poly.getVertex( j ) << std::endl;
+            strm << "VERTEX " << j << ": " << poly.getVertex( j ) << '\n';
         }
 
         return strm;

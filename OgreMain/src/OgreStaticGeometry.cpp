@@ -633,20 +633,20 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     std::ostream& operator<<(std::ostream& o, const StaticGeometry& g)
     {
-        o << "Static Geometry Report for " << g.mName << std::endl;
-        o << "-------------------------------------------------" << std::endl;
-        o << "Number of queued submeshes: " << g.mQueuedSubMeshes.size() << std::endl;
-        o << "Number of regions: " << g.mRegionMap.size() << std::endl;
-        o << "Region dimensions: " << g.mRegionDimensions << std::endl;
-        o << "Origin: " << g.mOrigin << std::endl;
-        o << "Max distance: " << g.mUpperDistance << std::endl;
-        o << "Casts shadows?: " << g.mCastShadows << std::endl;
-        o << std::endl;
+        o << "Static Geometry Report for " << g.mName << '\n';
+        o << "-------------------------------------------------" << '\n';
+        o << "Number of queued submeshes: " << g.mQueuedSubMeshes.size() << '\n';
+        o << "Number of regions: " << g.mRegionMap.size() << '\n';
+        o << "Region dimensions: " << g.mRegionDimensions << '\n';
+        o << "Origin: " << g.mOrigin << '\n';
+        o << "Max distance: " << g.mUpperDistance << '\n';
+        o << "Casts shadows?: " << g.mCastShadows << '\n';
+        o << '\n';
         for (auto ri : g.mRegionMap)
         {
             o << *ri.second;
         }
-        o << "-------------------------------------------------" << std::endl;
+        o << "-------------------------------------------------" << '\n';
         return o;
     }
     //---------------------------------------------------------------------

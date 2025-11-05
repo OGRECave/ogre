@@ -301,19 +301,19 @@ namespace Ogre {
 
         if (mActiveRenderer)
         {
-            of << "Render System=" << mActiveRenderer->getName() << std::endl;
+            of << "Render System=" << mActiveRenderer->getName() << '\n';
         }
         else
         {
-            of << "Render System=" << std::endl;
+            of << "Render System=" << '\n';
         }
 
         for (const auto& r : getAvailableRenderers())
         {
-            of << std::endl;
-            of << "[" << r->getName() << "]" << std::endl;
+            of << '\n';
+            of << "[" << r->getName() << "]" << '\n';
             for (const auto& o : r->getConfigOptions()) {
-                of << o.first << "=" << o.second.currentValue << std::endl;
+                of << o.first << "=" << o.second.currentValue << '\n';
             }
         }
 

@@ -127,7 +127,7 @@ namespace Ogre
                         os << RESET;
                     }
 
-                    os << std::endl;
+                    os << '\n';
                 }
 
                 // Write time into log
@@ -139,7 +139,7 @@ namespace Ogre
                         auto pTime = std::localtime(&t);
                         mLog << std::put_time(pTime, "%H:%M:%S: ");
                     }
-                    mLog << message << std::endl;
+                    mLog << message << '\n';
 
                     // Flush stcmdream to ensure it is written (incase of a crash, we need log to be up to date)
                     mLog.flush();
