@@ -1620,7 +1620,7 @@ static void injectGlobalInstancingDeclaration(RenderOperation& ro, const GlobalI
     if(!ro.vertexData->vertexDeclaration->findElementBySemantic(testElement.getSemantic(), testElement.getIndex()))
     {
         instancingSrc += 1;
-        for (auto el : instanceData.vertexDecl->getElements())
+        for (const auto& el : instanceData.vertexDecl->getElements())
         {
             ro.vertexData->vertexDeclaration->addElement(instancingSrc, el.getOffset(), el.getType(), el.getSemantic(),
                                                          el.getIndex());
