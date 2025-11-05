@@ -928,6 +928,7 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
         if (schemesToRemove.find(pDstTech->_getSchemeIndex()) != schemesToRemove.end())
         {
             dstMat.removeTechnique(ti);
+            dstMat._notifyNeedsRecompile();
         }
     }
     dstMat.prepare(); // ensure supported techniques are compiled, after removing techniques
