@@ -267,15 +267,15 @@ namespace Ogre {
 
             // Counter pass
             // Initialise the counts
-            int p;
-            for (p = 0; p < mNumPasses; ++p)
-                memset(mCounters[p], 0, sizeof(int) * 256);
+            int passIndex;
+            for (passIndex = 0; passIndex < mNumPasses; ++passIndex)
+                memset(mCounters[passIndex], 0, sizeof(int) * 256);
 
             // Perform alpha pass to count
             ContainerIter i = mTmpContainer.begin();
             TCompValueType prevValue = func.operator()(*i); 
             bool needsSorting = false;
-            for (int u = 0; i != mTmpContainer.end(); ++i, ++u)
+            for (int entryIndex = 0; i != mTmpContainer.end(); ++i, ++entryIndex)
             {
                 // get sort value
                 TCompValueType val = func.operator()(*i);
@@ -284,14 +284,14 @@ namespace Ogre {
                     needsSorting = true;
 
                 // Create a sort entry
-                mSortArea1[u].key = val;
-                mSortArea1[u].iter = i;
+                mSortArea1[entryIndex].key = val;
+                mSortArea1[entryIndex].iter = i;
 
                 // increase counters
-                for (p = 0; p < mNumPasses; ++p)
+                for (passIndex = 0; passIndex < mNumPasses; ++passIndex)
                 {
-                    unsigned char byteVal = getByte(p, val);
-                    mCounters[p][byteVal]++;
+                    unsigned char byteVal = getByte(passIndex, val);
+                    mCounters[passIndex][byteVal]++;
                 }
 
                 prevValue = val;
@@ -307,22 +307,22 @@ namespace Ogre {
             mSrc = &mSortArea1;
             mDest = &mSortArea2;
 
-            for (p = 0; p < mNumPasses - 1; ++p)
+            for (passIndex = 0; passIndex < mNumPasses - 1; ++passIndex)
             {
-                sortPass(p);
+                sortPass(passIndex);
                 // flip src/dst
                 SortVector* tmp = mSrc;
                 mSrc = mDest;
                 mDest = tmp;
             }
             // Final pass may differ, make polymorphic
-            finalPass(p, prevValue);
+            finalPass(passIndex, prevValue);
 
             // Copy everything back
-            int c = 0;
-            for (i = dbegin; i != dend; ++i, ++c)
+            int copyIndex = 0;
+            for (i = dbegin; i != dend; ++i, ++copyIndex)
             {
-                *i = *((*mDest)[c].iter);
+                *i = *((*mDest)[copyIndex].iter);
             }
         }
 
