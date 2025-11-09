@@ -179,7 +179,7 @@ void PBR_MakeParams(in vec3 baseColor, in vec2 mrParam, inout PixelParams pixel)
     pixel.roughness = perceptualRoughnessToRoughness(pixel.perceptualRoughness);
 
     float metallic = saturate(mrParam.y);
-    pixel.f0 = computeF0(baseColor, metallic, 0.04);
+    pixel.f0 = computeF0(baseColor, metallic, 0.04); // using fixed IOR of 1.5 as per glTF spec
     pixel.diffuseColor = computeDiffuseColor(baseColor, metallic);
 
     pixel.dfg = vec3_splat(0.5); // use full f0 for energy compensation
