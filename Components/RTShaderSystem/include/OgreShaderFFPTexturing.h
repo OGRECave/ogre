@@ -213,6 +213,8 @@ private:
     // Pixel shader specular colour.
     ParameterPtr mPSSpecular;
 
+    float mUVMixingScale;
+
     bool mIsPointSprite;
     bool mLateAddBlend;
 };

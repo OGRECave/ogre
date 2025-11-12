@@ -41,7 +41,7 @@ const String SRS_TEXTURING = "FFP_Texturing";
 const String c_ParamTexelEx("texel_");
 
 //-----------------------------------------------------------------------
-FFPTexturing::FFPTexturing() : mIsPointSprite(false), mLateAddBlend(false)
+FFPTexturing::FFPTexturing() : mUVMixingScale(0.0f), mIsPointSprite(false), mLateAddBlend(false)
 {
 }
 
@@ -360,6 +360,13 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
 {
     auto stage = psMain->getStage(groupOrder);
 
+    if(mUVMixingScale > 0.0f && textureUnitParams->mTextureSamplerType == GCT_SAMPLER2D)
+    {
+        stage.callFunction("TextureUVMix", {In(textureUnitParams->mTextureSampler),
+                                            In(textureUnitParams->mPSInputTexCoord), In(1/mUVMixingScale), Out(texel)});
+        return;
+    }
+
     if (textureUnitParams->mTexCoordCalcMethod != TEXCALC_PROJECTIVE_TEXTURE)
     {
         stage.sampleTexture(textureUnitParams->mTextureSampler, textureUnitParams->mPSInputTexCoord, texel);
@@ -501,6 +508,12 @@ bool FFPTexturing::setParameter(const String& name, const String& value)
         StringConverter::parse(value, mLateAddBlend);
         return true;
     }
+
+    if(name == "uv_mixing")
+    {
+        return StringConverter::parse(value, mUVMixingScale);
+    }
+
     return false;
 }
 
@@ -510,6 +523,7 @@ void FFPTexturing::copyFrom(const SubRenderState& rhs)
     const FFPTexturing& rhsTexture = static_cast<const FFPTexturing&>(rhs);
 
     mLateAddBlend = rhsTexture.mLateAddBlend;
+    mUVMixingScale = rhsTexture.mUVMixingScale;
     setTextureUnitCount(rhsTexture.getTextureUnitCount());
 
     for (unsigned int i=0; i < rhsTexture.getTextureUnitCount(); ++i)
@@ -658,6 +672,19 @@ SubRenderState* FFPTexturingFactory::createInstance(const ScriptProperty& prop, 
 
             if (prop.values[0] == "late_add_blend")
                 inst->setParameter(prop.values[0], "true");
+
+            if (prop.values[0] == "uv_mixing")
+                inst->setParameter(prop.values[0], "4");
+
+            return inst;
+        }
+
+        if(prop.values.size() == 2)
+        {
+            auto inst = createOrRetrieveInstance(translator);
+
+            if(!inst->setParameter(prop.values[0], prop.values[1]))
+                translator->emitError(prop.values[0]);
 
             return inst;
         }
