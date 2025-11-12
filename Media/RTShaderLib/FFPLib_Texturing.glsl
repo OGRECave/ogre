@@ -142,3 +142,8 @@ void FFP_DotProduct(in vec4 vIn0, in vec4 vIn1, out vec4 vOut)
 {
 	vOut = vec4_splat(dot(vIn0, vIn1));
 }
+
+void TextureUVMix(in sampler2D tex, in vec2 uv, in float scale, out vec4 color)
+{
+	color = texture2D(tex, uv) * 0.5 + texture2D(tex, -vec2(uv.y, uv.x) * scale) * 0.5;
+}

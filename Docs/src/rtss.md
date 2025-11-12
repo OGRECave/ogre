@@ -29,6 +29,7 @@ Here are the attributes you can use in a `rtshader_system` block of a `pass {}`:
 
 - [transform_stage](#transform_stage)
 - [lighting_stage](#lighting_stage)
+- [texturing_stage](#texturing_stage)
 - [image_based_lighting](#image_based_lighting)
 - [gbuffer](#gbuffer)
 - [normal_map](#normal_map_pass)
@@ -72,6 +73,17 @@ Example: `lighting_stage ffp two_sided`
 
 @param two_sided compute lighting on both sides of the surface, when culling is disabled.
 @param normalised normalise the blinn-phong reflection model to make it energy conserving - see [this for details](http://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/)
+
+<a name="texturing_stage"></a>
+## texturing_stage
+
+@copybrief Ogre::RTShader::SRS_TEXTURING
+
+@par
+Format: `texturing_stage [uv_mixing] [uv_mix_scale]`
+
+@param uv_mixing mix texture with itself at a larger uv scale to reduce tiling artifacts.
+@param uv_mix_scale scale factor for the second uv set when using uv_mixing. Default is 4.0
 
 <a name="image_based_lighting"></a>
 
