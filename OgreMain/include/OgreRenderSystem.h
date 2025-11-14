@@ -1214,6 +1214,12 @@ namespace Ogre
         /** Initialize the render system from the capabilities*/
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary) = 0;
 
+        /** Helper method to initialise capabilities and fire the RenderSystemCapabilitiesCreated event.
+         * This method creates render system capabilities, sets current capabilities if custom capabilities 
+         * are not used, fires the RenderSystemCapabilitiesCreated event, and initialises from capabilities.
+         * @param primary The primary render target
+         */
+        void initialiseRenderSystemCapabilities(RenderTarget* primary);
 
         DriverVersion mDriverVersion;
         uint16 mNativeShadingLanguageVersion;

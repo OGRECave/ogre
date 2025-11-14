@@ -755,6 +755,19 @@ namespace Ogre {
             msSharedEventListener->eventOccurred(name, params);
     }
     //-----------------------------------------------------------------------
+    void RenderSystem::initialiseRenderSystemCapabilities(RenderTarget* primary)
+    {
+        mRealCapabilities = createRenderSystemCapabilities();
+
+        // use real capabilities if custom capabilities are not available
+        if (!mUseCustomCapabilities)
+            mCurrentCapabilities = mRealCapabilities;
+
+        fireEvent("RenderSystemCapabilitiesCreated");
+
+        initialiseFromRenderSystemCapabilities(mCurrentCapabilities, primary);
+    }
+    //-----------------------------------------------------------------------
     void RenderSystem::destroyHardwareOcclusionQuery( HardwareOcclusionQuery *hq)
     {
         auto end = mHwOcclusionQueries.end();
