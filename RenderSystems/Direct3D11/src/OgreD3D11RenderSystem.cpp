@@ -757,7 +757,7 @@ namespace Ogre
 
 			fireEvent("RenderSystemCapabilitiesCreated");
 
-			initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
+			HighLevelGpuProgramManager::getSingleton().addFactory(mHLSLProgramFactory);
 
 		}
 		else
@@ -913,13 +913,6 @@ namespace Ogre
 
         return rsc;
 
-    }
-    //-----------------------------------------------------------------------
-    void D3D11RenderSystem::initialiseFromRenderSystemCapabilities(
-        RenderSystemCapabilities* caps, RenderTarget* primary)
-    {
-        // add hlsl
-        HighLevelGpuProgramManager::getSingleton().addFactory(mHLSLProgramFactory);
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::convertVertexShaderCaps(RenderSystemCapabilities* rsc) const

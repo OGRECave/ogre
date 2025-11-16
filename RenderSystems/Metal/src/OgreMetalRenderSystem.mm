@@ -311,7 +311,9 @@ namespace Ogre
 
             fireEvent("RenderSystemCapabilitiesCreated");
 
-            initialiseFromRenderSystemCapabilities( mCurrentCapabilities, 0 );
+            //DepthBuffer::DefaultDepthBufferFormat = PF_D32_FLOAT_X24_S8_UINT;
+            mMetalProgramFactory = new MetalProgramFactory( &mDevice );
+            HighLevelGpuProgramManager::getSingleton().addFactory( mMetalProgramFactory );
 
             mTextureManager = new MetalTextureManager( &mDevice );
             mHardwareBufferManager = new MetalHardwareBufferManager( &mDevice );
@@ -1160,13 +1162,6 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::markProfileEvent( const String &event )
     {
-    }
-    //-------------------------------------------------------------------------
-    void MetalRenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
-    {
-        //DepthBuffer::DefaultDepthBufferFormat = PF_D32_FLOAT_X24_S8_UINT;
-        mMetalProgramFactory = new MetalProgramFactory( &mDevice );
-        HighLevelGpuProgramManager::getSingleton().addFactory( mMetalProgramFactory );
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::setStencilState(const StencilState& state)

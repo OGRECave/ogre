@@ -130,17 +130,6 @@ namespace Ogre {
         return rsc;
     }
 
-    void TinyRenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
-    {
-        // Use VBO's by default
-        mHardwareBufferManager = new DefaultHardwareBufferManager();
-
-        // Create the texture manager
-        mTextureManager = new TinyTextureManager();
-
-        mGLInitialised = true;
-    }
-
     void TinyRenderSystem::shutdown(void)
     {
         RenderSystem::shutdown();
@@ -180,7 +169,13 @@ namespace Ogre {
 
             fireEvent("RenderSystemCapabilitiesCreated");
 
-            initialiseFromRenderSystemCapabilities(mCurrentCapabilities, (RenderTarget *) win);
+            // Use VBO's by default
+            mHardwareBufferManager = new DefaultHardwareBufferManager();
+
+            // Create the texture manager
+            mTextureManager = new TinyTextureManager();
+
+            mGLInitialised = true;
         }
 
         if ( win->getDepthBufferPool() != RBP_NONE )

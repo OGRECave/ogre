@@ -734,7 +734,8 @@ namespace Ogre
             mRealCapabilities = createRenderSystemCapabilities();
             mCurrentCapabilities = mRealCapabilities;
 
-            initialiseFromRenderSystemCapabilities( mCurrentCapabilities, 0 );
+            mSPIRVProgramFactory = OGRE_NEW VulkanProgramFactory( mActiveDevice );
+            GpuProgramManager::getSingleton().addFactory( mSPIRVProgramFactory );
 
             mNativeShadingLanguageVersion = 100;
 
@@ -1171,13 +1172,6 @@ namespace Ogre
     void VulkanRenderSystem::beginGPUSampleProfile( const String &name, uint32 *hashCache ) {}
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::endGPUSampleProfile( const String &name ) {}
-    //-------------------------------------------------------------------------
-    void VulkanRenderSystem::initialiseFromRenderSystemCapabilities( RenderSystemCapabilities *caps,
-                                                                     RenderTarget *primary )
-    {
-        mSPIRVProgramFactory = OGRE_NEW VulkanProgramFactory( mActiveDevice );
-        GpuProgramManager::getSingleton().addFactory( mSPIRVProgramFactory );
-    }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::executeRenderPassDescriptorDelayedActions( bool officialCall )
     {

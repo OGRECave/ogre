@@ -165,9 +165,6 @@ namespace Ogre
         virtual void beginGPUSampleProfile( const String &name, uint32 *hashCache );
         virtual void endGPUSampleProfile( const String &name );
 
-        void initialiseFromRenderSystemCapabilities( RenderSystemCapabilities* caps,
-                                                             RenderTarget* primary ) override;
-
         MetalDevice* getActiveDevice(void)                      { return mActiveDevice; }
 
         void _notifyActiveEncoderEnded(void);
