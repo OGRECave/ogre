@@ -151,7 +151,7 @@ namespace Ogre
         RenderSystemCapabilities* updateRenderSystemCapabilities(D3D9RenderWindow* renderWindow);
 
         /** See RenderSystem definition */
-        virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
+        virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* = NULL);
 
 
         void convertVertexShaderCaps(RenderSystemCapabilities* rsc);

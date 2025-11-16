@@ -1109,7 +1109,7 @@ namespace Ogre
 
             fireEvent("RenderSystemCapabilitiesCreated");
 
-            initialiseFromRenderSystemCapabilities(mCurrentCapabilities, renderWindow);
+            initialiseFromRenderSystemCapabilities(mCurrentCapabilities);
         }
 
         return rsc;
@@ -1337,7 +1337,7 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void D3D9RenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
+    void D3D9RenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget*)
     {
         for(const auto& lang : caps->getSupportedShaderProfiles())
         {

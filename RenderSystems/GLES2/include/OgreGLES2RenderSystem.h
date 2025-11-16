@@ -121,7 +121,7 @@ namespace Ogre {
 
             RenderSystemCapabilities* createRenderSystemCapabilities() const override;
 
-            void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary) override;
+            void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* = NULL) override;
 
             void shutdown(void) override;
 

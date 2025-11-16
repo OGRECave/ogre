@@ -95,8 +95,6 @@ namespace Ogre
 
         /// Internal method for populating the capabilities structure
         RenderSystemCapabilities* createRenderSystemCapabilities() const;
-        /** See RenderSystem definition */
-        void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
         void convertVertexShaderCaps(RenderSystemCapabilities* rsc) const;
         void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
