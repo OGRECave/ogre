@@ -64,7 +64,8 @@ if (OGRE_BUILD_SAMPLES)
   add_definitions(${OGRE_VISIBILITY_FLAGS})
   add_library(DefaultSamples ${OGRE_LIB_TYPE} 
               ${CMAKE_CURRENT_SOURCE_DIR}/Common/src/DefaultSamplesPlugin.cpp
-              ${SAMPLES_SOURCES} ${SAMPLES_HEADERS})
+              ${SAMPLES_SOURCES} ${SAMPLES_HEADERS}
+          Simple/include/Gizmos.h)
   target_link_libraries(DefaultSamples OgreMain ${SAMPLE_DEPENDENCIES} OgreBites)
 
   if(OGRE_BUILD_PLUGIN_PCZ)
