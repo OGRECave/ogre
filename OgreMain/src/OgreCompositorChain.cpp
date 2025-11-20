@@ -322,7 +322,7 @@ void CompositorChain::preRenderTargetUpdate(const RenderTargetEvent& evt)
 
         /// Setup and render
         preTargetOperation(op, vp, cam);
-        op.target->update();
+        op.target->update(op.swapBuffers);
         postTargetOperation(op, vp, cam);
     }
 }
