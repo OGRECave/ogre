@@ -478,6 +478,13 @@ void CompositorInstance::_compileTargetOperations(CompiledState &compiledState)
     for (CompositionTargetPass *target : mTechnique->getTargetPasses())
     {        
         TargetOperation ts(getRenderTarget(target->getOutputName(), target->getOutputSlice()));
+
+        if(!compiledState.empty() && compiledState.back().target == ts.target)
+        {
+            // only the last operation on a target swaps buffers
+            compiledState.back().swapBuffers = false;
+        }
+
         /// Set "only initial" flag, visibilityMask and lodBias according to CompositionTargetPass.
         ts.onlyInitial = target->getOnlyInitial();
         ts.visibilityMask = target->getVisibilityMask();

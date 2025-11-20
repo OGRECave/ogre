@@ -122,7 +122,7 @@ namespace Ogre {
                 : target(inTarget), currentQueueGroupID(0), visibilityMask(0xFFFFFFFF), lodBias(1.0f),
                   onlyInitial(false), hasBeenRendered(false), findVisibleObjects(false),
                   materialScheme(MaterialManager::DEFAULT_SCHEME_NAME), shadowsEnabled(true),
-                  alignCameraToFace(-1)
+                  alignCameraToFace(-1), swapBuffers(true)
             {
             }
             /// Target
@@ -167,6 +167,8 @@ namespace Ogre {
 
             String cameraOverride;
             int alignCameraToFace;
+
+            bool swapBuffers;
         };
         typedef std::vector<TargetOperation> CompiledState;
         
