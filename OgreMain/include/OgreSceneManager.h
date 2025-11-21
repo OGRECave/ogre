@@ -684,9 +684,6 @@ namespace Ogre {
             return OGRE_NEW AutoParamDataSource();
         }
 
-        /// Internal method for destroying shadow textures (texture-based shadows)
-        void destroyShadowTextures(void);
-
         /** Internal method for preparing the render queue for use with each render. */
         void prepareRenderQueue(void);
 

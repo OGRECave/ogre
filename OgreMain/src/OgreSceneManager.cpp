@@ -2892,10 +2892,6 @@ void SceneManager::ensureShadowTexturesCreated()
 {
     mTextureShadowRenderer.ensureShadowTexturesCreated();
 }
-void SceneManager::destroyShadowTextures(void)
-{
-    mTextureShadowRenderer.destroyShadowTextures();
-}
 const std::vector<Camera*>& SceneManager::getShadowTextureCameras()
 {
     return mTextureShadowRenderer.mShadowTextureCameras;
