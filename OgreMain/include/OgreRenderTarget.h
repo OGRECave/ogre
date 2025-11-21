@@ -125,33 +125,31 @@ namespace Ogre {
         /** Tells the target to update it's contents.
 
             If OGRE is not running in an automatic rendering loop
-            (started using Root::startRendering),
+            (via @ref Root::startRendering),
             the user of the library is responsible for asking each render
             target to refresh. This is the method used to do this. It automatically
             re-renders the contents of the target using whatever cameras have been
-            pointed at it (using Camera::setRenderTarget).
-            @par
-                This allows OGRE to be used in multi-windowed utilities
-                and for contents to be refreshed only when required, rather than
-                constantly as with the automatic rendering loop.
-            @param swapBuffers For targets that support double-buffering, if set 
-                to true, the target will immediately
-                swap it's buffers after update. Otherwise, the buffers are
-                not swapped, and you have to call swapBuffers yourself sometime
-                later. You might want to do this on some rendersystems which 
-                pause for queued rendering commands to complete before accepting
-                swap buffers calls - so you could do other CPU tasks whilst the 
-                queued commands complete. Or, you might do this if you want custom
-                control over your windows, such as for externally created windows.
+            pointed at it (using @ref addViewport).
+
+            This allows OGRE to be used in multi-windowed utilities
+            and for contents to be refreshed only when required, rather than
+            constantly as with the automatic rendering loop.
+            @param swapBuffers If set to true, the target will immediately call
+            @ref swapBuffers() after the update. See @ref swapBuffers() for why you
+            might want to set this to false.
         */
         void update(bool swapBuffers = true);
-        /** Swaps the frame buffers to display the next frame.
+        /** Finalizes the frame by performing buffer swaps and MSAA resolves
 
-            For targets that are double-buffered so that no
-            'in-progress' versions of the scene are displayed
-            during rendering. Once rendering has completed (to
-            an off-screen version of the window) the buffers
-            are swapped to display the new frame.
+            This method handles the end-of-frame operations required to display the
+            rendered content. Depending on the target configuration, this includes:
+            - Swapping the front and back buffers (if double-buffering is enabled).
+            - Resolving the MSAA (Multisample Anti-Aliasing) surface to the
+            displayable surface (if MSAA is enabled).
+
+            @attention After this method returns, the contents of the multisample buffers
+            are invalidated/discarded. You cannot rely on their contents for
+            subsequent operations without re-rendering.
         */
         virtual void swapBuffers() {}
 
