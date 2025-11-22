@@ -503,9 +503,6 @@ void SceneManager::TextureShadowRenderer::prepareTexCam(Camera* texCam, Camera* 
 }
 void SceneManager::TextureShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
-    // create shadow textures if needed
-    ensureShadowTexturesCreated();
-
     // Determine far shadow distance
     Real shadowDist = mDefaultShadowFarDist;
     if (!shadowDist)
@@ -1056,14 +1053,9 @@ void SceneManager::TextureShadowRenderer::setShadowTextureSettings(unsigned shor
 //---------------------------------------------------------------------
 const TexturePtr& SceneManager::TextureShadowRenderer::getShadowTexture(size_t shadowIndex)
 {
-    if (shadowIndex >= mShadowTextureConfigList.size())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-            "shadowIndex out of bounds",
-            "SceneManager::getShadowTexture");
-    }
-    ensureShadowTexturesCreated();
+    mSceneManager->ensureShadowTexturesCreated();
 
+    OgreAssert(shadowIndex < mShadowTextures.size(), "");
     return mShadowTextures[shadowIndex];
 }
 

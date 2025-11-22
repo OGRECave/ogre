@@ -2913,6 +2913,7 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 
     try
     {
+        ensureShadowTexturesCreated();
         mTextureShadowRenderer.prepareShadowTextures(cam, vp, lightList);
     }
     catch (Exception&)
