@@ -434,18 +434,14 @@ void SceneManager::TextureShadowRenderer::ensureShadowTexturesCreated()
                 setupRenderTarget(camName, shadowTex->getRenderTarget(rtidx), depthBufferId);
             }
 
-            // Get null shadow texture
-            if (mShadowTextureConfigList.empty())
-            {
-                mNullShadowTexture.reset();
-            }
-            else
-            {
-                mNullShadowTexture = ShadowTextureManager::getSingleton().getNullShadowTexture(
-                    mShadowTextureConfigList[0].format);
-            }
             ++__i;
         }
+
+        // Assume first one is representative
+        if (!mShadowTextureConfigList.empty())
+            mNullShadowTexture =
+                ShadowTextureManager::getSingleton().getNullShadowTexture(mShadowTextureConfigList[0].format);
+
         mShadowTextureConfigDirty = false;
     }
 
