@@ -294,7 +294,7 @@ namespace Ogre
         void _clearAllZonesPortalUpdateFlag(void);
 
         /// @see SceneManager::prepareShadowTextures.
-        void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0) override;
+        void updateShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0) override;
 
     protected:
         /// Type of default zone to be used

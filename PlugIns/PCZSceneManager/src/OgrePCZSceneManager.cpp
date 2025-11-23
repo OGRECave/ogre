@@ -1272,10 +1272,10 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     /// See SceneManager::prepareShadowTextures.
-    void PCZSceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
+    void PCZSceneManager::updateShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
     {
         mActiveCameraZone = ((PCZSceneNode*)cam->getParentSceneNode())->getHomeZone();
-        SceneManager::prepareShadowTextures(cam, vp);
+        SceneManager::updateShadowTextures(cam, vp);
     }
 
     //-----------------------------------------------------------------------

@@ -787,7 +787,7 @@ namespace Ogre {
             SamplerPtr mBorderSampler;
 
             TexturePtr mSpotFadeTexture;
-            TexturePtr mNullShadowTexture;
+            TexturePtr mNoShadowTexture;
             CameraList mShadowTextureCameras;
             LightList mShadowTextureCurrentCasterLightList; // remove for 13.4: unused
             // ShadowCamera to light mapping
@@ -848,7 +848,7 @@ namespace Ogre {
             /// Internal method for creating shadow textures (texture-based shadows)
             void ensureShadowTexturesCreated();
             void setupRenderTarget(const String& camName, RenderTarget* rendTarget, uint16 depthBufferId);
-            void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList);
+            void updateShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList);
             void prepareTexCam(Camera* texCam, Camera* cam, Viewport* vp, Light* light, size_t j);
             /// Internal method for destroying shadow textures (texture-based shadows)
             void destroyShadowTextures(void);
@@ -2736,10 +2736,16 @@ namespace Ogre {
         Real getShadowFarDistanceSquared(void) const
         { return mTextureShadowRenderer.mDefaultShadowFarDistSquared; }
 
-        /// Method for preparing shadow textures ready for use in a regular render
+        /// Method for update shadow textures ready for use in a regular render
         /// Do not call manually unless before frame start or rendering is paused
         /// If lightList is not supplied, will render all lights in frustum
-        virtual void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0);
+        virtual void updateShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0);
+
+        /// @deprecated use @ref updateShadowTextures
+        OGRE_DEPRECATED void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0)
+        {
+            updateShadowTextures(cam, vp, lightList);
+        }
 
         /** Set the size of the texture used for all texture-based shadows.
 

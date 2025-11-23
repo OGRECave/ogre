@@ -1004,8 +1004,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
             // technique in use
             if (isShadowTechniqueTextureBased())
             {
-                OgreProfileGroup("prepareShadowTextures", OGREPROF_GENERAL);
-                
+                OgreProfileGroup("updateShadowTextures", OGREPROF_GENERAL);
+
                 ensureShadowTexturesCreated();
                 // *******
                 // WARNING
@@ -1016,7 +1016,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
                 // MUST be specific to this camera / target is done
                 // AFTER THIS POINT
                 if(vp->getShadowsEnabled())
-                    prepareShadowTextures(camera, vp);
+                    updateShadowTextures(camera, vp);
                 // reset the cameras & viewport because of the re-entrant call
                 mCameraInProgress = camera;
                 mCurrentViewport = vp;
@@ -2904,7 +2904,7 @@ bool SceneManager::isShadowTextureConfigDirty() const
     return mTextureShadowRenderer.mShadowTextureConfigDirty;
 }
 
-void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
+void SceneManager::updateShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
         // Set the illumination stage, prevents recursive calls
     IlluminationRenderStage savedStage = mIlluminationStage;
@@ -2916,7 +2916,7 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
     try
     {
         ensureShadowTexturesCreated();
-        mTextureShadowRenderer.prepareShadowTextures(cam, vp, lightList);
+        mTextureShadowRenderer.updateShadowTextures(cam, vp, lightList);
     }
     catch (Exception&)
     {
