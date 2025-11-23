@@ -439,8 +439,8 @@ void SceneManager::TextureShadowRenderer::ensureShadowTexturesCreated()
 
         // Assume first one is representative
         if (!mShadowTextureConfigList.empty())
-            mNullShadowTexture =
-                ShadowTextureManager::getSingleton().getNullShadowTexture(mShadowTextureConfigList[0].format);
+            mNoShadowTexture =
+                ShadowTextureManager::getSingleton().getNoShadowTexture(mShadowTextureConfigList[0].format);
 
         mShadowTextureConfigDirty = false;
     }
@@ -501,7 +501,7 @@ void SceneManager::TextureShadowRenderer::prepareTexCam(Camera* texCam, Camera* 
     // Fire shadow caster update, callee can alter camera settings
     fireShadowTexturesPreCaster(light, texCam, j);
 }
-void SceneManager::TextureShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
+void SceneManager::TextureShadowRenderer::updateShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
     // Determine far shadow distance
     Real shadowDist = mDefaultShadowFarDist;
@@ -1071,9 +1071,9 @@ void SceneManager::TextureShadowRenderer::resolveShadowTexture(TextureUnitState*
     }
     else
     {
-        // Use fallback 'null' shadow texture
+        // Use fallback no-shadow texture
         // no projection since all uniform colour anyway
-        shadowTex = mNullShadowTexture;
+        shadowTex = mNoShadowTexture;
         tu->setProjectiveTexturing(false);
     }
 
