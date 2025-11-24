@@ -27,7 +27,7 @@ public:
 
     Ogre::SceneNode* getObject()
     {
-        return mSceneNode;
+        return mGizmoNode->getParentSceneNode();
     }
 
     GizmoMode getStyle()
@@ -40,7 +40,11 @@ protected:
 
     void createPlaneMesh(Ogre::SceneManager *manager, Ogre::String name);
 
-    Ogre::SceneNode* mSceneNode{};
+    Ogre::SceneNode* mGizmoNode{};
+    Ogre::SceneNode* mGizmoX{};
+    Ogre::SceneNode* mGizmoY{};
+    Ogre::SceneNode* mGizmoZ{};
+    Ogre::Entity* mGizmoEntities{};
     std::unique_ptr<Ogre::ManualObject> mGizmoObj{};
     GizmoMode mMode;
 };
