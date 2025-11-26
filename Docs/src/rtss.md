@@ -122,13 +122,13 @@ Example: `lighting_stage gbuffer normal_viewdepth diffuse_specular`
 @copybrief Ogre::RTShader::SRS_NORMALMAP
 
 @par
-Format: `lighting_stage normal_map <texture> [normalmap_space] [texcoord_index] [sampler]`
+Format: `lighting_stage normal_map <texture> [normalmap_space] [tex_coord_set] [sampler]`
 @par
 Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 SamplerToUse`
 
 @param texture normal map name to use
 @param normalmap_space see @ref normal_map
-@param texcoord_index the start texcoord attribute index to read the uv coordinates from
+@param tex_coord_set the texcoord attribute index to read the uv coordinates from
 @param sampler the [Sampler](@ref Samplers) to use for the normal map
 
 
@@ -141,12 +141,13 @@ Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 Sa
 By default, roughness is read from `specular[0]` and metalness from `specular[1]`.
 
 @par
-Format: `lighting_stage metal_roughness [texture <texturename>]`
+Format: `lighting_stage metal_roughness [texture <texturename> [sampler]]`
 @par
 Example: `lighting_stage metal_roughness texture Default_metalRoughness.jpg`
 
 @param texturename texture for spatially varying parametrization.
 [In accordance to the glTF2.0 specification](https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_pbrmetallicroughness_metallicroughnesstexture), roughness is sampled from the G channel and metalness from the B channel.
+@param sampler the [Sampler](@ref Samplers) to use for the metal-roughness map
 
 @note Using this option switches the lighting equations from Blinn-Phong to the Cook-Torrance PBR model [using the equations described by Filament](https://google.github.io/filament/Filament.html#materialsystem/standardmodelsummary).
 
@@ -237,7 +238,7 @@ Here are the attributes you can use in a `rtshader_system` block of a `texture_u
 @copybrief Ogre::RTShader::SRS_NORMALMAP
 
 @par
-Format: `normal_map <normalmap_space> [height_scale scale] [texcoord_index idx]`
+Format: `normal_map <normalmap_space> [height_scale scale]`
 @par
 Example: `normal_map parallax_occlusion height_scale 0.1`
 
@@ -263,7 +264,6 @@ This is used for parallax corrected rendering.</dd>
 a larger displacement value without getting artifacts.</dd>
 </dl>
 @param height_scale displacement scale factor, when using @c parallax or @c parallax_occlusion
-@param texcoord_index the texcoord attribute index to read the uv coordinates from
 
 <a name="layered_blend"></a>
 
