@@ -177,6 +177,9 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
     dstPass->createTextureUnitState(mMetalRoughnessMapName);
     mMRMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
+    if(mSampler)
+        dstPass->getTextureUnitState(mMRMapSamplerIndex)->setSampler(mSampler);
+
     return true;
 }
 
@@ -189,6 +192,17 @@ bool CookTorranceLighting::setParameter(const String& name, const String& value)
     }
 
     return false;
+}
+
+void CookTorranceLighting::setParameter(const String& name, const Any& value)
+{
+    if (name == "sampler")
+    {
+        mSampler = any_cast<SamplerPtr>(value);
+        return;
+    }
+
+    SubRenderState::setParameter(name, value);
 }
 
 //-----------------------------------------------------------------------
@@ -217,6 +231,18 @@ SubRenderState* CookTorranceLightingFactory::createInstance(const ScriptProperty
 
         if(!subRenderState->setParameter("texture", prop.values[2]))
             translator->emitError();
+
+        if(prop.values.size() < 4)
+            return subRenderState;
+
+        if (auto sampler = TextureManager::getSingleton().getSampler(prop.values[3]))
+        {
+            subRenderState->setParameter("sampler", sampler);
+        }
+        else
+        {
+            translator->emitError();
+        }
 
         return subRenderState;
     }
