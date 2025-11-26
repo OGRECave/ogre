@@ -109,7 +109,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         # patch toolchain for iOS
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy
             ${PROJECT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
-            freetype-2.13.2/builds/cmake/iOS.cmake
+            freetype-2.14.1/builds/cmake/iOS.cmake
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
