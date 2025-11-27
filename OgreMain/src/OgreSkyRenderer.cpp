@@ -144,6 +144,8 @@ void SceneManager::SkyBoxRenderer::create(
             "Sky box material '" + materialName + "' not found.",
             "SceneManager::setSkyBox");
     }
+    // Make sure the material doesn't update the depth buffer
+    m->setDepthWriteEnabled(false);
     // Ensure loaded
     m->load();
 
