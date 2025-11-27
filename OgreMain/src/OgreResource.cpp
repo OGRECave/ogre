@@ -397,9 +397,13 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void Resource::_fireLoadingComplete(bool unused)
     {
-        // Lock the listener list
-        OGRE_LOCK_MUTEX(mListenerListMutex);
-        for (auto& l : mListenerList)
+        ListenerList listenerList;
+        {
+            // Lock the listener list and make a copy of it
+            OGRE_LOCK_MUTEX(mListenerListMutex);
+            listenerList = mListenerList;
+        }
+        for (auto& l : listenerList)
         {
             l->loadingComplete(this);
         }
@@ -407,9 +411,13 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void Resource::_firePreparingComplete(bool unused)
     {
-        // Lock the listener list
-        OGRE_LOCK_MUTEX(mListenerListMutex);
-        for (auto& l : mListenerList)
+        ListenerList listenerList;
+        {
+            // Lock the listener list and make a copy of it
+            OGRE_LOCK_MUTEX(mListenerListMutex);
+            listenerList = mListenerList;
+        }
+        for (auto& l : listenerList)
         {
             l->preparingComplete(this);
         }
@@ -417,9 +425,13 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void Resource::_fireUnloadingComplete(void)
     {
-        // Lock the listener list
-        OGRE_LOCK_MUTEX(mListenerListMutex);
-        for (auto& l : mListenerList)
+        ListenerList listenerList;
+        {
+            // Lock the listener list and make a copy of it
+            OGRE_LOCK_MUTEX(mListenerListMutex);
+            listenerList = mListenerList;
+        }
+        for (auto& l : listenerList)
         {
             l->unloadingComplete(this);
         }
