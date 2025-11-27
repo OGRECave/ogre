@@ -1,13 +1,14 @@
 #ifndef OGRE_OGREGIZMOS_H
 #define OGRE_OGREGIZMOS_H
 #include "OgreSceneNode.h"
+#include "OgreBitesPrerequisites.h"
 
 namespace OgreBites
 {
 enum GizmoMode   /// enum for different kinds of gizmo
 {
     G_NONE,
-    G_CAMERA,
+    G_AXIS,
     G_TRANSLATE,
     G_ROTATE,
     G_SCALE,
@@ -16,11 +17,10 @@ enum GizmoMode   /// enum for different kinds of gizmo
 /**
 Class which applies a manipulable gizmo to a scene object (including the camera).
 */
-class Gizmo
+class _OgreBitesExport Gizmo
 {
 public:
-    Gizmo(Ogre::SceneNode* sceneNode, GizmoMode style);
-
+    Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, GizmoMode mode);
     void setObject(Ogre::SceneNode* sceneObject);
 
     void setMode(GizmoMode style);
@@ -30,7 +30,7 @@ public:
         return mGizmoNode->getParentSceneNode();
     }
 
-    GizmoMode getStyle()
+    GizmoMode getMode()
     {
         return mMode;
     }
@@ -44,7 +44,7 @@ protected:
     Ogre::SceneNode* mGizmoX{};
     Ogre::SceneNode* mGizmoY{};
     Ogre::SceneNode* mGizmoZ{};
-    Ogre::Entity* mGizmoEntities{};
+    Ogre::Entity* mGizmoEntities[6]{};
     std::unique_ptr<Ogre::ManualObject> mGizmoObj{};
     GizmoMode mMode;
 };

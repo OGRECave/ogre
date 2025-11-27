@@ -2,15 +2,16 @@
 #include "OgreManualObject.h"
 #include "OgreMaterialManager.h"
 #include "OgreSceneManager.h"
+#include "OgreSubEntity.h"
 #include "OgreTechnique.h"
+#include <OgreEntity.h>
 
 namespace OgreBites
 {
-Gizmo::Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, GizmoMode mode) : mMode(G_CAMERA)
+Gizmo::Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, GizmoMode mode) : mMode(G_NONE)
 {
     Ogre::MaterialPtr gizmoMaterial = Ogre::MaterialManager::getSingletonPtr()->createOrRetrieve("Gizmo_Material", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first.staticCast<Ogre::Material>();
     setObject(sceneNode);
-    setMode(mode);
     gizmoMaterial->setReceiveShadows(false);
     gizmoMaterial->getTechnique(0)->getPass(0)->setLightingEnabled(false);
     gizmoMaterial->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
@@ -39,53 +40,53 @@ Gizmo::Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, Gizmo
     mGizmoZ->setOrientation(q1 * q2);
 
     //Entities
-    mGizmoEntities[0] = sceneManager->createEntity("scbwx", "OgitorAxisGizmoMesh", "EditorResources");
-    mGizmoEntities[1] = sceneManager->createEntity("scbwy", "OgitorAxisGizmoMesh", "EditorResources");
-    mGizmoEntities[2] = sceneManager->createEntity("scbwz", "OgitorAxisGizmoMesh", "EditorResources");
-    mGizmoEntities[3] = sceneManager->createEntity("scbwt", "OgitorAxisPlaneMesh", "EditorResources");
-    mGizmoEntities[4] = sceneManager->createEntity("scbwu", "OgitorAxisPlaneMesh", "EditorResources");
-    mGizmoEntities[5] = sceneManager->createEntity("scbwv", "OgitorAxisPlaneMesh", "EditorResources");
+    mGizmoEntities[0] = sceneManager->createEntity("scbwx", "OgitorAxisGizmoMesh", "General");
+    mGizmoEntities[1] = sceneManager->createEntity("scbwy", "OgitorAxisGizmoMesh", "General");
+    mGizmoEntities[2] = sceneManager->createEntity("scbwz", "OgitorAxisGizmoMesh", "General");
+    mGizmoEntities[3] = sceneManager->createEntity("scbwt", "OgitorAxisPlaneMesh", "General");
+    mGizmoEntities[4] = sceneManager->createEntity("scbwu", "OgitorAxisPlaneMesh", "General");
+    mGizmoEntities[5] = sceneManager->createEntity("scbwv", "OgitorAxisPlaneMesh", "General");
 
     //XX arrows
     mGizmoEntities[0]->setCastShadows(false);
     mGizmoEntities[0]->setMaterialName("MAT_GIZMO_X");
     mGizmoEntities[0]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[0]->setQueryFlags(QUERYFLAG_WIDGET);
+    // mGizmoEntities[0]->setQueryFlags(Ogre::QUERYFLAG_WIDGET);
     mGizmoX->attachObject(mGizmoEntities[0]);
 
     //YY arrows
     mGizmoEntities[1]->setCastShadows(false);
     mGizmoEntities[1]->setMaterialName("MAT_GIZMO_Y");
     mGizmoEntities[1]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[1]->setQueryFlags(QUERYFLAG_WIDGET);
+    // mGizmoEntities[1]->setQueryFlags(QUERYFLAG_WIDGET);
     mGizmoY->attachObject(mGizmoEntities[1]);
 
     //ZZ arrows
     mGizmoEntities[2]->setCastShadows(false);
     mGizmoEntities[2]->setMaterialName("MAT_GIZMO_Z");
     mGizmoEntities[2]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[2]->setQueryFlags(QUERYFLAG_WIDGET);
+    // mGizmoEntities[2]->setQueryFlags(QUERYFLAG_WIDGET);
     mGizmoZ->attachObject(mGizmoEntities[2]);
 
     //XY Plane
     mGizmoEntities[3]->setCastShadows(false);
     mGizmoEntities[3]->setMaterialName("MAT_GIZMO_XY");
     mGizmoEntities[3]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[3]->setQueryFlags(QUERYFLAG_WIDGET);
+    // mGizmoEntities[3]->setQueryFlags(QUERYFLAG_WIDGET);
     mGizmoX->attachObject(mGizmoEntities[3]);
 
     //YZ Plane
     mGizmoEntities[4]->setCastShadows(false);
     mGizmoEntities[4]->setMaterialName("MAT_GIZMO_YZ");
     mGizmoEntities[4]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[4]->setQueryFlags(QUERYFLAG_WIDGET);
+    // mGizmoEntities[4]->setQueryFlags(QUERYFLAG_WIDGET);
     mGizmoY->attachObject(mGizmoEntities[4]);
 
     //ZX Plane
     mGizmoEntities[5]->setCastShadows(false);
     mGizmoEntities[5]->setMaterialName("MAT_GIZMO_ZX");
     mGizmoEntities[5]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[5]->setQueryFlags(QUERYFLAG_WIDGET);
+    // mGizmoEntities[5]->setQueryFlags(QUERYFLAG_WIDGET);
     mGizmoZ->attachObject(mGizmoEntities[5]);
 
     // Call once to derive bounding boxes
@@ -93,7 +94,8 @@ Gizmo::Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, Gizmo
     mGizmoEntities[1]->getWorldBoundingBox(true);
     mGizmoEntities[2]->getWorldBoundingBox(true);
 
-    mGizmoNode->setVisible(false);
+    mGizmoNode->setVisible(true);
+    setMode(mode);
 }
 
 void Gizmo::setObject(Ogre::SceneNode* sceneObject)
@@ -103,7 +105,68 @@ void Gizmo::setObject(Ogre::SceneNode* sceneObject)
 
 void Gizmo::setMode(GizmoMode mode)
 {
+    if (mMode == mode)
+        return;
     mMode = mode;
+    Ogre::Entity* wx = mGizmoEntities[0];
+    Ogre::Entity* wy = mGizmoEntities[1];
+    Ogre::Entity* wz = mGizmoEntities[2];
+
+    mGizmoEntities[3]->getSubEntity(0)->setVisible(false);
+    mGizmoEntities[4]->getSubEntity(0)->setVisible(false);
+    mGizmoEntities[5]->getSubEntity(0)->setVisible(false);
+
+    wx->getSubEntity(0)->setVisible(true);
+    wx->getSubEntity(1)->setVisible(false);
+    wx->getSubEntity(2)->setVisible(false);
+    wx->getSubEntity(3)->setVisible(false);
+    wx->getSubEntity(4)->setVisible(false);
+    wy->getSubEntity(0)->setVisible(true);
+    wy->getSubEntity(1)->setVisible(false);
+    wy->getSubEntity(2)->setVisible(false);
+    wy->getSubEntity(3)->setVisible(false);
+    wy->getSubEntity(4)->setVisible(false);
+    wz->getSubEntity(0)->setVisible(true);
+    wz->getSubEntity(1)->setVisible(false);
+    wz->getSubEntity(2)->setVisible(false);
+    wz->getSubEntity(3)->setVisible(false);
+    wz->getSubEntity(4)->setVisible(false);
+    switch(mode)
+    {
+    case G_TRANSLATE:
+        {
+            wx->getSubEntity(2)->setVisible(true);
+            wy->getSubEntity(2)->setVisible(true);
+            wz->getSubEntity(2)->setVisible(true);
+            mGizmoEntities[3]->getSubEntity(0)->setVisible(true);
+            mGizmoEntities[4]->getSubEntity(0)->setVisible(true);
+            mGizmoEntities[5]->getSubEntity(0)->setVisible(true);
+            break;
+        }
+    case G_ROTATE:
+        {
+            wx->getSubEntity(0)->setVisible(false);
+            wy->getSubEntity(0)->setVisible(false);
+            wz->getSubEntity(0)->setVisible(false);
+            wx->getSubEntity(1)->setVisible(true);
+            wy->getSubEntity(1)->setVisible(true);
+            wz->getSubEntity(1)->setVisible(true);
+            wx->getSubEntity(3)->setVisible(true);
+            wy->getSubEntity(3)->setVisible(true);
+            wz->getSubEntity(3)->setVisible(true);
+            break;
+        }
+    case G_SCALE:
+        {
+            wx->getSubEntity(4)->setVisible(true);
+            wy->getSubEntity(4)->setVisible(true);
+            wz->getSubEntity(4)->setVisible(true);
+            mGizmoEntities[3]->getSubEntity(0)->setVisible(true);
+            mGizmoEntities[4]->getSubEntity(0)->setVisible(true);
+            mGizmoEntities[5]->getSubEntity(0)->setVisible(true);
+            break;
+        }
+    }
 
 }
 void Gizmo::createMesh(Ogre::SceneManager *manager, Ogre::String name)
@@ -366,7 +429,7 @@ void Gizmo::createMesh(Ogre::SceneManager *manager, Ogre::String name)
 
     mMesh->end();
 
-    mMesh->convertToMesh(name, "GizmoResources");
+    mMesh->convertToMesh(name, "General");
 
     manager->destroyManualObject(mMesh);
 }
@@ -391,8 +454,13 @@ void Gizmo::createPlaneMesh(Ogre::SceneManager *manager, Ogre::String name)
 
     mMesh->end();
 
-    mMesh->convertToMesh(name, "EditorResources");
+    mMesh->convertToMesh(name, "General");
 
     manager->destroyManualObject(mMesh);
+}
+
+Ogre::MovableObject* pickObject(float x, float y)
+{
+
 }
 }

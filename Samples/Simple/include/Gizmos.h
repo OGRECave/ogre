@@ -38,17 +38,40 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
 
         // create our model, give it the shader material, and place it at the origin
         SceneNode* gizmoParent = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        auto* gizmo = new Gizmo(gizmoParent, G_CAMERA);
+        mGizmo = new Gizmo(getSceneManager(), gizmoParent, G_ROTATE);
 
-        // create a check box to toggle light movement
-        mMoveLight = mTrayMgr->createCheckBox(TL_TOPLEFT, "MoveLight", "Move Light");
-        mMoveLight->setChecked(true);
+        // create a checkbox to toggle light movement
+        mTranslate = mTrayMgr->createButton(TL_TOPLEFT, "Translate", "Translate");
+        mRotate = mTrayMgr->createButton(TL_TOPLEFT, "Rotate", "Rotate");
+        mScale = mTrayMgr->createButton(TL_TOPLEFT, "Scale", "Scale");
     }
+
+    void buttonHit(OgreBites::Button* button) override;
 
     // custom shader parameter bindings
     enum ShaderParam { SP_SHININESS = 1, SP_DIFFUSE, SP_SPECULAR };
 
+    Gizmo* mGizmo;
     SceneNode* mLightPivot;
-    CheckBox* mMoveLight;
+    Button* mTranslate;
+    Button* mRotate;
+    Button* mScale;
 };
+
+inline void Sample_Gizmos::buttonHit( OgreBites::Button* button )
+{
+    Ogre::String name = button->getName();
+    if (name == "Translate")
+    {
+        mGizmo->setMode(G_TRANSLATE);
+    }
+    else if (name == "Rotate")
+    {
+        mGizmo->setMode(G_ROTATE);
+    }
+    else if (name == "Scale")
+    {
+        mGizmo->setMode(G_SCALE);
+    }
+}
 #endif // OGRE_GIZMOS_H
