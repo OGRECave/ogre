@@ -216,7 +216,12 @@ namespace Ogre
             if (mIsManual)
             {
                 if (old==LOADSTATE_UNLOADED && mLoader)
+                {
                     mLoader->prepareResource(this);
+
+                    if (!background)
+                        _firePreparingComplete();
+                }
 
                 preLoadImpl();
 
@@ -240,7 +245,12 @@ namespace Ogre
             {
 
                 if (old==LOADSTATE_UNLOADED)
+                {
                     prepareImpl();
+
+                    if (!background)
+                        _firePreparingComplete();
+                }
 
                 preLoadImpl();
 
