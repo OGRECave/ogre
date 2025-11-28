@@ -1420,6 +1420,19 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("**************************************");
     }
 
+    void GL3PlusRenderSystem::bindRenderTarget(RenderTarget* target)
+    {
+        /* Bind a certain render target if it is a FBO. If it is not a FBO, bind the
+            main frame buffer.
+        */
+        if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
+        {
+            fbo->bind(true);
+        }
+        else
+            _getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
+    }
+
     void GL3PlusRenderSystem::_setRenderTarget(RenderTarget *target)
     {
         mActiveRenderTarget = target;
@@ -1443,15 +1456,7 @@ namespace Ogre {
                 setDepthBufferFor( target );
             }
 
-            /* Bind a certain render target if it is a FBO. If it is not a FBO, bind the
-               main frame buffer.
-            */
-            if(auto fbo = gltarget->getFBO())
-            {
-                fbo->bind(true);
-            }
-            else
-                _getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
+            bindRenderTarget(target);
 
             // Enable / disable sRGB states
             if (target->isHardwareGammaEnabled())

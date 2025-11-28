@@ -833,8 +833,7 @@ namespace Ogre {
             // On iOS RenderWindow is FBO based, renders to multisampled FBO and then resolves
             // to non-multisampled FBO, therefore we need to restore FBO binding even when
             // rendering to the same viewport.
-            RenderTarget* target = vp->getTarget();
-            mRTTManager->bind(target);
+            bindRenderTarget(vp->getTarget());
         }
 #endif
     }
@@ -1401,6 +1400,24 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("**************************************");
     }
 
+    void GLES2RenderSystem::bindRenderTarget(RenderTarget* target)
+    {
+        if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
+        {
+            fbo->bind(true);
+        }
+        else
+        {
+            // Non-multisampled screen buffer is FBO #1 on iOS, multisampled is yet another,
+            // so give the target ability to influence decision which FBO to use
+            GLuint mainfbo = 0;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            target->getCustomAttribute("GLFBO", &mainfbo);
+#endif
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mainfbo));
+        }
+    }
+
     void GLES2RenderSystem::_setRenderTarget(RenderTarget *target)
     {
         mActiveRenderTarget = target;
@@ -1425,7 +1442,7 @@ namespace Ogre {
             }
 
             // Bind frame buffer object
-            mRTTManager->bind(target);
+            bindRenderTarget(target);
         }
     }
 
