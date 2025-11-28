@@ -74,11 +74,6 @@ namespace Ogre {
     public:
         GLES2FBOManager();
         ~GLES2FBOManager();
-        
-        /** Bind a certain render target if it is a FBO. If it is not a FBO, bind the
-            main frame buffer.
-        */
-        void bind(RenderTarget *target) override;
 
         /** Get best depth and stencil supported for given internalFormat
         */

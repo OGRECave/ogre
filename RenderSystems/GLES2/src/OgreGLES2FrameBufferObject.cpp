@@ -179,14 +179,6 @@ GLES2FrameBufferObject::GLES2FrameBufferObject()
         GLuint status;
         OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
-        // Bind main buffer
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // The screen buffer is 1 on iOS
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 1));
-#else
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-#endif
-
         switch(status)
         {
         case GL_FRAMEBUFFER_COMPLETE:
