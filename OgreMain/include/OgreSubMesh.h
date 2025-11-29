@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreRenderOperation.h"
+#include "OgreRenderable.h"
 #include "OgreVertexBoneAssignment.h"
 #include "OgreAnimationTrack.h"
 #include "OgreResourceGroupManager.h"
@@ -152,6 +153,34 @@ namespace Ogre {
         void setMaterial(const MaterialPtr& mat) { mMaterial = mat; }
         const MaterialPtr& getMaterial() const { return mMaterial; }
 
+        /** Sets a custom parameter for this SubMesh, which SubEntities may use or override.
+            @see Renderable::setCustomParameter
+        */
+        void setCustomParameter(size_t index, const Vector4f& value);
+
+        /** Removes a custom value which is associated with this SubMesh at the given index.
+            @see Renderable::removeCustomParameter
+        */
+        void removeCustomParameter(size_t index);
+
+        /** Checks whether a custom value is associated with this SubMesh at the given index.
+            @see Renderable::hasCustomParameter for full details.
+        */
+        bool hasCustomParameter(size_t index) const;
+
+        /** Gets the custom value associated with this SubMesh at the given index.
+            @see Renderable::getCustomParameter for full details.
+        */
+        const Vector4f& getCustomParameter(size_t index) const;
+
+        /** Gets all the custom parameters associated with this Renderable.
+        */
+        const Renderable::CustomParameterMap & getCustomParameters() const;
+
+        /** Sets multiple custom parameters associated with this Renderable.
+        */
+        void setCustomParameters(const Renderable::CustomParameterMap & paramMap);
+
         /** Returns a RenderOperation structure required to render this mesh.
             @param 
                 rend Reference to a RenderOperation structure to populate.
@@ -239,6 +268,8 @@ namespace Ogre {
 
         /// the material this SubMesh uses.
         MaterialPtr mMaterial;
+
+        Renderable::CustomParameterMap mCustomParameters;
 
         VertexBoneAssignmentList mBoneAssignments;
 

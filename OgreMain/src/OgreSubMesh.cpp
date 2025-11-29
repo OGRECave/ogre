@@ -60,6 +60,41 @@ namespace Ogre {
         return mMaterial ? mMaterial->getName() : BLANKSTRING;
     }
     //-----------------------------------------------------------------------
+    void SubMesh::setCustomParameter(size_t index, const Vector4f& value) { mCustomParameters[index] = value; }
+    //-----------------------------------------------------------------------
+    void SubMesh::removeCustomParameter(size_t index) { mCustomParameters.erase(index); }
+    //-----------------------------------------------------------------------
+    bool SubMesh::hasCustomParameter(size_t index) const
+    {
+        return mCustomParameters.find(index) != mCustomParameters.end();
+    }
+    //-----------------------------------------------------------------------
+    const Vector4f& SubMesh::getCustomParameter(size_t index) const
+    {
+        Renderable::CustomParameterMap::const_iterator i = mCustomParameters.find(index);
+        if (i != mCustomParameters.end())
+        {
+            return i->second;
+        }
+        else
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Parameter at the given index was not found.");
+        }
+    }
+    //-----------------------------------------------------------------------
+    const Renderable::CustomParameterMap& SubMesh::getCustomParameters() const
+    {
+        return mCustomParameters;
+    }
+    //-----------------------------------------------------------------------
+    void SubMesh::setCustomParameters(const Renderable::CustomParameterMap& paramMap)
+    {
+        for (auto & i : paramMap)
+        {
+            mCustomParameters[i.first] = i.second;
+        }
+    }
+    //-----------------------------------------------------------------------
     void SubMesh::_getRenderOperation(RenderOperation& ro, ushort lodIndex)
     {
         if (lodIndex > 0 && static_cast< size_t >( lodIndex - 1 ) < mLodFaceList.size())

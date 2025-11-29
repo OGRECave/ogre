@@ -1371,6 +1371,7 @@ namespace Ogre {
             SubEntity* subEnt = OGRE_NEW SubEntity(this, subMesh);
             if (subMesh->getMaterial())
                 subEnt->setMaterial(subMesh->getMaterial());
+            subEnt->setCustomParameters(subMesh->getCustomParameters());
             sublist->push_back(subEnt);
         }
     }

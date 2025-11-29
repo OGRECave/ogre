@@ -28,6 +28,19 @@ const Vector4f& Renderable::getCustomParameter(size_t index) const
     }
 }
 
+const Renderable::CustomParameterMap& Renderable::getCustomParameters() const
+{
+    return mCustomParameters;
+}
+
+void Renderable::setCustomParameters(const Renderable::CustomParameterMap& paramMap)
+{
+    for (auto & i : paramMap)
+    {
+        mCustomParameters[i.first] = i.second;
+    }
+}
+
 void Renderable::_updateCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry,
                                            GpuProgramParameters* params) const
 {
