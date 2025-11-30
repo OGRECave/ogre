@@ -82,7 +82,10 @@ namespace Ogre {
 
         // tell material it's been used
         if (pRend->getMaterial())
+        {
+            pRend->getTechnique();
             pRend->getMaterial()->touch();
+        }
 
         // Check material & technique supplied (the former since the default implementation
         // of getTechnique is based on it for backwards compatibility
