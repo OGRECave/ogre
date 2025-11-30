@@ -150,8 +150,8 @@ protected:
         // do this first so we generate edge lists
         if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_HWSTENCIL))
         {
-            mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
-            mCurrentShadowTechnique = SHADOWTYPE_STENCIL_MODULATIVE;
+            mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
+            mCurrentShadowTechnique = SHADOWTYPE_STENCIL_ADDITIVE;
         }
         else
         {
