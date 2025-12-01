@@ -80,9 +80,9 @@ namespace Ogre {
     {
         Technique* pTech;
 
-        // tell material it's been used
-        if (pRend->getMaterial())
-            pRend->getMaterial()->touch();
+        // make sure supported techniques are populated
+        if (auto mat = pRend->getMaterial())
+            mat->prepare();
 
         // Check material & technique supplied (the former since the default implementation
         // of getTechnique is based on it for backwards compatibility
@@ -93,7 +93,7 @@ namespace Ogre {
             pRend->getRenderOperation(op);
             bool useLighting = (NULL != op.vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL));
             MaterialPtr defaultMat = MaterialManager::getSingleton().getDefaultMaterial(useLighting);
-            defaultMat->load();
+            defaultMat->prepare();
             pTech = defaultMat->getBestTechnique();
         }
         else
@@ -102,13 +102,12 @@ namespace Ogre {
         if (mRenderableListener)
         {
             // Allow listener to override technique and to abort
-            if (!mRenderableListener->renderableQueued(pRend, groupID, priority, 
-                &pTech, this))
+            if (!mRenderableListener->renderableQueued(pRend, groupID, priority, &pTech, this))
                 return; // rejected
-
-            // tell material it's been used (incase changed)
-            pTech->getParent()->touch();
         }
+
+        // tell material it's been used
+        pTech->getParent()->touch();
 
         if(groupID == mDefaultQueueGroup && onTransparentQueue(pTech))
             groupID = RENDER_QUEUE_TRANSPARENTS;
