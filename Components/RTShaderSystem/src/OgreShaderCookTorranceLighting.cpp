@@ -157,6 +157,7 @@ void CookTorranceLighting::copyFrom(const SubRenderState& rhs)
 {
     const CookTorranceLighting& rhsLighting = static_cast<const CookTorranceLighting&>(rhs);
     mMetalRoughnessMapName = rhsLighting.mMetalRoughnessMapName;
+    mSampler = rhsLighting.mSampler;
     mLightCount = rhsLighting.mLightCount;
 }
 
