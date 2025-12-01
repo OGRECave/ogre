@@ -171,41 +171,7 @@ void Gizmo::setMode(GizmoMode mode)
 }
 void Gizmo::createMesh(Ogre::SceneManager *manager, Ogre::String name)
 {
-    // // Create object
-    // mGizmoObj = std::make_unique<Ogre::ManualObject>("gizmo");
-    // mGizmoObj->setCastShadows(false);
-    // mSceneNode->attachObject(mGizmoObj.get());
-    //
-    // mGizmoObj->begin("baseWhiteNoLighting", Ogre::RenderOperation::OT_TRIANGLE_STRIP);
-    // mGizmoObj->colour((Ogre::Real)0.0, (Ogre::Real)1.0, (Ogre::Real)0.0);
-    //
-    //
-    // // rendering cube, only using 14 vertices
-    // const Ogre::Vector3 cube_strip[14] = {
-    //     {-1.f, 1.f, 1.f},   // Front-top-left
-    //     {1.f, 1.f, 1.f},    // Front-top-right
-    //     {-1.f, -1.f, 1.f},  // Front-bottom-left
-    //     {1.f, -1.f, 1.f},   // Front-bottom-right
-    //     {1.f, -1.f, -1.f},  // Back-bottom-right
-    //     {1.f, 1.f, 1.f},    // Front-top-right
-    //     {1.f, 1.f, -1.f},   // Back-top-right
-    //     {-1.f, 1.f, 1.f},   // Front-top-left
-    //     {-1.f, 1.f, -1.f},  // Back-top-left
-    //     {-1.f, -1.f, 1.f},  // Front-bottom-left
-    //     {-1.f, -1.f, -1.f}, // Back-bottom-left
-    //     {1.f, -1.f, -1.f},  // Back-bottom-right
-    //     {-1.f, 1.f, -1.f},  // Back-top-left
-    //     {1.f, 1.f, -1.f}    // Back-top-right
-    // };
-    //
-    // for (const auto& vtx : cube_strip)
-    // {
-    //     mGizmoObj->position(vtx);
-    // }
-    //
-    // mGizmoObj->end();
-
-        Ogre::ManualObject *mMesh = manager->createManualObject("AxisGizmoManualObject");
+    Ogre::ManualObject *mMesh = manager->createManualObject("AxisGizmoManualObject");
 
     mMesh->begin("AxisGizmo_Material", Ogre::RenderOperation::OT_LINE_LIST);
     mMesh->position(0, 0, 0);
@@ -457,10 +423,5 @@ void Gizmo::createPlaneMesh(Ogre::SceneManager *manager, Ogre::String name)
     mMesh->convertToMesh(name, "General");
 
     manager->destroyManualObject(mMesh);
-}
-
-Ogre::MovableObject* pickObject(float x, float y)
-{
-
 }
 }
