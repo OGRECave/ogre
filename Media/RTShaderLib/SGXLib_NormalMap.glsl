@@ -60,7 +60,7 @@ void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
 						out vec2 newTexCoord)
 {
 	//Calculate eye direction
-	vec3 eyeVec = mul(-viewPos, TBN);
+	f32vec3 eyeVec = mul(-viewPos, TBN);
 	eyeVec = normalize(eyeVec);
 #ifndef TERRAIN_PARALLAX_MAPPING
 	eyeVec.y = -eyeVec.y; //Inverse y

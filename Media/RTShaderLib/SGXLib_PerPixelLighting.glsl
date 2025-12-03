@@ -60,7 +60,7 @@ void SGX_Flip_Backface_Normal(in bool frontFacing, in float targetFlipped, inout
 
 void evaluateLight(
 				in vec3 vNormal,
-				in vec3 vViewPos,
+				in f32vec3 vViewPos,
 				in vec4 vLightPos,
 				in vec4 vAttParams,
 				in vec4 vLightDirView,
@@ -128,14 +128,19 @@ void evaluateLight(
 
     if (vLightPos.w != 0.0)
     {
-        vLightView -= vViewPos; // to light
-        fLightD     = length(vLightView);
+		f32vec3 tmp = vLightPos.xyz - vViewPos;
+        fLightD     = length(tmp);
 
         if(fLightD > vAttParams.x)
             return;
-    }
 
-	vLightView		   = normalize(vLightView);
+		vLightView = tmp / fLightD; // normalize
+    }
+	else
+	{
+		vLightView = normalize(vLightView);
+	}
+
 	vec3 vNormalView = normalize(vNormal);
 	float nDotL		   = saturate(dot(vNormalView, vLightView));
 	
