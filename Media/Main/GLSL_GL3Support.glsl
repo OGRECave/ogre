@@ -4,7 +4,7 @@
 
 // @public-api
 
-#if defined(OGRE_FRAGMENT_SHADER) && defined(OGRE_GLSLES)
+#if defined(OGRE_FRAGMENT_SHADER) && (defined(OGRE_GLSLES) || defined(VULKAN))
 // define default precisions for ES fragement shaders
 precision mediump float;
 
