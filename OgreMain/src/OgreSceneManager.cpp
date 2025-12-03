@@ -51,7 +51,7 @@ THE SOFTWARE.
 #include <memory>
 
 namespace Ogre {
-bool SceneManager::msPerRenderableLights = true;
+bool SceneManager::msPerRenderableLights = false;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
 mName(name),
