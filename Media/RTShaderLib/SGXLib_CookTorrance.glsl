@@ -80,7 +80,7 @@ float V_SmithGGXCorrelated(float roughness, float NoV, float NoL) {
 }
 
 // https://google.github.io/filament/Filament.md.html#materialsystem/specularbrdf/normaldistributionfunction(speculard)
-float D_GGX(float roughness, float NoH, const vec3 h, const vec3 n) {
+float D_GGX(float roughness, float32_t NoH, const vec3 h, const vec3 n) {
     // Walter et al. 2007, "Microfacet Models for Refraction through Rough Surfaces"
 
     // In mediump, there are two problems computing 1.0 - NoH^2
@@ -108,16 +108,16 @@ float D_GGX(float roughness, float NoH, const vec3 h, const vec3 n) {
 }
 
 vec3 evaluateLight(
-                in vec3 vNormal,
+                in f32vec3 vNormal,
                 in vec3 viewPos,
-                in vec4 lightPos,
+                in f32vec4 lightPos,
                 in vec3 lightColor,
                 in vec4 pointParams,
                 in vec4 vLightDirView,
                 in vec4 spotParams,
                 in PixelParams pixel)
 {
-    vec3 vLightView = lightPos.xyz;
+    f32vec3 vLightView = lightPos.xyz;
     float fLightD = 0.0;
 
     if (lightPos.w != 0.0)
@@ -131,7 +131,7 @@ vec3 evaluateLight(
 
 	vLightView		   = normalize(vLightView);
 
-	vec3 vNormalView = normalize(vNormal);
+	f32vec3 vNormalView = normalize(vNormal);
 	float NoL		 = saturate(dot(vNormalView, vLightView));
 
     if(NoL <= 0.0)

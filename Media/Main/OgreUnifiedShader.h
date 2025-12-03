@@ -180,7 +180,7 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define OGRE_UNIFORMS(params) OGRE_UNIFORMS_BEGIN params OGRE_UNIFORMS_END
 
 // GL_EXT_shader_explicit_arithmetic_types polyfill
-#if defined(OGRE_GLSLES) && (!defined(OGRE_FRAGMENT_SHADER) || __VERSION__ > 100)
+#if defined(VULKAN) || defined(OGRE_GLSLES) && (!defined(OGRE_FRAGMENT_SHADER) || __VERSION__ > 100)
 #define float32_t highp float
 #define f32vec2 highp vec2
 #define f32vec3 highp vec3
