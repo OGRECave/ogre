@@ -94,9 +94,60 @@ Gizmo::Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, Gizmo
     mGizmoEntities[1]->getWorldBoundingBox(true);
     mGizmoEntities[2]->getWorldBoundingBox(true);
 
+    mEntityToAxis[mGizmoEntities[0]] = AXIS_X;
+    mEntityToAxis[mGizmoEntities[1]] = AXIS_Y;
+    mEntityToAxis[mGizmoEntities[2]] = AXIS_Z;
+
+    mEntityToAxis[mGizmoEntities[3]] = AXIS_XY;
+    mEntityToAxis[mGizmoEntities[4]] = AXIS_YZ;
+    mEntityToAxis[mGizmoEntities[5]] = AXIS_XZ;
+
     mGizmoNode->setVisible(true);
     setMode(mode);
 }
+
+void Gizmo::setHighlighted(Ogre::Entity* entity)
+{
+    if (!entity)
+    {
+        mOldGizmoAxis = AXIS_NONE;
+        mGizmoEntities[0]->setMaterialName("MAT_GIZMO_X");
+        mGizmoEntities[1]->setMaterialName("MAT_GIZMO_Y");
+        mGizmoEntities[2]->setMaterialName("MAT_GIZMO_Z");
+        mGizmoEntities[3]->setMaterialName("MAT_GIZMO_XY");
+        mGizmoEntities[4]->setMaterialName("MAT_GIZMO_YZ");
+        mGizmoEntities[5]->setMaterialName("MAT_GIZMO_ZX");
+
+        mHighlighted = nullptr;
+        return;
+    }
+    auto it = mEntityToAxis.find(entity);
+    if (it == mEntityToAxis.end())
+        return;
+
+    int axis = it->second;
+
+    // Nothing changed?
+    if (axis == mOldGizmoAxis)
+        return;
+
+    mOldGizmoAxis = axis;
+    mHighlighted = entity;
+
+    mGizmoEntities[0]->setMaterialName((axis & AXIS_X) ?
+        "MAT_GIZMO_X_L" : "MAT_GIZMO_X");
+    mGizmoEntities[1]->setMaterialName((axis & AXIS_Y) ?
+        "MAT_GIZMO_Y_L" : "MAT_GIZMO_Y");
+    mGizmoEntities[2]->setMaterialName((axis & AXIS_Z) ?
+        "MAT_GIZMO_Z_L" : "MAT_GIZMO_Z");
+    mGizmoEntities[3]->setMaterialName((axis == AXIS_XY) ?
+        "MAT_GIZMO_XY_L" : "MAT_GIZMO_XY");
+    mGizmoEntities[4]->setMaterialName((axis == AXIS_YZ) ?
+        "MAT_GIZMO_YZ_L" : "MAT_GIZMO_YZ");
+    mGizmoEntities[5]->setMaterialName((axis == AXIS_XZ) ?
+        "MAT_GIZMO_ZX_L" : "MAT_GIZMO_ZX");
+}
+
 
 void Gizmo::setObject(Ogre::SceneNode* sceneObject)
 {
@@ -169,6 +220,38 @@ void Gizmo::setMode(GizmoMode mode)
     }
 
 }
+
+Ogre::Vector3 computeDrag(const Ogre::Ray& ray)
+{
+    if (!mActiveGizmo || !mParentObject)
+        return mInitialObjectPos;
+
+    // Determine axis
+    Ogre::Vector3 axis;
+    if (mActiveGizmo == mGizmoEntities[0]) axis = Ogre::Vector3::UNIT_X;
+    else if (mActiveGizmo == mGizmoEntities[1]) axis = Ogre::Vector3::UNIT_Y;
+    else if (mActiveGizmo == mGizmoEntities[2]) axis = Ogre::Vector3::UNIT_Z;
+    else return mInitialObjectPos;
+
+    // Construct a plane perpendicular to the axis, passing through initial object position
+    Ogre::Plane plane(axis.crossProduct(mCamera->getDerivedDirection()), mInitialObjectPos);
+
+    // Intersect ray with plane
+    std::pair<bool, Ogre::Real> intersection = ray.intersects(plane);
+    if (!intersection.first)
+        return mInitialObjectPos;
+
+    Ogre::Vector3 hitPoint = ray.getPoint(intersection.second);
+
+    // Project delta onto axis
+    Ogre::Vector3 delta = hitPoint - mInitialObjectPos;
+    Ogre::Real amount = delta.dotProduct(axis);
+
+    return mInitialObjectPos + axis * amount;
+}
+
+
+
 void Gizmo::createMesh(Ogre::SceneManager *manager, Ogre::String name)
 {
     Ogre::ManualObject *mMesh = manager->createManualObject("AxisGizmoManualObject");

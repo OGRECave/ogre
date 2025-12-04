@@ -14,6 +14,19 @@ enum GizmoMode   /// enum for different kinds of gizmo
     G_SCALE,
 };
 
+enum AXIS
+{
+    AXIS_NONE = 0,
+    AXIS_X    = 1 << 0, // 1
+    AXIS_Y    = 1 << 1, // 2
+    AXIS_Z    = 1 << 2, // 4
+
+    AXIS_XY   = AXIS_X | AXIS_Y, // 3
+    AXIS_YZ   = AXIS_Y | AXIS_Z, // 6
+    AXIS_XZ   = AXIS_X | AXIS_Z  // 5
+};
+
+
 /**
 Class which applies a manipulable gizmo to a scene object (including the camera).
 */
@@ -25,6 +38,8 @@ public:
 
     void setMode(GizmoMode style);
 
+    void setHighlighted(Ogre::Entity* highlighted);
+
     Ogre::SceneNode* getObject()
     {
         return mGizmoNode->getParentSceneNode();
@@ -34,6 +49,8 @@ public:
     {
         return mMode;
     }
+
+    Ogre::Vector3 computeDrag(Ogre::Ray ray);
 
 protected:
     void createMesh(Ogre::SceneManager *manager, Ogre::String name);
@@ -45,6 +62,9 @@ protected:
     Ogre::SceneNode* mGizmoY{};
     Ogre::SceneNode* mGizmoZ{};
     Ogre::Entity* mGizmoEntities[6]{};
+    std::unordered_map<Ogre::Entity*, int> mEntityToAxis;
+    Ogre::Entity* mHighlighted = nullptr;
+    int mOldGizmoAxis{};
     std::unique_ptr<Ogre::ManualObject> mGizmoObj{};
     GizmoMode mMode;
 };

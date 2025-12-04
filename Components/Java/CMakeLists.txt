@@ -1,4 +1,10 @@
-if(ANDROID)
+if(ANDROID)(auto & mGizmoEntity : mGizmoEntities)
+    {
+        if (entity == mGizmoEntity)
+        {
+            mHighlighted = entity;
+        }
+    }
 	set(JNI_FOUND TRUE)
 	add_library(cpufeatures STATIC ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
 	set(JNI_LIBRARIES android log cpufeatures)
