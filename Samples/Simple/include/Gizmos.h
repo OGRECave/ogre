@@ -48,36 +48,29 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         mScale = mTrayMgr->createButton(TL_TOPLEFT, "Scale", "Scale");
     }
 
-    bool mouseMoved(const OgreBites::MouseMotionEvent& evt) override
+    bool mouseMoved(const MouseMotionEvent& evt) override
     {
+        float nx = float(evt.x) / float(mWindow->getWidth());
+        float ny = float(evt.y) / float(mWindow->getHeight());
 
-
-        if (!mDragging)
+        // If we are dragging, DO NOT pick again — only continue the drag
+        if (mGizmo->isDragging())
         {
-            if (mCameraMan->mouseMoved(evt))
-                return true;
-            pickObject(evt.x / float(mWindow->getWidth()),
-                            evt.y / float(mWindow->getHeight()));
+            Ogre::Ray ray = mCamera->getCameraToViewportRay(nx, ny);
+            mGizmo->computeDrag(ray, mCamera->getDerivedDirection());
+            return true;  // handled
         }
-        else if (mActiveGizmo)
-        {
-            Ray ray = mCamera->getCameraToViewportRay(
-                evt.x / float(mWindow->getWidth()),
-                evt.y / float(mWindow->getHeight()));
 
-            // 1. Compute intersection with plane/axis
-            Vector3 newPos = mActiveGizmo.computeDrag(ray);
+        // Not dragging → hover highlighting
+        Ogre::Entity* hover = pickObject(nx, ny);
+        mGizmo->setHighlighted(hover);
 
-            // 2. Apply to object
-            mGizmo->getObject()->setPosition(newPos);
-
-             // // 3. Notify parent / owner object
-            // if (mParentObject)
-            //     mParentObject->onGizmoMoved(newPos);
-        }
+        // Allow camera to still move/orbit/etc.
+        mCameraMan->mouseMoved(evt);
 
         return true;
     }
+
 
 
     bool mousePressed(const MouseButtonEvent& evt) override
@@ -92,13 +85,9 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
 
         if (picked)
         {
-            mDragging = true;
-            mActiveGizmo = picked;
-            mDragStartRay = Sample::mCamera->getCameraToViewportRay(
+            mGizmo->startDrag(picked, mCamera->getCameraToViewportRay(
                 evt.x / float(mWindow->getWidth()),
-                evt.y / float(mWindow->getHeight()));
-
-            mInitialObjectPos = mGizmo->getObject()->getPosition();
+                evt.y / float(mWindow->getHeight())));
         }
 
         return true;
@@ -109,8 +98,7 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         if (evt.button != BUTTON_LEFT)
             return false;
 
-        mDragging = false;
-        mActiveGizmo = nullptr;
+        mGizmo->stopDrag();
 
         return true;
     }
@@ -161,9 +149,6 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
 
     // custom shader parameter bindings
     enum ShaderParam { SP_SHININESS = 1, SP_DIFFUSE, SP_SPECULAR };
-    bool mDragging = false;
-    Entity* mActiveGizmo = nullptr;
-    Ray mDragStartRay;
     Vector3 mInitialObjectPos;
     RaySceneQuery* mRayQuery;
     Gizmo* mGizmo;

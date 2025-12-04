@@ -1,10 +1,14 @@
 #ifndef OGRE_OGREGIZMOS_H
 #define OGRE_OGREGIZMOS_H
-#include "OgreSceneNode.h"
 #include "OgreBitesPrerequisites.h"
+#include "OgreRay.h"
+#include "OgreSceneNode.h"
 
 namespace OgreBites
 {
+
+constexpr uint32_t QUERYFLAG_GIZMO       = 1 << 1;
+
 enum GizmoMode   /// enum for different kinds of gizmo
 {
     G_NONE,
@@ -50,13 +54,23 @@ public:
         return mMode;
     }
 
-    Ogre::Vector3 computeDrag(Ogre::Ray ray);
+    void startDrag(Ogre::Entity* pickedGizmo, Ogre::Ray startRay);
+
+    Ogre::Vector3 computeDrag(Ogre::Ray ray, Ogre::Vector3 cameraDirection);
+
+    void stopDrag();
+
+    bool isDragging();
 
 protected:
-    void createMesh(Ogre::SceneManager *manager, Ogre::String name);
+    static void createMesh(Ogre::SceneManager *manager, Ogre::String name);
 
-    void createPlaneMesh(Ogre::SceneManager *manager, Ogre::String name);
+    static void createPlaneMesh(Ogre::SceneManager *manager, Ogre::String name);
 
+    bool mDragging = false;
+    Ogre::Ray mDragStartRay;
+    Ogre::Entity* mActiveGizmo = nullptr;
+    Ogre::Vector3 mInitialObjectPos;
     Ogre::SceneNode* mGizmoNode{};
     Ogre::SceneNode* mGizmoX{};
     Ogre::SceneNode* mGizmoY{};
