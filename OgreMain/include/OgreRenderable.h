@@ -68,6 +68,8 @@ namespace Ogre {
             DEFAULT_PRIORITY = 100
         };
 
+        typedef std::map<size_t, Vector4f> CustomParameterMap;
+
         Renderable()
             : mMaterialLodIndex(0), mPolygonModeOverrideable(true), mUseIdentityProjection(false),
               mUseIdentityView(false)
@@ -261,7 +263,15 @@ namespace Ogre {
         */
         const Vector4f& getCustomParameter(size_t index) const;
 
-        /** Update a custom GpuProgramParameters constant which is derived from 
+        /** Gets all the custom parameters associated with this Renderable.
+        */
+        const CustomParameterMap & getCustomParameters() const;
+
+        /** Sets multiple custom parameters associated with this Renderable.
+        */
+        void setCustomParameters(const CustomParameterMap & paramMap);
+
+        /** Update a custom GpuProgramParameters constant which is derived from
             information only this Renderable knows.
 
             This method allows a Renderable to map in a custom GPU program parameter
@@ -353,7 +363,6 @@ namespace Ogre {
         };
 
     protected:
-        typedef std::map<size_t, Vector4f> CustomParameterMap;
         CustomParameterMap mCustomParameters;
         UserObjectBindings mUserObjectBindings;      /// User objects binding.
         uint16 mMaterialLodIndex;
