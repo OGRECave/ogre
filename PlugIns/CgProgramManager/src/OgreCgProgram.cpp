@@ -1200,6 +1200,9 @@ namespace Ogre {
 			dict->addParameter(ParameterDef("profiles",
 				"Space-separated list of Cg profiles supported by this profile.",
 				PT_STRING),&msCmdProfiles);
+			dict->addParameter(ParameterDef("target",
+				"Space-separated list of Cg profiles supported by this profile.",
+				PT_STRING),&msCmdProfiles);
 			dict->addParameter(ParameterDef("compile_arguments",
 				"A string of compilation arguments to pass to the Cg compiler.",
 				PT_STRING),&msCmdArgs);
