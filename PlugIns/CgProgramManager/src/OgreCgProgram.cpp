@@ -116,7 +116,13 @@ namespace Ogre {
 		if (!mPreprocessorDefines.empty())
 			args = StringUtil::split(mPreprocessorDefines);
 
-		StringVector::const_iterator i;
+		for(auto& arg : args)
+		{
+			if(!StringUtil::startsWith(arg, "-"))
+				arg = "-D" + arg;
+		}
+
+		StringVector::iterator i;
 		if (mSelectedCgProfile == CG_PROFILE_VS_1_1)
 		{
 			// Need the 'dcls' argument whenever we use this profile
