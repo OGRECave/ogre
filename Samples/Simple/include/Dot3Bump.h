@@ -104,7 +104,6 @@ protected:
         matNames.push_back("RTSS/ParallaxOcclusionMapping");
         matNames.push_back("RTSS/NormalMapping_MultiPass");
 #endif
-        matNames.push_back("Examples/BumpMapping/MultiLight");
         matNames.push_back("Examples/ShowUV");
         matNames.push_back("Examples/ShowNormals");
         matNames.push_back("Examples/ShowTangents");
