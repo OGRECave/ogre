@@ -117,10 +117,9 @@ protected:
 
         matNames.clear();
 #ifdef INCLUDE_RTSHADER_SYSTEM
-        matNames.push_back("RTSS/Athene/NormalMapping_SinglePass");
-        matNames.push_back("RTSS/Athene/NormalMapping_MultiPass");
-#endif
         matNames.push_back("Examples/Athene/NormalMapped");
+        matNames.push_back("Examples/Athene/NormalMapped_MultiPass");
+#endif
         matNames.push_back("Examples/ShowUV");
         matNames.push_back("Examples/ShowNormals");
         matNames.push_back("Examples/ShowTangents");

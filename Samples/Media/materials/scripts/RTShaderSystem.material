@@ -110,10 +110,7 @@ material RTSS/NormalMapping_MultiPass
 			// to lighting pass categorisation routine
 			ambient 0 0 0 
 			
-			// do this for each point light
-			// You MUST specify the light type when working with the RT Shader System in iterative lighting method. 
-			// otherwise an exception will be thrown.
-			iteration once_per_light point
+			iteration once_per_light
 
 			scene_blend add		
 			
@@ -145,7 +142,7 @@ material RTSS/NormalMapping_MultiPass
 }
 
 // Athene single multi pass material override.
-material RTSS/Athene/NormalMapping_SinglePass : RTSS/NormalMapping_SinglePass
+material Examples/Athene/NormalMapped
 {	
 	technique
 	{			
@@ -172,12 +169,13 @@ material RTSS/Athene/NormalMapping_SinglePass : RTSS/NormalMapping_SinglePass
 }
 
 // Athene model multi pass material override.
-material RTSS/Athene/NormalMapping_MultiPass : RTSS/NormalMapping_MultiPass
+material Examples/Athene/NormalMapped_MultiPass : RTSS/NormalMapping_MultiPass
 {	
 	technique
 	{
 		pass lighting
-		{								
+		{
+			specular 0 0 0 0
 			texture_unit
 			{
 				texture atheneNormalMap.png
