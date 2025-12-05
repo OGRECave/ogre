@@ -53,7 +53,8 @@ namespace Ogre {
 
 		for (i = mProfiles.begin(); i != iend; ++i)
 		{
-			bool syntaxSupported = gpuMgr.isSyntaxSupported(*i);
+			String profile = *i == "ps_2_x" ? "ps_2_a" : *i;
+			bool syntaxSupported = gpuMgr.isSyntaxSupported(profile);
 			if (!syntaxSupported && find(specialCgProfiles, specialCgProfilesEnd, *i) != specialCgProfilesEnd)
 			{
 				// Cg has some "special" profiles which don't have direct equivalents
@@ -69,8 +70,8 @@ namespace Ogre {
 
 			if (syntaxSupported)
 			{
-				mSelectedProfile = *i;
-				String selectedProfileForFind = mSelectedProfile;
+				mSelectedProfile = profile;
+				String selectedProfileForFind = *i;
 				if(StringUtil::startsWith(mSelectedProfile,"vs_4_0_", true))
 				{
 					selectedProfileForFind = "vs_4_0";
