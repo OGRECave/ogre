@@ -34,7 +34,7 @@ String CUSTOM_ROCKWALL_MATERIAL("Ogre/DepthShadowmap/Receiver/RockWall");
 String CUSTOM_ATHENE_MATERIAL("Ogre/DepthShadowmap/Receiver/Athene");
 
 String BASIC_ROCKWALL_MATERIAL("Examples/Rockwall");
-String BASIC_ATHENE_MATERIAL("Examples/Athene/NormalMapped");
+String BASIC_ATHENE_MATERIAL("Examples/Athene/NormalMapped_MultiPass");
 
 /** This class 'wibbles' the light and billboard */
 class LightWibbler : public ControllerValue<float>
@@ -144,6 +144,7 @@ protected:
     // Just override the mandatory create scene method
     void setupContent(void) override
     {
+        mViewport->setMaterialScheme(MSN_SHADERGEN); // ensure RTSS is enabled
         mCameraMan->setStyle(CS_ORBIT);
         mCameraMan->setYawPitchDist(Degree(0), Degree(45), 400);
 
@@ -538,7 +539,6 @@ protected:
 
                 break;
             case MAT_DEPTH_FLOAT:
-                mViewport->setMaterialScheme(MSN_SHADERGEN); // ensure RTSS is enabled
                 mSceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
                 mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
@@ -557,7 +557,6 @@ protected:
                 updateDepthShadowParams();
                 break;
             case MAT_DEPTH_FLOAT_PCF:
-                mViewport->setMaterialScheme(MSN_SHADERGEN); // ensure RTSS is enabled
                 mSceneMgr->setShadowTexturePixelFormat(PF_DEPTH16);
                 mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 

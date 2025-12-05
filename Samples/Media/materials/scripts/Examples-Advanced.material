@@ -527,40 +527,6 @@ material Examples/FresnelReflectionRefraction
 	}
 }
 
-// Normal-mapped Athene statue
-material Examples/Athene/NormalMapped : Examples/BumpMapping/MultiLight
-{
-
-	// This is the preferred technique which uses both vertex and
-	// fragment programs, supports coloured lights
-	technique
-	{
-		// Now do the lighting pass
-		// NB we don't do decal texture here because this is repeated per light
-		pass perlight
-		{
-
-			
-			// Base bump map
-			texture_unit normalmap
-			{
-				texture atheneNormalMap.png
-				colour_op replace
-			}
-		}
-		
-		// Decal pass
-		pass decal
-		{
-			texture_unit decalmap
-			{
-				texture egyptrockyfull.jpg 
-			}
-			
-		}
-	}
-}
-
 // Basic Athene statue
 material Examples/Athene/Basic
 {
@@ -578,40 +544,6 @@ material Examples/Athene/Basic
 			}
 			
 		}
-	}
-}
-
-
-// Any number of lights, diffuse and specular
-material Examples/Athene/NormalMappedSpecular : Examples/BumpMapping/MultiLightSpecular
-{
-
-	// This is the preferred technique which uses both vertex and
-	// fragment programs, supports coloured lights
-	technique
-	{
-		// Now do the lighting pass
-		// NB we don't do decal texture here because this is repeated per light
-		pass perlight
-		{
-			
-			// Base bump map
-			texture_unit normalmap
-			{
-				texture atheneNormalMap.png
-			}
-		}
-		
-		// Decal pass
-		pass decal
-		{
-			texture_unit decalmap
-			{
-				texture egyptrockyfull.jpg 
-			}
-			
-		}
-
 	}
 }
 
