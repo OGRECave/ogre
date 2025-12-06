@@ -212,6 +212,7 @@ public:
 
     void getLightCamera()
     {
+        mViewport->update(); // make sure LightCamera is available
         // Create a texture for use as rtt
         TexturePtr LightCameraRTT = mSceneMgr->getShadowTexture(0);
         RenderTarget* RT_Texture = LightCameraRTT->getBuffer()->getRenderTarget();
