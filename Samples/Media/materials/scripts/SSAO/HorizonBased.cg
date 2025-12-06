@@ -1,12 +1,15 @@
+#include <OgreUnifiedShader.h>
+
+SAMPLER2D(sMRT1, 0); // fragment normals
+SAMPLER2D(sMRT2, 1); // view space position
+SAMPLER2D(sRand, 2); // (cos(a), sin(a), jitter
+
 void HorizonBased_fp
 (
+    in float4 position: POSITION,
     in float2 uv : TEXCOORD0,
     
     out float4 oColor0 : COLOR0,
-    
-    uniform sampler sMRT1 : register(s0), // fragment normal
-    uniform sampler sMRT2 : register(s1), // view space position
-    uniform sampler sRand : register(s2),  // (cos(a), sin(a), jitter
     
     uniform float4 cViewportSize, // (viewport_width, viewport_height, inverse_viewport_width, inverse_viewport_height)
     uniform float cFov, // vertical field of view in radians

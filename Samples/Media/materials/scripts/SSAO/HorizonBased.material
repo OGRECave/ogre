@@ -1,15 +1,8 @@
-fragment_program SSAO/HorizonBased_fp_hlsl hlsl
-{
-    source HorizonBased.hlsl
-    entry_point HorizonBased_fp
-    target ps_4_0 
-}
-
-fragment_program SSAO/HorizonBased_fp_cg cg
+fragment_program SSAO/HorizonBased_fp_cg hlsl cg
 {
     source HorizonBased.cg
     entry_point HorizonBased_fp
-    profiles ps_3_0 arbfp1
+    target ps_3_0 arbfp1
 }
 
 fragment_program SSAO/HorizonBased_fp_glsl glsl
@@ -26,7 +19,6 @@ fragment_program SSAO/HorizonBased_fp_glsl glsl
 fragment_program SSAO/HorizonBased_fp unified
 {
 	delegate SSAO/HorizonBased_fp_glsl 
-	delegate SSAO/HorizonBased_fp_hlsl 
 	delegate SSAO/HorizonBased_fp_cg
 }
 

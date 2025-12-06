@@ -1,13 +1,16 @@
+#include <OgreUnifiedShader.h>
+
+SAMPLER2D(sMRT1, 0); // fragment normals
+SAMPLER2D(sMRT2, 1); // view space position, remember that we are looking down the negative Z axis!!!
+SAMPLER2D(sRand, 2);
+
 void Volumetric_fp
 (
+    in float4 position: POSITION,
     in const float2 uv : TEXCOORD0,
     
     out float4 oColor0 : COLOR0,
-    
-    uniform sampler sMRT1 : register(s0), // fragment normals
-    uniform sampler sMRT2 : register(s1), // view space position, remember that we are looking down the negative Z axis!!!
-    uniform sampler sRand : register(s2),
-    
+
     uniform const float4 cViewportSize, // (viewport_width, viewport_height, inverse_viewport_width, inverse_viewport_height)
     uniform const float cFov, // vertical field of view in radians
     uniform const float cSampleInScreenspace, // whether to sample in screen or world space
@@ -41,7 +44,7 @@ void Volumetric_fp
 
     if (rUV < (cViewportSize.z)) // abort if the projected radius of influence is smaller than 1 fragment
     {
-        oColor0 = 1;
+        oColor0 = vec4_splat(1);
         return;
     }
     
