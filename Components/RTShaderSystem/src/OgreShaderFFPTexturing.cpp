@@ -25,6 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderPrecompiledHeaders.h"
+#include "OgreStringConverter.h"
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 
 namespace Ogre {
@@ -41,7 +42,7 @@ const String SRS_TEXTURING = "FFP_Texturing";
 const String c_ParamTexelEx("texel_");
 
 //-----------------------------------------------------------------------
-FFPTexturing::FFPTexturing() : mUVMixingScale(0.0f), mIsPointSprite(false), mLateAddBlend(false)
+FFPTexturing::FFPTexturing() : mUVMixingParams(0.0f), mIsPointSprite(false), mLateAddBlend(false)
 {
 }
 
@@ -360,10 +361,10 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
 {
     auto stage = psMain->getStage(groupOrder);
 
-    if(mUVMixingScale > 0.0f && textureUnitParams->mTextureSamplerType == GCT_SAMPLER2D)
+    if(mUVMixingParams.x > 0.0f && textureUnitParams->mTextureSamplerType == GCT_SAMPLER2D)
     {
         stage.callFunction("TextureUVMix", {In(textureUnitParams->mTextureSampler),
-                                            In(textureUnitParams->mPSInputTexCoord), In(1/mUVMixingScale), Out(texel)});
+                                            In(textureUnitParams->mPSInputTexCoord), In(mUVMixingParams), Out(texel)});
         return;
     }
 
@@ -509,12 +510,17 @@ bool FFPTexturing::setParameter(const String& name, const String& value)
         return true;
     }
 
+    return false;
+}
+
+void FFPTexturing::setParameter(const String& name, const Any& value)
+{
     if(name == "uv_mixing")
     {
-        return StringConverter::parse(value, mUVMixingScale);
+        mUVMixingParams = any_cast<Vector4>(value);
+        mUVMixingParams[0] = 1.0f / mUVMixingParams[0];
+        return;
     }
-
-    return false;
 }
 
 //-----------------------------------------------------------------------
@@ -523,7 +529,7 @@ void FFPTexturing::copyFrom(const SubRenderState& rhs)
     const FFPTexturing& rhsTexture = static_cast<const FFPTexturing&>(rhs);
 
     mLateAddBlend = rhsTexture.mLateAddBlend;
-    mUVMixingScale = rhsTexture.mUVMixingScale;
+    mUVMixingParams = rhsTexture.mUVMixingParams;
     setTextureUnitCount(rhsTexture.getTextureUnitCount());
 
     for (unsigned int i=0; i < rhsTexture.getTextureUnitCount(); ++i)
@@ -674,18 +680,26 @@ SubRenderState* FFPTexturingFactory::createInstance(const ScriptProperty& prop, 
                 inst->setParameter(prop.values[0], "true");
 
             if (prop.values[0] == "uv_mixing")
-                inst->setParameter(prop.values[0], "4");
+                inst->setParameter(prop.values[0], Vector4(4, 0.5, 0, 0));
 
             return inst;
         }
 
-        if(prop.values.size() == 2)
+        if(prop.values.size() >= 2 && prop.values[0] == "uv_mixing")
         {
             auto inst = createOrRetrieveInstance(translator);
 
-            if(!inst->setParameter(prop.values[0], prop.values[1]))
-                translator->emitError(prop.values[0]);
+            Vector4 uvMixingParams(0, 0.5, 0, 0);
+            for(size_t i=1; i < prop.values.size() && i <=4; ++i)
+            {
+                if(!StringConverter::parse(prop.values[i], uvMixingParams[i-1]))
+                {
+                    translator->emitError(prop.values[0]);
+                    return inst;
+                }
+            }
 
+            inst->setParameter(prop.values[0], uvMixingParams);
             return inst;
         }
     }

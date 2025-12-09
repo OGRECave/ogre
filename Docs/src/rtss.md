@@ -80,10 +80,13 @@ Example: `lighting_stage ffp two_sided`
 @copybrief Ogre::RTShader::SRS_TEXTURING
 
 @par
-Format: `texturing_stage [uv_mixing] [uv_mix_scale]`
+Format: `texturing_stage uv_mixing [mix_scale] [mix_alpha] [c1] [c2]`
 
-@param uv_mixing mix texture with itself at a larger uv scale to reduce tiling artifacts.
-@param uv_mix_scale scale factor for the second uv set when using uv_mixing. Default is 4.0
+mix texture with itself at a larger uv scale to reduce tiling artifacts.
+
+@param mix_scale scale factor for the second uv set. Default is 4.0
+@param mix_alpha blend factor between first and second (1 - mix_alpha) uv sets. Default is 0.5
+@param c1, c2 custom parameters for future use (currently unused)
 
 <a name="image_based_lighting"></a>
 
