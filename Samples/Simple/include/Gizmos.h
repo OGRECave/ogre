@@ -52,58 +52,65 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
     {
         float nx = float(evt.x) / float(mWindow->getWidth());
         float ny = float(evt.y) / float(mWindow->getHeight());
-
-        // If we are dragging, DO NOT pick again — only continue the drag
         if (mGizmo->isDragging())
         {
-            Ogre::Ray ray = mCamera->getCameraToViewportRay(nx, ny);
+            Ray ray = mCamera->getCameraToViewportRay(nx, ny);
             mGizmo->computeDrag(ray, mCamera->getDerivedDirection());
-            return true;  // handled
+            return true;
         }
 
-        // Not dragging → hover highlighting
-        Ogre::Entity* hover = pickObject(nx, ny);
-        mGizmo->setHighlighted(hover);
+        if (mCameraMan->mouseMoved(evt)) return true;
 
-        // Allow camera to still move/orbit/etc.
-        mCameraMan->mouseMoved(evt);
+        Entity* hover = pickObject(nx, ny);
+        mGizmo->setHighlighted(hover);
 
         return true;
     }
-
-
 
     bool mousePressed(const MouseButtonEvent& evt) override
     {
-        if (evt.button != BUTTON_LEFT)
-            return false;
-
-        float nx = float(evt.x) / float(mWindow->getWidth());
-        float ny = float(evt.y) / float(mWindow->getHeight());
-
-        auto* picked = pickObject(nx, ny);
-
-        if (picked)
+        if (evt.button == BUTTON_LEFT)
         {
-            mGizmo->startDrag(picked, mCamera->getCameraToViewportRay(
-                evt.x / float(mWindow->getWidth()),
-                evt.y / float(mWindow->getHeight())));
+            float nx = evt.x / float(mWindow->getWidth());
+            float ny = evt.y / float(mWindow->getHeight());
+
+            Entity* picked = pickObject(nx, ny);
+
+            if (picked)
+            {
+                mGizmo->startDrag(
+                    picked,
+                    mCamera->getCameraToViewportRay(nx, ny),
+                    mCamera->getDerivedDirection()
+                );
+                return true;
+            }
+            if (mCameraMan->mousePressed(evt))
+            {
+                return true;
+            }
         }
-
-        return true;
+        return false;
     }
-
     bool mouseReleased(const MouseButtonEvent& evt) override
     {
-        if (evt.button != BUTTON_LEFT)
-            return false;
+        if (evt.button == BUTTON_LEFT)
+        {
+            if (mGizmo->isDragging())
+            {
+                mGizmo->stopDrag();
+                return true;
+            }
+        }
+        if (mCameraMan->mouseReleased(evt))
+        {
+            return true;
+        }
 
-        mGizmo->stopDrag();
-
-        return true;
+        return false;
     }
 
-    private:
+private:
 
     Entity* pickObject(float x, float y)
     {
@@ -149,7 +156,6 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
 
     // custom shader parameter bindings
     enum ShaderParam { SP_SHININESS = 1, SP_DIFFUSE, SP_SPECULAR };
-    Vector3 mInitialObjectPos;
     RaySceneQuery* mRayQuery;
     Gizmo* mGizmo;
     SceneNode* mLightPivot;

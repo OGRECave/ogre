@@ -42,6 +42,8 @@ public:
 
     void setMode(GizmoMode style);
 
+    void attachTo(Ogre::SceneNode* target);
+
     void setHighlighted(Ogre::Entity* highlighted);
 
     Ogre::SceneNode* getObject()
@@ -54,9 +56,9 @@ public:
         return mMode;
     }
 
-    void startDrag(Ogre::Entity* pickedGizmo, Ogre::Ray startRay);
+    void startDrag(Ogre::Entity* pickedGizmo, const Ogre::Ray& startRay, const Ogre::Vector3& cameraDir);
 
-    Ogre::Vector3 computeDrag(Ogre::Ray ray, Ogre::Vector3 cameraDirection);
+    void computeDrag(const Ogre::Ray& ray, const Ogre::Vector3& cameraDir);
 
     void stopDrag();
 
@@ -66,6 +68,9 @@ protected:
     static void createMesh(Ogre::SceneManager *manager, Ogre::String name);
 
     static void createPlaneMesh(Ogre::SceneManager *manager, Ogre::String name);
+
+    Ogre::Vector3 computePlaneHit(const Ogre::Ray& ray, const Ogre::Vector3& axis, const Ogre::Vector3& cameraDir,
+                                  const Ogre::Vector3& planePoint);
 
     bool mDragging = false;
     Ogre::Ray mDragStartRay;
@@ -81,6 +86,10 @@ protected:
     int mOldGizmoAxis{};
     std::unique_ptr<Ogre::ManualObject> mGizmoObj{};
     GizmoMode mMode;
+    Ogre::Quaternion mInitialObjectRot;
+    Ogre::Vector3 mInitialObjectScale;
+    Ogre::Vector3 mDragStartHitPos;
+    Ogre::Vector3 mDragAxis;
 };
 }
 #endif // OGRE_OGREGIZMOS_H

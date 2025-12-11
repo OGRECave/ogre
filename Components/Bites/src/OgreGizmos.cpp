@@ -5,6 +5,7 @@
 #include "OgreSubEntity.h"
 #include "OgreTechnique.h"
 #include <OgreEntity.h>
+#include <iostream>
 
 namespace OgreBites
 {
@@ -110,6 +111,19 @@ Gizmo::Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, Gizmo
     mDragging = false;
 }
 
+void Gizmo::attachTo(Ogre::SceneNode* target)
+{
+    if (mParentNode)
+        mParentNode->removeChild(mGizmoNode);
+
+    // Create intermediate node that follows target but does NOT inherit scale
+    mParentNode = target->createChildSceneNode();
+    mParentNode->setInheritScale(false);
+
+    mParentNode->addChild(mGizmoNode);
+}
+
+
 void Gizmo::setHighlighted(Ogre::Entity* entity)
 {
     if (!entity)
@@ -129,21 +143,21 @@ void Gizmo::setHighlighted(Ogre::Entity* entity)
     if (it == mEntityToAxis.end())
         return;
 
-    int axis = it->second;
+    int mDragAxis = it->second;
 
     // Nothing changed?
-    if (axis == mOldGizmoAxis)
+    if (mDragAxis == mOldGizmoAxis)
         return;
 
-    mOldGizmoAxis = axis;
+    mOldGizmoAxis = mDragAxis;
     mHighlighted = entity;
 
-    mGizmoEntities[0]->setMaterialName((axis & AXIS_X) ? "MAT_GIZMO_X_L" : "MAT_GIZMO_X");
-    mGizmoEntities[1]->setMaterialName((axis & AXIS_Y) ? "MAT_GIZMO_Y_L" : "MAT_GIZMO_Y");
-    mGizmoEntities[2]->setMaterialName((axis & AXIS_Z) ? "MAT_GIZMO_Z_L" : "MAT_GIZMO_Z");
-    mGizmoEntities[3]->setMaterialName((axis == AXIS_XY) ? "MAT_GIZMO_XY_L" : "MAT_GIZMO_XY");
-    mGizmoEntities[4]->setMaterialName((axis == AXIS_YZ) ? "MAT_GIZMO_YZ_L" : "MAT_GIZMO_YZ");
-    mGizmoEntities[5]->setMaterialName((axis == AXIS_XZ) ? "MAT_GIZMO_ZX_L" : "MAT_GIZMO_ZX");
+    mGizmoEntities[0]->setMaterialName((mDragAxis & AXIS_X) ? "MAT_GIZMO_X_L" : "MAT_GIZMO_X");
+    mGizmoEntities[1]->setMaterialName((mDragAxis & AXIS_Y) ? "MAT_GIZMO_Y_L" : "MAT_GIZMO_Y");
+    mGizmoEntities[2]->setMaterialName((mDragAxis & AXIS_Z) ? "MAT_GIZMO_Z_L" : "MAT_GIZMO_Z");
+    mGizmoEntities[3]->setMaterialName((mDragAxis == AXIS_XY) ? "MAT_GIZMO_XY_L" : "MAT_GIZMO_XY");
+    mGizmoEntities[4]->setMaterialName((mDragAxis == AXIS_YZ) ? "MAT_GIZMO_YZ_L" : "MAT_GIZMO_YZ");
+    mGizmoEntities[5]->setMaterialName((mDragAxis == AXIS_XZ) ? "MAT_GIZMO_ZX_L" : "MAT_GIZMO_ZX");
 }
 
 void Gizmo::setObject(Ogre::SceneNode* sceneObject) { mGizmoNode = sceneObject; }
@@ -214,56 +228,106 @@ void Gizmo::setMode(GizmoMode mode)
     }
 }
 
-void Gizmo::startDrag(Ogre::Entity* pickedGizmo, Ogre::Ray startRay)
+void Gizmo::startDrag(Ogre::Entity* gizmoPart, const Ogre::Ray& startRay, const Ogre::Vector3& cameraDir)
 {
-    mActiveGizmo = pickedGizmo;
+    mActiveGizmo = gizmoPart;
     mDragging = true;
 
-    // Store the position of the object the gizmo is attached to
-    if (mGizmoNode && mGizmoNode->getParentSceneNode())
-        mInitialObjectPos = mGizmoNode->getParentSceneNode()->getPosition();
+    // cache initial object transform
+    mInitialObjectPos  = mGizmoNode->getPosition();
+    mInitialObjectRot  = mGizmoNode->getOrientation();
+    mInitialObjectScale = mGizmoNode->getScale();
 
-    mDragStartRay = startRay;
-    mInitialObjectPos = mGizmoNode->getPosition();
+    if      (gizmoPart == mGizmoEntities[0]) mDragAxis = Ogre::Vector3::UNIT_X;
+    else if (gizmoPart == mGizmoEntities[1]) mDragAxis = Ogre::Vector3::UNIT_Y;
+    else if (gizmoPart == mGizmoEntities[2]) mDragAxis = Ogre::Vector3::UNIT_Z;
+    mDragAxis.normalise();
+
+    mDragStartHitPos   = computePlaneHit(startRay, mDragAxis, cameraDir, mInitialObjectPos);
 }
 
-Ogre::Vector3 Gizmo::computeDrag(Ogre::Ray ray, Ogre::Vector3 cameraDirection)
+void Gizmo::computeDrag(const Ogre::Ray& ray, const Ogre::Vector3& cameraDir)
 {
     if (!mActiveGizmo)
+        return;
+    
+    if (mMode == G_TRANSLATE)
     {
-        return mInitialObjectPos;
+        Ogre::Vector3 hit = computePlaneHit(ray, mDragAxis, cameraDir, mInitialObjectPos);
+        Ogre::Real amount = (hit - mInitialObjectPos).dotProduct(mDragAxis);
+
+        mGizmoNode->setPosition(mInitialObjectPos + mDragAxis * amount);
+        return;
     }
+    if (mMode == G_ROTATE)
+    {
+        // rotation uses a different plane: plane normal = mDragAxis
+        Ogre::Plane plane(mDragAxis, mInitialObjectPos);
+        auto r = ray.intersects(plane);
+        if (!r.first)
+            return;
 
-    // Determine axis
-    Ogre::Vector3 axis;
-    if (mActiveGizmo == mGizmoEntities[0])
-        axis = Ogre::Vector3::UNIT_X;
-    else if (mActiveGizmo == mGizmoEntities[1])
-        axis = Ogre::Vector3::UNIT_Y;
-    else if (mActiveGizmo == mGizmoEntities[2])
-        axis = Ogre::Vector3::UNIT_Z;
-    else
-        return mInitialObjectPos;
+        Ogre::Vector3 hit = ray.getPoint(r.second);
 
-    // Construct a plane perpendicular to the axis, passing through initial object position
-    Ogre::Plane plane(axis.crossProduct(cameraDirection), mInitialObjectPos);
+        Ogre::Vector3 v0 = (mDragStartHitPos - mInitialObjectPos).normalisedCopy();
+        Ogre::Vector3 v1 = (hit - mInitialObjectPos).normalisedCopy();
 
-    // Intersect ray with plane
-    std::pair<bool, Ogre::Real> intersection = ray.intersects(plane);
-    if (!intersection.first)
-        return mInitialObjectPos;
+        Ogre::Real dot = Ogre::Math::Clamp(v0.dotProduct(v1), -1.0f, 1.0f);
+        Ogre::Radian angle = Ogre::Math::ACos(dot);
 
-    Ogre::Vector3 hitPoint = ray.getPoint(intersection.second);
+        if (v0.crossProduct(v1).dotProduct(mDragAxis) < 0)
+            angle = -angle;
 
-    // Project delta onto axis
-    Ogre::Vector3 delta = hitPoint - mInitialObjectPos;
-    Ogre::Real amount = delta.dotProduct(axis);
+        // Apply rotation relative to initial orientation
+        mGizmoNode->setOrientation(mInitialObjectRot * Ogre::Quaternion(angle, mDragAxis));
+        return;
+    }
+    if (mMode == G_SCALE)
+    {
+        Ogre::Vector3 hit = computePlaneHit(ray, mDragAxis, cameraDir, mInitialObjectPos);
 
-    return mInitialObjectPos + axis * amount;
+        float startDist = (mDragStartHitPos - mInitialObjectPos).dotProduct(mDragAxis);
+        float currDist  = (hit               - mInitialObjectPos).dotProduct(mDragAxis);
+
+        float delta = currDist - startDist;
+
+        // Linear scaling factor
+        float scaleFactor = 1.0f + delta * 0.01f;
+
+        Ogre::Vector3 newScale = mInitialObjectScale;
+
+        if (mDragAxis == Ogre::Vector3::UNIT_X) newScale.x *= scaleFactor;
+        if (mDragAxis == Ogre::Vector3::UNIT_Y) newScale.y *= scaleFactor;
+        if (mDragAxis == Ogre::Vector3::UNIT_Z) newScale.z *= scaleFactor;
+        mGizmoNode->setScale(newScale);
+        return;
+    }
 }
+
+Ogre::Vector3 Gizmo::computePlaneHit(const Ogre::Ray& ray, const Ogre::Vector3& mDragAxis, const Ogre::Vector3& cameraDir, const Ogre::Vector3& planePoint)
+{
+    Ogre::Vector3 v = mDragAxis.crossProduct(cameraDir);
+
+    // handle degeneracy (camera looking along mDragAxis)
+    if (v.squaredLength() < 1e-6f)
+        v = mDragAxis.perpendicular();
+
+    Ogre::Vector3 planeNormal = v.crossProduct(mDragAxis).normalisedCopy();
+    Ogre::Plane plane(planeNormal, planePoint);
+
+    auto r = ray.intersects(plane);
+    if (!r.first)
+        return planePoint; // fallback
+
+    return ray.getPoint(r.second);
+}
+
+
 
 void Gizmo::stopDrag()
 {
+    std::cout << "Stop Drag" << std::endl;
+
     mDragging = false;
     mActiveGizmo = nullptr;
 }
