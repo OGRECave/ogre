@@ -1324,11 +1324,10 @@ namespace Ogre {
             allocating and releasing memory, which is convenient in complex
             scenes.
             @par
-                To include the returned SceneNode in the scene, use the addChild
-                method of the SceneNode which is to be it's parent.
+                To include the returned SceneNode in the scene, use the SceneNode::addChild
+                method of the node which is to be it's parent.
             @par
-                Note that this method takes no parameters, and the node created is unnamed (it is
-                actually given a generated name, which you can retrieve if you want).
+                Note that this method takes no parameters, and the node created is unnamed.
                 If you wish to create a node with a specific name, call the alternative method
                 which takes a name parameter.
         */
@@ -1340,8 +1339,8 @@ namespace Ogre {
         /** Destroys a SceneNode.
 
             This allows you to physically delete an individual SceneNode if you want to.
-            Note that this is not normally recommended, it's better to allow SceneManager
-            to delete the nodes when the scene is cleared.
+            @note it is not necessary to call this method when destroying a scene.
+            it's better to allow SceneManager to delete the nodes when the scene is cleared.
         */
         virtual void destroySceneNode(SceneNode* sn);
 
