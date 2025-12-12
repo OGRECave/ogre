@@ -198,11 +198,11 @@ void PBR_Lights(
                 in vec3 vNormal,
                 in vec3 viewPos,
                 in vec4 ambient,
-                in vec4 lightPos[LIGHT_COUNT],
-                in vec4 lightColor[LIGHT_COUNT],
-                in vec4 pointParams[LIGHT_COUNT],
-                in vec4 vLightDirView[LIGHT_COUNT],
-                in vec4 spotParams[LIGHT_COUNT],
+                in f32vec4 lightPos[LIGHT_COUNT],
+                in f32vec4 lightColor[LIGHT_COUNT],
+                in f32vec4 pointParams[LIGHT_COUNT],
+                in f32vec4 vLightDirView[LIGHT_COUNT],
+                in f32vec4 spotParams[LIGHT_COUNT],
                 in PixelParams pixel,
                 inout vec3 vOutColour)
 {
