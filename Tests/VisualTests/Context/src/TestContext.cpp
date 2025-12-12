@@ -45,7 +45,7 @@ THE SOFTWARE.
 #include "VTestPlugin.h"
 #include "PlayPenTestPlugin.h"
 
-TestContext::TestContext(int argc, char** argv) : OgreBites::SampleContext(), mSuccess(true), mTimestep(0.01f), mBatch(0)
+TestContext::TestContext(int argc, char** argv) : OgreBites::SampleContext("OgreVTests"), mSuccess(true), mTimestep(0.01f), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
