@@ -28,8 +28,17 @@ THE SOFTWARE.
 
 #include <gtest/gtest.h>
 
+#include "OgreConfigFile.h"
+#include "OgreDefaultHardwareBufferManager.h"
+#include "OgreMaterialManager.h"
+#include "OgreMeshManager.h"
+#include "OgreTextureManager.h"
 #include "ResourceLocationPriorityTest.h"
 #include "RootWithoutRenderSystemFixture.h"
+#include "OgreMesh.h"
+#include "OgreSkeleton.h"
+#include "OgreSubMesh.h"
+#include "OgreTechnique.h"
 
 #include "OgreArchiveManager.h"
 
@@ -56,4 +65,37 @@ TEST(ResourceGroupLocationTest, ResourceLocationPriority)
 
     resGrpMgr.removeResourceLocation("ResourceLocationPriority0");
     resGrpMgr.removeResourceLocation("ResourceLocationPriority1");
+}
+
+TEST(ResourceGroupLocationTest, NonUniqueResourceNames)
+{
+    using namespace Ogre;
+    DefaultHardwareBufferManager defaultHwBufMgr;
+    Root root("");
+    DefaultTextureManager defaultTexMgr;
+
+    ConfigFile cf;
+    cf.load(FileSystemLayer(OGRE_VERSION_NAME).getConfigFilePath("resources.cfg"));
+    auto testPath = cf.getSettings("Tests").begin()->second;
+
+    auto& rgm = ResourceGroupManager::getSingleton();
+    auto group = "Model1";
+    rgm.createResourceGroup(group, false);
+    rgm.addResourceLocation(testPath + "/" + group, "FileSystem", group);
+
+    group = "Model2";
+    rgm.createResourceGroup(group, false);
+    rgm.addResourceLocation(testPath + "/" + group, "FileSystem", group);
+    rgm.initialiseAllResourceGroups();
+
+    auto model1 = MeshManager::getSingleton().load("UniqueModel.MESH", "Model1");
+    auto model2 = MeshManager::getSingleton().load("UniqueModel.MESH", "Model2");
+
+    EXPECT_NEAR(model1->getBoundingSphereRadius(), 10, 0.1f);
+    EXPECT_EQ(model1->getSkeleton()->getNumBones(), 4);
+    EXPECT_FLOAT_EQ(model1->getSubMesh(0)->getMaterial()->getTechnique(0)->getPass(0)->getShininess(), 10);
+
+    EXPECT_NEAR(model2->getBoundingSphereRadius(), 40.1, 0.1f);
+    EXPECT_EQ(model2->getSkeleton()->getNumBones(), 7);
+    EXPECT_FLOAT_EQ(model2->getSubMesh(0)->getMaterial()->getTechnique(0)->getPass(0)->getShininess(), 20);
 }
