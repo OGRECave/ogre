@@ -372,18 +372,6 @@ namespace Ogre
         return c;
     }
 
-    // Destroy a Scene Node by name.
-    void PCZSceneManager::destroySceneNode( const String &name )
-    {
-        SceneNode * on = ( getSceneNode( name ) );
-
-        if ( on != 0 )
-        {
-            // destroy the node
-            destroySceneNode( on );
-        }
-    }
-
     // Destroy a scene node
     void PCZSceneManager::destroySceneNode(SceneNode* sn)
     {

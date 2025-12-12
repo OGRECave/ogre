@@ -112,9 +112,6 @@ namespace Ogre
         /** Creates a specialized PCZCamera */
         Camera * createCamera( const String &name ) override;
 
-        /** Deletes a scene node by name & corresponding PCZSceneNode */
-        void destroySceneNode( const String &name ) override;
-
         /** Deletes a scene node & corresponding PCZSceneNode */
         void destroySceneNode(SceneNode* sn) override;
 

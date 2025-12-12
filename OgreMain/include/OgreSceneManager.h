@@ -1346,7 +1346,7 @@ namespace Ogre {
         virtual void destroySceneNode(SceneNode* sn);
 
         /// @overload
-        virtual void destroySceneNode(const String& name);
+        void destroySceneNode(const String& name);
 
         /** Gets the SceneNode at the root of the scene hierarchy.
 
