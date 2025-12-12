@@ -144,13 +144,14 @@ Example: `lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 Sa
 By default, roughness is read from `specular[0]` and metalness from `specular[1]`.
 
 @par
-Format: `lighting_stage metal_roughness [texture <texturename> [sampler]]`
+Format: `lighting_stage metal_roughness [texture <texturename> [sampler] [tex_coord_set]]`
 @par
 Example: `lighting_stage metal_roughness texture Default_metalRoughness.jpg`
 
 @param texturename texture for spatially varying parametrization.
 [In accordance to the glTF2.0 specification](https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#_material_pbrmetallicroughness_metallicroughnesstexture), roughness is sampled from the G channel and metalness from the B channel.
 @param sampler the [Sampler](@ref Samplers) to use for the metal-roughness map
+@param tex_coord_set the texcoord attribute index to read the uv coordinates from
 
 @note Using this option switches the lighting equations from Blinn-Phong to the Cook-Torrance PBR model [using the equations described by Filament](https://google.github.io/filament/Filament.html#materialsystem/standardmodelsummary).
 

@@ -53,6 +53,7 @@ private:
     String mMetalRoughnessMapName;
     SamplerPtr mSampler;
     int mLightCount;
+    uint32 mTexCoordSet;
     uint8 mMRMapSamplerIndex;
     int8 mLtcLUT1SamplerIndex;
 };

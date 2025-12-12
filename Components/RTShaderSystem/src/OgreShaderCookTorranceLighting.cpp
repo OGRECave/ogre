@@ -16,7 +16,10 @@ namespace RTShader
 const String SRS_COOK_TORRANCE_LIGHTING = "CookTorranceLighting";
 
 //-----------------------------------------------------------------------
-CookTorranceLighting::CookTorranceLighting() : mLightCount(0), mMRMapSamplerIndex(0), mLtcLUT1SamplerIndex(-1) {}
+CookTorranceLighting::CookTorranceLighting()
+    : mLightCount(0), mTexCoordSet(0), mMRMapSamplerIndex(0), mLtcLUT1SamplerIndex(-1)
+{
+}
 
 //-----------------------------------------------------------------------
 const String& CookTorranceLighting::getType() const { return SRS_COOK_TORRANCE_LIGHTING; }
@@ -36,12 +39,13 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     psProgram->addPreprocessorDefines(StringUtil::format("LIGHT_COUNT=%d", mLightCount));
 
     // Resolve texture coordinates.
-    auto vsOutTexcoord = vsMain->getOutputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2); // allow override by others
+    auto uvSet = Parameter::SPC_TEXTURE_COORDINATE0 + mTexCoordSet;
+    auto vsOutTexcoord = vsMain->getOutputParameter(uvSet, GCT_FLOAT2); // allow override by others
     ParameterPtr vsInTexcoord;
     if(!vsOutTexcoord)
     {
-        vsInTexcoord = vsMain->resolveInputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
-        vsOutTexcoord = vsMain->resolveOutputParameter(Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
+        vsInTexcoord = vsMain->resolveInputParameter(uvSet, GCT_FLOAT2);
+        vsOutTexcoord = vsMain->resolveOutputParameter(uvSet, GCT_FLOAT2);
     }
     auto psInTexcoord = psMain->resolveInputParameter(vsOutTexcoord);
 
@@ -159,6 +163,7 @@ void CookTorranceLighting::copyFrom(const SubRenderState& rhs)
     mMetalRoughnessMapName = rhsLighting.mMetalRoughnessMapName;
     mSampler = rhsLighting.mSampler;
     mLightCount = rhsLighting.mLightCount;
+    mTexCoordSet = rhsLighting.mTexCoordSet;
 }
 
 //-----------------------------------------------------------------------
@@ -190,6 +195,10 @@ bool CookTorranceLighting::setParameter(const String& name, const String& value)
     {
         mMetalRoughnessMapName = value;
         return true;
+    }
+    else if (name == "tex_coord_set")
+    {
+        return StringConverter::parse(value, mTexCoordSet);
     }
 
     return false;
@@ -244,6 +253,12 @@ SubRenderState* CookTorranceLightingFactory::createInstance(const ScriptProperty
         {
             translator->emitError();
         }
+
+        if(prop.values.size() < 5)
+            return subRenderState;
+
+        if(!subRenderState->setParameter("tex_coord_set", prop.values[4]))
+            translator->emitError();
 
         return subRenderState;
     }
