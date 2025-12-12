@@ -162,9 +162,9 @@ void evaluateLight(
 	vOutDiffuse = saturate(vOutDiffuse);
 
 #ifdef USE_SPECULAR
-	vec3 vView       = -normalize(vViewPos);
-	vec3 vHalfWay    = normalize(vView + vLightView);
-	float nDotH        = saturate(dot(vNormalView, vHalfWay));
+	f32vec3 vView       = -normalize(vViewPos);
+	f32vec3 vHalfWay    = normalize(vView + vLightView);
+	float32_t nDotH  = saturate(dot(vNormalView, vHalfWay));
 #ifdef TVC_SPECULAR
 	vSpecularColour *= vInVertexColour;
 #endif
