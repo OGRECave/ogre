@@ -212,6 +212,18 @@ GLES2FrameBufferObject::GLES2FrameBufferObject()
             mMultisampleFB = 0;
         }
 
+        if(mColour[1].buffer && mMultisampleFB)
+        {
+            // no MSAA for MRT in GLES2 yet
+            mColour[0].numSamples = 0;
+            mNumSamples = 0;
+            mMultisampleFB = 0;
+            mContext = 0;
+
+            if(mMultisampleFB)
+                rs->_destroyFbo(mContext, mMultisampleFB);
+        }
+
         if(!mContext && recreateIfNeeded) // create FBO lazy or recreate after destruction
         {
             mContext = currentContext;
