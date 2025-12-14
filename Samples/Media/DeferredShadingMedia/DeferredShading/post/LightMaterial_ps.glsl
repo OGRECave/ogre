@@ -33,6 +33,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 
+#include "OgreUnifiedShader.h"
+
 void checkShadow(
     sampler2D shadowMap,
     vec3 viewPos,
@@ -112,7 +114,7 @@ void main()
     vec4 normProjPos = oPos / oPos.w;
     // -1 is because generally +Y is down for textures but up for the screen
     vec2 oUv0 = vec2(normProjPos.x, normProjPos.y * -1.0 * flip) * 0.5 + 0.5;
-    vec3 oRay = vec3(normProjPos.x, normProjPos.y * flip, 1.0) * farCorner;
+    f32vec3 oRay = vec3(normProjPos.x, normProjPos.y * flip, 1.0) * farCorner;
 #endif
     
     vec4 a0 = texture(Tex0, oUv0); // Attribute 0: Diffuse color+shininess
