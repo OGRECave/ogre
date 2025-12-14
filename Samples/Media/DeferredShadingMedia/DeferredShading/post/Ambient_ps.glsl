@@ -25,8 +25,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 
+#include "OgreUnifiedShader.h"
+
 in vec2 oUv0;
-in vec3 oRay;
+in f32vec3 oRay;
 
 out vec4 oColour;
 
