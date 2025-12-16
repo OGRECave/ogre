@@ -365,10 +365,6 @@ namespace {
             // cluster by submesh
             for(auto& it : mGrouped)
             {
-                // FIXME: pass is already deleted, but still present in map..
-                if(it.second.empty())
-                    continue;
-
                 auto instanced = it.first->hasVertexProgram() && it.first->getVertexProgram()->isInstancingIncluded();
                 if (!instanced)
                     continue;
