@@ -30,8 +30,6 @@ OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 in vec2 oUv0;
 in f32vec3 oRay;
 
-out vec4 oColour;
-
 uniform sampler2D Tex0;
 uniform sampler2D Tex1;
 uniform mat4 proj;
@@ -54,7 +52,7 @@ void main()
         discard;
 
 	// Calculate ambient colour of fragment
-	oColour = vec4(ambientColor * vec4(a0.rgb,0));
+	gl_FragColor = vec4(ambientColor * vec4(a0.rgb,0));
 
 	// Calculate depth of fragment;
 	vec3 viewPos = normalize(oRay) * farClipDistance * a1.w;
