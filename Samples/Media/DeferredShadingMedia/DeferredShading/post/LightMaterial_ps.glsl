@@ -105,8 +105,6 @@ uniform vec4 lightSpecularColor;
 uniform vec4 lightFalloff;
 uniform vec3 lightPos;
 
-out vec4 fragColour;
-
 void main()
 {
     // None directional lights have some calculations to do in the beginning of the pixel shader
@@ -174,5 +172,5 @@ void main()
     total_light_contrib *= (1.0-spotFalloff);
 #endif
 
-    fragColour = vec4(total_light_contrib*colour, 0.0);
+    gl_FragColor = vec4(total_light_contrib*colour, 0.0);
 }
