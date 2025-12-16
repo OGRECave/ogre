@@ -306,7 +306,7 @@ def camera_intrinsics(window_name: str, K, imsize):
     fovy = math.atan2(K[1][2], K[1][1]) + math.atan2(imsize[1] - K[1][2], K[1][1])
     cam.setFOVy(fovy)
 
-def mesh_show(window_name: str, mesh_path: str | os.PathLike, rot_mat = None, position = (0, 0, 0), material_name: str | None = None):
+def mesh_show(window_name: str, mesh_path: str | os.PathLike, rot_mat = None, position = (0, 0, 0), material_name: str | None = None, entity_name: str | None = None):
     """!
     show a mesh in the window
     @param window_name: name of the window
@@ -314,16 +314,21 @@ def mesh_show(window_name: str, mesh_path: str | os.PathLike, rot_mat = None, po
     @param rot_mat: 3x3 rotation matrix
     @param position: 3x1 translation vector
     @param material_name: optional material name to use instead of the default
+    @param entity_name: optional entity name to allow multiple instances of the same mesh
     """
     assert _ctx is not None, "call window_create first"
     assert window_name in _ctx.windows, f"no window named: {window_name}"
 
     mesh_path = str(mesh_path)
     scn_mgr = _ctx.windows[window_name].scn_mgr
-    if scn_mgr.hasEntity(mesh_path):
-        ent = scn_mgr.getEntity(mesh_path)
+
+    if entity_name is None:
+        entity_name = mesh_path
+
+    if scn_mgr.hasEntity(entity_name):
+        ent = scn_mgr.getEntity(entity_name)
     else:
-        ent = scn_mgr.createEntity(mesh_path, mesh_path, Ogre.RGN_DEFAULT)
+        ent = scn_mgr.createEntity(entity_name, mesh_path, Ogre.RGN_DEFAULT)
         scn_mgr.getRootSceneNode().createChildSceneNode().attachObject(ent)
 
     if material_name:
