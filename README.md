@@ -22,7 +22,7 @@ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "loongarch|LoongArch|LOONGARCH")
   if (OGRE_LOONGARCH_HAS_LSX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mlsx")
   endif ()
-  # Note: LASX is not enabled as it's only supported on newer
+  # Note: LASX is not enabled as it's not supported on Loongson-3B6000M
   # Loongson-3B6000M only supports LSX, not LASX
 ```
 
@@ -31,7 +31,7 @@ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "loongarch|LoongArch|LOONGARCH")
 1. **Architecture Detection**: Automatically detects LoongArch64 processors
 2. **Base Architecture**: Enables `-march=loongarch64` for optimal instruction set usage
 3. **LSX SIMD**: Enables `-mlsx` to utilize Loongson SIMD extensions for improved vector operations
-4. **Compatibility**: Specifically designed for Loongson 3B6000M series (supports LSX but not LASX)
+4. **Compatibility**: Specifically designed for Loongarch series (supports LSX but not LASX)
 
 ## Benefits
 
