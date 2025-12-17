@@ -15,6 +15,19 @@ precision lowp sampler3D;
 #endif
 #endif
 
+// GL_EXT_shader_explicit_arithmetic_types polyfill
+#if defined(VULKAN) || defined(OGRE_GLSLES) && (!defined(OGRE_FRAGMENT_SHADER) || __VERSION__ > 100)
+#define float32_t highp float
+#define f32vec2 highp vec2
+#define f32vec3 highp vec3
+#define f32vec4 highp vec4
+#else
+#define float32_t float
+#define f32vec2 vec2
+#define f32vec3 vec3
+#define f32vec4 vec4
+#endif
+
 #if __VERSION__ == 100
 mat2 transpose(mat2 m)
 {

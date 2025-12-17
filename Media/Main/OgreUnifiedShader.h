@@ -39,6 +39,11 @@
 #define mat4 float4x4
 #endif
 
+#define float32_t float
+#define f32vec2 float2
+#define f32vec3 float3
+#define f32vec4 float4
+
 #define ivec2 int2
 #define ivec3 int3
 #define ivec4 int4
@@ -109,11 +114,17 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define IN(decl, sem) in decl : sem,
 #define OUT(decl, sem) out decl : sem,
 #elif defined(OGRE_METAL)
+
 #define vec2 float2
 #define vec3 float3
 #define vec4 float4
 #define mat3 metal::float3x3
 #define mat4 metal::float4x4
+
+#define float32_t float
+#define f32vec2 float2
+#define f32vec3 float3
+#define f32vec4 float4
 
 #define IN(decl, sem) decl [[ attribute(sem) ]];
 #else
@@ -188,21 +199,3 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #endif
 
 #define OGRE_UNIFORMS(params) OGRE_UNIFORMS_BEGIN params OGRE_UNIFORMS_END
-
-// GL_EXT_shader_explicit_arithmetic_types polyfill
-#if defined(VULKAN) || defined(OGRE_GLSLES) && (!defined(OGRE_FRAGMENT_SHADER) || __VERSION__ > 100)
-#define float32_t highp float
-#define f32vec2 highp vec2
-#define f32vec3 highp vec3
-#define f32vec4 highp vec4
-#elif OGRE_HLSL >= 4
-#define float32_t float
-#define f32vec2 float2
-#define f32vec3 float3
-#define f32vec4 float4
-#else
-#define float32_t float
-#define f32vec2 vec2
-#define f32vec3 vec3
-#define f32vec4 vec4
-#endif
