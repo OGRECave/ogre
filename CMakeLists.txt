@@ -125,6 +125,21 @@ if (NOT ANDROID AND NOT EMSCRIPTEN AND UNIX OR MINGW)
     if (OGRE_GCC_HAS_SSE)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
     endif ()
+  elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "loongarch|LoongArch|LOONGARCH")
+    # LoongArch specific optimizations
+    include(CheckCXXCompilerFlag)
+    # Check for LoongArch SIMD extensions (LSX/ LASX)
+    check_cxx_compiler_flag(-march=loongarch64 OGRE_LOONGARCH_HAS_ARCH)
+    if (OGRE_LOONGARCH_HAS_ARCH)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=loongarch64")
+    endif ()
+    # Check for LoongArch SIMD (LSX) - supported on 3B6000 series
+    check_cxx_compiler_flag(-mlsx OGRE_LOONGARCH_HAS_LSX)
+    if (OGRE_LOONGARCH_HAS_LSX)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mlsx")
+    endif ()
+    # Note: LASX is not enabled as it's only supported on newer
+    # Loongson-3B6000M only supports LSX, not LASX
   endif()
 endif()
 
