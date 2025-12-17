@@ -23,6 +23,8 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
 
     void setupContent() override
     {
+        mSceneMgr->showBoundingBoxes(true);
+
         mRayQuery = mSceneMgr->createRayQuery(Ray());
         mRayQuery->setSortByDistance(true);
         mViewport->setBackgroundColour(ColourValue::White);
@@ -39,8 +41,11 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         mLightPivot->createChildSceneNode(Vector3(20, 40, 50))->attachObject(light);
 
         // create our model, give it the shader material, and place it at the origin
-        SceneNode* gizmoParent = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        mGizmo = new Gizmo(getSceneManager(), gizmoParent, G_ROTATE);
+        // Entity *ent = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+        // ent->setMaterialName("Examples/CelShading");
+        auto node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        // node->attachObject(ent);
+        mGizmo = new Gizmo(mSceneMgr, node, G_TRANSLATE);
 
         // create a checkbox to toggle light movement
         mTranslate = mTrayMgr->createButton(TL_TOPLEFT, "Translate", "Translate");
@@ -60,10 +65,7 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         }
 
         if (mCameraMan->mouseMoved(evt)) return true;
-
-        Entity* hover = pickObject(nx, ny);
-        mGizmo->setHighlighted(hover);
-
+        Entity* hover = pickEntity(nx, ny);
         return true;
     }
 
@@ -74,9 +76,9 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
             float nx = evt.x / float(mWindow->getWidth());
             float ny = evt.y / float(mWindow->getHeight());
 
-            Entity* picked = pickObject(nx, ny);
+            Entity* picked = pickEntity(nx, ny);
 
-            if (picked)
+            if (mGizmo->isGizmoEntity(picked))
             {
                 mGizmo->startDrag(
                     picked,
@@ -106,19 +108,15 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         {
             return true;
         }
-
         return false;
     }
 
 private:
 
-    Entity* pickObject(float x, float y)
+    Entity* pickEntity(float x, float y)
     {
         Ray ray = mCamera->getCameraToViewportRay(x, y);
-
         mRayQuery->setRay(ray);
-
-        Entity* pickedEntity = nullptr;
 
         auto& hits = mRayQuery->execute();
         for (auto& h : hits)
@@ -128,13 +126,18 @@ private:
             auto* ent = dynamic_cast<Entity*>(h.movable);
             if (!ent) continue;
 
-            pickedEntity = ent;
-            mGizmo->setHighlighted(ent);
-            break;
+            // Is this one of the gizmo entities?
+            if (mGizmo->isGizmoEntity(ent))
+            {
+                mGizmo->pickAxis(ray);
+                return ent;
+            } else
+            {
+                mGizmo->pickAxis();
+            }
+            return ent;
         }
-        if (!pickedEntity)
-            mGizmo->setHighlighted(nullptr);
-        return pickedEntity;
+        return nullptr;
     }
 
     void buttonHit( Button* button ) override

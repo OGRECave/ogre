@@ -38,23 +38,19 @@ class _OgreBitesExport Gizmo
 {
 public:
     Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, GizmoMode mode);
-    void setObject(Ogre::SceneNode* sceneObject);
 
     void setMode(GizmoMode style);
 
+    bool isGizmoEntity(Ogre::Entity* ent) const;
+
     void attachTo(Ogre::SceneNode* target);
-
-    void setHighlighted(Ogre::Entity* highlighted);
-
-    Ogre::SceneNode* getObject()
-    {
-        return mGizmoNode->getParentSceneNode();
-    }
 
     GizmoMode getMode()
     {
         return mMode;
     }
+
+    void pickAxis(const Ogre::Ray& ray) const;
 
     void startDrag(Ogre::Entity* pickedGizmo, const Ogre::Ray& startRay, const Ogre::Vector3& cameraDir);
 
@@ -69,27 +65,37 @@ protected:
 
     static void createPlaneMesh(Ogre::SceneManager *manager, Ogre::String name);
 
+    void scaleToParent();
+
+    void highlightAxis(AXIS axis);
+
     Ogre::Vector3 computePlaneHit(const Ogre::Ray& ray, const Ogre::Vector3& axis, const Ogre::Vector3& cameraDir,
                                   const Ogre::Vector3& planePoint);
 
-    bool mDragging = false;
-    Ogre::Ray mDragStartRay;
-    Ogre::Entity* mActiveGizmo = nullptr;
-    Ogre::Vector3 mInitialObjectPos;
+    GizmoMode mMode;
+    std::unique_ptr<Ogre::ManualObject> mGizmoObj{};
+
+    // Gizmo nodes
     Ogre::SceneNode* mGizmoNode{};
+    Ogre::SceneNode* mParentNode{};
     Ogre::SceneNode* mGizmoX{};
     Ogre::SceneNode* mGizmoY{};
     Ogre::SceneNode* mGizmoZ{};
     Ogre::Entity* mGizmoEntities[6]{};
-    std::unordered_map<Ogre::Entity*, int> mEntityToAxis;
-    Ogre::Entity* mHighlighted = nullptr;
-    int mOldGizmoAxis{};
-    std::unique_ptr<Ogre::ManualObject> mGizmoObj{};
-    GizmoMode mMode;
+
+    // Drag state
+    bool mDragging = false;
+    Ogre::Ray mDragStartRay;
+    AXIS mActiveAxis = AXIS_NONE;
+    Ogre::Vector3 mInitialObjectPos;
     Ogre::Quaternion mInitialObjectRot;
     Ogre::Vector3 mInitialObjectScale;
     Ogre::Vector3 mDragStartHitPos;
     Ogre::Vector3 mDragAxis;
+
+    // Picking
+    std::unordered_map<Ogre::Entity*, int> mEntityToAxis;
+    int mOldGizmoAxis{};
 };
 }
 #endif // OGRE_OGREGIZMOS_H
