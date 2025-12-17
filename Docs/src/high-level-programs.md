@@ -905,6 +905,7 @@ In general, you have to do the following changes compared to regular GLSL:
 - Use `mtxFromRows` / `mtxFromCols` to construct matrices from vectors
 - Use the HLSL style `mul` instead of `*` to multiply matrices
 - Use `vec2_splat(1.0)` instead of the `vec2(1.0)` single component constructor.
+- Use `f32vecN` instead of `highp vecN` types to denote full precision floats in the fragment shader.
 
 Let's take a look at how to use the `OgreUnifiedShader.h` macros by starting with a simple GLSL shader:
 
