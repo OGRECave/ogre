@@ -40,14 +40,3 @@ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "loongarch|LoongArch|LOONGARCH")
 - Enhanced texture processing capabilities
 - Optimized geometry calculations
 
-## Building
-
-To build with these optimizations, simply use the standard OGRE build process:
-
-```bash
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j$(nproc)
-```
-
-The optimizations will be automatically detected and applied on LoongArch64 systems.
