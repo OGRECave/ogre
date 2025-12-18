@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 #include "OgreGLHardwarePixelBuffer.h"
-#include "OgreGLFBOMultiRenderTarget.h"
 
 namespace Ogre {
 

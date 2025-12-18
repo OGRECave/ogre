@@ -49,7 +49,7 @@ THE SOFTWARE.
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLES2PixelFormat.h"
-#include "OgreGLES2FBOMultiRenderTarget.h"
+#include "OgreGLMultiRenderTarget.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "OgreEAGLES2Context.h"
@@ -649,8 +649,7 @@ namespace Ogre {
 
     MultiRenderTarget* GLES2RenderSystem::createMultiRenderTarget(const String & name)
     {
-        MultiRenderTarget* retval =
-            new GLES2FBOMultiRenderTarget(name);
+        MultiRenderTarget* retval = new GLMultiRenderTarget(name, new GLES2FrameBufferObject());
         attachRenderTarget(*retval);
         return retval;
     }
