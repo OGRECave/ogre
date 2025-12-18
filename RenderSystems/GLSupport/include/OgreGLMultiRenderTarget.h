@@ -26,26 +26,24 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLES2MULTIRENDERTARGET_H__
-#define __GLES2MULTIRENDERTARGET_H__
+#ifndef __GLMULTIRENDERTARGET_H__
+#define __GLMULTIRENDERTARGET_H__
 
-#include "OgreGLES2FrameBufferObject.h"
+#include "OgreGLRenderTexture.h"
+#include <memory>
 
 namespace Ogre {
-    
-    class GLES2FBOManager;
-
-    /** MultiRenderTarget for GL ES 2.x.
+    /** MultiRenderTarget for GL. Requires the FBO extension.
     */
-    class _OgreGLES2Export GLES2FBOMultiRenderTarget : public MultiRenderTarget, public GLRenderTarget
+    class _OgreGLExport GLMultiRenderTarget : public MultiRenderTarget, public GLRenderTarget
     {
     public:
-        GLES2FBOMultiRenderTarget(const String &name);
-        ~GLES2FBOMultiRenderTarget();
+        GLMultiRenderTarget(const String &name, GLFrameBufferObjectCommon* fbo);
+        ~GLMultiRenderTarget();
 
         void getCustomAttribute( const String& name, void *pData ) override;
-        GLContext* getContext() const override { return fbo.getContext(); }
-        GLFrameBufferObjectCommon* getFBO() override { return &fbo; }
+        GLContext* getContext() const override { return fbo->getContext(); }
+        GLFrameBufferObjectCommon* getFBO() override { return fbo.get(); }
 
         bool requiresTextureFlipping() const override { return true; }
 
@@ -53,13 +51,13 @@ namespace Ogre {
         bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
         void _detachDepthBuffer() override;
 
-        void swapBuffers() override { fbo.swapBuffers(); }
+        void swapBuffers() override { fbo->swapBuffers(); }
     private:
         void bindSurfaceImpl(size_t attachment, RenderTexture *target) override;
         void unbindSurfaceImpl(size_t attachment) override;
-        GLES2FrameBufferObject fbo;
+        std::unique_ptr<GLFrameBufferObjectCommon> fbo;
     };
 
 }
 
-#endif // __GLES2MULTIRENDERTARGET_H__
+#endif // __GLMULTIRENDERTARGET_H__

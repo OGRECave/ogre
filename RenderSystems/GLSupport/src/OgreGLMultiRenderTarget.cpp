@@ -26,67 +26,68 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLES2FBOMultiRenderTarget.h"
-#include "OgreLogManager.h"
+#include "OgreGLMultiRenderTarget.h"
 
 namespace Ogre {
 
-    GLES2FBOMultiRenderTarget::GLES2FBOMultiRenderTarget(const String &name):
-        MultiRenderTarget(name)
-    {
-    }
-    GLES2FBOMultiRenderTarget::~GLES2FBOMultiRenderTarget()
+    GLMultiRenderTarget::GLMultiRenderTarget(const String &name, GLFrameBufferObjectCommon* fbo_):
+        MultiRenderTarget(name),
+        fbo(fbo_)
     {
     }
 
-    void GLES2FBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
+    GLMultiRenderTarget::~GLMultiRenderTarget()
+    {
+    }
+
+    void GLMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
     {
         /// Check if the render target is in the rendertarget->FBO map
-        auto *fbobj = dynamic_cast<GLRenderTarget*>(target)->getFBO();
+        auto fbobj = dynamic_cast<GLRenderTarget*>(target)->getFBO();
         assert(fbobj);
-        fbo.setRenderTargetPool(mDepthBufferPoolId);
-        fbo.bindSurface(attachment, fbobj->getSurface(0));
+        fbo->setRenderTargetPool(mDepthBufferPoolId);
+        fbo->bindSurface(attachment, fbobj->getSurface(0));
 
         // Set width and height
-        mWidth = fbo.getWidth();
-        mHeight = fbo.getHeight();
-        mFSAA = fbo.getFSAA();
+        mWidth = fbo->getWidth();
+        mHeight = fbo->getHeight();
+        mFSAA = fbo->getFSAA();
     }
 
-    void GLES2FBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
+    void GLMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
     {
-        fbo.unbindSurface(attachment);
+        fbo->unbindSurface(attachment);
 
         // Set width and height
-        mWidth = fbo.getWidth();
-        mHeight = fbo.getHeight();
-        mFSAA = fbo.getFSAA();
+        mWidth = fbo->getWidth();
+        mHeight = fbo->getHeight();
+        mFSAA = fbo->getFSAA();
     }
 
-    void GLES2FBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
+    void GLMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
     {
-        if(name == GLRenderTexture::CustomAttributeString_FBO)
+        if( name == GLRenderTexture::CustomAttributeString_FBO )
         {
-            *static_cast<GLES2FrameBufferObject **>(pData) = &fbo;
+            *static_cast<GLFrameBufferObjectCommon **>(pData) = fbo.get();
         }
         else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
         {
-            *static_cast<GLContext**>(pData) = fbo.getContext();
+            *static_cast<GLContext**>(pData) = fbo->getContext();
         }
     }
     //-----------------------------------------------------------------------------
-    bool GLES2FBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
+    bool GLMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
         bool result;
         if( (result = MultiRenderTarget::attachDepthBuffer( depthBuffer )) )
-            fbo.attachDepthBuffer( depthBuffer );
+            fbo->attachDepthBuffer( depthBuffer );
 
         return result;
     }
     //-----------------------------------------------------------------------------
-    void GLES2FBOMultiRenderTarget::_detachDepthBuffer()
+    void GLMultiRenderTarget::_detachDepthBuffer()
     {
-        fbo.detachDepthBuffer();
+        fbo->detachDepthBuffer();
         MultiRenderTarget::_detachDepthBuffer();
     }
 }

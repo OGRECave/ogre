@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 
 #include "OgreGLRenderSystem.h"
+#include "OgreGLFrameBufferObject.h"
 #include "OgreGLNativeSupport.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -57,7 +58,7 @@ THE SOFTWARE.
 #include "OgreGLPixelFormat.h"
 
 #include "OgreGLSLProgramCommon.h"
-#include "OgreGLFBOMultiRenderTarget.h"
+#include "OgreGLMultiRenderTarget.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 extern "C" void glFlushRenderAPPLE();
@@ -1095,7 +1096,7 @@ namespace Ogre {
         if (!fboMgr)
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "MultiRenderTarget is not supported");
 
-        MultiRenderTarget *retval = new GLFBOMultiRenderTarget(name);
+        MultiRenderTarget *retval = new GLMultiRenderTarget(name, new GLFrameBufferObject(0 /* no fsaa */));
         attachRenderTarget( *retval );
         return retval;
     }

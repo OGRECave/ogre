@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreGLES2PixelFormat.h"
 #include "OgreLogManager.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
-#include "OgreGLES2FBOMultiRenderTarget.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLUtil.h"
