@@ -50,6 +50,7 @@ namespace Ogre {
         // Set width and height
         mWidth = fbo.getWidth();
         mHeight = fbo.getHeight();
+        mFSAA = fbo.getFSAA();
     }
 
     void GLES2FBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
@@ -59,6 +60,7 @@ namespace Ogre {
         // Set width and height
         mWidth = fbo.getWidth();
         mHeight = fbo.getHeight();
+        mFSAA = fbo.getFSAA();
     }
 
     void GLES2FBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
