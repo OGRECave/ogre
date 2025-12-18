@@ -112,6 +112,14 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanWindow::createSwapchain( void )
     {
+        VkSurfaceCapabilitiesKHR surfaceCaps;
+        OGRE_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mDevice->mPhysicalDevice, mSurfaceKHR, &surfaceCaps));
+
+        // Swapchain may be smaller/bigger than requested
+        mWidth = Math::Clamp(mWidth, surfaceCaps.minImageExtent.width, surfaceCaps.maxImageExtent.width);
+        mHeight =
+            Math::Clamp(mHeight, surfaceCaps.minImageExtent.height, surfaceCaps.maxImageExtent.height);
+
         mTexture->setWidth(mWidth);
         mTexture->setHeight(mHeight);
         mTexture->createInternalResources();
@@ -120,14 +128,6 @@ namespace Ogre
         mDepthTexture->setHeight(mHeight);
         mDepthTexture->setNumMipmaps(0);
         mDepthTexture->createInternalResources();
-
-        VkSurfaceCapabilitiesKHR surfaceCaps;
-        OGRE_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mDevice->mPhysicalDevice, mSurfaceKHR, &surfaceCaps));
-
-        // Swapchain may be smaller/bigger than requested
-        mWidth = Math::Clamp(mWidth, surfaceCaps.minImageExtent.width, surfaceCaps.maxImageExtent.width);
-        mHeight =
-            Math::Clamp(mHeight, surfaceCaps.minImageExtent.height, surfaceCaps.maxImageExtent.height);
 
         VkBool32 supported;
         OGRE_VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(mDevice->mPhysicalDevice, mDevice->mGraphicsQueue.mFamilyIdx,
@@ -291,7 +291,16 @@ namespace Ogre
         uint32 imageIdx = 0u;
         auto res =
             vkAcquireNextImageKHR(mDevice->mDevice, mSwapchain, UINT64_MAX, semaphore, VK_NULL_HANDLE, &imageIdx);
-        if (res != VK_ERROR_OUT_OF_DATE_KHR && res != VK_SUBOPTIMAL_KHR && res != VK_SUCCESS)
+
+        if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
+        {
+            mDevice->stall();
+            destroySwapchain();
+            createSwapchain();
+            return;
+        }
+
+        if (res != VK_SUCCESS)
         {
             LogManager::getSingleton().logError("vkAcquireNextImageKHR failed with" + vkResultToString(res));
             return;
@@ -309,17 +318,9 @@ namespace Ogre
         if (mClosed)
             return;
 
-        if (mWidth == width && mHeight == height)
-            return;
-
         if (width != 0 && height != 0)
         {
             RenderWindow::resize(width, height);
-
-            // recreate swapchain
-            mDevice->stall();
-            destroySwapchain();
-            createSwapchain();
         }
     }
 
