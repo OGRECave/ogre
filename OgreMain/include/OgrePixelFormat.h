@@ -48,7 +48,7 @@ namespace Ogre {
      * on a little-endian (x86) machine or as @c 0xBBGGRRAA on a big-endian machine.
      * The example above would be expressed with an array of bytes as `{0xBB, 0xGG, 0xRR, 0xAA}` on both machines.
      * Therefore, one would use the Ogre::PF_BYTE_BGRA format when reading pixel data expressed in bytes.
-     * This format aliases to either Ogre::PF_A8B8G8R8 or Ogre::PF_R8G8B8A8
+     * This format aliases to either Ogre::PF_A8R8G8B8 or Ogre::PF_B8G8R8A8
      * depending on the machine endianness.
      */
     enum PixelFormat

@@ -179,14 +179,6 @@ GLES2FrameBufferObject::GLES2FrameBufferObject()
         GLuint status;
         OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
-        // Bind main buffer
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // The screen buffer is 1 on iOS
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 1));
-#else
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-#endif
-
         switch(status)
         {
         case GL_FRAMEBUFFER_COMPLETE:
@@ -218,6 +210,18 @@ GLES2FrameBufferObject::GLES2FrameBufferObject()
             mContext = 0;
             mFB = 0;
             mMultisampleFB = 0;
+        }
+
+        if(mColour[1].buffer && mMultisampleFB)
+        {
+            // no MSAA for MRT in GLES2 yet
+            mColour[0].numSamples = 0;
+            mNumSamples = 0;
+            mMultisampleFB = 0;
+            mContext = 0;
+
+            if(mMultisampleFB)
+                rs->_destroyFbo(mContext, mMultisampleFB);
         }
 
         if(!mContext && recreateIfNeeded) // create FBO lazy or recreate after destruction

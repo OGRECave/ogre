@@ -40,9 +40,7 @@ sampler RTSS/NormalMapSampler
 
 // This is a single pass normal map lighting based material.
 // All scene lights will be applied within a single rendering pass.
-// Supports all kind of lights - directional, point and spot.
 // It saves geometry overdraw but it consumes more instructions during vertex and pixel shaders.
-// Use this method when your scene uses small amount of lights. (1-3).
 material RTSS/NormalMapping_SinglePass
 {
 	technique
@@ -73,10 +71,8 @@ material RTSS/NormalMapping_SinglePass
 
 // This is a multi pass normal map lighting based material.
 // It acts as any other multi light material.
-// This material defined to use only one type of light per lighting pass because the RTSS need to
-// know what code to produce for the iterative lighting pass, otherwise it will throw an exception.
-// It support any number of lights drawing but it uses more geometry drawing. 
-// Use this method when your scene uses large amount of lights. (3-8).
+// It support any number of lights drawing but it uses more geometry drawing.
+//![normal_map_multipass]
 material RTSS/NormalMapping_MultiPass
 {
 	technique
@@ -87,17 +83,13 @@ material RTSS/NormalMapping_MultiPass
 			// base colours, not needed for rendering, but as information
 			// to lighting pass categorisation routine
 			diffuse 0 0 0
-			
-			// RT Shader system section.			
- 			rtshader_system
- 			{	
- 				// Override dynamic light count with zero light count.
- 				// Doing this will cause the RTSS to create 
- 				// ambient lighting shaders.
- 				// If not doing that the RTSS it will use the current scene light count
- 				// which will result in full lighting calculation in this pass.
-				light_count 0
-			}
+
+			// Override dynamic light count with zero light count.
+			// Doing this will cause the RTSS to create
+			// ambient lighting shaders.
+			// If not doing that the RTSS it will use the current scene light count
+			// which will result in full lighting calculation in this pass.
+			max_lights 0
 		}
 		
 		// Lighting pass.
@@ -110,10 +102,7 @@ material RTSS/NormalMapping_MultiPass
 			// to lighting pass categorisation routine
 			ambient 0 0 0 
 			
-			// do this for each point light
-			// You MUST specify the light type when working with the RT Shader System in iterative lighting method. 
-			// otherwise an exception will be thrown.
-			iteration once_per_light point
+			iteration once_per_light
 
 			scene_blend add		
 			
@@ -121,7 +110,7 @@ material RTSS/NormalMapping_MultiPass
 			{
 				texture Bricks076C_normheight.dds
 				sampler_ref RTSS/NormalMapSampler
-				// RT Shader system section.
+
 				rtshader_system
 				{
 					normal_map tangent_space
@@ -135,7 +124,7 @@ material RTSS/NormalMapping_MultiPass
 			
 			lighting off
 			
-			scene_blend dest_colour zero
+			scene_blend modulate
 			texture_unit decalmap
 			{
 				texture Bricks076C_diffspec.dds
@@ -143,9 +132,10 @@ material RTSS/NormalMapping_MultiPass
 		}			
 	}
 }
+//![normal_map_multipass]
 
 // Athene single multi pass material override.
-material RTSS/Athene/NormalMapping_SinglePass : RTSS/NormalMapping_SinglePass
+material Examples/Athene/NormalMapped
 {	
 	technique
 	{			
@@ -172,12 +162,13 @@ material RTSS/Athene/NormalMapping_SinglePass : RTSS/NormalMapping_SinglePass
 }
 
 // Athene model multi pass material override.
-material RTSS/Athene/NormalMapping_MultiPass : RTSS/NormalMapping_MultiPass
+material Examples/Athene/NormalMapped_MultiPass : RTSS/NormalMapping_MultiPass
 {	
 	technique
 	{
 		pass lighting
-		{								
+		{
+			specular 0 0 0 0
 			texture_unit
 			{
 				texture atheneNormalMap.png

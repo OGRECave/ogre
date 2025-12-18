@@ -51,7 +51,7 @@ THE SOFTWARE.
 #include <memory>
 
 namespace Ogre {
-bool SceneManager::msPerRenderableLights = true;
+bool SceneManager::msPerRenderableLights = false;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
 mName(name),
@@ -1078,6 +1078,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     } // end lock on scene graph mutex
 
     mDestRenderSystem->_beginGeometryCount();
+    // Begin the frame
+    mDestRenderSystem->_beginFrame();
     // Clear the viewport if required
     if (mCurrentViewport->getClearEveryFrame())
     {
@@ -1086,8 +1088,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
             mCurrentViewport->getBackgroundColour(),
             mCurrentViewport->getDepthClear() );
     }
-    // Begin the frame
-    mDestRenderSystem->_beginFrame();
 
     mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
 

@@ -14,14 +14,18 @@ uniform sampler2D jitterMapUnit : register(s5);
 //#define DEBUG_CSM // enables cascade debug visualisation
 #define JITTER_SHADOWS // enables poisson disk jitter filtering
 
+#ifdef OGRE_CG
 arbfp1 float4 tex2D_inBranch(uniform sampler2D sampler, float2 texCoords)
 {
     return tex2D(sampler, texCoords);
 }
+#else
+#define ps_3_0
+#endif
 
-ps_3_0 float4 tex2D_inBranch(uniform sampler2D sampler, float2 texCoords)
+ps_3_0 float4 tex2D_inBranch(uniform sampler2D tex, float2 texCoords)
 {
-    return tex2D(sampler, texCoords, 0, 0);
+    return tex2D(tex, texCoords, 0, 0);
 }
 
 #ifdef JITTER_SHADOWS
@@ -57,7 +61,7 @@ void main_vp
 {
     oPosition = mul(worldViewProj, iPosition);
     oTexCoord0 = iTexCoord0;
-    oNormal = normalize(mul(float3x3(worldMat), iNormal));
+    oNormal = normalize(mul((float3x3)worldMat, iNormal));
 
     // Calculate vertex position in light space
     float4 worldPos = mul(worldMat, iPosition);

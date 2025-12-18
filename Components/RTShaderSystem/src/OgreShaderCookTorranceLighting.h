@@ -45,11 +45,15 @@ public:
 
     bool setParameter(const String& name, const String& value) override;
 
+    void setParameter(const String& name, const Any& value) override;
+
     bool createCpuSubPrograms(ProgramSet* programSet) override;
 
 private:
     String mMetalRoughnessMapName;
+    SamplerPtr mSampler;
     int mLightCount;
+    uint32 mTexCoordSet;
     uint8 mMRMapSamplerIndex;
     int8 mLtcLUT1SamplerIndex;
 };

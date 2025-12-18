@@ -226,14 +226,12 @@ namespace Ogre {
     ushort OverlayContainer::_notifyZOrder(ushort newZOrder)
     {
         OverlayElement::_notifyZOrder(newZOrder);
-        // One for us
-        newZOrder++;
 
         // Update children
         for (const auto& p : mChildren)
         {
-            // Children "consume" Z-order values, so keep track of them
-            newZOrder = p.second->_notifyZOrder(newZOrder);
+            // Give children ZOrder 1 higher than this
+            p.second->_notifyZOrder(newZOrder + 1);
         }
 
         return newZOrder;

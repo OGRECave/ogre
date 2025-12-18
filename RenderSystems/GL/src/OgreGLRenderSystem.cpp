@@ -2636,6 +2636,10 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
+    void GLRenderSystem::bindRenderTarget(RenderTarget* target)
+    {
+        mRTTManager->bind(target);
+    }
     void GLRenderSystem::_setRenderTarget(RenderTarget *target)
     {
         // Unbind frame buffer object
@@ -2663,8 +2667,7 @@ namespace Ogre {
                 setDepthBufferFor( target );
             }
 
-            // Bind frame buffer object
-            mRTTManager->bind(target);
+            bindRenderTarget(target);
 
             if (GLAD_GL_EXT_framebuffer_sRGB)
             {

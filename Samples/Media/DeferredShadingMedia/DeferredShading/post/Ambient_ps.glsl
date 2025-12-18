@@ -25,10 +25,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 
-in vec2 oUv0;
-in vec3 oRay;
+#include "OgreUnifiedShader.h"
 
-out vec4 oColour;
+in vec2 oUv0;
+in f32vec3 oRay;
 
 uniform sampler2D Tex0;
 uniform sampler2D Tex1;
@@ -52,7 +52,7 @@ void main()
         discard;
 
 	// Calculate ambient colour of fragment
-	oColour = vec4(ambientColor * vec4(a0.rgb,0));
+	gl_FragColor = vec4(ambientColor * vec4(a0.rgb,0));
 
 	// Calculate depth of fragment;
 	vec3 viewPos = normalize(oRay) * farClipDistance * a1.w;

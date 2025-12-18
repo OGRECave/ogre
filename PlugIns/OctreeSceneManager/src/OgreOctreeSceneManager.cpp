@@ -360,14 +360,14 @@ Camera * OctreeSceneManager::createCamera( const String &name )
     return c;
 }
 
-void OctreeSceneManager::destroySceneNode( const String &name )
+void OctreeSceneManager::destroySceneNode( SceneNode* sn )
 {
-    OctreeNode * on = static_cast < OctreeNode* > ( getSceneNode( name ) );
+    OctreeNode * on = static_cast < OctreeNode* > ( sn );
 
     if ( on != 0 )
         _removeOctreeNode( on );
 
-    SceneManager::destroySceneNode( name );
+    SceneManager::destroySceneNode( sn );
 }
 
 bool OctreeSceneManager::getOptionValues( const String & key, StringVector  &refValueList )

@@ -1,6 +1,8 @@
-sampler2D Image: register(s0);
-sampler3D Rand: register(s1);
-sampler3D Noise: register(s2);
+#include <OgreUnifiedShader.h>
+
+SAMPLER2D(Image, 0);
+SAMPLER3D(Rand, 1);
+SAMPLER3D(Noise, 2);
 
 float4 OldTV_ps(float4 posIn: POSITION, float2 img: TEXCOORD0,
     uniform float distortionFreq: register(c3),

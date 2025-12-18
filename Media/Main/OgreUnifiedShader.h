@@ -23,11 +23,26 @@
 #if defined(OGRE_HLSL) || defined(OGRE_CG)
 // HLSL
 #include "HLSL_SM4Support.hlsl"
+
+#if OGRE_HLSL >= 4 && defined(OGRE_FRAGMENT_SHADER) && defined(USE_OGRE_FROM_FUTURE)
+// #define float min16float - redefining float itself overwrites RTSS cbuffer parts
+#define vec2 min16float2
+#define vec3 min16float3
+#define vec4 min16float4
+#define mat3 min16float3x3
+#define mat4 min16float4x4
+#else
 #define vec2 float2
 #define vec3 float3
 #define vec4 float4
 #define mat3 float3x3
 #define mat4 float4x4
+#endif
+
+#define float32_t float
+#define f32vec2 float2
+#define f32vec3 float3
+#define f32vec4 float4
 
 #define ivec2 int2
 #define ivec3 int3
@@ -57,9 +72,9 @@ vec4 textureCubeLod(samplerCube s, vec3 v, float lod) { return texCUBElod(s, vec
 #define dFdy ddy
 
 float mod(float _a, float _b) { return _a - _b * floor(_a / _b); }
-vec2  mod(vec2  _a, vec2  _b) { return _a - _b * floor(_a / _b); }
-vec3  mod(vec3  _a, vec3  _b) { return _a - _b * floor(_a / _b); }
-vec4  mod(vec4  _a, vec4  _b) { return _a - _b * floor(_a / _b); }
+vec2  mod(float2  _a, float2  _b) { return _a - _b * floor(_a / _b); }
+vec3  mod(float3  _a, float3  _b) { return _a - _b * floor(_a / _b); }
+vec4  mod(float4  _a, float4  _b) { return _a - _b * floor(_a / _b); }
 
 vec2 vec2_splat(float x) { return vec2(x, x); }
 vec3 vec3_splat(float x) { return vec3(x, x, x); }
@@ -99,11 +114,17 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #define IN(decl, sem) in decl : sem,
 #define OUT(decl, sem) out decl : sem,
 #elif defined(OGRE_METAL)
+
 #define vec2 float2
 #define vec3 float3
 #define vec4 float4
 #define mat3 metal::float3x3
 #define mat4 metal::float4x4
+
+#define float32_t float
+#define f32vec2 float2
+#define f32vec3 float3
+#define f32vec4 float4
 
 #define IN(decl, sem) decl [[ attribute(sem) ]];
 #else
@@ -178,16 +199,3 @@ mat3 mtxFromCols(vec3 a, vec3 b, vec3 c)
 #endif
 
 #define OGRE_UNIFORMS(params) OGRE_UNIFORMS_BEGIN params OGRE_UNIFORMS_END
-
-// GL_EXT_shader_explicit_arithmetic_types polyfill
-#ifdef OGRE_GLSLES
-#define float32_t highp float
-#define f32vec2 highp vec2
-#define f32vec3 highp vec3
-#define f32vec4 highp vec4
-#else
-#define float32_t float
-#define f32vec2 vec2
-#define f32vec3 vec3
-#define f32vec4 vec4
-#endif
