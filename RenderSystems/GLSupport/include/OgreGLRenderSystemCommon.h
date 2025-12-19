@@ -151,6 +151,10 @@ namespace Ogre {
         void preExtraThreadsStarted() override;
         void postExtraThreadsStarted() override;
 
+        RenderTarget* getActiveRenderTarget() const {return mActiveRenderTarget; }
+
+        virtual void bindRenderTarget(RenderTarget* target) = 0;
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         virtual void resetRenderer(RenderWindow* pRenderWnd) = 0;
         virtual void notifyOnContextLost() = 0;

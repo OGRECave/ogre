@@ -372,18 +372,6 @@ namespace Ogre
         return c;
     }
 
-    // Destroy a Scene Node by name.
-    void PCZSceneManager::destroySceneNode( const String &name )
-    {
-        SceneNode * on = ( getSceneNode( name ) );
-
-        if ( on != 0 )
-        {
-            // destroy the node
-            destroySceneNode( on );
-        }
-    }
-
     // Destroy a scene node
     void PCZSceneManager::destroySceneNode(SceneNode* sn)
     {
@@ -1272,10 +1260,10 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     /// See SceneManager::prepareShadowTextures.
-    void PCZSceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
+    void PCZSceneManager::updateShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
     {
         mActiveCameraZone = ((PCZSceneNode*)cam->getParentSceneNode())->getHomeZone();
-        SceneManager::prepareShadowTextures(cam, vp);
+        SceneManager::updateShadowTextures(cam, vp);
     }
 
     //-----------------------------------------------------------------------

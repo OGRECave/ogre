@@ -319,9 +319,6 @@ namespace Ogre {
         nested within this to ensure that containers are displayed behind contained
         items. This method is used internally to notify the element of a change in
         final Z-order which is used to render the element.
-        @return Return the next Z-ordering number available. For single elements, this
-        is simply 'newZOrder + 1', except for containers. They increment it once for each
-        child (or even more if those children are also containers with their own elements).
         */
         virtual ushort _notifyZOrder(ushort newZOrder);
 

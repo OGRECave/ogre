@@ -99,7 +99,7 @@ float sampleDepth(in SAMPLER_TYPE shadowMap, vec2 uv, PSSM_LAYER_ARG(in float la
 	return (depth <= texture2D(shadowMap, uv).r) ? 1.0 : 0.0;
 #endif
 }
-void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in vec4 shadowMapPos, in vec2 invTexSize, PSSM_LAYER_ARG(in float layer) out float c)
+void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in f32vec4 shadowMapPos, in vec2 invTexSize, PSSM_LAYER_ARG(in float layer) out float c)
 {
 	shadowMapPos = shadowMapPos / shadowMapPos.w;
 #if !defined(OGRE_REVERSED_Z) && !defined(OGRE_HLSL) && !defined(VULKAN)
@@ -124,7 +124,7 @@ void SGX_ShadowPCF4(in SAMPLER_TYPE shadowMap, in vec4 shadowMapPos, in vec2 inv
 #endif
 
 //-----------------------------------------------------------------------------
-void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
+void SGX_ComputeShadowFactor_PSSM3(in float32_t fDepth,
 							in vec4 vSplitPoints,	
 							in vec4 lightPosition0,
 							in SAMPLER_TYPE shadowMap0,

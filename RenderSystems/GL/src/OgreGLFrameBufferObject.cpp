@@ -175,10 +175,7 @@ GLFrameBufferObject::GLFrameBufferObject(uint fsaa)
         // Check status
         GLuint status;
         status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-        
-        // Bind main buffer
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        
+
         switch(status)
         {
         case GL_FRAMEBUFFER_COMPLETE_EXT:

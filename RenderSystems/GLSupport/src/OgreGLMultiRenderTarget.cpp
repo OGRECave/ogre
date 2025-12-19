@@ -26,67 +26,68 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLFBOMultiRenderTarget.h"
-#include "OgreGLPixelFormat.h"
-#include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-#include "OgreRoot.h"
-#include "OgreGLHardwarePixelBuffer.h"
+#include "OgreGLMultiRenderTarget.h"
 
 namespace Ogre {
 
-    GLFBOMultiRenderTarget::GLFBOMultiRenderTarget(const String &name):
+    GLMultiRenderTarget::GLMultiRenderTarget(const String &name, GLFrameBufferObjectCommon* fbo_):
         MultiRenderTarget(name),
-        fbo(0 /* TODO: multisampling on MRTs? */)
+        fbo(fbo_)
     {
     }
 
-    GLFBOMultiRenderTarget::~GLFBOMultiRenderTarget()
+    GLMultiRenderTarget::~GLMultiRenderTarget()
     {
     }
 
-    void GLFBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
+    void GLMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
     {
         /// Check if the render target is in the rendertarget->FBO map
         auto fbobj = dynamic_cast<GLRenderTarget*>(target)->getFBO();
         assert(fbobj);
-        fbo.setRenderTargetPool(mDepthBufferPoolId);
-        fbo.bindSurface(attachment, fbobj->getSurface(0));
+        fbo->setRenderTargetPool(mDepthBufferPoolId);
+        fbo->bindSurface(attachment, fbobj->getSurface(0));
 
         // Set width and height
-        mWidth = fbo.getWidth();
-        mHeight = fbo.getHeight();
+        mWidth = fbo->getWidth();
+        mHeight = fbo->getHeight();
+        mFSAA = fbo->getFSAA();
     }
 
-    void GLFBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
+    void GLMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
     {
-        fbo.unbindSurface(attachment);
+        fbo->unbindSurface(attachment);
 
         // Set width and height
-        mWidth = fbo.getWidth();
-        mHeight = fbo.getHeight();
+        mWidth = fbo->getWidth();
+        mHeight = fbo->getHeight();
+        mFSAA = fbo->getFSAA();
     }
 
-    void GLFBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
+    void GLMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
     {
         if( name == GLRenderTexture::CustomAttributeString_FBO )
         {
-            *static_cast<GLFrameBufferObject **>(pData) = &fbo;
+            *static_cast<GLFrameBufferObjectCommon **>(pData) = fbo.get();
+        }
+        else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
+        {
+            *static_cast<GLContext**>(pData) = fbo->getContext();
         }
     }
     //-----------------------------------------------------------------------------
-    bool GLFBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
+    bool GLMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
         bool result;
         if( (result = MultiRenderTarget::attachDepthBuffer( depthBuffer )) )
-            fbo.attachDepthBuffer( depthBuffer );
+            fbo->attachDepthBuffer( depthBuffer );
 
         return result;
     }
     //-----------------------------------------------------------------------------
-    void GLFBOMultiRenderTarget::_detachDepthBuffer()
+    void GLMultiRenderTarget::_detachDepthBuffer()
     {
-        fbo.detachDepthBuffer();
+        fbo->detachDepthBuffer();
         MultiRenderTarget::_detachDepthBuffer();
     }
 }

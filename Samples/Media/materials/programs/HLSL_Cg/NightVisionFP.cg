@@ -1,5 +1,7 @@
-sampler2D RT : register(s0);
-sampler3D noiseVol : register(s1);
+#include <OgreUnifiedShader.h>
+
+SAMPLER2D(RT, 0);
+SAMPLER3D(noiseVol, 1);
 
 float4 NightVision_ps(	float4 pos : POSITION,
       float2 TexCoord : TEXCOORD0,

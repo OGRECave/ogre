@@ -55,7 +55,7 @@ namespace Ogre
                 lods.push_back(OGRE_NEW IndexData());
                 lods.back()->indexStart = buff.indexStart;
                 lods.back()->indexCount = buff.indexCount;
-                if(buff.indexBuffer->getNumIndexes() != 0) {
+                if(buff.indexBuffer && buff.indexBuffer->getNumIndexes() != 0) {
                     if(n > 0 && buffers[n-1].indexBuffer == buff.indexBuffer){
                         lods.back()->indexBuffer = (*(++lods.rbegin()))->indexBuffer;
                     } else {

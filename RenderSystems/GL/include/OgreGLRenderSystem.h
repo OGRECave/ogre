@@ -255,6 +255,8 @@ namespace Ogre {
          * Set current render target to target, enabling its GL context if needed
          */
         void _setRenderTarget(RenderTarget *target) override;
+
+        void bindRenderTarget(RenderTarget* target) override;
         /** Unregister a render target->context mapping. If the context of target 
             is the current context, change the context to the main context so it
             can be destroyed safely. 

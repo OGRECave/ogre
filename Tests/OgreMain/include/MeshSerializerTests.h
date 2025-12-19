@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include <gtest/gtest.h>
 #include "OgreMesh.h"
 #include "OgreMeshSerializer.h"
-#include "OgreFileSystemLayer.h"
 
 using namespace Ogre;
 
@@ -46,7 +45,6 @@ protected:
     String mSkeletonFullPath;
     SkeletonPtr mSkeleton;
     Real mErrorFactor;
-    FileSystemLayer* mFSLayer;
 
 public:
     void SetUp() override;

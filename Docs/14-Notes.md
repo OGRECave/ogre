@@ -31,6 +31,9 @@ SAMPLER2D(sampler, 0);
 
 You opt-in to this syntax with Ogre 13, by defining `USE_OGRE_FROM_FUTURE` before including `OgreUnifiedShader.h`.
 
+Since Ogre 14.5, relaxed precision (i.e. `mediump`) is used on Vulkan in fragment shaders to improve performance.
+This means that shader code now behaves equivalently to OpenGL ES.
+
 ### Task-based WorkQueue
 
 The WorkQueue API was changed from request/ response style to a task-based style.

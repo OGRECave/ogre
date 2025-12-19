@@ -202,6 +202,8 @@ namespace Ogre {
              */
             void _setRenderTarget(RenderTarget *target) override;
 
+            void bindRenderTarget(RenderTarget* target) override;
+
             GLint convertCompareFunction(CompareFunction func) const;
             GLint convertStencilOp(StencilOperation op, bool invert = false) const;
 

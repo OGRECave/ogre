@@ -28,6 +28,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreGL3PlusRenderSystem.h"
 
+#include "OgreGL3PlusFrameBufferObject.h"
 #include "OgreGLUtil.h"
 #include "OgreRenderSystem.h"
 #include "OgreLogManager.h"
@@ -53,7 +54,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusStateCacheManager.h"
 #include "OgreGLSLProgramCommon.h"
-#include "OgreGL3PlusFBOMultiRenderTarget.h"
+#include "OgreGLMultiRenderTarget.h"
 #include "OgreSPIRVShaderFactory.h"
 
 
@@ -631,8 +632,7 @@ namespace Ogre {
 
     MultiRenderTarget* GL3PlusRenderSystem::createMultiRenderTarget(const String & name)
     {
-        MultiRenderTarget* retval =
-            new GL3PlusFBOMultiRenderTarget(name);
+        MultiRenderTarget* retval = new GLMultiRenderTarget(name, new GL3PlusFrameBufferObject());
         attachRenderTarget(*retval);
         return retval;
     }
@@ -1420,6 +1420,19 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("**************************************");
     }
 
+    void GL3PlusRenderSystem::bindRenderTarget(RenderTarget* target)
+    {
+        /* Bind a certain render target if it is a FBO. If it is not a FBO, bind the
+            main frame buffer.
+        */
+        if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
+        {
+            fbo->bind(true);
+        }
+        else
+            _getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
+    }
+
     void GL3PlusRenderSystem::_setRenderTarget(RenderTarget *target)
     {
         mActiveRenderTarget = target;
@@ -1443,15 +1456,7 @@ namespace Ogre {
                 setDepthBufferFor( target );
             }
 
-            /* Bind a certain render target if it is a FBO. If it is not a FBO, bind the
-               main frame buffer.
-            */
-            if(auto fbo = gltarget->getFBO())
-            {
-                fbo->bind(true);
-            }
-            else
-                _getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
+            bindRenderTarget(target);
 
             // Enable / disable sRGB states
             if (target->isHardwareGammaEnabled())

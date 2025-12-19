@@ -1574,6 +1574,12 @@ namespace Ogre
             mDevice.GetImmediateContext()->ClearState();
             CHECK_DEVICE_ERROR("Clear State");
             _setRenderTargetViews();
+            if(mRasterizerDesc.ScissorEnable)
+            {
+                // Reapply scissor rects
+                mDevice.GetImmediateContext()->RSSetScissorRects(1, &mScissorRect);
+                CHECK_DEVICE_ERROR("set scissor rects");
+            }
         }
     }
 

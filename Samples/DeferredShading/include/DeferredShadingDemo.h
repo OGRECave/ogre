@@ -234,6 +234,9 @@ protected:
     // Just override the mandatory create scene method
     void setupContent(void) override
     {
+        // otherwise we get deleted passes in the render queue when toggling deferred shading
+        Root::getSingleton().setRemoveRenderQueueStructuresOnClear(true);
+
         mCameraMan->setTopSpeed(20.0);
         mSystem = 0;
 

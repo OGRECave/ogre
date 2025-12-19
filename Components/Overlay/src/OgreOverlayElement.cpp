@@ -567,7 +567,7 @@ namespace Ogre {
     ushort OverlayElement::_notifyZOrder(ushort newZOrder)
     {
         mZOrder = newZOrder;
-        return mZOrder + 1;
+        return mZOrder;
     }
     //---------------------------------------------------------------------
     void OverlayElement::_notifyWorldTransforms(const Matrix4& xform)

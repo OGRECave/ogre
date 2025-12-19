@@ -45,18 +45,9 @@ namespace Ogre {
         ~GLES2FrameBufferObject();
         
         bool bind(bool recreateIfNeeded) override;
-        
-        /** Swap buffers - only useful when using multisample buffers.
-        */
-        void swapBuffers();
-
-        /** This function acts very similar to @see GLES2FBORenderTexture::attachDepthBuffer
-            The difference between D3D & OGL is that D3D setups the DepthBuffer before rendering,
-            while OGL setups the DepthBuffer per FBO. So the DepthBuffer (RenderBuffer) needs to
-            be attached for OGL.
-        */
-        void attachDepthBuffer( DepthBuffer *depthBuffer );
-        void detachDepthBuffer();
+        void swapBuffers() override;
+        void attachDepthBuffer( DepthBuffer *depthBuffer ) override;
+        void detachDepthBuffer() override;
         
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         /** See AndroidResource. */

@@ -96,7 +96,7 @@ public:
     Camera * createCamera( const String &name ) override;
 
     /** Deletes a scene node */
-    void destroySceneNode( const String &name ) override;
+    void destroySceneNode( SceneNode* sn) override;
 
 
 

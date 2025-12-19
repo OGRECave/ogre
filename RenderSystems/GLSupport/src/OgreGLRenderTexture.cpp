@@ -73,6 +73,11 @@ namespace Ogre {
             mNumSamples = mColour[0].numSamples;
             bind(true);
             initialise();
+
+            // restore previous render target
+            auto rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
+            if(auto prevTarget = rs->getActiveRenderTarget())
+                rs->bindRenderTarget(prevTarget);
         }
     }
 

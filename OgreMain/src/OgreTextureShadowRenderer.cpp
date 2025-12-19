@@ -434,18 +434,14 @@ void SceneManager::TextureShadowRenderer::ensureShadowTexturesCreated()
                 setupRenderTarget(camName, shadowTex->getRenderTarget(rtidx), depthBufferId);
             }
 
-            // Get null shadow texture
-            if (mShadowTextureConfigList.empty())
-            {
-                mNullShadowTexture.reset();
-            }
-            else
-            {
-                mNullShadowTexture = ShadowTextureManager::getSingleton().getNullShadowTexture(
-                    mShadowTextureConfigList[0].format);
-            }
             ++__i;
         }
+
+        // Assume first one is representative
+        if (!mShadowTextureConfigList.empty())
+            mNoShadowTexture =
+                ShadowTextureManager::getSingleton().getNoShadowTexture(mShadowTextureConfigList[0].format);
+
         mShadowTextureConfigDirty = false;
     }
 
@@ -505,11 +501,8 @@ void SceneManager::TextureShadowRenderer::prepareTexCam(Camera* texCam, Camera* 
     // Fire shadow caster update, callee can alter camera settings
     fireShadowTexturesPreCaster(light, texCam, j);
 }
-void SceneManager::TextureShadowRenderer::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
+void SceneManager::TextureShadowRenderer::updateShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
-    // create shadow textures if needed
-    ensureShadowTexturesCreated();
-
     // Determine far shadow distance
     Real shadowDist = mDefaultShadowFarDist;
     if (!shadowDist)
@@ -1060,14 +1053,9 @@ void SceneManager::TextureShadowRenderer::setShadowTextureSettings(unsigned shor
 //---------------------------------------------------------------------
 const TexturePtr& SceneManager::TextureShadowRenderer::getShadowTexture(size_t shadowIndex)
 {
-    if (shadowIndex >= mShadowTextureConfigList.size())
-    {
-        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-            "shadowIndex out of bounds",
-            "SceneManager::getShadowTexture");
-    }
-    ensureShadowTexturesCreated();
+    mSceneManager->ensureShadowTexturesCreated();
 
+    OgreAssert(shadowIndex < mShadowTextures.size(), "");
     return mShadowTextures[shadowIndex];
 }
 
@@ -1083,9 +1071,9 @@ void SceneManager::TextureShadowRenderer::resolveShadowTexture(TextureUnitState*
     }
     else
     {
-        // Use fallback 'null' shadow texture
+        // Use fallback no-shadow texture
         // no projection since all uniform colour anyway
-        shadowTex = mNullShadowTexture;
+        shadowTex = mNoShadowTexture;
         tu->setProjectiveTexturing(false);
     }
 

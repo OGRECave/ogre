@@ -119,7 +119,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    TexturePtr ShadowTextureManager::getNullShadowTexture(PixelFormat format)
+    TexturePtr ShadowTextureManager::getNoShadowTexture(PixelFormat format)
     {
         for (auto & tex : mNullTextureList)
         {

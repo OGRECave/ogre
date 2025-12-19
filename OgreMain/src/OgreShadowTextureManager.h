@@ -74,7 +74,7 @@ namespace Ogre
         /** Get an appropriately defined 'null' texture, i.e. one which will always
             result in no shadows.
         */
-        virtual TexturePtr getNullShadowTexture(PixelFormat format);
+        virtual TexturePtr getNoShadowTexture(PixelFormat format);
 
         /** Remove any shadow textures that are no longer being referenced.
 

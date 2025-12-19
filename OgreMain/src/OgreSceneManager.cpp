@@ -51,7 +51,7 @@ THE SOFTWARE.
 #include <memory>
 
 namespace Ogre {
-bool SceneManager::msPerRenderableLights = true;
+bool SceneManager::msPerRenderableLights = false;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name) :
 mName(name),
@@ -1002,10 +1002,11 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 
             // Prepare shadow textures if texture shadow based shadowing
             // technique in use
-            if (isShadowTechniqueTextureBased() && vp->getShadowsEnabled())
+            if (isShadowTechniqueTextureBased())
             {
-                OgreProfileGroup("prepareShadowTextures", OGREPROF_GENERAL);
+                OgreProfileGroup("updateShadowTextures", OGREPROF_GENERAL);
 
+                ensureShadowTexturesCreated();
                 // *******
                 // WARNING
                 // *******
@@ -1014,7 +1015,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
                 // guaranteed persistent. Make sure that anything which
                 // MUST be specific to this camera / target is done
                 // AFTER THIS POINT
-                prepareShadowTextures(camera, vp);
+                if(vp->getShadowsEnabled())
+                    updateShadowTextures(camera, vp);
                 // reset the cameras & viewport because of the re-entrant call
                 mCameraInProgress = camera;
                 mCurrentViewport = vp;
@@ -1076,6 +1078,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     } // end lock on scene graph mutex
 
     mDestRenderSystem->_beginGeometryCount();
+    // Begin the frame
+    mDestRenderSystem->_beginFrame();
     // Clear the viewport if required
     if (mCurrentViewport->getClearEveryFrame())
     {
@@ -1084,8 +1088,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
             mCurrentViewport->getBackgroundColour(),
             mCurrentViewport->getDepthClear() );
     }
-    // Begin the frame
-    mDestRenderSystem->_beginFrame();
 
     mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
 
@@ -2892,10 +2894,6 @@ void SceneManager::ensureShadowTexturesCreated()
 {
     mTextureShadowRenderer.ensureShadowTexturesCreated();
 }
-void SceneManager::destroyShadowTextures(void)
-{
-    mTextureShadowRenderer.destroyShadowTextures();
-}
 const std::vector<Camera*>& SceneManager::getShadowTextureCameras()
 {
     return mTextureShadowRenderer.mShadowTextureCameras;
@@ -2906,7 +2904,7 @@ bool SceneManager::isShadowTextureConfigDirty() const
     return mTextureShadowRenderer.mShadowTextureConfigDirty;
 }
 
-void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
+void SceneManager::updateShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
         // Set the illumination stage, prevents recursive calls
     IlluminationRenderStage savedStage = mIlluminationStage;
@@ -2917,7 +2915,8 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 
     try
     {
-        mTextureShadowRenderer.prepareShadowTextures(cam, vp, lightList);
+        ensureShadowTexturesCreated();
+        mTextureShadowRenderer.updateShadowTextures(cam, vp, lightList);
     }
     catch (Exception&)
     {

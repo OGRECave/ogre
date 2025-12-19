@@ -112,19 +112,8 @@ namespace Ogre {
         */
         void update(void);
         
-        /** Instructs the viewport to clear itself, without performing an update.
-
-            You would not normally call this method when updating the viewport, 
-            since the viewport usually clears itself when updating anyway. However, if you wish you have the
-            option of manually clearing the frame buffer (or elements of it)
-            using this method.
-            @see Viewport::setClearEveryFrame
-         @param buffers Bitmask identifying which buffer elements to clear
-         @param colour The colour value to clear to, if FBT_COLOUR is included
-         @param depth The depth value to clear to, if FBT_DEPTH is included
-         @param stencil The stencil value to clear to, if FBT_STENCIL is included
-        */
-        void clear(uint32 buffers = FBT_COLOUR | FBT_DEPTH, const ColourValue& colour = ColourValue::Black,
+        /// @deprecated use RenderSystem::clearFrameBuffer instead
+        OGRE_DEPRECATED void clear(uint32 buffers = FBT_COLOUR | FBT_DEPTH, const ColourValue& colour = ColourValue::Black,
                    float depth = 1.0f, uint16 stencil = 0);
 
         /** Retrieves a pointer to the render target for this viewport.

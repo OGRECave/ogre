@@ -64,6 +64,18 @@ namespace Ogre {
         */
         virtual bool bind(bool recreateIfNeeded) = 0;
 
+        /** Swap buffers - only useful when using multisample buffers.
+        */
+        virtual void swapBuffers() = 0;
+
+        /** This function acts very similar to @ref RenderTarget::attachDepthBuffer
+            The difference between D3D & OGL is that D3D setups the DepthBuffer before rendering,
+            while OGL setups the DepthBuffer per FBO. So the DepthBuffer (RenderBuffer) needs to
+            be attached for OGL.
+        */
+        virtual void attachDepthBuffer( DepthBuffer *depthBuffer ) = 0;
+        virtual void detachDepthBuffer() = 0;
+
         /** Bind a surface to a certain attachment point.
             attachment: 0..OGRE_MAX_MULTIPLE_RENDER_TARGETS-1
         */

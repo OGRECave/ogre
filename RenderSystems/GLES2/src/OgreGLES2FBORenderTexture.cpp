@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreGLES2PixelFormat.h"
 #include "OgreLogManager.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
-#include "OgreGLES2FBOMultiRenderTarget.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLUtil.h"
@@ -495,24 +494,6 @@ namespace Ogre {
     {
         GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(name, target, writeGamma);
         return retval;
-    }
-
-    void GLES2FBOManager::bind(RenderTarget *target)
-    {
-        if(auto fbo = dynamic_cast<GLRenderTarget*>(target)->getFBO())
-        {
-            fbo->bind(true);
-        }
-        else
-        {
-            // Non-multisampled screen buffer is FBO #1 on iOS, multisampled is yet another,
-            // so give the target ability to influence decision which FBO to use
-            GLuint mainfbo = 0;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            target->getCustomAttribute("GLFBO", &mainfbo);
-#endif
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mainfbo));
-        }
     }
 
     GLHardwarePixelBufferCommon* GLES2FBOManager::createNewRenderBuffer(unsigned format, uint32 width, uint32 height, uint fsaa)

@@ -101,7 +101,7 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
         {
             SceneManager::RenderContext* context = sm->_pauseRendering();
 
-            sm->prepareShadowTextures(cam, mViewport, &ll);
+            sm->updateShadowTextures(cam, mViewport, &ll);
             sm->_resumeRendering(context);
 
             Pass* pass = tech->getPass(0);

@@ -1061,7 +1061,8 @@ namespace Ogre {
                 break;
             } // columns
             break;
-        case D3D10_SVT_FLOAT:
+        case D3D_SVT_MIN16FLOAT:
+        case D3D_SVT_FLOAT:
             switch(d3dDesc.Rows)
             {
             case 1:

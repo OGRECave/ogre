@@ -1,9 +1,9 @@
 // CASTER pass
-vertex_program ShadowCasterVP cg
+vertex_program ShadowCasterVP cg hlsl
 {
     source pssm.cg
     entry_point shadow_caster_vs
-    profiles vs_3_0 arbvp1
+    target vs_3_0 arbvp1
 
     default_params
     {
@@ -11,11 +11,11 @@ vertex_program ShadowCasterVP cg
     }
 }
 
-fragment_program ShadowCasterFP cg
+fragment_program ShadowCasterFP cg hlsl
 {
     source pssm.cg
     entry_point shadow_caster_ps
-    profiles ps_3_0 arbfp1
+    target ps_3_0 arbfp1
 }
 
 material CSMShadows/Caster
@@ -36,11 +36,11 @@ material CSMShadows/Caster
 }
 
 // RECEIVER pass
-vertex_program ShadowReceiverVP cg
+vertex_program ShadowReceiverVP cg hlsl
 {
     source ShadowReceiver.cg
     entry_point main_vp
-    profiles vs_3_0 arbvp1
+    target vs_3_0 arbvp1
 
     default_params
     {
@@ -55,11 +55,11 @@ shared_params params_shadowMatrixScaleBias
     // filled by code
 }
 
-fragment_program ShadowReceiverFP cg
+fragment_program ShadowReceiverFP cg hlsl
 {
     source ShadowReceiver.cg
     entry_point main_fp
-    profiles ps_3_0 arbfp1
+    target ps_3_0 arbfp1
 
     default_params
     {

@@ -159,9 +159,6 @@ GL3PlusFrameBufferObject::GL3PlusFrameBufferObject()
         GLuint status;
         OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
-        // Bind main buffer
-        rs->_getStateCacheManager()->bindGLFrameBuffer( GL_FRAMEBUFFER, 0 );
-
         switch(status)
         {
         case GL_FRAMEBUFFER_COMPLETE:

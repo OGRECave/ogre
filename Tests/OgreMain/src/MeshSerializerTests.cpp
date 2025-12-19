@@ -35,9 +35,7 @@ THE SOFTWARE.
 #include "OgreMeshSerializer.h"
 #include "OgreRoot.h"
 #include "OgreException.h"
-#include "OgreArchive.h"
-#include "OgreArchiveManager.h"
-#include "OgreFileSystem.h"
+#include "OgreFileSystemLayer.h"
 #include "OgreConfigFile.h"
 #include "OgreSkeletonManager.h"
 #include "OgreSkeletonSerializer.h"
@@ -72,22 +70,14 @@ void MeshSerializerTests::SetUp()
 {
     mErrorFactor = 0.05;
 
-    mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
-
-    OGRE_NEW ResourceGroupManager();
-    OGRE_NEW LodStrategyManager();
-    OGRE_NEW DefaultHardwareBufferManager();
-    OGRE_NEW MeshManager();
-    OGRE_NEW SkeletonManager();
-    ArchiveManager* archiveMgr = OGRE_NEW ArchiveManager();
-    archiveMgr->addArchiveFactory(OGRE_NEW FileSystemArchiveFactory());
-
-    MaterialManager* matMgr = OGRE_NEW MaterialManager();
-    matMgr->initialise();
+    new DefaultHardwareBufferManager();
+    new Root("");
+    MaterialManager::getSingleton().initialise();
 
     // Load resource paths from config file
+    FileSystemLayer fsLayer(OGRE_VERSION_NAME);
+    String resourcesPath = fsLayer.getConfigFilePath("resources.cfg");
     ConfigFile cf;
-    String resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 
     // Go through all sections & settings in the file
     cf.load(resourcesPath);
@@ -156,14 +146,8 @@ void MeshSerializerTests::TearDown()
         mSkeleton.reset();
     }    
     
-    OGRE_DELETE MeshManager::getSingletonPtr();
-    OGRE_DELETE SkeletonManager::getSingletonPtr();
-    OGRE_DELETE DefaultHardwareBufferManager::getSingletonPtr();
-    OGRE_DELETE ArchiveManager::getSingletonPtr();    
-    OGRE_DELETE MaterialManager::getSingletonPtr();
-    OGRE_DELETE LodStrategyManager::getSingletonPtr();
-    OGRE_DELETE ResourceGroupManager::getSingletonPtr();
-    OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
+    delete Root::getSingletonPtr();
+    delete DefaultHardwareBufferManager::getSingletonPtr();
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshSerializerTests,Mesh_clone)
@@ -668,3 +652,45 @@ bool MeshSerializerTests::isEqual(const Vector3& a, const Vector3& b)
     return isEqual(a.x, b.x) && isEqual(a.y, b.y) && isEqual(a.z, b.z);
 }
 //--------------------------------------------------------------------------
+TEST_F(MeshSerializerTests, VertexColour)
+{
+    MaterialPtr mat = MaterialManager::getSingleton().create("AmbientVertexColourTracking", RGN_DEFAULT);
+
+    ManualObject man("test");
+    man.begin(mat);
+
+    // Define a 40x40 plane, indexed
+    man.position(-20, 20, 20);
+    man.colour(1, 0, 0);
+
+    man.position(-20, -20, 20);
+    man.colour(1, 0, 0);
+
+    man.position(20, -20, 20);
+    man.colour(1, 0, 0);
+
+    man.position(20, 20, 20);
+    man.colour(1, 0, 0);
+
+    man.quad(0, 1, 2, 3);
+    man.end();
+
+    MeshPtr mesh = man.convertToMesh("colourtest.mesh");
+    MeshSerializer ms;
+    ms.exportMesh(mesh.get(), "colourtest.mesh");
+    MeshManager::getSingleton().remove("colourtest.mesh");
+
+    ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem", RGN_DEFAULT);
+    mesh = MeshManager::getSingleton().load("colourtest.mesh", RGN_DEFAULT);
+
+    SubMesh* sub = mesh->getSubMesh(0);
+    VertexData* vdata = sub->vertexData;
+
+    auto elem = vdata->vertexDeclaration->findElementBySemantic(Ogre::VES_COLOUR);
+    auto buf = vdata->vertexBufferBinding->getBuffer(elem->getSource());
+
+    // Check the colour values
+    unsigned char colour[4];
+    buf->readData(elem->getOffset(), 4, &colour);
+    EXPECT_EQ(ColourValue(colour), ColourValue(1, 0, 0));
+}
