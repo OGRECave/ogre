@@ -7,9 +7,9 @@
 namespace OgreBites
 {
 
-constexpr uint32_t QUERYFLAG_GIZMO       = 1 << 1;
+constexpr uint32_t QUERYFLAG_GIZMO = 1 << 1;
 
-enum GizmoMode   /// enum for different kinds of gizmo
+enum GizmoMode /// enum for different kinds of gizmo
 {
     G_NONE,
     G_AXIS,
@@ -21,15 +21,14 @@ enum GizmoMode   /// enum for different kinds of gizmo
 enum AXIS
 {
     AXIS_NONE = 0,
-    AXIS_X    = 1 << 0, // 1
-    AXIS_Y    = 1 << 1, // 2
-    AXIS_Z    = 1 << 2, // 4
+    AXIS_X = 1 << 0, // 1
+    AXIS_Y = 1 << 1, // 2
+    AXIS_Z = 1 << 2, // 4
 
-    AXIS_XY   = AXIS_X | AXIS_Y, // 3
-    AXIS_YZ   = AXIS_Y | AXIS_Z, // 6
-    AXIS_XZ   = AXIS_X | AXIS_Z  // 5
+    AXIS_XY = AXIS_X | AXIS_Y, // 3
+    AXIS_YZ = AXIS_Y | AXIS_Z, // 6
+    AXIS_XZ = AXIS_X | AXIS_Z  // 5
 };
-
 
 /**
 Class which applies a manipulable gizmo to a scene object (including the camera).
@@ -45,31 +44,34 @@ public:
 
     void attachTo(Ogre::SceneNode* target);
 
-    GizmoMode getMode()
-    {
-        return mMode;
-    }
+    GizmoMode getMode() { return mMode; }
 
-    void pickAxis(const Ogre::Ray& ray) const;
+    void pickAxis(const Ogre::Ray& ray);
 
-    void startDrag(Ogre::Entity* pickedGizmo, const Ogre::Ray& startRay, const Ogre::Vector3& cameraDir);
+    void startDrag(const Ogre::Ray& startRay, const Ogre::Vector3& cameraDir);
 
     void computeDrag(const Ogre::Ray& ray, const Ogre::Vector3& cameraDir);
 
     void stopDrag();
 
-    bool isDragging();
+    bool isDragging() const;
 
 protected:
-    static void createMesh(Ogre::SceneManager *manager, Ogre::String name);
+    static void createMesh(Ogre::SceneManager* manager, Ogre::String name);
 
-    static void createPlaneMesh(Ogre::SceneManager *manager, Ogre::String name);
+    static void createPlaneMesh(Ogre::SceneManager* manager, Ogre::String name);
 
     void scaleToParent();
 
     void highlightAxis(AXIS axis);
 
-    Ogre::Vector3 computePlaneHit(const Ogre::Ray& ray, const Ogre::Vector3& axis, const Ogre::Vector3& cameraDir,
+    static Ogre::Real rayLineDistance(const Ogre::Ray& ray, const Ogre::Vector3& lineOrigin,
+                                      const Ogre::Vector3& lineDir, Ogre::Real lineLength);
+
+    static bool pickRotateRing(const Ogre::Ray& ray, const Ogre::Vector3& center, const Ogre::Vector3& axis, Ogre::Real radius,
+                        Ogre::Real tolerance);
+
+    static Ogre::Vector3 computePlaneHit(const Ogre::Ray& ray, const Ogre::Vector3& axis, const Ogre::Vector3& cameraDir,
                                   const Ogre::Vector3& planePoint);
 
     GizmoMode mMode;
@@ -97,5 +99,5 @@ protected:
     std::unordered_map<Ogre::Entity*, int> mEntityToAxis;
     int mOldGizmoAxis{};
 };
-}
+} // namespace OgreBites
 #endif // OGRE_OGREGIZMOS_H

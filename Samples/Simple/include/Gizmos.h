@@ -81,7 +81,6 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
             if (mGizmo->isGizmoEntity(picked))
             {
                 mGizmo->startDrag(
-                    picked,
                     mCamera->getCameraToViewportRay(nx, ny),
                     mCamera->getDerivedDirection()
                 );
@@ -131,9 +130,6 @@ private:
             {
                 mGizmo->pickAxis(ray);
                 return ent;
-            } else
-            {
-                mGizmo->pickAxis();
             }
             return ent;
         }
