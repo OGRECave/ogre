@@ -45,7 +45,8 @@ enum EventType {
     CONTROLLERAXISMOTION,
     CONTROLLERBUTTONDOWN,
     CONTROLLERBUTTONUP,
-    JOYAXISMOTION
+    JOYAXISMOTION,
+    JOYHATMOTION
 };
 
 typedef int Keycode;
@@ -97,6 +98,12 @@ struct ButtonEvent {
     int which;
     unsigned char button;
 };
+struct HatEvent {
+    int type;
+    int which;
+    short hat;      // joystick hat index
+    short value; 	// hat position
+};
 
 union Event
 {
@@ -109,6 +116,7 @@ union Event
     TextInputEvent text;
     AxisEvent axis;
     ButtonEvent cbutton;
+    HatEvent hat;
 };
 
 // SDL compat
@@ -185,6 +193,7 @@ struct _OgreBitesExport InputListener {
     virtual bool mouseReleased(const MouseButtonEvent& evt) { return false; }
     virtual bool textInput(const TextInputEvent& evt) { return false; }
     virtual bool axisMoved(const AxisEvent& evt) { return false; }
+    virtual bool hatMoved(const HatEvent& evt) { return false; }
     virtual bool buttonPressed(const ButtonEvent& evt) { return false; }
     virtual bool buttonReleased(const ButtonEvent& evt) { return false; }
 };
