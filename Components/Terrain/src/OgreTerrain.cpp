@@ -48,6 +48,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreTimer.h"
 #include "OgreTerrainMaterialGeneratorA.h"
+#include <future>
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing
@@ -1861,8 +1862,9 @@ namespace Ogre
             }
             else
             {
-                updateDerivedDataImpl(mDirtyDerivedDataRect, mDirtyLightmapFromNeighboursRect, 
-                    synchronous, typeMask);
+                futures.push_back(
+                    updateDerivedDataImpl(mDirtyDerivedDataRect, mDirtyLightmapFromNeighboursRect,
+                        synchronous, typeMask));
                 mDirtyDerivedDataRect.setNull();
                 mDirtyLightmapFromNeighboursRect.setNull();
             }
@@ -1878,7 +1880,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void Terrain::updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, 
+    std::shared_ptr<std::future<void> > Terrain::updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect,
         bool synchronous, uint8 typeMask)
     {
         mDerivedDataUpdateInProgress = true;
@@ -1896,23 +1898,32 @@ namespace Ogre
 
         if(synchronous)
         {
-            auto r = new WorkQueue::Request(0, 0, req, 0, 0);
-            auto res = handleRequest(r, NULL);
-            handleResponse(res, NULL);
-            delete res;
-            return;
-        }
+            auto taskSync = std::make_shared<std::packaged_task<void()>>(
+                [this, req]()
+                {
+                    auto r = new WorkQueue::Request(0, 0, req, 0, 0);
+                    auto res = handleRequest(r, NULL);
+                    handleResponse(res, NULL);
+                    delete res;
+                });
 
-        Root::getSingleton().getWorkQueue()->addTask(
+            (*taskSync)();
+            return std::make_shared<std::future<void> >(taskSync->get_future());
+        }
+        auto task = std::make_shared<std::packaged_task<void()>>(
             [this, req]()
             {
                 auto r = new WorkQueue::Request(0, 0, req, 0, 0);
                 auto res = handleRequest(r, NULL);
-                Root::getSingleton().getWorkQueue()->addMainThreadTask([this, res](){
-                    handleResponse(res, NULL);
-                    delete res;
-                });
+                Root::getSingleton().getWorkQueue()->addMainThreadTask(
+                    [this, res]()
+                    {
+                        handleResponse(res, NULL);
+                        delete res;
+                    });
             });
+        Root::getSingleton().getWorkQueue()->addTask([task]() { (*task)(); });
+        return std::make_shared<std::future<void> >(task->get_future());
     }
     //---------------------------------------------------------------------
     void Terrain::waitForDerivedProcesses()
@@ -1922,6 +1933,11 @@ namespace Ogre
             // we need to wait for this to finish
             OGRE_THREAD_SLEEP(50);
             Root::getSingleton().getWorkQueue()->processMainThreadTasks();
+        }
+        while (futures.size() > 0)
+        {
+            futures.front()->wait();
+            futures.pop_front();
         }
 
     }
@@ -3061,7 +3077,7 @@ namespace Ogre
         if (newMask)
         {
             // trigger again
-            updateDerivedDataImpl(newRect, newLightmapExtraRect, false, newMask);
+            futures.push_back(updateDerivedDataImpl(newRect, newLightmapExtraRect, false, newMask));
         }
         else
         {
@@ -3071,6 +3087,14 @@ namespace Ogre
                 updateCompositeMap();
         }
 
+        for (auto it = futures.begin(); it != futures.end();)
+        {
+            std::future_status status = (*it)->wait_for(std::chrono::seconds(0));
+            if (status == std::future_status::ready)
+                it = futures.erase(it);
+            else
+                it++;
+        }
     }
     //---------------------------------------------------------------------
     void Terrain::generateMaterial()

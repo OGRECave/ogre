@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreTerrainLayerBlendMap.h"
 #include "OgreWorkQueue.h"
 #include "OgreTerrainLodManager.h"
+#include <future>
 
 namespace Ogre
 {
@@ -1655,7 +1656,8 @@ namespace Ogre
         void checkDeclaration();
         void deriveUVMultipliers();
 
-        void updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, bool synchronous, uint8 typeMask);
+        std::shared_ptr<std::future<void> > updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, bool synchronous,
+                                            uint8 typeMask);
 
         void getEdgeRect(NeighbourIndex index, int32 range, Rect* outRect) const;
         // get the equivalent of the passed in edge rectangle in neighbour
@@ -1819,6 +1821,7 @@ namespace Ogre
     private:
         /// Test a single quad of the terrain for ray intersection.
         OGRE_FORCE_INLINE std::pair<bool, Vector3> checkQuadIntersection(int x, int y, const Ray& ray) const;
+        std::list<std::shared_ptr<std::future<void> > > futures;
     };
 
 
