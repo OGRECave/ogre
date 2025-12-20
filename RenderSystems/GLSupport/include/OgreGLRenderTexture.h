@@ -144,6 +144,29 @@ namespace Ogre {
         static const String CustomAttributeString_GLCONTEXT;
     };
 
+    /** RenderTexture for GL FBO
+    */
+    class _OgreGLExport GLFBORenderTexture: public GLRenderTexture
+    {
+    public:
+        GLFBORenderTexture(const String& name, const GLSurfaceDesc& target, bool writeGamma,
+                           GLFrameBufferObjectCommon* fbo);
+
+        void getCustomAttribute(const String& name, void* pData) override;
+
+        /// Override needed to deal with multisample buffers
+        void swapBuffers() override { mFB->swapBuffers(); }
+
+        /// Override so we can attach the depth buffer to the FBO
+        bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
+        void _detachDepthBuffer() override;
+
+        GLContext* getContext() const override { return mFB->getContext(); }
+        GLFrameBufferObjectCommon* getFBO() override { return mFB.get(); }
+    protected:
+        std::unique_ptr<GLFrameBufferObjectCommon> mFB;
+    };
+
     /** Manager/factory for RenderTextures.
      */
     class _OgreGLExport GLRTTManager : public Singleton<GLRTTManager>

@@ -28,39 +28,14 @@ THE SOFTWARE.
 #ifndef __OgreGLFBORTT_H__
 #define __OgreGLFBORTT_H__
 
-#include "OgreGLCopyingRenderTexture.h"
-#include "OgreGLContext.h"
-#include "OgreGLFrameBufferObject.h"
+#include "OgreGLPrerequisites.h"
+#include "OgreGLRenderTexture.h"
 
 /// Extra GL constants
 #define GL_DEPTH24_STENCIL8_EXT                           0x88F0
 
 
 namespace Ogre {
-    class GLFBOManager;
-
-    /** RenderTexture for GL FBO
-    */
-    class _OgreGLExport GLFBORenderTexture: public GLRenderTexture
-    {
-    public:
-        GLFBORenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma);
-
-        void getCustomAttribute(const String& name, void* pData) override;
-
-        /// Override needed to deal with multisample buffers
-        void swapBuffers() override;
-
-        /// Override so we can attach the depth buffer to the FBO
-        bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
-        void _detachDepthBuffer() override;
-
-        GLContext* getContext() const override { return mFB.getContext(); }
-        GLFrameBufferObjectCommon* getFBO() override { return &mFB; }
-    protected:
-        GLFrameBufferObject mFB;
-    };
-    
     /** Factory for GL Frame Buffer Objects, and related things.
     */
     class _OgreGLExport GLFBOManager: public GLRTTManager
