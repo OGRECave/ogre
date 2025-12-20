@@ -2081,9 +2081,8 @@ namespace Ogre
                                           source->getLightSpecularColour(l), ac.elementCount);
                     break;
                 case ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY:
-                    for (size_t l = 0; l < ac.data; ++l)
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(ColourValue),
-                                          source->getLightDiffuseColourWithPower(l), ac.elementCount);
+                    _writeRawConstants(ac.physicalIndex, source->getLightDiffuseColourPowerScaledArray(ac.data),
+                                       ac.data);
                     break;
 
                 case ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED_ARRAY:
@@ -2110,23 +2109,11 @@ namespace Ogre
                     break;
 
                 case ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY:
-                    for (size_t l = 0; l < ac.data; ++l)
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
-                                          source->getViewMatrix() *
-                                              source->getLightAs4DVector(l),
-                                          ac.elementCount);
+                    _writeRawConstants(ac.physicalIndex, source->getLightPositionViewSpaceArray(ac.data), ac.data);
                     break;
 
                 case ACT_LIGHT_DIRECTION_VIEW_SPACE_ARRAY:
-                    m3 = source->getInverseTransposeViewMatrix().linear();
-                    for (size_t l = 0; l < ac.data; ++l)
-                    {
-                        vec3 = m3 * source->getLightDirection(l);
-                        vec3.normalise();
-                        // Set as 4D vector for compatibility
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
-                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), ac.elementCount);
-                    }
+                    _writeRawConstants(ac.physicalIndex, source->getLightDirectionViewSpaceArray(ac.data), ac.data);
                     break;
 
                 case ACT_LIGHT_POWER_SCALE_ARRAY:
@@ -2136,18 +2123,10 @@ namespace Ogre
                     break;
 
                 case ACT_LIGHT_ATTENUATION_ARRAY:
-                    for (size_t l = 0; l < ac.data; ++l)
-                    {
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
-                                          source->getLightAttenuation(l), ac.elementCount);
-                    }
+                    _writeRawConstants(ac.physicalIndex, source->getLightAttenuationArray(ac.data), ac.data);
                     break;
                 case ACT_SPOTLIGHT_PARAMS_ARRAY:
-                    for (size_t l = 0 ; l < ac.data; ++l)
-                    {
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f), source->getSpotlightParams(l),
-                                          ac.elementCount);
-                    }
+                    _writeRawConstants(ac.physicalIndex, source->getSpotlightParamsArray(ac.data), ac.data);
                     break;
                 case ACT_DERIVED_LIGHT_DIFFUSE_COLOUR:
                     _writeRawConstant(ac.physicalIndex,

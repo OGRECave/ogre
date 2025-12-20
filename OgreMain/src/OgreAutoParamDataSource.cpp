@@ -151,6 +151,13 @@ namespace Ogre {
     void AutoParamDataSource::setCurrentLightList(const LightList* ll)
     {
         mCurrentLightList = ll;
+
+        mLightPosViewSpaceArray.clear();
+        mLightAttenuationArray.clear();
+        mSpotlightParamsArray.clear();
+        mLightDirViewSpaceArray.clear();
+        mLightDiffuseColourPowerScaledArray.clear();
+
         for(size_t i = 0; i < ll->size() && i < OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i)
         {
             mSpotlightViewProjMatrixDirty[i] = true;
@@ -257,6 +264,74 @@ namespace Ogre {
             // therefore set x = 1 and y = 0 so divisor doesn't change scale
             return Vector4f(1.0, 0.0, 0.0, 0.0); // since the main op is pow(.., vec4.z), this will result in 1.0
         }
+    }
+    const Vector4f* AutoParamDataSource::getLightPositionViewSpaceArray(size_t size) const
+    {
+        if (size > mLightPosViewSpaceArray.size())
+        {
+            getViewMatrix(); // refresh view matrix
+            mLightPosViewSpaceArray.resize(size);
+            for (size_t i = 0; i < size; ++i)
+            {
+                mLightPosViewSpaceArray[i] = Vector4f(mViewMatrix * getLightAs4DVector(i));
+            }
+        }
+
+        return mLightPosViewSpaceArray.data();
+    }
+    const Vector4f* AutoParamDataSource::getLightAttenuationArray(size_t size) const
+    {
+        if (size > mLightAttenuationArray.size())
+        {
+            mLightAttenuationArray.resize(size);
+            for (size_t i = 0; i < size; ++i)
+            {
+                mLightAttenuationArray[i] = getLightAttenuation(i);
+            }
+        }
+
+        return mLightAttenuationArray.data();
+    }
+    const Vector4f* AutoParamDataSource::getSpotlightParamsArray(size_t size) const
+    {
+        if (size > mSpotlightParamsArray.size())
+        {
+            mSpotlightParamsArray.resize(size);
+            for (size_t i = 0; i < size; ++i)
+            {
+                mSpotlightParamsArray[i] = getSpotlightParams(i);
+            }
+        }
+
+        return mSpotlightParamsArray.data();
+    }
+    const Vector4f* AutoParamDataSource::getLightDirectionViewSpaceArray(size_t size) const
+    {
+        if (size > mLightDirViewSpaceArray.size())
+        {
+            auto invTransViewMatrix = getInverseTransposeViewMatrix().linear();
+            mLightDirViewSpaceArray.resize(size);
+            for (size_t i = 0; i < size; ++i)
+            {
+                Vector3 dirView = invTransViewMatrix * getLightDirection(i);
+                mLightDirViewSpaceArray[i] = Vector4f(dirView.x, dirView.y, dirView.z, 0.0f);
+            }
+        }
+
+        return mLightDirViewSpaceArray.data();
+    }
+    const ColourValue* AutoParamDataSource::getLightDiffuseColourPowerScaledArray(size_t size) const
+    {
+        if (size > mLightDiffuseColourPowerScaledArray.size())
+        {
+            mLightDiffuseColourPowerScaledArray.resize(size);
+            for (size_t i = 0; i < size; ++i)
+            {
+                mLightDiffuseColourPowerScaledArray[i] = getLightDiffuseColourWithPower(i);
+            }
+        }
+
+        return mLightDiffuseColourPowerScaledArray.data();
     }
     //-----------------------------------------------------------------------------
     void AutoParamDataSource::setMainCamBoundsInfo(VisibleObjectsBoundsInfo* info)
