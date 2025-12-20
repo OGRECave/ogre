@@ -39,25 +39,11 @@ namespace Ogre {
 
     /** RenderTexture for GL ES 2 FBO
     */
-    class _OgreGLES2Export GLES2FBORenderTexture: public GLRenderTexture MANAGED_RESOURCE
+    class _OgreGLES2Export GLES2FBORenderTexture: public GLFBORenderTexture MANAGED_RESOURCE
     {
     public:
         GLES2FBORenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma);
-        
-        void getCustomAttribute(const String& name, void* pData) override;
 
-        /// Override needed to deal with multisample buffers
-        void swapBuffers() override;
-
-        /// Override so we can attach the depth buffer to the FBO
-        bool attachDepthBuffer( DepthBuffer *depthBuffer ) override;
-        void _detachDepthBuffer() override;
-
-        GLContext* getContext() const override { return mFB.getContext(); }
-        GLFrameBufferObjectCommon* getFBO() override { return &mFB; }
-    protected:
-        GLES2FrameBufferObject mFB;
-        
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         /** See AndroidResource. */
         void notifyOnContextLost() override;
