@@ -85,6 +85,13 @@ namespace Ogre {
         mutable Vector4 mLodCameraPosition;
         mutable Vector4 mLodCameraPositionObjectSpace;
 
+        // Light arrays fastpath
+        mutable std::vector<Vector4f> mLightPosViewSpaceArray;
+        mutable std::vector<Vector4f> mLightAttenuationArray;
+        mutable std::vector<Vector4f> mSpotlightParamsArray;
+        mutable std::vector<Vector4f> mLightDirViewSpaceArray;
+        mutable std::vector<ColourValue> mLightDiffuseColourPowerScaledArray;
+
         mutable bool mWorldMatrixDirty;
         mutable bool mViewMatrixDirty;
         mutable bool mProjMatrixDirty;
@@ -198,6 +205,13 @@ namespace Ogre {
         Real getLightPowerScale(size_t index) const;
         Vector4f getLightAttenuation(size_t index) const;
         Vector4f getSpotlightParams(size_t index) const;
+        // Light arrays fastpath
+        const Vector4f* getLightPositionViewSpaceArray(size_t size) const;
+        const Vector4f* getLightAttenuationArray(size_t size) const;
+        const Vector4f* getSpotlightParamsArray(size_t size) const;
+        const Vector4f* getLightDirectionViewSpaceArray(size_t size) const;
+        const ColourValue* getLightDiffuseColourPowerScaledArray(size_t size) const;
+
         void setAmbientLightColour(const ColourValue& ambient);
         const ColourValue& getAmbientLightColour(void) const;
         const ColourValue& getSurfaceAmbientColour(void) const;
