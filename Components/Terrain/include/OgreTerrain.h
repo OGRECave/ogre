@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreTerrainLayerBlendMap.h"
 #include "OgreWorkQueue.h"
 #include "OgreTerrainLodManager.h"
+#include <future>
 
 namespace Ogre
 {
@@ -1802,6 +1803,8 @@ namespace Ogre
         size_t getDeltaBufVertexSize() const;
 
         TerrainLodManager* mLodManager;
+
+        std::future<void> mDerivedDataFuture;
 
     public:
         /** Increase Terrain's LOD level by 1

@@ -1903,11 +1903,18 @@ namespace Ogre
             return;
         }
 
+        auto p = std::make_shared<std::promise<void>>();
+        OgreAssertDbg(!mDerivedDataFuture.valid() ||
+                          mDerivedDataFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready,
+                      "Previous derived future must be finished");
+        mDerivedDataFuture = p->get_future();
+
         Root::getSingleton().getWorkQueue()->addTask(
-            [this, req]()
+            [this, req, p]()
             {
                 auto r = new WorkQueue::Request(0, 0, req, 0, 0);
                 auto res = handleRequest(r, NULL);
+                p->set_value();
                 Root::getSingleton().getWorkQueue()->addMainThreadTask([this, res](){
                     handleResponse(res, NULL);
                     delete res;
@@ -1920,7 +1927,10 @@ namespace Ogre
         while (mDerivedDataUpdateInProgress || mGenerateMaterialInProgress || mPrepareInProgress)
         {
             // we need to wait for this to finish
-            OGRE_THREAD_SLEEP(50);
+            if (mDerivedDataUpdateInProgress && mDerivedDataFuture.valid())
+            {
+                mDerivedDataFuture.wait();
+            }
             Root::getSingleton().getWorkQueue()->processMainThreadTasks();
         }
 
