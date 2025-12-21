@@ -482,6 +482,9 @@ void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t window
         case CONTROLLERAXISMOTION:
             l.axisMoved(event.axis);
             break;
+        case JOYHATMOTION:
+            l.hatMoved(event.hat);
+            break;
         case CONTROLLERBUTTONDOWN:
             l.buttonPressed(event.cbutton);
             break;
