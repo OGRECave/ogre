@@ -1593,11 +1593,6 @@ namespace Ogre
 
         void waitForDerivedProcesses();
     private:
-        /// WorkQueue::RequestHandler override
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
-        /// WorkQueue::ResponseHandler override
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
-
         void generateMaterial();
 
         /** Gets the data size at a given LOD level.
@@ -1740,6 +1735,9 @@ namespace Ogre
             PixelBox* normalMapBox;
             PixelBox* lightMapBox;
         };
+
+        DerivedDataResponse handleRequest(DerivedDataRequest& req);
+        void handleResponse(const DerivedDataResponse& res, const DerivedDataRequest& req);
 
         String mMaterialName;
         MaterialPtr mMaterial;
