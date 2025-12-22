@@ -1896,10 +1896,8 @@ namespace Ogre
 
         if(synchronous)
         {
-            auto r = new WorkQueue::Request(0, 0, req, 0, 0);
-            auto res = handleRequest(r, NULL);
-            handleResponse(res, NULL);
-            delete res;
+            auto res = handleRequest(req);
+            handleResponse(res, req);
             return;
         }
 
@@ -1912,12 +1910,11 @@ namespace Ogre
         Root::getSingleton().getWorkQueue()->addTask(
             [this, req, p]()
             {
-                auto r = new WorkQueue::Request(0, 0, req, 0, 0);
-                auto res = handleRequest(r, NULL);
+                auto lreq = req; // make a mutable copy
+                auto res = handleRequest(lreq);
                 p->set_value();
-                Root::getSingleton().getWorkQueue()->addMainThreadTask([this, res](){
-                    handleResponse(res, NULL);
-                    delete res;
+                Root::getSingleton().getWorkQueue()->addMainThreadTask([this, res, lreq](){
+                    handleResponse(res, lreq);
                 });
             });
     }
@@ -2992,10 +2989,9 @@ namespace Ogre
             TerrainGlobalOptions::getSingleton().getUseVertexCompressionWhenAvailable();
     }
     //---------------------------------------------------------------------
-    WorkQueue::Response* Terrain::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
+    Terrain::DerivedDataResponse Terrain::handleRequest(DerivedDataRequest& ddr)
     {
         // Background thread (maybe)
-        DerivedDataRequest ddr = any_cast<DerivedDataRequest>(req->getData());
         DerivedDataResponse ddres;
         ddres.remainingTypeMask = ddr.typeMask & DERIVED_DATA_ALL;
 
@@ -3020,16 +3016,12 @@ namespace Ogre
         }
 
         ddres.terrain = ddr.terrain;
-        WorkQueue::Response* response = OGRE_NEW WorkQueue::Response(req, true, ddres);
-        return response;
+        return ddres;
     }
     //---------------------------------------------------------------------
-    void Terrain::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
+    void Terrain::handleResponse(const DerivedDataResponse& ddres, const DerivedDataRequest& ddreq)
     {
         // Main thread
-        DerivedDataResponse ddres = any_cast<DerivedDataResponse>(res->getData());
-        DerivedDataRequest ddreq = any_cast<DerivedDataRequest>(res->getRequest()->getData());
-
         if ((ddreq.typeMask & DERIVED_DATA_DELTAS) && 
             !(ddres.remainingTypeMask & DERIVED_DATA_DELTAS))
             finaliseHeightDeltas(ddres.deltaUpdateRect, false);
