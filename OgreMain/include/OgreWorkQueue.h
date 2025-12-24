@@ -47,7 +47,7 @@ namespace Ogre
     *  @{
     */
 
-    /** Interface to a general purpose task-basedbackground work queue.
+    /** Interface to a general purpose task-based background work queue.
 
         A work queue is a simple structure, where tasks of work are placed
         onto the queue, then removed by a worker for processing.
@@ -64,6 +64,15 @@ namespace Ogre
         number of background tasks. This doesn't mean you have to implement all the
         request processing in one class, you can plug in many handlers in order to
         process the tasks.
+
+        The WorkQueue distinguishes between two types of tasks:
+        1. Background tasks: Added via @ref addTask. These are processed by the worker threads.
+        2. Main thread tasks: Added via @ref addMainThreadTask. These are processed by the main thread
+           when @ref processMainThreadTasks is called. This is useful for tasks that need to access
+           resources that are not thread-safe or must be accessed from the main thread (e.g. GPU resources).
+
+        @ref processMainThreadTasks is automatically called by @ref Root::renderOneFrame (via @ref Root::_fireFrameEnded)
+        or can be called manually by the user in the main loop.
 
         This is an abstract interface definition; users can subclass this and 
         provide their own implementation if required to centralise task management
@@ -184,6 +193,8 @@ namespace Ogre
             try to clear all tasks before returning; however, you can specify
             a time limit on the tasks processing to limit the impact of
             spikes in demand by calling @ref setMainThreadProcessingTimeLimit.
+
+            @note This is automatically called by @ref Root::renderOneFrame.
         */
         virtual void processMainThreadTasks();
 
