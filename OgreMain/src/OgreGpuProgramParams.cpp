@@ -597,94 +597,27 @@ namespace Ogre
 
         for (const CopyDataEntry& e : mCopyDataList)
         {
-            if (e.dstDefinition->isFloat())
+            // dst type cannot be double, so src will never be double either
+            if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_4X4))
             {
                 const float* pSrc = sharedParams->getFloatPointer(e.srcDefinition->physicalIndex);
                 float* pDst = mParams->getFloatPointer(e.dstDefinition->physicalIndex);
 
-                // Deal with matrix transposition here!!!
-                // transposition is specific to the dest param set, shared params don't do it
-                if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_4X4))
+                // for each matrix that needs to be transposed and copied,
+                for (size_t iMat = 0; iMat < e.dstDefinition->arraySize; ++iMat)
                 {
-                    // for each matrix that needs to be transposed and copied,
-                    for (size_t iMat = 0; iMat < e.dstDefinition->arraySize; ++iMat)
-                    {
-                        for (int row = 0; row < 4; ++row)
-                            for (int col = 0; col < 4; ++col)
-                                pDst[row * 4 + col] = pSrc[col * 4 + row];
-                        pSrc += 16;
-                        pDst += 16;
-                    }
-                }
-                else
-                {
-                    if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
-                    {
-                        // simple copy
-                        memcpy(pDst, pSrc, sizeof(float) * e.dstDefinition->elementSize * e.dstDefinition->arraySize);
-                    }
-                    else
-                    {
-                        // target params may be padded to 4 elements, shared params are packed
-                        assert(e.dstDefinition->elementSize % 4 == 0);
-                        size_t iterations = e.dstDefinition->elementSize / 4
-                            * e.dstDefinition->arraySize;
-                        assert(iterations > 0);
-                        size_t valsPerIteration = e.srcDefinition->elementSize;
-                        for (size_t l = 0; l < iterations; ++l)
-                        {
-                            memcpy(pDst, pSrc, sizeof(float) * valsPerIteration);
-                            pSrc += valsPerIteration;
-                            pDst += 4;
-                        }
-                    }
+                    for (int row = 0; row < 4; ++row)
+                        for (int col = 0; col < 4; ++col)
+                            pDst[row * 4 + col] = pSrc[col * 4 + row];
+                    pSrc += 16;
+                    pDst += 16;
                 }
             }
-            else if (e.dstDefinition->isDouble())
+            else
             {
-                const double* pSrc = sharedParams->getDoublePointer(e.srcDefinition->physicalIndex);
-                double* pDst = mParams->getDoublePointer(e.dstDefinition->physicalIndex);
-
-                // Deal with matrix transposition here!!!
-                // transposition is specific to the dest param set, shared params don't do it
-                if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_DOUBLE_4X4))
-                {
-                    // for each matrix that needs to be transposed and copied,
-                    for (size_t iMat = 0; iMat < e.dstDefinition->arraySize; ++iMat)
-                    {
-                        for (int row = 0; row < 4; ++row)
-                            for (int col = 0; col < 4; ++col)
-                                pDst[row * 4 + col] = pSrc[col * 4 + row];
-                        pSrc += 16;
-                        pDst += 16;
-                    }
-                }
-                else
-                {
-                    if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
-                    {
-                        // simple copy
-                        memcpy(pDst, pSrc, sizeof(double) * e.dstDefinition->elementSize * e.dstDefinition->arraySize);
-                    }
-                    else
-                    {
-                        // target params may be padded to 4 elements, shared params are packed
-                        assert(e.dstDefinition->elementSize % 4 == 0);
-                        size_t iterations = e.dstDefinition->elementSize / 4
-                            * e.dstDefinition->arraySize;
-                        assert(iterations > 0);
-                        size_t valsPerIteration = e.srcDefinition->elementSize;
-                        for (size_t l = 0; l < iterations; ++l)
-                        {
-                            memcpy(pDst, pSrc, sizeof(double) * valsPerIteration);
-                            pSrc += valsPerIteration;
-                            pDst += 4;
-                        }
-                    }
-                }
-            }
-            else if (e.dstDefinition->isInt())
-            {
+                OgreAssertDbg(!e.dstDefinition->isSampler() && !e.dstDefinition->isDouble() &&
+                                  !e.dstDefinition->isSpecialization(),
+                              "expected 4 byte type");
                 const int* pSrc = sharedParams->getIntPointer(e.srcDefinition->physicalIndex);
                 int* pDst = mParams->getIntPointer(e.dstDefinition->physicalIndex);
 
@@ -695,48 +628,14 @@ namespace Ogre
                 }
                 else
                 {
-                    // target params may be padded to 4 elements, shared params are packed
-                    assert(e.dstDefinition->elementSize % 4 == 0);
-                    size_t iterations = (e.dstDefinition->elementSize / 4)
-                        * e.dstDefinition->arraySize;
-                    assert(iterations > 0);
-                    size_t valsPerIteration = e.srcDefinition->elementSize;
-                    for (size_t l = 0; l < iterations; ++l)
+                    // element wise copy
+                    for (uint32 l = 0; l < e.dstDefinition->arraySize; ++l)
                     {
-                        memcpy(pDst, pSrc, sizeof(int) * valsPerIteration);
-                        pSrc += valsPerIteration;
-                        pDst += 4;
+                        memcpy(pDst, pSrc, sizeof(int) * e.dstDefinition->elementSize);
+                        pSrc += e.srcDefinition->elementSize;
+                        pDst += e.dstDefinition->elementSize;
                     }
                 }
-            }
-            else if (e.dstDefinition->isUnsignedInt() || e.dstDefinition->isBool()) 
-            {
-                const uint* pSrc = sharedParams->getUnsignedIntPointer(e.srcDefinition->physicalIndex);
-                uint* pDst = mParams->getUnsignedIntPointer(e.dstDefinition->physicalIndex);
-
-                if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
-                {
-                    // simple copy
-                    memcpy(pDst, pSrc, sizeof(uint) * e.dstDefinition->elementSize * e.dstDefinition->arraySize);
-                }
-                else
-                {
-                    // target params may be padded to 4 elements, shared params are packed
-                    assert(e.dstDefinition->elementSize % 4 == 0);
-                    size_t iterations = (e.dstDefinition->elementSize / 4)
-                        * e.dstDefinition->arraySize;
-                    assert(iterations > 0);
-                    size_t valsPerIteration = e.srcDefinition->elementSize;
-                    for (size_t l = 0; l < iterations; ++l)
-                    {
-                        memcpy(pDst, pSrc, sizeof(uint) * valsPerIteration);
-                        pSrc += valsPerIteration;
-                        pDst += 4;
-                    }
-                }
-            }
-            else {
-                //TODO add error
             }
         }
     }
