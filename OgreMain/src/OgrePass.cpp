@@ -753,11 +753,6 @@ namespace Ogre {
         // TODO Unload programs
     }
     //-----------------------------------------------------------------------
-    void Pass::setVertexProgram(const String& name, bool resetParams)
-    {
-        setGpuProgram(GPT_VERTEX_PROGRAM, name, resetParams);
-    }
-    //-----------------------------------------------------------------------
     void Pass::setGpuProgramParameters(GpuProgramType type, const GpuProgramParametersSharedPtr& params)
     {
         OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
@@ -769,10 +764,6 @@ namespace Ogre {
                 "This pass does not have this program type assigned!");
         }
         programUsage->setParameters(params);
-    }
-    void Pass::setVertexProgramParameters(GpuProgramParametersSharedPtr params)
-    {
-        setGpuProgramParameters(GPT_VERTEX_PROGRAM, params);
     }
     //-----------------------------------------------------------------------
     void Pass::setGpuProgram(GpuProgramType type, const GpuProgramPtr& program, bool resetParams)
@@ -814,56 +805,6 @@ namespace Ogre {
 
         setGpuProgram(type, program, resetParams);
     }
-
-    void Pass::setFragmentProgram(const String& name, bool resetParams)
-    {
-        setGpuProgram(GPT_FRAGMENT_PROGRAM, name, resetParams);
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setFragmentProgramParameters(GpuProgramParametersSharedPtr params)
-    {
-        setGpuProgramParameters(GPT_FRAGMENT_PROGRAM, params);
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setGeometryProgram(const String& name, bool resetParams)
-    {
-        setGpuProgram(GPT_GEOMETRY_PROGRAM, name, resetParams);
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setGeometryProgramParameters(GpuProgramParametersSharedPtr params)
-    {
-        setGpuProgramParameters(GPT_GEOMETRY_PROGRAM, params);
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setTessellationHullProgram(const String& name, bool resetParams)
-    {
-        setGpuProgram(GPT_HULL_PROGRAM, name, resetParams);
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setTessellationHullProgramParameters(GpuProgramParametersSharedPtr params)
-    {
-        setGpuProgramParameters(GPT_HULL_PROGRAM, params);
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setTessellationDomainProgram(const String& name, bool resetParams)
-    {
-        setGpuProgram(GPT_DOMAIN_PROGRAM, name, resetParams);
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setTessellationDomainProgramParameters(GpuProgramParametersSharedPtr params)
-    {
-        setGpuProgramParameters(GPT_DOMAIN_PROGRAM, params);
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setComputeProgram(const String& name, bool resetParams)
-    {
-        setGpuProgram(GPT_COMPUTE_PROGRAM, name, resetParams);
-    }
-    //-----------------------------------------------------------------------
-    void Pass::setComputeProgramParameters(GpuProgramParametersSharedPtr params)
-    {
-        setGpuProgramParameters(GPT_COMPUTE_PROGRAM, params);
-    }
     //-----------------------------------------------------------------------
     const GpuProgramParametersSharedPtr& Pass::getGpuProgramParameters(GpuProgramType type) const
     {
@@ -874,11 +815,6 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "This pass has no " + to_string(type) + " program");
         }
         return programUsage->getParameters();
-    }
-
-    GpuProgramParametersSharedPtr Pass::getVertexProgramParameters(void) const
-    {
-        return getGpuProgramParameters(GPT_VERTEX_PROGRAM);
     }
 
     std::unique_ptr<GpuProgramUsage>& Pass::getProgramUsage(GpuProgramType programType) {
@@ -912,31 +848,6 @@ namespace Ogre {
             return BLANKSTRING;
         else
             return programUsage->getProgramName();
-    }
-    //-----------------------------------------------------------------------
-    GpuProgramParametersSharedPtr Pass::getFragmentProgramParameters(void) const
-    {
-        return getGpuProgramParameters(GPT_FRAGMENT_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
-    GpuProgramParametersSharedPtr Pass::getGeometryProgramParameters(void) const
-    {
-        return getGpuProgramParameters(GPT_GEOMETRY_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
-    GpuProgramParametersSharedPtr Pass::getTessellationHullProgramParameters(void) const
-    {
-        return getGpuProgramParameters(GPT_HULL_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
-    GpuProgramParametersSharedPtr Pass::getTessellationDomainProgramParameters(void) const
-    {
-        return getGpuProgramParameters(GPT_DOMAIN_PROGRAM);
-    }
-    //-----------------------------------------------------------------------
-    GpuProgramParametersSharedPtr Pass::getComputeProgramParameters(void) const
-    {
-        return getGpuProgramParameters(GPT_COMPUTE_PROGRAM);
     }
     //-----------------------------------------------------------------------
     bool Pass::isLoaded(void) const
