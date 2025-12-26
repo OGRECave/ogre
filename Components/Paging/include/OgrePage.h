@@ -59,6 +59,8 @@ namespace Ogre
         bool mModified;
 
         SceneNode* mDebugNode;
+        bool mInUnload;
+
         void updateDebugDisplay();
 
         struct PageData : public PageAlloc
