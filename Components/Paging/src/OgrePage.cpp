@@ -53,6 +53,7 @@ namespace Ogre
         , mDeferredProcessInProgress(false)
         , mModified(false)
         , mDebugNode(0)
+        , mInUnload(false)
     {
         touch();
     }
@@ -171,6 +172,7 @@ namespace Ogre
         {
             destroyAllContentCollections();
             mDeferredProcessInProgress = true;
+            mInUnload = false;
 
             if(synchronous)
             {
@@ -195,6 +197,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void Page::unload()
     {
+        mInUnload = true;
         destroyAllContentCollections();
     }
     //---------------------------------------------------------------------
@@ -225,7 +228,7 @@ namespace Ogre
         PageResponse pres = any_cast<PageResponse>(res->getData());
 
         // final loading behaviour
-        if (res->succeeded())
+        if (res->succeeded() && !mInUnload)
         {
             if(!pres.pageData->collectionsToAdd.empty())
                 std::swap(mContentCollections, pres.pageData->collectionsToAdd);
