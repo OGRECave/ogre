@@ -578,12 +578,12 @@ namespace Ogre {
 
         auto& hbm = static_cast<GL3PlusHardwareBufferManager&>(HardwareBufferManager::getSingleton());
 
-        const GLenum blockProperties[3] = {GL_NUM_ACTIVE_VARIABLES, GL_NAME_LENGTH, GL_BUFFER_DATA_SIZE};
+        const GLenum blockProperties[4] = {GL_NUM_ACTIVE_VARIABLES, GL_NAME_LENGTH, GL_BUFFER_DATA_SIZE, GL_BUFFER_BINDING};
         for(int blockIdx = 0; blockIdx < numBlocks; ++blockIdx)
         {
-            GLint values[3];
-            OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(mGLProgramHandle, type, blockIdx, 3, blockProperties,
-                                                       3, NULL, values));
+            GLint values[4];
+            OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(mGLProgramHandle, type, blockIdx, 4, blockProperties,
+                                                       4, NULL, values));
             if(values[0] == 0) continue;
 
             std::vector<char> nameData(values[1]);
@@ -611,14 +611,25 @@ namespace Ogre {
             if(!hwGlBuffer)
             {
                 size_t binding = 0;
-                if(type == GL_UNIFORM_BLOCK)
+                if(values[3] > 0)
+                {
+                    binding = values[3];
+                }
+                else if(type == GL_UNIFORM_BLOCK)
                 {
                     binding = hbm.getUniformBufferCount() + 2; // slots 0 & 1 are reserved for defaultbuffer
-                    hwGlBuffer = hbm.createUniformBuffer(values[2]);
                 }
                 else
                 {
                     binding = hbm.getShaderStorageBufferCount();
+                }
+
+                if(type == GL_UNIFORM_BLOCK)
+                {
+                    hwGlBuffer = hbm.createUniformBuffer(values[2]);
+                }
+                else
+                {
                     hwGlBuffer = hbm.createShaderStorageBuffer(values[2]);
                 }
 
