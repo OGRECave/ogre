@@ -46,11 +46,11 @@ public:
 
     GizmoMode getMode() { return mMode; }
 
-    void pickAxis(const Ogre::Ray& ray);
+    bool pickAxis(Ogre::Ray& ray);
 
     void startDrag(const Ogre::Ray& startRay, const Ogre::Vector3& cameraDir);
 
-    void computeDrag(const Ogre::Ray& ray, const Ogre::Vector3& cameraDir);
+    void computeDrag(Ogre::Ray& ray, const Ogre::Vector3& cameraDir);
 
     void stopDrag();
 
@@ -67,6 +67,8 @@ protected:
 
     static Ogre::Real rayLineDistance(const Ogre::Ray& ray, const Ogre::Vector3& lineOrigin,
                                       const Ogre::Vector3& lineDir, Ogre::Real lineLength);
+
+    Ogre::Ray toLocalRay(const Ogre::Ray& worldRay) const;
 
     static bool pickRotateRing(const Ogre::Ray& ray, const Ogre::Vector3& center, const Ogre::Vector3& axis, Ogre::Real radius,
                         Ogre::Real tolerance);

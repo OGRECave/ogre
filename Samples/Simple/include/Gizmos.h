@@ -23,8 +23,6 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
 
     void setupContent() override
     {
-        mSceneMgr->showBoundingBoxes(true);
-
         mRayQuery = mSceneMgr->createRayQuery(Ray());
         mRayQuery->setSortByDistance(true);
         mViewport->setBackgroundColour(ColourValue::White);
@@ -41,10 +39,19 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         mLightPivot->createChildSceneNode(Vector3(20, 40, 50))->attachObject(light);
 
         // create our model, give it the shader material, and place it at the origin
-        // Entity *ent = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-        // ent->setMaterialName("Examples/CelShading");
+        Entity *ent = mSceneMgr->createEntity("Head", "tudorhouse.mesh");
+        Entity *ent2 = mSceneMgr->createEntity("Head2", "ogrehead.mesh");
+        Entity *ent3 = mSceneMgr->createEntity("Head3", "knot.mesh");
         auto node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        // node->attachObject(ent);
+        auto node2 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        auto node3 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        node->attachObject(ent);
+        node2->attachObject(ent2);
+        node3->attachObject(ent3);
+        node2->setPosition(75, 0, 0);
+        node3->setPosition(-75, 0, 0);
+        node3->setScale(Vector3{0.25,0.25, 0.25});
+        mSelectedEnt = ent;
         mGizmo = new Gizmo(mSceneMgr, node, G_TRANSLATE);
 
         // create a checkbox to toggle light movement
@@ -65,7 +72,9 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         }
 
         if (mCameraMan->mouseMoved(evt)) return true;
-        Entity* hover = pickEntity(nx, ny);
+        Ray ray = mCamera->getCameraToViewportRay(nx, ny);
+        mRayQuery->setRay(ray);
+        mGizmo->pickAxis(ray);
         return true;
     }
 
@@ -76,16 +85,14 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
             float nx = evt.x / float(mWindow->getWidth());
             float ny = evt.y / float(mWindow->getHeight());
 
-            Entity* picked = pickEntity(nx, ny);
-
-            if (mGizmo->isGizmoEntity(picked))
+            Ray ray = mCamera->getCameraToViewportRay(nx, ny);
+            mRayQuery->setRay(ray);
+            if (mGizmo->pickAxis(ray))
             {
-                mGizmo->startDrag(
-                    mCamera->getCameraToViewportRay(nx, ny),
-                    mCamera->getDerivedDirection()
-                );
+                mGizmo->startDrag(mCamera->getCameraToViewportRay(nx, ny), mCamera->getDerivedDirection());
                 return true;
             }
+            // selectEntity(pickEntity(ray));
             if (mCameraMan->mousePressed(evt))
             {
                 return true;
@@ -112,11 +119,8 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
 
 private:
 
-    Entity* pickEntity(float x, float y)
+    Entity* pickEntity(Ray& ray)
     {
-        Ray ray = mCamera->getCameraToViewportRay(x, y);
-        mRayQuery->setRay(ray);
-
         auto& hits = mRayQuery->execute();
         for (auto& h : hits)
         {
@@ -125,16 +129,17 @@ private:
             auto* ent = dynamic_cast<Entity*>(h.movable);
             if (!ent) continue;
 
-            // Is this one of the gizmo entities?
-            if (mGizmo->isGizmoEntity(ent))
-            {
-                mGizmo->pickAxis(ray);
-                return ent;
-            }
             return ent;
         }
         return nullptr;
     }
+
+    // void selectEntity(Entity* ent)
+    // {
+    //     if (ent != mSelectedEnt && !mGizmo->isGizmoEntity(ent))
+    //     mSelectedEnt = ent;
+    //     mGizmo->attachTo(ent->getParentSceneNode());
+    // }
 
     void buttonHit( Button* button ) override
     {
@@ -157,6 +162,7 @@ private:
     enum ShaderParam { SP_SHININESS = 1, SP_DIFFUSE, SP_SPECULAR };
     RaySceneQuery* mRayQuery;
     Gizmo* mGizmo;
+    Entity* mSelectedEnt;
     SceneNode* mLightPivot;
     Button* mTranslate;
     Button* mRotate;
