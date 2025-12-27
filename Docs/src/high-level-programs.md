@@ -150,7 +150,7 @@ layout(binding = 0) uniform sampler2D diffuseMap;
 uniform sampler2D diffuseMap;
 ```
 
-@note as we cannot detect the presence of explicit binding, you must add the `has_sampler_binding true` option to the program definition, so your locations are not overriden
+@note as we cannot always detect the presence of explicit binding, you should add the `has_sampler_binding true` option to the program definition, so your locations are not overriden
 
 Binding the sampler in material script is done as:
 

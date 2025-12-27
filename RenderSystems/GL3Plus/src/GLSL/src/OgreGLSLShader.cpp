@@ -556,8 +556,13 @@ namespace Ogre {
             }
             else if(def.isSampler())
             {
-                if(mHasSamplerBinding)
+                GLint binding = 0;
+                if(values[3] != -1)
+                    OGRE_CHECK_GL_ERROR(glGetUniformiv(mGLProgramHandle, values[3], &binding));
+
+                if(binding > 0 || mHasSamplerBinding)
                     continue;
+
                 def.physicalIndex = mConstantDefs->registerCount;
                 mConstantDefs->registerCount += def.arraySize * def.elementSize;
                 // no index based referencing
