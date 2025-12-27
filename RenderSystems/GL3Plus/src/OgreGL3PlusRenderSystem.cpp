@@ -1582,6 +1582,28 @@ namespace Ogre {
             return;
         }
 
+        auto& bufferInfoMap = mCurrentShader[gptype]->getBufferInfoMap();
+        for (const auto& usage : params->getSharedParameters())
+        {
+            auto it = bufferInfoMap.find(usage.getName());
+            if (it == bufferInfoMap.end())
+                continue; // TODO warn?
+
+            auto hwBuffer = usage.getSharedParams()->_getHardwareBuffer();
+            auto bufSize = usage.getSharedParams()->getConstantList().size();
+            if (!hwBuffer || hwBuffer->getSizeInBytes() < bufSize)
+            {
+                auto hbm = static_cast<GL3PlusHardwareBufferManager*>(mHardwareBufferManager);
+                if(it->second.bufferType == GL_UNIFORM_BLOCK)
+                    hwBuffer = hbm->createUniformBuffer(bufSize);
+                else
+                    hwBuffer = hbm->createShaderStorageBuffer(bufSize);
+                usage.getSharedParams()->_setHardwareBuffer(hwBuffer);
+            }
+
+            static_cast<GL3PlusHardwareBuffer*>(hwBuffer.get())->setGLBufferBinding(it->second.binding);
+        }
+
         if (mask & (uint16)GPV_GLOBAL)
         {
             params->_updateSharedParams();

@@ -34,7 +34,8 @@
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
-
+    struct BufferInfo { int binding; uint bufferType; };
+    typedef std::map<String, BufferInfo> BufferInfoMap;
     class GLUniformCache;
     class GLSLShader : public GLSLShaderCommon
     {
@@ -52,6 +53,8 @@ namespace Ogre {
         void setSamplerBinding(bool enable) { mHasSamplerBinding = enable; }
         bool getSamplerBinding() const { return mHasSamplerBinding; }
 
+        const BufferInfoMap& getBufferInfoMap() const { return mBufferInfoMap; }
+
         /// Overridden from GpuProgram
         const String& getLanguage(void) const override;
     protected:
@@ -68,6 +71,7 @@ namespace Ogre {
         void extractUniforms(int block = -1) const;
         void extractBufferBlocks(GLenum type);
 
+        BufferInfoMap mBufferInfoMap;
         bool mHasSamplerBinding;
     };
 

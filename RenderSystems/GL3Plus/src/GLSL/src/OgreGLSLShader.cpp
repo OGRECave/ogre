@@ -581,8 +581,6 @@ namespace Ogre {
         GLint numBlocks = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(mGLProgramHandle, type, GL_ACTIVE_RESOURCES, &numBlocks));
 
-        auto& hbm = static_cast<GL3PlusHardwareBufferManager&>(HardwareBufferManager::getSingleton());
-
         const GLenum blockProperties[4] = {GL_NUM_ACTIVE_VARIABLES, GL_NAME_LENGTH, GL_BUFFER_DATA_SIZE, GL_BUFFER_BINDING};
         for(int blockIdx = 0; blockIdx < numBlocks; ++blockIdx)
         {
@@ -610,39 +608,13 @@ namespace Ogre {
                 continue;
             }
 
-            auto blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(name);
-
-            HardwareBufferPtr hwGlBuffer = blockSharedParams->_getHardwareBuffer();
-            if(!hwGlBuffer)
+            // slots 0 & 1 are reserved for defaultbuffer
+            int binding = type == GL_UNIFORM_BLOCK ? blockIdx + 2 : blockIdx;
+            if(values[3] > 0)
             {
-                size_t binding = 0;
-                if(values[3] > 0)
-                {
-                    binding = values[3];
-                }
-                else if(type == GL_UNIFORM_BLOCK)
-                {
-                    binding = hbm.getUniformBufferCount() + 2; // slots 0 & 1 are reserved for defaultbuffer
-                }
-                else
-                {
-                    binding = hbm.getShaderStorageBufferCount();
-                }
-
-                if(type == GL_UNIFORM_BLOCK)
-                {
-                    hwGlBuffer = hbm.createUniformBuffer(values[2]);
-                }
-                else
-                {
-                    hwGlBuffer = hbm.createShaderStorageBuffer(values[2]);
-                }
-
-                static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->setGLBufferBinding(int(binding));
-                blockSharedParams->_setHardwareBuffer(hwGlBuffer);
+                binding = values[3];
             }
-
-            int binding = static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->getGLBufferBinding();
+            mBufferInfoMap[name] = {binding, type};
 
             if(type == GL_UNIFORM_BLOCK)
             {
