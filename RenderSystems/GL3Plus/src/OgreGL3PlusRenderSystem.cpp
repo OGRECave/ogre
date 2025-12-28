@@ -1586,11 +1586,11 @@ namespace Ogre {
         for (const auto& usage : params->getSharedParameters())
         {
             auto it = bufferInfoMap.find(usage.getName());
-            if (it == bufferInfoMap.end())
+            auto bufSize = usage.getSharedParams()->getConstantList().size();
+            if (it == bufferInfoMap.end() || bufSize == 0)
                 continue; // TODO warn?
 
             auto hwBuffer = usage.getSharedParams()->_getHardwareBuffer();
-            auto bufSize = usage.getSharedParams()->getConstantList().size();
             if (!hwBuffer || hwBuffer->getSizeInBytes() < bufSize)
             {
                 auto hbm = static_cast<GL3PlusHardwareBufferManager*>(mHardwareBufferManager);
