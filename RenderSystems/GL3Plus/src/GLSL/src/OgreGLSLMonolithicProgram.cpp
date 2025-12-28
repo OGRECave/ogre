@@ -127,9 +127,19 @@ namespace Ogre {
             params[i] = &(mShaders[i]->getConstantDefinitions().map);
         }
 
+        BufferInfoMap bufferInfoMap;
+
         // Do we know how many shared params there are yet? Or if there are any blocks defined?
         GLSLProgramManager::getSingleton().extractUniformsFromProgram(mGLProgramHandle, params,
-                                                                      mGLUniformReferences);
+                                                                      mGLUniformReferences, bufferInfoMap);
+        // assign UBOs to all shaders
+        for (auto shader : mShaders)
+        {
+            if(shader)
+            {
+                static_cast<GLSLShader*>(shader)->_setBufferInfoMap(bufferInfoMap);
+            }
+        }
 
         mUniformRefsBuilt = true;
     }

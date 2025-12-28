@@ -55,6 +55,8 @@ namespace Ogre {
 
         const BufferInfoMap& getBufferInfoMap() const { return mBufferInfoMap; }
 
+        void _setBufferInfoMap(const BufferInfoMap& bufferInfoMap) { mBufferInfoMap = bufferInfoMap; }
+
         /// Overridden from GpuProgram
         const String& getLanguage(void) const override;
     protected:

@@ -76,10 +76,8 @@ namespace Ogre {
 
         /** Populate a list of uniforms based on an OpenGL program object.
         */
-        void extractUniformsFromProgram(
-            GLuint programObject,
-            const GpuConstantDefinitionMap* (&constantDefs)[6],
-            GLUniformReferenceList& uniformList);
+        void extractUniformsFromProgram(GLuint programObject, const GpuConstantDefinitionMap* (&constantDefs)[6],
+                                        GLUniformReferenceList& uniformList, BufferInfoMap& bufferInfoMap);
 
         GL3PlusStateCacheManager* getStateCacheManager();
 
