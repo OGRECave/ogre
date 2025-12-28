@@ -122,7 +122,7 @@ namespace Ogre {
 
     void GLSLProgramManager::extractUniformsFromProgram(GLuint programObject,
                                                         const GpuConstantDefinitionMap* (&constantDefs)[6],
-                                                        GLUniformReferenceList& uniformList)
+                                                        GLUniformReferenceList& uniformList, BufferInfoMap& bufferInfoMap)
     {
 #define uniformLength 200
         //              GLint uniformLength = 0;
@@ -155,34 +155,16 @@ namespace Ogre {
         // This could be impemented as a switch-like statement inside shared_params:
 
         // Now deal with uniform blocks
-        auto& hbm = static_cast<GL3PlusHardwareBufferManager&>(HardwareBufferManager::getSingleton());
         GLint blockCount = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount));
 
         for (int index = 0; index < blockCount; index++)
         {
             OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockName(programObject, index, uniformLength, NULL, uniformName));
-
-            // Map uniform block to binding point of GL buffer of
-            // shared param bearing the same name.
-            GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
-
-            HardwareBufferPtr hwGlBuffer = blockSharedParams->_getHardwareBuffer();
-            if (!hwGlBuffer)
-            {
-                // Create buffer and add entry to buffer map.
-                GLint blockSize;
-                OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
-
-                auto binding = hbm.getUniformBufferCount();
-                hwGlBuffer = hbm.createUniformBuffer(blockSize);
-                static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->setGLBufferBinding(int(binding));
-
-                blockSharedParams->_setHardwareBuffer(hwGlBuffer);
-            }
-
-            OGRE_CHECK_GL_ERROR(glUniformBlockBinding(
-                programObject, index, static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->getGLBufferBinding()));
+            // slots 0 & 1 are reserved for defaultbuffer
+            auto binding = index + 2;
+            bufferInfoMap[uniformName] = {binding, GL_UNIFORM_BLOCK};
+            OGRE_CHECK_GL_ERROR(glUniformBlockBinding(programObject, index, binding));
         }
 
         // Now deal with shader storage blocks
@@ -196,32 +178,8 @@ namespace Ogre {
             for (int index = 0; index < blockCount; index++)
             {
                 OGRE_CHECK_GL_ERROR(glGetProgramResourceName(programObject, GL_SHADER_STORAGE_BLOCK, index, uniformLength, NULL, uniformName));
-
-                // Map uniform block to binding point of GL buffer of
-                // shared param bearing the same name.
-
-                GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
-
-                HardwareBufferPtr hwGlBuffer = blockSharedParams->_getHardwareBuffer();
-                if (!hwGlBuffer)
-                {
-                    // Create buffer and add entry to buffer map.
-                    GLint blockSize;
-                    // const GLenum properties [2] = {GL_BUFFER_DATA_SIZE, GL_BUFFER_BINDING};
-                    GLenum properties[] = {GL_BUFFER_DATA_SIZE};
-                    OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(programObject, GL_SHADER_STORAGE_BLOCK, index, 1, properties, 1, NULL, &blockSize));
-                    //TODO Implement shared param access param in materials (R, W, R+W)
-
-                    auto binding = hbm.getShaderStorageBufferCount();
-                    hwGlBuffer = hbm.createShaderStorageBuffer(blockSize);
-                    static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->setGLBufferBinding(binding);
-
-                    blockSharedParams->_setHardwareBuffer(hwGlBuffer);
-                }
-
-                OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(
-                    programObject, index,
-                    static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->getGLBufferBinding()));
+                bufferInfoMap[uniformName] = {index, GL_SHADER_STORAGE_BLOCK};
+                OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, index));
             }
         }
     }
