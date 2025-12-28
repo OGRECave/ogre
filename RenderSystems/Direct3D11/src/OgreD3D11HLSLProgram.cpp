@@ -823,10 +823,6 @@ namespace Ogre {
                     }
                     else
                     {
-                        auto blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(cb_name);
-
-                        auto cbuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size);
-                        blockSharedParams->_setHardwareBuffer(cbuffer);
                         mBufferInfoMap[cb_name] = b;
                     }
                 }
