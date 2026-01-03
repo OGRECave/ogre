@@ -1,11 +1,13 @@
-uniform sampler2D inRTT;
+#include "OgreUnifiedShader.h"
+
+SAMPLER2D(inRTT, 0);
 
 uniform vec4 sampleOffsets[15];
 uniform vec4 sampleWeights[15];
 
-varying vec2 oUv0;
-
-void main(void)
+MAIN_PARAMETERS
+IN(vec2 oUv0, TEXCOORD0)
+MAIN_DECLARATION
 {
     vec4 accum = vec4(0.0, 0.0, 0.0, 1.0);
 	vec2 sampleUV;
