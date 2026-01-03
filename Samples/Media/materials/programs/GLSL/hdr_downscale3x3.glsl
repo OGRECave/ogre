@@ -1,9 +1,11 @@
-uniform sampler2D inRTT;
+#include "OgreUnifiedShader.h"
+
+SAMPLER2D(inRTT, 0);
 uniform vec2 texelSize;
 
-varying vec2 oUv0;
-
-void main(void)
+MAIN_PARAMETERS
+IN(vec2 oUv0, TEXCOORD0)
+MAIN_DECLARATION
 {
     vec4 accum = vec4(0.0, 0.0, 0.0, 0.0);
 

@@ -103,7 +103,7 @@ material Ogre/MRTtest/quad
 			depth_func always_pass
             polygon_mode_overrideable false
 
-			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 
