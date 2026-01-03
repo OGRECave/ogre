@@ -1,6 +1,6 @@
-const float MIDDLE_GREY = 0.72;
-const float FUDGE = 0.001;
-const float L_WHITE = 1.5;
+STATIC const float MIDDLE_GREY = 0.72;
+STATIC const float FUDGE = 0.001;
+STATIC const float L_WHITE = 1.5;
 
 /** Tone mapping function 
 @note Only affects rgb, not a

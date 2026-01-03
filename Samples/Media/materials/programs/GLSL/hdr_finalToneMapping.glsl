@@ -1,12 +1,14 @@
-uniform sampler2D inRTT;
-uniform sampler2D inBloom;
-uniform sampler2D inLum;
-
-varying vec2 oUv0;
+#include "OgreUnifiedShader.h"
 
 #include "hdr_tonemap_util.glsl"
 
-void main(void)
+SAMPLER2D(inRTT, 0);
+SAMPLER2D(inBloom, 1);
+SAMPLER2D(inLum, 2);
+
+MAIN_PARAMETERS
+IN(vec2 oUv0, TEXCOORD0)
+MAIN_DECLARATION
 {
 	// Get main scene colour
     vec4 sceneCol = texture2D(inRTT, oUv0);

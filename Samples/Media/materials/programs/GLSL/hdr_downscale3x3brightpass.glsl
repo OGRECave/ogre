@@ -1,13 +1,17 @@
-uniform sampler2D inRTT;
-uniform sampler2D inLum;
-uniform vec2 texelSize;
-
-varying vec2 oUv0;
-const vec4 BRIGHT_LIMITER = vec4(0.6, 0.6, 0.6, 0.0);
+#include "OgreUnifiedShader.h"
 
 #include "hdr_tonemap_util.glsl"
 
-void main(void)
+SAMPLER2D(inRTT, 0);
+SAMPLER2D(inLum, 1);
+
+uniform vec2 texelSize;
+
+STATIC const vec4 BRIGHT_LIMITER = vec4(0.6, 0.6, 0.6, 0.0);
+
+MAIN_PARAMETERS
+IN(vec2 oUv0, TEXCOORD0)
+MAIN_DECLARATION
 {
     vec4 accum = vec4(0.0, 0.0, 0.0, 0.0);
 

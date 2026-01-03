@@ -1,13 +1,16 @@
-uniform sampler2D inRTT;
+#include "OgreUnifiedShader.h"
+
+SAMPLER2D(inRTT, 0);
+
 uniform vec2 texelSize;
 
-varying vec2 oUv0;
+STATIC const vec4 LUMINENCE_FACTOR  = vec4(0.27, 0.67, 0.06, 0.0); // NTSC (1953)
 
-void main(void)
+MAIN_PARAMETERS
+IN(vec2 oUv0, TEXCOORD0)
+MAIN_DECLARATION
 {
-	
     vec4 accum = vec4(0.0, 0.0, 0.0, 0.0);
-	vec4 LUMINENCE_FACTOR  = vec4(0.27, 0.67, 0.06, 0.0);
 
     // Get colour from source
     accum += texture2D(inRTT, oUv0 + texelSize * vec2(-0.5, -0.5));
