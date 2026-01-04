@@ -5,7 +5,6 @@
 #include "OgreSubEntity.h"
 #include "OgreTechnique.h"
 #include <OgreEntity.h>
-#include <iostream>
 
 namespace OgreBites
 {
@@ -134,6 +133,7 @@ void Gizmo::attachTo(Ogre::SceneNode* target)
 
     mGizmoNode->setPosition(Ogre::Vector3::ZERO);
     mGizmoNode->setOrientation(Ogre::Quaternion::IDENTITY);
+    scaleToParent();
 }
 
 void Gizmo::setMode(GizmoMode mode)
@@ -220,86 +220,130 @@ bool Gizmo::isGizmoEntity(Ogre::Entity* ent) const
     return false;
 }
 
-void Gizmo::startDrag(const Ogre::Ray& startRay, const Ogre::Vector3& cameraDir)
+void Gizmo::startDrag(const Ogre::Ray& startRay,
+                      const Ogre::Vector3& cameraDir)
 {
+    mGizmoWorldAtDragStart =
+    mGizmoNode->_getFullTransform();
+
+    mGizmoWorldInvAtDragStart =
+        mGizmoWorldAtDragStart.inverse();
+
     mDragging = true;
 
-    // cache initial object transform
-    mInitialObjectPos = mParentNode->getPosition();
-    mInitialObjectRot = mParentNode->getOrientation();
+    mInitialObjectPos   = mParentNode->getPosition();
+    mInitialObjectRot   = mParentNode->getOrientation();
     mInitialObjectScale = mParentNode->getScale();
 
-    mDragAxis = Ogre::Vector3::ZERO;
+    mDragAxisLocal = Ogre::Vector3::ZERO;
 
-    if (mActiveAxis & AXIS_X) mDragAxis += Ogre::Vector3::UNIT_X;
-    if (mActiveAxis & AXIS_Y) mDragAxis += Ogre::Vector3::UNIT_Y;
-    if (mActiveAxis & AXIS_Z) mDragAxis += Ogre::Vector3::UNIT_Z;
+    if (mActiveAxis & AXIS_X) mDragAxisLocal += Ogre::Vector3::UNIT_X;
+    if (mActiveAxis & AXIS_Y) mDragAxisLocal += Ogre::Vector3::UNIT_Y;
+    if (mActiveAxis & AXIS_Z) mDragAxisLocal += Ogre::Vector3::UNIT_Z;
 
-    if (mDragAxis.isZeroLength())
-        return; // safety
+    if (mDragAxisLocal.isZeroLength())
+        return;
 
-    mDragAxis.normalise();
+    mDragAxisLocal.normalise();
 
-    mDragStartHitPos = computePlaneHit(startRay, mDragAxis, cameraDir, mInitialObjectPos);
+    mDragAxisWorld =
+        mGizmoNode->_getDerivedOrientation() * mDragAxisLocal;
+    mDragAxisWorld.normalise();
+
+    Ogre::Ray localRay = toDragLocalRay(startRay);
+
+    mDragStartHitLocal =
+        computePlaneHit(localRay,
+                        mDragAxisLocal,
+                        cameraDir,
+                        Ogre::Vector3::ZERO);
 }
 
-void Gizmo::computeDrag(Ogre::Ray& ray, const Ogre::Vector3& cameraDir)
+void Gizmo::computeDrag(Ogre::Ray& ray,
+                        const Ogre::Vector3& cameraDir)
 {
-    ray = toLocalRay(ray);
-    if (!mActiveAxis)
+    if (!mDragging || !mActiveAxis)
         return;
+
+    Ogre::Ray localRay = toLocalRay(ray);
 
     if (mMode == G_TRANSLATE)
     {
-        Ogre::Vector3 hit = computePlaneHit(ray, mDragAxis, cameraDir, mInitialObjectPos);
-        Ogre::Real amount = (hit - mInitialObjectPos).dotProduct(mDragAxis);
+        Ogre::Vector3 hitLocal =
+            computePlaneHit(localRay,
+                            mDragAxisLocal,
+                            cameraDir,
+                            Ogre::Vector3::ZERO);
 
-        mParentNode->setPosition(mInitialObjectPos + mDragAxis * amount);
+        Ogre::Real delta =
+            (hitLocal - mDragStartHitLocal).dotProduct(mDragAxisLocal);
+
+        Ogre::Vector3 gizmoScale =
+            mGizmoNode->_getDerivedScale();
+
+        Ogre::Real axisScale =
+            std::abs(mDragAxisLocal.dotProduct(gizmoScale));
+
+        mParentNode->setPosition(
+            mInitialObjectPos + mDragAxisWorld * (delta * axisScale)
+        );
+
         return;
     }
+
     if (mMode == G_ROTATE)
     {
-        // rotation uses a different plane: plane normal = mDragAxis
-        Ogre::Plane plane(mDragAxis, mInitialObjectPos);
-        auto r = ray.intersects(plane);
+        // Plane is LOCAL
+        Ogre::Plane plane(mDragAxisLocal, Ogre::Vector3::ZERO);
+        auto r = localRay.intersects(plane);
         if (!r.first)
             return;
 
-        Ogre::Vector3 hit = ray.getPoint(r.second);
+        Ogre::Vector3 hitLocal = localRay.getPoint(r.second);
 
-        Ogre::Vector3 v0 = (mDragStartHitPos - mInitialObjectPos).normalisedCopy();
-        Ogre::Vector3 v1 = (hit - mInitialObjectPos).normalisedCopy();
+        Ogre::Vector3 v0 =
+            (mDragStartHitLocal).normalisedCopy();
+        Ogre::Vector3 v1 =
+            (hitLocal).normalisedCopy();
 
-        Ogre::Real dot = Ogre::Math::Clamp(v0.dotProduct(v1), -1.0f, 1.0f);
+        Ogre::Real dot =
+            Ogre::Math::Clamp(v0.dotProduct(v1), -1.0f, 1.0f);
+
         Ogre::Radian angle = Ogre::Math::ACos(dot);
 
-        if (v0.crossProduct(v1).dotProduct(mDragAxis) < 0)
+        if (v0.crossProduct(v1).dotProduct(mDragAxisLocal) < 0)
             angle = -angle;
 
-        // Apply rotation relative to initial orientation
-        mParentNode->setOrientation(mInitialObjectRot * Ogre::Quaternion(angle, mDragAxis));
+        // Rotate in WORLD space
+        mParentNode->setOrientation(
+            mInitialObjectRot *
+            Ogre::Quaternion(angle, mDragAxisWorld)
+        );
         return;
     }
+
     if (mMode == G_SCALE)
     {
-        Ogre::Vector3 hit = computePlaneHit(ray, mDragAxis, cameraDir, mInitialObjectPos);
+        Ogre::Vector3 hitLocal =
+            computePlaneHit(localRay,
+                            mDragAxisLocal,
+                            cameraDir,
+                            Ogre::Vector3::ZERO);
 
-        float startDist = (mDragStartHitPos - mInitialObjectPos).dotProduct(mDragAxis);
-        float currDist = (hit - mInitialObjectPos).dotProduct(mDragAxis);
+        Ogre::Real startDist =
+            mDragStartHitLocal.dotProduct(mDragAxisLocal);
+        Ogre::Real currDist =
+            hitLocal.dotProduct(mDragAxisLocal);
 
-        float delta = currDist - startDist;
-
-        // Linear scaling factor
-        float scaleFactor = 1.0f + delta * 0.01f;
+        Ogre::Real delta = currDist - startDist;
+        Ogre::Real scaleFactor = 1.0f + delta * 0.01f;
 
         Ogre::Vector3 newScale = mInitialObjectScale;
 
-        if (mDragAxis == Ogre::Vector3::UNIT_X)
-            newScale.x *= scaleFactor;
-        if (mDragAxis == Ogre::Vector3::UNIT_Y)
-            newScale.y *= scaleFactor;
-        if (mDragAxis == Ogre::Vector3::UNIT_Z)
-            newScale.z *= scaleFactor;
+        if (mActiveAxis & AXIS_X) newScale.x *= scaleFactor;
+        if (mActiveAxis & AXIS_Y) newScale.y *= scaleFactor;
+        if (mActiveAxis & AXIS_Z) newScale.z *= scaleFactor;
+
         mParentNode->setScale(newScale);
     }
 }
@@ -326,7 +370,10 @@ Ogre::Vector3 Gizmo::computePlaneHit(const Ogre::Ray& ray, const Ogre::Vector3& 
 void Gizmo::stopDrag()
 {
     mDragging = false;
+    mDragAxisLocal = Ogre::Vector3::ZERO;
+    mDragAxisWorld = Ogre::Vector3::ZERO;
 }
+
 
 bool Gizmo::isDragging() const { return mDragging; }
 
@@ -637,7 +684,6 @@ void Gizmo::scaleToParent()
     mGizmoNode->setScale(Ogre::Vector3(scale));
 }
 
-
 bool Gizmo::pickAxis(Ogre::Ray& ray)
 {
     ray = toLocalRay(ray);
@@ -692,7 +738,6 @@ bool Gizmo::pickAxis(Ogre::Ray& ray)
     highlightAxis(mActiveAxis);
     return (mActiveAxis != AXIS_NONE);
 }
-
 
 void Gizmo::highlightAxis(AXIS axis)
 {
@@ -762,6 +807,15 @@ Ogre::Ray Gizmo::toLocalRay(const Ogre::Ray& worldRay) const
     return Ogre::Ray(localOrigin, localDir);
 }
 
+Ogre::Ray Gizmo::toDragLocalRay(const Ogre::Ray& ray) const
+{
+    return Ogre::Ray(
+        mGizmoWorldInvAtDragStart.transformAffine(ray.getOrigin()),
+        mGizmoWorldInvAtDragStart.linear() * ray.getDirection()
+    );
+}
+
+
 bool Gizmo::pickRotateRing(
     const Ogre::Ray& ray,
     const Ogre::Vector3& center,
@@ -779,6 +833,5 @@ bool Gizmo::pickRotateRing(
 
     return Ogre::Math::Abs(d - radius) < tolerance;
 }
-
 
 } // namespace OgreBites

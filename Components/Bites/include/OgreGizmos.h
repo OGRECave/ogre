@@ -94,8 +94,12 @@ protected:
     Ogre::Vector3 mInitialObjectPos;
     Ogre::Quaternion mInitialObjectRot;
     Ogre::Vector3 mInitialObjectScale;
-    Ogre::Vector3 mDragStartHitPos;
-    Ogre::Vector3 mDragAxis;
+    Ogre::Vector3 mDragAxisLocal;
+    Ogre::Vector3 mDragAxisWorld;
+    Ogre::Vector3 mDragStartHitLocal;
+    Ogre::Matrix4 mGizmoWorldAtDragStart;
+    Ogre::Matrix4 mGizmoWorldInvAtDragStart;
+
 
     // Picking
     std::unordered_map<Ogre::Entity*, int> mEntityToAxis;
