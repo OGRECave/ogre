@@ -5,6 +5,7 @@
 #include "OgreSubEntity.h"
 #include "OgreTechnique.h"
 #include <OgreEntity.h>
+#include <iostream>
 
 namespace OgreBites
 {
@@ -124,7 +125,7 @@ void Gizmo::attachTo(Ogre::SceneNode* target)
     {
         mGizmoNode = mParentNode->createChildSceneNode();
         mGizmoNode->setInheritScale(false);
-        mGizmoNode->setInheritOrientation(false);
+        mGizmoNode->setInheritOrientation(mMode == G_SCALE);
     }
     else
     {
@@ -134,6 +135,10 @@ void Gizmo::attachTo(Ogre::SceneNode* target)
     mGizmoNode->setPosition(Ogre::Vector3::ZERO);
     mGizmoNode->setOrientation(Ogre::Quaternion::IDENTITY);
     scaleToParent();
+
+    //Debug
+    Ogre::Vector3 origin = mGizmoNode->_getDerivedPosition();
+    std::cout << origin.x << " " << origin.y << " " << origin.z << std::endl;
 }
 
 void Gizmo::setMode(GizmoMode mode)
@@ -208,6 +213,7 @@ void Gizmo::setMode(GizmoMode mode)
         break;
     }
     }
+    mGizmoNode->setInheritOrientation(mMode == G_SCALE);
 }
 
 bool Gizmo::isGizmoEntity(Ogre::Entity* ent) const
@@ -223,12 +229,6 @@ bool Gizmo::isGizmoEntity(Ogre::Entity* ent) const
 void Gizmo::startDrag(const Ogre::Ray& startRay,
                       const Ogre::Vector3& cameraDir)
 {
-    mGizmoWorldAtDragStart =
-    mGizmoNode->_getFullTransform();
-
-    mGizmoWorldInvAtDragStart =
-        mGizmoWorldAtDragStart.inverse();
-
     mDragging = true;
 
     mInitialObjectPos   = mParentNode->getPosition();
@@ -250,7 +250,7 @@ void Gizmo::startDrag(const Ogre::Ray& startRay,
         mGizmoNode->_getDerivedOrientation() * mDragAxisLocal;
     mDragAxisWorld.normalise();
 
-    Ogre::Ray localRay = toDragLocalRay(startRay);
+    Ogre::Ray localRay = startRay;
 
     mDragStartHitLocal =
         computePlaneHit(localRay,
@@ -265,7 +265,7 @@ void Gizmo::computeDrag(Ogre::Ray& ray,
     if (!mDragging || !mActiveAxis)
         return;
 
-    Ogre::Ray localRay = toLocalRay(ray);
+    Ogre::Ray localRay = ray;
 
     if (mMode == G_TRANSLATE)
     {
@@ -686,7 +686,6 @@ void Gizmo::scaleToParent()
 
 bool Gizmo::pickAxis(Ogre::Ray& ray)
 {
-    ray = toLocalRay(ray);
     Ogre::Vector3 origin = mGizmoNode->_getDerivedPosition();
     Ogre::Quaternion q = mGizmoNode->_getDerivedOrientation();
 
@@ -702,11 +701,15 @@ bool Gizmo::pickAxis(Ogre::Ray& ray)
     case G_TRANSLATE:
     case G_SCALE:
     {
+
+
         Ogre::Real dx = rayLineDistance(ray, origin, xAxis, axisLen);
         Ogre::Real dy = rayLineDistance(ray, origin, yAxis, axisLen);
         Ogre::Real dz = rayLineDistance(ray, origin, zAxis, axisLen);
 
         Ogre::Real minD = std::min({ dx, dy, dz });
+
+        std::cout << "dx: " << dx << " dy: " << dy << " dz: " << dz << std::endl;
 
         if (minD > axisRadius)
         {mActiveAxis = AXIS_NONE; break;}
@@ -806,15 +809,6 @@ Ogre::Ray Gizmo::toLocalRay(const Ogre::Ray& worldRay) const
 
     return Ogre::Ray(localOrigin, localDir);
 }
-
-Ogre::Ray Gizmo::toDragLocalRay(const Ogre::Ray& ray) const
-{
-    return Ogre::Ray(
-        mGizmoWorldInvAtDragStart.transformAffine(ray.getOrigin()),
-        mGizmoWorldInvAtDragStart.linear() * ray.getDirection()
-    );
-}
-
 
 bool Gizmo::pickRotateRing(
     const Ogre::Ray& ray,

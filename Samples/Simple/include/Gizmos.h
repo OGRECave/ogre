@@ -42,16 +42,23 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         Entity *ent = mSceneMgr->createEntity("Head", "ogrehead.mesh");
         Entity *ent2 = mSceneMgr->createEntity("Head2", "ogrehead.mesh");
         Entity *ent3 = mSceneMgr->createEntity("Head3", "ogrehead.mesh");
+        Entity *ent4 = mSceneMgr->createEntity("Head4", "ogrehead.mesh");
         auto node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         auto node2 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         auto node3 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        auto node4 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         node->attachObject(ent);
         node2->attachObject(ent2);
         node3->attachObject(ent3);
-        node->setScale(Vector3{0.75,0.75, 0.75});
-        node2->setPosition(75, 0, 0);
-        node3->setPosition(-66, 0, 0);
-        node3->setScale(Vector3{0.5,0.5, 0.5});
+        node4->attachObject(ent4);
+        node->setScale(Vector3{0.10,0.10, 0.10});
+        node2->setScale(Vector3{0.10,0.10, 0.10});
+        node3->setScale(Vector3{0.10,0.10, 0.10});
+        node4->setScale(Vector3{0.10,0.10, 0.10});
+        node->setPosition(-10, 0, 0);
+        node2->setPosition(0, 0, 0);
+        node3->setPosition(10, 0, 0);
+        node4->setPosition(20, 0, 0);
         mSelectedEnt = ent;
         mGizmo = new Gizmo(mSceneMgr, node, G_TRANSLATE);
 
