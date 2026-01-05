@@ -135,10 +135,6 @@ void Gizmo::attachTo(Ogre::SceneNode* target)
     mGizmoNode->setPosition(Ogre::Vector3::ZERO);
     mGizmoNode->setOrientation(Ogre::Quaternion::IDENTITY);
     scaleToParent();
-
-    //Debug
-    Ogre::Vector3 origin = mGizmoNode->_getDerivedPosition();
-    std::cout << origin.x << " " << origin.y << " " << origin.z << std::endl;
 }
 
 void Gizmo::setMode(GizmoMode mode)
@@ -708,8 +704,6 @@ bool Gizmo::pickAxis(Ogre::Ray& ray)
         Ogre::Real dz = rayLineDistance(ray, origin, zAxis, axisLen);
 
         Ogre::Real minD = std::min({ dx, dy, dz });
-
-        std::cout << "dx: " << dx << " dy: " << dy << " dz: " << dz << std::endl;
 
         if (minD > axisRadius)
         {mActiveAxis = AXIS_NONE; break;}

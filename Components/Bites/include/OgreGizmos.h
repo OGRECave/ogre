@@ -30,13 +30,6 @@ enum AXIS
     AXIS_XZ = AXIS_X | AXIS_Z  // 5
 };
 
-struct DragState
-{
-    Ogre::Vector3 startGizmoOrigin;
-    AXIS startAxisDir;       // normalized
-    Ogre::Vector3 startObjectPos;
-};
-
 /**
 Class which applies a manipulable gizmo to a scene object (including the camera).
 */
@@ -96,7 +89,6 @@ protected:
 
     // Drag state
     bool mDragging = false;
-    Ogre::Ray mDragStartRay;
     AXIS mActiveAxis = AXIS_NONE;
     Ogre::Vector3 mInitialObjectPos;
     Ogre::Quaternion mInitialObjectRot;
@@ -104,8 +96,6 @@ protected:
     Ogre::Vector3 mDragAxisLocal;
     Ogre::Vector3 mDragAxisWorld;
     Ogre::Vector3 mDragStartHitLocal;
-    Ogre::Matrix4 mGizmoWorldAtDragStart;
-    Ogre::Matrix4 mGizmoWorldInvAtDragStart;
 
     // Picking
     std::unordered_map<Ogre::Entity*, int> mEntityToAxis;
