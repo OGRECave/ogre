@@ -54,11 +54,11 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         node->setScale(Vector3{0.10,0.10, 0.10});
         node2->setScale(Vector3{0.10,0.10, 0.10});
         node3->setScale(Vector3{0.10,0.10, 0.10});
-        node4->setScale(Vector3{0.10,0.10, 0.10});
+        node4->setScale(Vector3{0.50,0.50, 0.50});
         node->setPosition(-10, 0, 0);
         node2->setPosition(0, 0, 0);
         node3->setPosition(10, 0, 0);
-        node4->setPosition(20, 0, 0);
+        node4->setPosition(75, 0, 0);
         mSelectedEnt = ent;
         mGizmo = new Gizmo(mSceneMgr, node, G_TRANSLATE);
 

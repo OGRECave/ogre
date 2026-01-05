@@ -125,7 +125,7 @@ void Gizmo::attachTo(Ogre::SceneNode* target)
     {
         mGizmoNode = mParentNode->createChildSceneNode();
         mGizmoNode->setInheritScale(false);
-        mGizmoNode->setInheritOrientation(mMode == G_SCALE);
+        mGizmoNode->setInheritOrientation(mMode == G_SCALE || mMode == G_ROTATE);
     }
     else
     {
@@ -209,7 +209,7 @@ void Gizmo::setMode(GizmoMode mode)
         break;
     }
     }
-    mGizmoNode->setInheritOrientation(mMode == G_SCALE);
+    mGizmoNode->setInheritOrientation(mMode == G_SCALE || mMode == G_ROTATE);
 }
 
 bool Gizmo::isGizmoEntity(Ogre::Entity* ent) const
@@ -302,13 +302,14 @@ void Gizmo::computeDrag(Ogre::Ray& ray,
         Ogre::Vector3 v1 =
             (hitLocal).normalisedCopy();
 
-        Ogre::Real dot =
+        Ogre::Real cosTheta =
             Ogre::Math::Clamp(v0.dotProduct(v1), -1.0f, 1.0f);
 
-        Ogre::Radian angle = Ogre::Math::ACos(dot);
+        Ogre::Real sinTheta =
+            v0.crossProduct(v1).dotProduct(mDragAxisLocal);
 
-        if (v0.crossProduct(v1).dotProduct(mDragAxisLocal) < 0)
-            angle = -angle;
+        Ogre::Radian angle = Ogre::Math::ATan2(sinTheta, cosTheta);
+
 
         // Rotate in WORLD space
         mParentNode->setOrientation(
@@ -369,7 +370,6 @@ void Gizmo::stopDrag()
     mDragAxisLocal = Ogre::Vector3::ZERO;
     mDragAxisWorld = Ogre::Vector3::ZERO;
 }
-
 
 bool Gizmo::isDragging() const { return mDragging; }
 
@@ -678,6 +678,7 @@ void Gizmo::scaleToParent()
     Ogre::Real scale = maxExtent * gizmoScaleFactor;
 
     mGizmoNode->setScale(Ogre::Vector3(scale));
+    std::cout << scale << std::endl;
 }
 
 bool Gizmo::pickAxis(Ogre::Ray& ray)
@@ -689,8 +690,8 @@ bool Gizmo::pickAxis(Ogre::Ray& ray)
     Ogre::Vector3 yAxis = q * Ogre::Vector3::UNIT_Y;
     Ogre::Vector3 zAxis = q * Ogre::Vector3::UNIT_Z;
 
-    constexpr Ogre::Real axisLen = 3.0f;
-    constexpr Ogre::Real axisRadius = 0.15f;
+    Ogre::Real axisLen = 4.0f * mGizmoNode->getScale().x;
+    Ogre::Real axisRadius = 0.3f  * mGizmoNode->getScale().x;
 
     switch (mMode)
     {
@@ -728,6 +729,7 @@ bool Gizmo::pickAxis(Ogre::Ray& ray)
         mActiveAxis = AXIS_NONE;
         break;
     }
+
 
     default:
         mActiveAxis = AXIS_NONE;
@@ -807,19 +809,37 @@ Ogre::Ray Gizmo::toLocalRay(const Ogre::Ray& worldRay) const
 bool Gizmo::pickRotateRing(
     const Ogre::Ray& ray,
     const Ogre::Vector3& center,
-    const Ogre::Vector3& axis,
+    const Ogre::Vector3& axis,   // must be normalized
     Ogre::Real radius,
     Ogre::Real tolerance)
 {
+    // 1. Reject near-parallel rays (huge stability win)
+    Ogre::Real ndotd = Ogre::Math::Abs(axis.dotProduct(ray.getDirection()));
+    if (ndotd > 0.95f)
+        return false;
+
+    // 2. Intersect ray with ring plane
     Ogre::Plane plane(axis, center);
     auto hit = ray.intersects(plane);
     if (!hit.first)
         return false;
 
     Ogre::Vector3 p = ray.getPoint(hit.second);
-    Ogre::Real d = (p - center).length();
 
-    return Ogre::Math::Abs(d - radius) < tolerance;
+    // 3. Compute radial distance IN THE PLANE
+    Ogre::Vector3 v = p - center;
+
+    // remove axis component (critical fix)
+    v -= axis * v.dotProduct(axis);
+
+    Ogre::Real d = v.length();
+
+    // 4. Scale tolerance by depth (simple perspective fix)
+    Ogre::Real depth = (center - ray.getOrigin()).length();
+    Ogre::Real scaledTolerance = tolerance * depth * 0.05f;
+
+    return Ogre::Math::Abs(d - radius) < scaledTolerance;
 }
+
 
 } // namespace OgreBites

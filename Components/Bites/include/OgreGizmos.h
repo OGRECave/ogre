@@ -70,11 +70,12 @@ protected:
 
     Ogre::Ray toLocalRay(const Ogre::Ray& worldRay) const;
 
-    static bool pickRotateRing(const Ogre::Ray& ray, const Ogre::Vector3& center, const Ogre::Vector3& axis, Ogre::Real radius,
-                        Ogre::Real tolerance);
+    static bool pickRotateRing(const Ogre::Ray& ray, const Ogre::Vector3& center,
+                               const Ogre::Vector3& axis,
+                               Ogre::Real radius, Ogre::Real tolerance);
 
-    static Ogre::Vector3 computePlaneHit(const Ogre::Ray& ray, const Ogre::Vector3& axis, const Ogre::Vector3& cameraDir,
-                                  const Ogre::Vector3& planePoint);
+    static Ogre::Vector3 computePlaneHit(const Ogre::Ray& ray, const Ogre::Vector3& axis,
+                                         const Ogre::Vector3& cameraDir, const Ogre::Vector3& planePoint);
 
     GizmoMode mMode;
     std::unique_ptr<Ogre::ManualObject> mGizmoObj{};
