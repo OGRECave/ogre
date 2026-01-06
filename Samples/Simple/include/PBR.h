@@ -28,8 +28,8 @@ protected:
         int gui_width = 250;
 
         SelectMenu* objectType = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "term", "Material", gui_width, 9);
-        objectType->addItem("glTF2 Shader");
         objectType->addItem("RTSS");
+        objectType->addItem("glTF2 Shader");
         if(GpuProgramManager::getSingleton().isSyntaxSupported("glsl330"))
             objectType->addItem("Filament Shader");
         objectType->selectItem(0, false);
@@ -70,13 +70,13 @@ protected:
 
         mViewport->setBackgroundColour(ColourValue(0.05, 0.05, 0.05));
 
-        MaterialPtr mat = MaterialManager::getSingleton().getByName("DamagedHelmet");
+        MaterialPtr mat = MaterialManager::getSingleton().getByName("DamagedHelmet_glTF");
         mParams = mat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
     }
 
     void itemSelected(SelectMenu* menu) override
     {
-        static const char* materials[] = {"DamagedHelmet", "DamagedHelmet_RTSS", "DamagedHelmet_Filament"};
+        static const char* materials[] = {"DamagedHelmet", "DamagedHelmet_glTF", "DamagedHelmet_Filament"};
         int n = menu->getSelectionIndex();
 
         mEntity->setMaterialName(materials[n]);
@@ -88,7 +88,7 @@ protected:
         mParams->setNamedConstant("u_ScaleIBLAmbient", Vector4(float(checked)));
 
         using namespace RTShader;
-        MaterialPtr mat = MaterialManager::getSingleton().getByName("DamagedHelmet_RTSS");
+        MaterialPtr mat = MaterialManager::getSingleton().getByName("DamagedHelmet");
         const auto& renderstate = any_cast<TargetRenderStatePtr>(
             mat->getTechnique(1)->getPass(0)->getUserObjectBindings().getUserAny(TargetRenderState::UserKey));
         renderstate->getSubRenderState(SRS_IMAGE_BASED_LIGHTING)->setParameter("luminance", checked ? "4" : "0");
