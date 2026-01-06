@@ -82,7 +82,8 @@ void evaluateIBL(inout PixelParams pixel,
 
     color += Fr + Fd;
 
-    // linear to gamma
-    color = pow(color, vec3_splat(1.0/2.2));
+#ifndef COLOUR_IS_LINEAR
+    color = pow(color, vec3_splat(1.0/2.2)); // linear to gamma
+#endif
     color = saturate(color);
 }
