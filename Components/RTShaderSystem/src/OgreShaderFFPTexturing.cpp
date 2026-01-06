@@ -323,7 +323,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 
     if(mLateAddBlend && colourBlend.operation == LBX_ADD)
     {
-        groupOrder = FFP_PS_COLOUR_END + 50 + 20; // after PBR lighting
+        groupOrder = FFP_PS_PBR_LIGHTING_END + 10;
     }
 
     // Build colours blend

@@ -79,7 +79,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     // insert after texturing
     auto vstage = vsMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
-    auto fstage = psMain->getStage(FFP_PS_COLOUR_END + 50);
+    auto fstage = psMain->getStage(FFP_PS_PBR_LIGHTING_BEGIN);
 
     // Forward texture coordinates
     if(vsInTexcoord)
@@ -124,7 +124,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     fstage.callFunction("PBR_MakeParams", {In(baseColor), In(mrparams), InOut(pixelParams)});
 
-    fstage = psMain->getStage(FFP_PS_COLOUR_END + 60); // make gap to inject IBL here
+    fstage = psMain->getStage(FFP_PS_PBR_LIGHTING_END);
     if(mLightCount > 0)
     {
         auto lightPos = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY, mLightCount);
