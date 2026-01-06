@@ -206,8 +206,6 @@ void PBR_Lights(
                 in PixelParams pixel,
                 inout vec3 vOutColour)
 {
-    vOutColour = pow(vOutColour, vec3_splat(2.2)); // gamma to linear
-
     // Energy compensation for multiple scattering in a microfacet model
     // See "Multiple-Scattering Microfacet BSDFs with the Smith Model"
     pixel.energyCompensation = 1.0 + pixel.f0 * (1.0 / pixel.dfg.y - 1.0);
