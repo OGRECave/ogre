@@ -105,7 +105,7 @@ bool ImageBasedLighting::createCpuSubPrograms(ProgramSet* programSet)
     auto iblEnvSize = psProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_SIZE, mEnvMapSamplerIndex);
     auto invViewMat = psProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX);
 
-    auto fstage = psMain->getStage(FFP_PS_COLOUR_END + 55); // run before CookTorrance evaluation
+    auto fstage = psMain->getStage(FFP_PS_PBR_LIGHTING_BEGIN + 5);
 
     fstage.callFunction("evaluateIBL",
                         {InOut(pixel), In(viewNormal), In(viewPos), In(invViewMat), In(dfgLUTSampler), In(iblEnvSampler),

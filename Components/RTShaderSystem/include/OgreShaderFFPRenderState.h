@@ -59,6 +59,8 @@ enum FFPFragmentShaderStage
     FFP_PS_SAMPLING                     = 150,
     FFP_PS_TEXTURING                    = 200,  
     FFP_PS_COLOUR_END                   = 300,
+    FFP_PS_PBR_LIGHTING_BEGIN           = 350,
+    FFP_PS_PBR_LIGHTING_END             = 360,
     FFP_PS_FOG                          = 400,
     FFP_PS_POST_PROCESS                 = 500,
 	FFP_PS_ALPHA_TEST					= 1000
