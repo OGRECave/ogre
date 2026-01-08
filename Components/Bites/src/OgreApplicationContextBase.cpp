@@ -102,6 +102,9 @@ bool ApplicationContextBase::initialiseRTShaderSystem()
     {
         mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
 
+        if(getRenderWindow()->isHardwareGammaEnabled())
+            mShaderGenerator->setTargetLinearColours(true);
+
         // Create and register the material manager listener if it doesn't exist yet.
         if (!mMaterialMgrListener) {
             mMaterialMgrListener = new SGTechniqueResolverListener(mShaderGenerator);

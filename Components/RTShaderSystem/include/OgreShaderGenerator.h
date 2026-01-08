@@ -456,6 +456,13 @@ public:
     */
     const String& getRTShaderScheme(size_t index) const;
 
+    /**
+     * Set whether the shaders should target the linear colour space - e.g. when rendering to
+     * a SRGB framebuffer.
+     */
+    void setTargetLinearColours(bool linear) { mTargetLinearColours = linear; }
+    bool getTargetLinearColours() const { return mTargetLinearColours; }
+
     /// mark the given texture unit as non-FFP
     static void _markNonFFP(const TextureUnitState* tu);
 
@@ -876,6 +883,7 @@ private:
     bool mCreateShaderOverProgrammablePass;
     // A flag to indicate finalizing
     bool mIsFinalizing;
+    bool mTargetLinearColours;
 
     uint32 ID_RT_SHADER_SYSTEM;
 
