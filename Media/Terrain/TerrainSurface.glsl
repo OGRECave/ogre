@@ -1,3 +1,10 @@
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
+// SPDX-License-Identifier: MIT
+
+#include "RTSLib_Colour.glsl"
+
 void transformToTS(in vec3 TSnormal, in mat3 normalMatrix, inout vec3 normal)
 {
     // derive the tangent space basis
@@ -49,6 +56,7 @@ void blendTerrainLayer(in float blendWeight, in f32vec2 uv0, in float uvMul,
 
     // sample diffuse texture
     vec4 diffuseSpecTex = texture2D(difftex, uv);
+    ENABLE_LINEAR_COLOUR(diffuseSpecTex);
     // apply to common
     diffuseSpec = mix(diffuseSpec, diffuseSpecTex, blendWeight);
 
