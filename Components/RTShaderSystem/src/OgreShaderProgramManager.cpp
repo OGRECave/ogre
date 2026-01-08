@@ -165,6 +165,12 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);
     String source = sourceCodeStringStream.str();
 
+    if (ShaderGenerator::getSingleton().getTargetLinearColours())
+    {
+        shaderProgram->addPreprocessorDefines("USE_LINEAR_COLOURS,TARGET_CONSUMES_LINEAR");
+        shaderProgram->setUseLinearColours(true);
+    }
+
     // Generate program name.
     String programName = generateHash(source, shaderProgram->getPreprocessorDefines());
 
