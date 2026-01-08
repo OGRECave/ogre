@@ -3669,6 +3669,7 @@ namespace Ogre{
         uint32 animParametricsCount = 0;
 
         String value;
+        bool bval;
         for(auto & i : obj->children)
         {
             if(i->type == ANT_PROPERTY)
@@ -3676,6 +3677,12 @@ namespace Ogre{
                 PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
                 switch(prop->id)
                 {
+                case ID_USE_LINEAR_COLOURS:
+                    if(getValue(prop, compiler, bval))
+                    {
+                        params->setUseLinearColours(bval);
+                    }
+                    break;
                 case ID_SHARED_PARAMS_REF:
                     if(getValue(prop, compiler, value))
                     {

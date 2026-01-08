@@ -1254,6 +1254,8 @@ namespace Ogre {
         /// physical index for active pass iteration parameter real constant entry;
         size_t mActivePassIterationIndex;
 
+        bool mUseLinearColours;
+
         /// Return the variability for an auto constant
         static uint16 deriveVariability(AutoConstantType act);
 
@@ -1287,6 +1289,11 @@ namespace Ogre {
             rendersystem.
         */
         bool hasLogicalIndexedParameters() const { return mLogicalToPhysical.get() != 0; }
+
+        /// Convert colour parameters from gamma to linear space when setting them.
+        /// This is useful when you have your materials defined in gamma space but your
+        /// rendering is in linear space.
+        void setUseLinearColours(bool enable) { mUseLinearColours = enable; }
 
         /// @name Set constant by logical index
         /// @{
