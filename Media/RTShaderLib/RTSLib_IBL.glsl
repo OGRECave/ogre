@@ -77,12 +77,13 @@ void evaluateIBL(inout PixelParams pixel,
 
     // Combine all terms
     // Note: iblLuminance is already premultiplied by the exposure
-
+#ifndef USE_LINEAR_COLOURS
     color = pow(color, vec3_splat(2.2)); // gamma to linear
+#endif
 
     color += Fr + Fd;
 
-#ifndef COLOUR_IS_LINEAR
+#ifndef USE_LINEAR_COLOURS
     color = pow(color, vec3_splat(1.0/2.2)); // linear to gamma
 #endif
     color = saturate(color);

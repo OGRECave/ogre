@@ -38,6 +38,8 @@ THE SOFTWARE.
 // see http://msdn.microsoft.com/en-us/library/bb206241.aspx
 //-----------------------------------------------------------------------------
 
+#include "RTSLib_Colour.glsl"
+
 //-----------------------------------------------------------------------------
 void FFP_TransformTexCoord(in mat4 m, in vec2 v, out vec2 vOut)
 {
@@ -146,4 +148,5 @@ void FFP_DotProduct(in vec4 vIn0, in vec4 vIn1, out vec4 vOut)
 void TextureUVMix(in sampler2D tex, in vec2 uv, in vec4 params, out vec4 color)
 {
 	color = mix(texture2D(tex, uv), texture2D(tex, -vec2(uv.y, uv.x) * params.x), params.y);
+	ENABLE_LINEAR_COLOUR(color);
 }

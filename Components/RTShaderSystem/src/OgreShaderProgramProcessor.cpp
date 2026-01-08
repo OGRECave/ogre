@@ -77,6 +77,7 @@ void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pG
 {
     GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
 
+    pGpuParams->setUseLinearColours(pCpuProgram->getUseLinearColours());
     for (const auto& p : pCpuProgram->getParameters())
     {
         const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(p->getName());

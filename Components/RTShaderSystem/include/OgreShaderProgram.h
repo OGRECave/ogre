@@ -181,6 +181,9 @@ public:
 
     const String& getPreprocessorDefines() const { return mPreprocessorDefines; }
 
+    void setUseLinearColours(bool useLinear) { mUseLinearColours = useLinear; }
+    bool getUseLinearColours() const { return mUseLinearColours; }
+
     /** Class destructor */
     ~Program();
 // Protected methods.
@@ -215,6 +218,7 @@ private:
     // Whether to pass matrices as column-major.
     bool mColumnMajorMatrices;
     bool mInstancing;
+    bool mUseLinearColours;
     friend class TargetRenderState;
 };
 
