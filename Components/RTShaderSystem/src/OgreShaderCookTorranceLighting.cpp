@@ -36,7 +36,8 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     psProgram->addDependency(FFP_LIB_TRANSFORM);
     psProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency("SGXLib_CookTorrance");
-    psProgram->addPreprocessorDefines(StringUtil::format("COLOUR_IS_LINEAR,LIGHT_COUNT=%d", mLightCount));
+    psProgram->addPreprocessorDefines(StringUtil::format("USE_LINEAR_COLOURS,LIGHT_COUNT=%d", mLightCount));
+    psProgram->setUseLinearColours(true);
 
     // Resolve texture coordinates.
     auto uvSet = Parameter::SPC_TEXTURE_COORDINATE0 + mTexCoordSet;

@@ -371,6 +371,9 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
     if (textureUnitParams->mTexCoordCalcMethod != TEXCALC_PROJECTIVE_TEXTURE)
     {
         stage.sampleTexture(textureUnitParams->mTextureSampler, textureUnitParams->mPSInputTexCoord, texel);
+        if (textureUnitParams->mTextureUnitState->getContentType() != TextureUnitState::CONTENT_COMPOSITOR &&
+            !textureUnitParams->mTextureUnitState->isHardwareGammaEnabled())
+            stage.callFunction("ENABLE_LINEAR_COLOUR", texel);
         return;
     }
 
