@@ -572,6 +572,7 @@ Parameters can be specified using one of 4 commands as shown below. The same syn
 -   [param_named](#param_005fnamed)
 -   [param_named_auto](#param_005fnamed_005fauto)
 -   [shared_params_ref](#shared_005fparams_005fref)
+-   [use_linear_colours](#use_005flinear_005fcolours)
 
 <a name="param_005findexed"></a><a name="param_005findexed-1"></a>
 
@@ -646,6 +647,19 @@ Format: shared\_params\_ref &lt;shared\_set\_name&gt;
 Example: shared\_params\_ref mySharedParams
 
 The only required parameter is a name, which must be the name of an already defined shared parameter set. All named parameters which are present in both the program and the shared parameter set will be linked, and the shared parameters values will be used.
+
+<a name="use_005flinear_005fcolours"></a>
+
+## use_linear_colours
+
+@copydoc Ogre::GpuProgramParameters::setUseLinearColours
+
+@par
+Format: use_linear_colours &lt;true|false&gt;
+@par
+Example: use_linear_colours true
+
+This only affects auto parameters or parameters set via code having the Ogre::ColourValue type.
 
 # Declaring Shared Parameters {#Declaring-Shared-Parameters}
 
