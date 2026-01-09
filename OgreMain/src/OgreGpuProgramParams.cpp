@@ -32,11 +32,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre
 {
-    static ColourValue gamma2linear(const ColourValue& color)
-    {
-        return ColourValue(powf(color.r, 2.2f), powf(color.g, 2.2f), powf(color.b, 2.2f), color.a);
-    }
-
     //---------------------------------------------------------------------
     GpuProgramParameters::AutoConstantDefinition GpuProgramParameters::AutoConstantDictionary[] = {
         AutoConstantDefinition(ACT_WORLD_MATRIX,                  "world_matrix",                16, ET_REAL, ACDT_NONE),
@@ -912,7 +907,7 @@ namespace Ogre
                                                  const ColourValue& colour, size_t count)
     {
         if(mUseLinearColours)
-            return _writeRawConstants(physicalIndex, gamma2linear(colour).ptr(), std::min(count, (size_t)4));
+            return _writeRawConstants(physicalIndex, colour.gammaToLinear().ptr(), std::min(count, (size_t)4));
 
         // write either the number requested (for packed types) or up to 4
         _writeRawConstants(physicalIndex, colour.ptr(), std::min(count, (size_t)4));
