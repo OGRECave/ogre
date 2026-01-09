@@ -316,7 +316,9 @@ SubRenderState* srs = shaderGen->createSubRenderState(SRS_NORMALMAP);
 rs->addTemplateSubRenderState(srs);
 
 srs->setParameter("height_scale", "0.1");
+srs->setParameter("texture_index", std::to_string(textureIndex));
 ```
+Note that for the SRS_NORMALMAP SubRenderState, the "texture_index" parameter is automatically inferred from context when using scripts, but must be explicitly specified when created programmatically.
 
 # System overview {#rtss_overview}
 
