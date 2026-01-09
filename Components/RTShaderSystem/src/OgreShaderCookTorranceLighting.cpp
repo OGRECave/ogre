@@ -32,6 +32,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
 
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
+    vsProgram->addPreprocessorDefines("USE_LINEAR_COLOURS"); // in case vertex colours are used
 
     psProgram->addDependency(FFP_LIB_TRANSFORM);
     psProgram->addDependency(FFP_LIB_TEXTURING);
