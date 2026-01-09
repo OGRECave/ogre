@@ -356,6 +356,21 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 }
 
 //-----------------------------------------------------------------------
+static bool canHaveGammaColour(TextureUnitState* tus) {
+    bool targetLinear = ShaderGenerator::getSingleton().getTargetLinearColours();
+
+    if (tus->getContentType() == TextureUnitState::CONTENT_COMPOSITOR && targetLinear)
+        return false;
+
+    if(tus->isHardwareGammaEnabled())
+        return false;
+
+    if(PixelUtil::isFloatingPoint(tus->getDesiredFormat()))
+        return false;
+
+    return true;
+}
+
 void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain,
                                               const ParameterPtr& texel, int groupOrder)
 {
@@ -371,8 +386,7 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
     if (textureUnitParams->mTexCoordCalcMethod != TEXCALC_PROJECTIVE_TEXTURE)
     {
         stage.sampleTexture(textureUnitParams->mTextureSampler, textureUnitParams->mPSInputTexCoord, texel);
-        if (textureUnitParams->mTextureUnitState->getContentType() != TextureUnitState::CONTENT_COMPOSITOR &&
-            !textureUnitParams->mTextureUnitState->isHardwareGammaEnabled())
+        if (canHaveGammaColour(textureUnitParams->mTextureUnitState))
             stage.callFunction("ENABLE_LINEAR_COLOUR", texel);
         return;
     }
