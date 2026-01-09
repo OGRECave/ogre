@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreTerrain.h"
+#include "OgreShaderGenerator.h"
 #include "OgreTerrainQuadTreeNode.h"
 #include "OgreStreamSerialiser.h"
 #include "OgreMath.h"
@@ -3534,6 +3535,9 @@ namespace Ogre
             mCompositeMap = TextureManager::getSingleton().createManual(
                 mMaterialName + "/comp", _getDerivedResourceGroup(), 
                 TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, MIP_DEFAULT, PF_BYTE_RGBA);
+
+            if(auto shaderGen = RTShader::ShaderGenerator::getSingletonPtr())
+                mCompositeMap->setHardwareGammaEnabled(shaderGen->getTargetLinearColours());
 
             mCompositeMapSizeActual = mCompositeMap->getWidth();
 
