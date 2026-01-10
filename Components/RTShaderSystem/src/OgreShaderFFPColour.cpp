@@ -102,6 +102,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     Function* psMain   = psProgram->getEntryPointFunction();    
     
     vsProgram->addDependency("RTSLib_Colour");
+    psProgram->addDependency("RTSLib_Colour");
 
     // Create vertex shader colour invocations.
     ParameterPtr vsDiffuse;

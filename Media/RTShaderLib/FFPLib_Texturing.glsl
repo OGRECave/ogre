@@ -38,8 +38,6 @@ THE SOFTWARE.
 // see http://msdn.microsoft.com/en-us/library/bb206241.aspx
 //-----------------------------------------------------------------------------
 
-#include "RTSLib_Colour.glsl"
-
 //-----------------------------------------------------------------------------
 void FFP_TransformTexCoord(in mat4 m, in vec2 v, out vec2 vOut)
 {
