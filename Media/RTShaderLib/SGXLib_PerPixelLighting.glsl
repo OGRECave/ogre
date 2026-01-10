@@ -40,6 +40,12 @@ THE SOFTWARE.
 #include "RTSLib_LTC.glsl"
 #endif
 
+#ifdef USE_LINEAR_COLOURS
+#define FFP_SATURATE(x) x
+#else
+#define FFP_SATURATE(x) saturate(x)
+#endif
+
 #ifdef OGRE_HLSL
 void SGX_Flip_Backface_Normal(in float triArea, in float targetFlipped, inout vec3 normal)
 {
@@ -117,10 +123,10 @@ void evaluateLight(
 
 		// linear to gamma
 		dcol = pow(dcol, vec3_splat(1.0/2.2));
-		vOutDiffuse.rgb = saturate(vOutDiffuse.rgb + dcol);
+		vOutDiffuse.rgb = FFP_SATURATE(vOutDiffuse.rgb + dcol);
 #ifdef USE_SPECULAR
 		scol = pow(scol, vec3_splat(1.0/2.2));
-		vOutSpecular.rgb = saturate(vOutSpecular.rgb + scol);
+		vOutSpecular.rgb = FFP_SATURATE(vOutSpecular.rgb + scol);
 #endif
 		return;
 	}
@@ -159,7 +165,7 @@ void evaluateLight(
     }
 
 	vOutDiffuse  += vDiffuseColour.rgb * nDotL * fAtten;
-	vOutDiffuse = saturate(vOutDiffuse);
+	vOutDiffuse = FFP_SATURATE(vOutDiffuse);
 
 #ifdef USE_SPECULAR
 	f32vec3 vView       = -normalize(vViewPos);
@@ -172,6 +178,6 @@ void evaluateLight(
 	vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
 	vOutSpecular += vSpecularColour.rgb * pow(nDotH, fSpecularPower) * fAtten;
-	vOutSpecular = saturate(vOutSpecular);
+	vOutSpecular = FFP_SATURATE(vOutSpecular);
 #endif
 }
