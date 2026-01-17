@@ -98,8 +98,8 @@ namespace Ogre {
         including all the objects attached to it. Once you've added everything
         you need to, you have to call build() the fix the geometry in place. 
     @note
-        This class is not a replacement for world geometry (@see 
-        SceneManager::setWorldGeometry). The single most efficient way to 
+        This class is not a replacement for world geometry (@ref 
+        Ogre::SceneManager::setWorldGeometry). The single most efficient way to 
         render large amounts of static geometry is to use a SceneManager which 
         is specialised for dealing with that particular world structure. 
         However, this class does provide you with a good 'halfway house'
@@ -107,14 +107,8 @@ namespace Ogre {
         SceneManagers but isn't efficient when using very large numbers, and 
         highly specialised world geometry which is extremely fast but not 
         generic and typically requires custom world editors.
-    @par
-        You should not construct instances of this class directly; instead, cal 
-        SceneManager::createStaticGeometry, which gives the SceneManager the 
-        option of providing you with a specialised version of this class if it
-        wishes, and also handles the memory management for you like other 
-        classes.
-    @note
-        Warning: this class only works with indexed triangle lists at the moment,
+    @attention
+        this class only works with indexed triangle lists at the moment,
         do not pass it triangle strips, fans or lines / points, or unindexed geometry.
     */
     class _OgreExport StaticGeometry : public BatchedGeometryAlloc
@@ -532,7 +526,12 @@ namespace Ogre {
         }
         
     public:
-        /// Constructor; do not use directly (@see SceneManager::createStaticGeometry)
+        /**
+            You should not construct instances of this class directly; instead, call 
+            SceneManager::createStaticGeometry, which gives the SceneManager the 
+            option of providing you with a specialised version of this class if it
+            wishes, and also handles the memory management for you like other classes.
+         */
         StaticGeometry(SceneManager* owner, const String& name);
         /// Destructor
         virtual ~StaticGeometry();
@@ -556,6 +555,8 @@ namespace Ogre {
         @param position The world position at which to add this Entity
         @param orientation The world orientation at which to add this Entity
         @param scale The scale at which to add this entity
+        @attention Do not unload the Mesh used by the Entity until after you have
+            called build(), as the geometry is read at that time.
         */
         virtual void addEntity(Entity* ent, const Vector3& position,
             const Quaternion& orientation = Quaternion::IDENTITY, 
@@ -576,6 +577,8 @@ namespace Ogre {
             versions! We don't do this for you in case you are preparing this
             in advance and so don't want the originals detached yet. 
         @note Must be called before 'build'.
+        @attention Do not unload the Mesh used by the Entities until after you have
+            called build(), as the geometry is read at that time.
         @param node Pointer to the node to use to provide a set of Entity 
             templates
         */

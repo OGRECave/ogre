@@ -943,7 +943,7 @@ OGRE supports a variety of techniques to speed up the rendering of many objects 
 
 <dl compact="compact">
 <dt>@ref Static-Geometry</dt>
-<dd>Pre-transforms and batches up meshes for efficient use as static geometry in a scene.</dd>
+<dd>@copybrief Ogre::StaticGeometry </dd>
 <dt>@ref Instance-Manager</dt>
 <dd>Instancing is a way of batching up geometry into a much more efficient form, but with some limitations, and still be able to move & animate it.</dd>
 </dl>
@@ -951,20 +951,9 @@ OGRE supports a variety of techniques to speed up the rendering of many objects 
 @tableofcontents
 
 # Static Geometry {#Static-Geometry}
-Modern graphics cards (GPUs) prefer to receive geometry in large batches.
-It is orders of magnitude faster to render 10 batches of 10,000 triangles than it is to render 10,000 batches of 10 triangles, even though both result in the same number of on-screen triangles.
 
-Therefore it is important when you are rendering a lot of geometry to batch things up into as few rendering calls as possible.
-This class allows you to build a batched object from a series of entities in order to benefit from this behaviour. Batching has implications of it's own though:
- - A geometry region cannot be subdivided; that means that the whole group will be displayed, or none of it will. This obivously has culling issues.
- - A single world transform must apply to the entire batch. Therefore once you have batched things, you can't move them around relative to each other.
-   That's why this class is most useful when dealing with static geometry (hence the name).
-   In addition, geometry is effectively duplicated, so if you add 3 entities based on the same mesh in different positions, they will use 3 times the geometry space than the movable version (which re-uses the same geometry).
-   So you trade memory and flexibility of movement for pure speed when using this class.
- - A single material must apply for each batch. In fact this class allows you to use multiple materials, but you should be aware that internally this means that there is one batch per material.
-   Therefore you won't gain as much benefit from the batching if you use many different materials; try to keep the number down.
+@copydetails Ogre::StaticGeometry
 
-@see Ogre::StaticGeometry
 @see [Tutorial - Static Geometry](@ref tut_StaticGeom)
 
 # Instance Manager {#Instance-Manager}
