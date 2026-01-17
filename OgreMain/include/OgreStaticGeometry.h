@@ -42,24 +42,15 @@ namespace Ogre {
     /** \addtogroup Scene
     *  @{
     */
-    /** Pre-transforms and batches up meshes for efficient use as static
+    /** Pre-transforms and batches up meshes on the CPU for efficient use as static
         geometry in a scene.
 
-        Modern graphics cards (GPUs) prefer to receive geometry in large
-        batches. It is orders of magnitude faster to render 10 batches
-        of 10,000 triangles than it is to render 10,000 batches of 10 
-        triangles, even though both result in the same number of on-screen
-        triangles.
-    @par
-        Therefore it is important when you are rendering a lot of geometry to 
-        batch things up into as few rendering calls as possible. This
-        class allows you to build a batched object from a series of entities 
-        in order to benefit from this behaviour.
+        This class allows you to build a batched object from a series of entities.
         Batching has implications of it's own though:
-        @li Batched geometry cannot be subdivided; that means that the whole
+        - Batched geometry cannot be subdivided; that means that the whole
             group will be displayed, or none of it will. This obivously has
             culling issues.
-        @li A single world transform must apply to the entire batch. Therefore
+        - A single world transform must apply to the entire batch. Therefore
             once you have batched things, you can't move them around relative to
             each other. That's why this class is most useful when dealing with 
             static geometry (hence the name). In addition, geometry is 
@@ -68,18 +59,18 @@ namespace Ogre {
             space than the movable version (which re-uses the same geometry). 
             So you trade memory and flexibility of movement for pure speed when
             using this class.
-        @li A single material must apply for each batch. In fact this class 
+        - A single material must apply for each batch. In fact this class
             allows you to use multiple materials, but you should be aware that 
             internally this means that there is one batch per material. 
             Therefore you won't gain as much benefit from the batching if you 
             use many different materials; try to keep the number down.
-    @par
+
         In order to retain some sort of culling, this class will batch up 
         meshes in localised regions. The size and shape of these blocks is
         controlled by the SceneManager which constructs this object, since it
         makes sense to batch things up in the most appropriate way given the 
         existing partitioning of the scene. 
-    @par
+
         The LOD settings of both the Mesh and the Materials used in 
         constructing this static geometry will be respected. This means that 
         if you use meshes/materials which have LOD, batches in the distance 
@@ -91,15 +82,15 @@ namespace Ogre {
         not degraded). Be aware that using Mesh LOD in this class will 
         further increase the memory required. Only generated LOD
         is supported for meshes.
-    @par
+
         There are 2 ways you can add geometry to this class; you can add
         Entity objects directly with predetermined positions, scales and 
         orientations, or you can add an entire SceneNode and it's subtree, 
         including all the objects attached to it. Once you've added everything
         you need to, you have to call build() the fix the geometry in place. 
     @note
-        This class is not a replacement for world geometry (@ref 
-        Ogre::SceneManager::setWorldGeometry). The single most efficient way to 
+        This class is not a replacement for world geometry (@ref
+        Ogre::SceneManager::setWorldGeometry). The single most efficient way to
         render large amounts of static geometry is to use a SceneManager which 
         is specialised for dealing with that particular world structure. 
         However, this class does provide you with a good 'halfway house'
@@ -527,8 +518,8 @@ namespace Ogre {
         
     public:
         /**
-            You should not construct instances of this class directly; instead, call 
-            SceneManager::createStaticGeometry, which gives the SceneManager the 
+            You should not construct instances of this class directly; instead, call
+            SceneManager::createStaticGeometry, which gives the SceneManager the
             option of providing you with a specialised version of this class if it
             wishes, and also handles the memory management for you like other classes.
          */
