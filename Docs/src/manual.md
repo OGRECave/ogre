@@ -937,15 +937,24 @@ When implementing custom animable properties, you have to also implement a numbe
 
 @page Instancing Instancing
 
-Instancing significantly reduces the CPU overhead of submitting many separate draw calls and is a great technique for rendering trees, rocks, grass, RTS units and other groups of similar (but necessarily identical) objects.
+Modern graphics cards (GPUs) prefer to receive geometry in large
+batches. It is orders of magnitude faster to render 10 batches
+of 10,000 triangles than it is to render 10,000 batches of 10
+triangles, even though both result in the same number of on-screen
+triangles.
 
-OGRE supports a variety of techniques to speed up the rendering of many objects in the Scene.
+Therefore it is important when you are rendering a lot of geometry to
+batch things up into as few rendering calls as possible.
+
+%Ogre supports a variety of techniques to speed up the rendering of many objects in the Scene.
 
 <dl compact="compact">
 <dt>@ref Static-Geometry</dt>
 <dd>@copybrief Ogre::StaticGeometry </dd>
 <dt>@ref Instance-Manager</dt>
-<dd>Instancing is a way of batching up geometry into a much more efficient form, but with some limitations, and still be able to move & animate it.</dd>
+<dd>Choose from different algorithms to batch up geometry and still be able to move & animate it. Requires manual setup and the algorithms have some limitations.</dd>
+<dt>[Auto-Instancing](@ref Instancing-in-Vertex-Programs)</dt>
+<dd>You can advertise instancing in you shaders and Ogre will batch the draw calls for you. Does not support animation.This is less efficient than the Explicit Instance Manager but requires no code changes and can be used with the RTSS.</dd>
 </dl>
 
 @tableofcontents
@@ -956,7 +965,7 @@ OGRE supports a variety of techniques to speed up the rendering of many objects 
 
 @see [Tutorial - Static Geometry](@ref tut_StaticGeom)
 
-# Instance Manager {#Instance-Manager}
+# Explicit Instance Manager {#Instance-Manager}
 Instancing is a rendering technique to draw multiple instances of the same mesh using just one render call. There are two kinds of instancing:
 
 @par Software
