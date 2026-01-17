@@ -16,8 +16,9 @@ jobs:
           libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev mesa-vulkan-drivers \
           libfreetype6-dev libpugixml-dev libassimp-dev libbullet-dev qtbase5-dev cargo \
           nvidia-cg-dev glslang-dev spirv-tools spirv-headers libvulkan-volk-dev \
-          swig4.0 mono-mcs python3-dev \
+          mono-mcs python3-dev \
           python3-lxml texlive-binaries texlive-base graphviz doxygen
+        sudo pip3 install swig
     - uses: actions/checkout@v4
       with:
         fetch-depth: 2
@@ -37,7 +38,7 @@ jobs:
         cd build/bin && ./TestContext -rs "OpenGL 3+ Rendering Subsystem"
         ./TestContext -rs "OpenGL ES 2.x Rendering Subsystem"
         # verify that the python modules are loadable
-        cd ../lib && python -c "import _Ogre; import _RTShader"
+        cd ../lib && python -c "import _Ogre; import _RTShader; import _Bites"
         cd ../../
         # validate XMLConverter output
         build/bin/OgreXMLConverter Samples/Media/models/ninja.mesh && build/bin/OgreXMLConverter Samples/Media/models/ninja.skeleton
@@ -59,7 +60,7 @@ jobs:
         path: android-ndk-r21e
         key: ${{ runner.os }}-android-ndk
     - name: Install Dependencies
-      run: sudo apt-get install -y swig4.0
+      run: sudo pip3 install swig
     - name: Build
       run: |
         cmake -P ci-build.cmake
