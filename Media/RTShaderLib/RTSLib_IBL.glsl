@@ -33,6 +33,10 @@ vec3 prefilteredRadiance(samplerCube light_iblSpecular, const vec3 r, float perc
     return decodeDataForIBL(textureCubeLod(light_iblSpecular, r, lod));
 }
 
+vec3 IrradianceMap(samplerCube iblDiffuse, const vec3 n) {
+    return decodeDataForIBL(textureCubeLod(iblDiffuse, n, 0.0));
+}
+
 vec3 getSpecularDominantDirection(const vec3 n, const vec3 r, float roughness) {
     return mix(r, n, roughness * roughness);
 }
@@ -43,6 +47,9 @@ void evaluateIBL(inout PixelParams pixel,
                  in mat4 invViewMat,
                  in sampler2D dfgTex,
                  in samplerCube iblEnvTex,
+                 #ifdef HAS_DUAL_TEXTURE
+                 in samplerCube iblEnvTexSpecular,
+                 #endif
                  in float iblRoughnessOneLevel,
                  in float iblLuminance,
                  inout vec3 color)
@@ -67,9 +74,16 @@ void evaluateIBL(inout PixelParams pixel,
     shading_normal = normalize(mul(invViewMat, vec4(shading_normal, 0.0)).xyz);
 
     // specular layer
+    #ifdef HAS_DUAL_TEXTURE
+    //Use dedicated specular texture, iblEnvTex should be diffuse irradiance.
+    vec3 Fr = E * prefilteredRadiance(iblEnvTexSpecular, r, pixel.perceptualRoughness, iblRoughnessOneLevel);
+    vec3 diffuseIrradiance = IrradianceMap(iblEnvTex, shading_normal);
+    #else
+    //Old behaviour
     vec3 Fr = E * prefilteredRadiance(iblEnvTex, r, pixel.perceptualRoughness, iblRoughnessOneLevel);
-
     vec3 diffuseIrradiance = Irradiance_RoughnessOne(iblEnvTex, shading_normal, iblRoughnessOneLevel);
+    #endif
+
     vec3 Fd = pixel.diffuseColor * diffuseIrradiance * (1.0 - E);
 
     Fr *= iblLuminance;

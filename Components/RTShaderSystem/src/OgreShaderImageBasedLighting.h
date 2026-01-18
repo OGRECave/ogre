@@ -30,10 +30,13 @@ class ImageBasedLighting : public SubRenderState
     friend class ImageBasedLightingFactory;
     int mDfgLUTSamplerIndex = 0;
     int mEnvMapSamplerIndex = 0;
+    int mEnvMapSamplerIndexSpecular = 0;
     float mLuminance = 1.0f;
     String mEnvMapName;
+    String mEnvMapNameSpecular;
     UniformParameterPtr mLuminanceParam;
     bool mIsLuminanceParamDirty = true;
+
 public:
     const String& getType() const override;
     int getExecutionOrder() const override;
