@@ -663,7 +663,7 @@ void Gizmo::scaleToParent()
     if (maxExtent < Ogre::Real(1e-6))
         maxExtent = 1.0f;
 
-    constexpr Ogre::Real gizmoScaleFactor = 0.01f;
+    constexpr Ogre::Real gizmoScaleFactor = 0.1f;
 
     Ogre::Real scale = maxExtent * gizmoScaleFactor;
 
