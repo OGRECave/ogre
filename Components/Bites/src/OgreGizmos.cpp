@@ -1,9 +1,12 @@
 #include "../include/OgreGizmos.h"
 #include "OgreManualObject.h"
 #include "OgreMaterialManager.h"
+#include "OgreRenderWindow.h"
+#include "OgreRoot.h"
 #include "OgreSceneManager.h"
 #include "OgreSubEntity.h"
 #include "OgreTechnique.h"
+#include "OgreViewport.h"
 #include <OgreEntity.h>
 #include <iostream>
 
@@ -11,17 +14,6 @@ namespace OgreBites
 {
 Gizmo::Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, GizmoMode mode) : mMode(G_NONE)
 {
-    Ogre::MaterialPtr gizmoMaterial =
-        Ogre::MaterialManager::getSingletonPtr()
-            ->createOrRetrieve("Gizmo_Material", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
-            .first.staticCast<Ogre::Material>();
-
-    gizmoMaterial->setReceiveShadows(false);
-    gizmoMaterial->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-    gizmoMaterial->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
-    gizmoMaterial->getTechnique(0)->getPass(0)->setCullingMode(Ogre::CULL_NONE);
-    gizmoMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(Ogre::TVC_DIFFUSE);
-
     createMesh(sceneManager, "AxisGizmosMesh");
     createPlaneMesh(sceneManager, "AxisPlaneMesh");
 
@@ -333,7 +325,7 @@ void Gizmo::computeDrag(Ogre::Ray& ray,
             hitLocal.dotProduct(mDragAxisLocal);
 
         Ogre::Real delta = currDist - startDist;
-        Ogre::Real scaleFactor = 1.0f + delta * 0.01f;
+        Ogre::Real scaleFactor = 1.0f + delta;
 
         Ogre::Vector3 newScale = mInitialObjectScale;
 
@@ -665,15 +657,13 @@ void Gizmo::scaleToParent()
     // Compute size
     Ogre::Vector3 size = worldAABB.getSize();
 
-    // Choose a representative scale
     Ogre::Real maxExtent = std::max({ size.x, size.y, size.z });
 
     // Avoid degenerate scale
     if (maxExtent < Ogre::Real(1e-6))
         maxExtent = 1.0f;
 
-    // Optional tuning factor (editor feel)
-    constexpr Ogre::Real gizmoScaleFactor = 0.1f;
+    constexpr Ogre::Real gizmoScaleFactor = 0.01f;
 
     Ogre::Real scale = maxExtent * gizmoScaleFactor;
 
@@ -841,5 +831,296 @@ bool Gizmo::pickRotateRing(
     return Ogre::Math::Abs(d - radius) < scaledTolerance;
 }
 
+CameraGizmo::CameraGizmo(
+    Ogre::RenderWindow* window,
+    Ogre::Camera* mainCamera,
+    CameraMan* cameraMan)
+{
+    Ogre::SceneManager* gizmoSM = Ogre::Root::getSingleton().createSceneManager();
+
+    mCameraMan = cameraMan;
+    mCamera = mainCamera;
+    mGizmoNode = gizmoSM->getRootSceneNode()->createChildSceneNode("GizmoRoot");
+
+    mGizmoCamera = gizmoSM->createCamera("GizmoCamera");
+    mGizmoCameraNode = gizmoSM->createSceneNode("GizmoCameraNode");
+
+    mGizmoCameraNode->attachObject(mGizmoCamera);
+    gizmoSM->getRootSceneNode()->addChild(mGizmoCameraNode);
+
+    mGizmoCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
+    mGizmoCamera->setOrthoWindow(2.0f, 2.0f);
+    mGizmoCamera->setNearClipDistance(0.01f);
+    mGizmoCamera->setFarClipDistance(10.0f);
+    Ogre::Viewport* vp = window->addViewport(
+        mGizmoCamera,
+        1,          // higher Z-order than main viewport
+        0.75f, 0.75f,
+        0.25f, 0.25f
+    );
+    vp->setOverlaysEnabled(false);
+    vp->setClearEveryFrame(false);
+
+    // Always look down -Z
+    mGizmoCameraNode->setPosition(0, 0, 2);
+    createMesh(gizmoSM, "AxisGizmosMesh");
+}
+
+void CameraGizmo::updateOrientation()
+{
+    mGizmoNode->setOrientation(
+        mCameraMan->getCamera()->getOrientation().Inverse()
+    );
+}
+
+void CameraGizmo::updateViewport()
+{
+    Ogre::Viewport* vp = mGizmoCamera->getViewport();
+    float aspect = vp->getActualWidth() / float(vp->getActualHeight());
+
+    float size = 2.0f;
+    mGizmoCamera->setOrthoWindow(size * aspect, size);
+}
+
+
+void CameraGizmo::snapCamera(Ogre::ManualObject* face)
+{
+    using namespace Ogre;
+
+    if (!face || !mCameraMan)
+        return;
+
+    int faceIndex = -1;
+
+    for (int i = 0; i < 6; ++i)
+    {
+        if (mGizmoObjects[i] == face)
+        {
+            faceIndex = i;
+            break;
+        }
+    }
+
+    if (faceIndex == -1)
+        return; // not one of our faces
+    Radian yaw(0), pitch(0);
+
+    switch (faceIndex)
+    {
+    case 0: // +X
+        yaw   = Degree(-90);
+        pitch = Degree(0);
+        break;
+
+    case 1: // -X
+        yaw   = Degree(90);
+        pitch = Degree(0);
+        break;
+
+    case 2: // +Y (top)
+        yaw   = Degree(0);
+        pitch = Degree(90);
+        break;
+
+    case 3: // -Y (bottom)
+        yaw   = Degree(0);
+        pitch = Degree(-90);
+        break;
+
+    case 4: // +Z (front)
+        yaw   = Degree(180);
+        pitch = Degree(0);
+        break;
+
+    case 5: // -Z (back)
+        yaw   = Degree(0);
+        pitch = Degree(0);
+        break;
+    default:;
+    }
+
+    Vector3 camPos = mCameraNode->getPosition();
+    Vector3 target = mCameraMan->getTarget()->getPosition();
+
+    Real dist = camPos.distance(target);
+
+    mCameraMan->setYawPitchDist(yaw, pitch, dist);
+
+}
+
+void CameraGizmo::highlightFace(Ogre::ManualObject* face)
+{
+    if (!face)
+        return;
+
+    int faceIndex = -1;
+
+    for (int i = 0; i < 6; ++i)
+    {
+        if (mGizmoObjects[i] == face)
+        {
+            faceIndex = i;
+            break;
+        }
+    }
+
+    if (faceIndex == mOldFaceIndex)
+        return;
+    mGizmoObjects[0]->setMaterialName(0, "MAT_CAMERA_GIZMO_X");
+    mGizmoObjects[1]->setMaterialName(0, "MAT_CAMERA_GIZMO_X");
+    mGizmoObjects[2]->setMaterialName(0, "MAT_CAMERA_GIZMO_Y");
+    mGizmoObjects[3]->setMaterialName(0, "MAT_CAMERA_GIZMO_Y");
+    mGizmoObjects[4]->setMaterialName(0, "MAT_CAMERA_GIZMO_Z");
+    mGizmoObjects[5]->setMaterialName(0, "MAT_CAMERA_GIZMO_Z");
+    if (faceIndex == -1)
+    {
+        mOldFaceIndex = -1;
+        return;
+    }
+    mGizmoObjects[0]->setMaterialName(0, faceIndex == 0 ? "MAT_CAMERA_GIZMO_X_L" : "MAT_CAMERA_GIZMO_X");
+    mGizmoObjects[1]->setMaterialName(0, faceIndex == 1 ? "MAT_CAMERA_GIZMO_Y_L" : "MAT_CAMERA_GIZMO_Y");
+    mGizmoObjects[2]->setMaterialName(0, faceIndex == 2 ? "MAT_CAMERA_GIZMO_Z_L" : "MAT_CAMERA_GIZMO_Z");
+    mGizmoObjects[3]->setMaterialName(0, faceIndex == 3 ? "MAT_CAMERA_GIZMO_XY_L" : "MAT_CAMERA_GIZMO_XY");
+    mGizmoObjects[4]->setMaterialName(0, faceIndex == 4 ? "MAT_CAMERA_GIZMO_YZ_L" : "MAT_CAMERA_GIZMO_YZ");
+    mGizmoObjects[5]->setMaterialName(0, faceIndex == 5 ? "MAT_CAMERA_GIZMO_ZX_L" : "MAT_CAMERA_GIZMO_ZX");
+}
+
+void CameraGizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
+{
+    using namespace Ogre;
+
+    auto addQuad =
+        [](ManualObject* mo,
+           float x0, float y0,
+           float x1, float y1,
+           float z = 0.0f)
+    {
+        mo->position(x0, y0, z);
+        mo->position(x1, y0, z);
+        mo->position(x1, y1, z);
+        mo->position(x0, y1, z);
+
+        int base = mo->getCurrentVertexCount() - 4;
+        mo->triangle(base + 0, base + 1, base + 2);
+        mo->triangle(base + 0, base + 2, base + 3);
+    };
+
+    auto createPlusGlyph =
+        [&](const String& n)
+    {
+        ManualObject* mo = manager->createManualObject(n);
+        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
+
+        addQuad(mo, -0.05f, -0.30f, 0.05f, 0.30f); // vertical
+        addQuad(mo, -0.30f, -0.05f, 0.30f, 0.05f); // horizontal
+
+        mo->end();
+        return mo;
+    };
+
+    auto createMinusGlyph =
+        [&](const String& n)
+    {
+        ManualObject* mo = manager->createManualObject(n);
+        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
+
+        addQuad(mo, -0.30f, -0.05f, 0.30f, 0.05f);
+
+        mo->end();
+        return mo;
+    };
+
+    auto createXGlyph =
+        [&](const String& n)
+    {
+        ManualObject* mo = manager->createManualObject(n);
+        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
+
+        addQuad(mo, -0.30f, -0.05f, 0.30f, 0.05f);
+        addQuad(mo, -0.05f, -0.30f, 0.05f, 0.30f);
+
+        mo->end();
+        return mo;
+    };
+
+    auto createYGlyph =
+        [&](const String& n)
+    {
+        ManualObject* mo = manager->createManualObject(n);
+        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
+
+        addQuad(mo, -0.05f, -0.30f, 0.05f, 0.05f);
+        addQuad(mo, -0.30f, 0.05f, 0.30f, 0.15f);
+
+        mo->end();
+        return mo;
+    };
+
+    auto createZGlyph =
+        [&](const String& n)
+    {
+        ManualObject* mo = manager->createManualObject(n);
+        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
+
+        addQuad(mo, -0.30f,  0.20f, 0.30f,  0.30f);
+        addQuad(mo, -0.30f, -0.05f, 0.30f,  0.05f);
+        addQuad(mo, -0.30f, -0.30f, 0.30f, -0.20f);
+
+        mo->end();
+        return mo;
+    };
+
+    auto createFace =
+        [&](const String& n,
+            ManualObject* sign,
+            ManualObject* axis,
+            const String& materialName,
+            const int index)
+    {
+        SceneNode* faceNode = mGizmoNode->createChildSceneNode(n);
+
+        // Face quad
+        ManualObject* quad = manager->createManualObject(n + "_Face");
+        quad->begin("Gizmo/Face", RenderOperation::OT_TRIANGLE_LIST);
+        addQuad(quad, -0.5f, -0.5f, 0.5f, 0.5f);
+        quad->end();
+
+        quad->setQueryFlags(QUERYFLAG_GIZMO); // pickable
+        quad->setCastShadows(false);
+        quad->setMaterialName(0, materialName);
+        quad->setRenderQueueGroup(RENDER_QUEUE_OVERLAY);
+        faceNode->attachObject(quad);
+        mGizmoObjects[index] = quad;
+
+        // Sign glyph
+        SceneNode* signNode = faceNode->createChildSceneNode();
+        signNode->attachObject(sign);
+        signNode->setPosition(-0.25f, 0.0f, 0.01f);
+
+        // Axis glyph
+        SceneNode* axisNode = faceNode->createChildSceneNode();
+        axisNode->attachObject(axis);
+        axisNode->setPosition(0.25f, 0.0f, 0.01f);
+
+        return faceNode;
+    };
+    SceneNode* px = createFace(name + "_PX", createPlusGlyph (name + "_Plus1"), createXGlyph (name + "_X1"), "MAT_CAMERA_GIZMO_X", 0);
+    px->setPosition(0.5f, 0, 0);
+    px->yaw(Degree(-90));
+    SceneNode* nx = createFace(name + "_NX", createMinusGlyph(name + "_Minus1"), createXGlyph (name + "_X2"), "MAT_CAMERA_GIZMO_X", 1);
+    nx->setPosition(-0.5f, 0, 0);
+    nx->yaw(Degree(90));
+    SceneNode* py = createFace(name + "_PY", createPlusGlyph (name + "_Plus2"), createYGlyph (name + "_Y1"), "MAT_CAMERA_GIZMO_Y", 2);
+    py->setPosition(0, 0.5f, 0);
+    py->pitch(Degree(90));
+    SceneNode* ny = createFace(name + "_NY", createMinusGlyph(name + "_Minus2"), createYGlyph (name + "_Y2"), "MAT_CAMERA_GIZMO_Y", 3);
+    ny->setPosition(0, -0.5f, 0);
+    ny->pitch(Degree(-90));
+    SceneNode* pz = createFace(name + "_PZ", createPlusGlyph (name + "_Plus3"), createZGlyph (name + "_Z1"), "MAT_CAMERA_GIZMO_Z", 4);
+    pz->setPosition(0, 0, 0.5f);
+    SceneNode* nz = createFace(name + "_NZ", createMinusGlyph(name + "_Minus3"), createZGlyph (name + "_Z2"), "MAT_CAMERA_GIZMO_Z", 5);
+    nz->setPosition(0, 0, -0.5f);
+    nz->yaw(Degree(180));
+}
 
 } // namespace OgreBites

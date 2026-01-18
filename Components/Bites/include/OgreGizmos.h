@@ -1,8 +1,8 @@
 #ifndef OGRE_OGREGIZMOS_H
 #define OGRE_OGREGIZMOS_H
 #include "OgreBitesPrerequisites.h"
+#include "OgreCameraMan.h"
 #include "OgreRay.h"
-#include "OgreSceneNode.h"
 
 namespace OgreBites
 {
@@ -101,6 +101,35 @@ protected:
     // Picking
     std::unordered_map<Ogre::Entity*, int> mEntityToAxis;
     int mOldGizmoAxis{};
+};
+
+class _OgreBitesExport CameraGizmo
+{
+public:
+    CameraGizmo(
+        Ogre::RenderWindow* window,
+        Ogre::Camera* mainCamera,
+        CameraMan* cameraMan);
+
+    void highlightFace(Ogre::ManualObject* face);
+
+    void snapCamera(Ogre::ManualObject* face);
+
+    void updateOrientation();
+
+    void updateViewport();
+
+protected:
+    void createMesh(Ogre::SceneManager* manager, Ogre::String name);
+
+    Ogre::SceneNode* mGizmoNode{};
+    CameraMan* mCameraMan;
+    Ogre::Camera* mGizmoCamera;
+    Ogre::SceneNode* mGizmoCameraNode;
+    Ogre::Camera* mCamera;
+    Ogre::Node* mCameraNode{};
+    int mOldFaceIndex{};
+    Ogre::ManualObject* mGizmoObjects[6]{};
 };
 } // namespace OgreBites
 #endif // OGRE_OGREGIZMOS_H

@@ -61,11 +61,19 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         node4->setPosition(75, 0, 0);
         mSelectedEnt = ent;
         mGizmo = new Gizmo(mSceneMgr, node, G_TRANSLATE);
+        mCameraGizmo = new CameraGizmo(mWindow, mCamera, &*mCameraMan);
 
         // create a checkbox to toggle light movement
         mTranslate = mTrayMgr->createButton(TL_TOPLEFT, "Translate", "Translate");
         mRotate = mTrayMgr->createButton(TL_TOPLEFT, "Rotate", "Rotate");
         mScale = mTrayMgr->createButton(TL_TOPLEFT, "Scale", "Scale");
+    }
+
+    bool frameRenderingQueued(const FrameEvent& evt) override
+    {
+        mCameraGizmo->updateOrientation();
+
+        return true;
     }
 
     bool mouseMoved(const MouseMotionEvent& evt) override
@@ -79,11 +87,11 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
             return true;
         }
 
-        if (mCameraMan->mouseMoved(evt)) return true;
+        if (mCameraMan != nullptr && mCameraMan->mouseMoved(evt)) return true;
         Ray ray = mCamera->getCameraToViewportRay(nx, ny);
         mRayQuery->setRay(ray);
         mGizmo->pickAxis(ray);
-        pickEntity(ray);
+        pickEntity();
         return true;
     }
 
@@ -101,7 +109,7 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
                 mGizmo->startDrag(mCamera->getCameraToViewportRay(nx, ny), mCamera->getDerivedDirection());
                 return true;
             }
-            selectEntity(pickEntity(ray));
+            selectEntity(pickEntity());
             if (mCameraMan->mousePressed(evt))
             {
                 return true;
@@ -128,7 +136,7 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
 
 private:
 
-    Entity* pickEntity(Ray& ray)
+    Entity* pickEntity()
     {
         auto& hits = mRayQuery->execute();
         for (auto& h : hits)
@@ -182,6 +190,7 @@ private:
     enum ShaderParam { SP_SHININESS = 1, SP_DIFFUSE, SP_SPECULAR };
     RaySceneQuery* mRayQuery;
     Gizmo* mGizmo;
+    CameraGizmo* mCameraGizmo;
     Entity* mSelectedEnt;
     Entity* mHoveredEnt;
     SceneNode* mLightPivot;
