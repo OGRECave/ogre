@@ -256,10 +256,10 @@ namespace Ogre {
         @param outerAngle
             Angle covered by the outer cone
         @param falloff
-            The rate of falloff between the inner and outer cones. 1.0 means a linear falloff,
-            less means slower falloff, higher means faster falloff.
+            The falloff exponent between the inner and outer cones. 1.0 means a linear falloff,
+            less means slower falloff, 2.0 means quadratic falloff.
         */
-        void setSpotlightRange(const Radian& innerAngle, const Radian& outerAngle, Real falloff = 1.0);
+        void setSpotlightRange(const Radian& innerAngle, const Radian& outerAngle, Real falloff = 2.0);
 
         /** Returns the angle covered by the spotlights inner cone.
         */

@@ -259,4 +259,54 @@ namespace Ogre {
         mName = name;
         mHwGamma = writeGamma;
     }
+
+    //-----------------------------------------------------------------------------
+    GLFBORenderTexture::GLFBORenderTexture(const String& name, const GLSurfaceDesc& target, bool writeGamma,
+                                           GLFrameBufferObjectCommon* fbo)
+        : GLRenderTexture(name, target, writeGamma), mFB(fbo)
+    {
+        mFB->setRenderTargetPool(mDepthBufferPoolId);
+        // Bind target to surface 0 and initialise
+        mFB->bindSurface(0, target);
+        // Get attributes
+        mWidth = mFB->getWidth();
+        mHeight = mFB->getHeight();
+        mFSAA = mFB->getFSAA();
+    }
+
+    void GLFBORenderTexture::getCustomAttribute(const String& name, void* pData)
+    {
+        if( name == GLRenderTexture::CustomAttributeString_FBO )
+        {
+            *static_cast<GLFrameBufferObjectCommon **>(pData) = mFB.get();
+        }
+        else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
+        {
+            *static_cast<GLContext**>(pData) = mFB->getContext();
+        }
+        else if (name == "GL_FBOID")
+        {
+            *static_cast<uint32*>(pData) = mFB->getGLFBOID();
+        }
+        else if (name == "GL_MULTISAMPLEFBOID")
+        {
+            *static_cast<uint32*>(pData) = mFB->getGLMultisampleFBOID();
+        }
+    }
+
+    //-----------------------------------------------------------------------------
+    bool GLFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
+    {
+        bool result;
+        if( (result = GLRenderTexture::attachDepthBuffer( depthBuffer )) )
+            mFB->attachDepthBuffer( depthBuffer );
+
+        return result;
+    }
+    //-----------------------------------------------------------------------------
+    void GLFBORenderTexture::_detachDepthBuffer()
+    {
+        mFB->detachDepthBuffer();
+        GLRenderTexture::_detachDepthBuffer();
+    }
 }

@@ -85,7 +85,7 @@ TestContext::TestContext(int argc, char** argv) : OgreBites::SampleContext("Ogre
 
     if(mForceConfig)
     {
-        OgreBites::ApplicationContext ctx(OGRE_VERSION_NAME);
+        OgreBites::ApplicationContext ctx("OgreVTests");
         ctx.runRenderingSettingsDialog();
     }
 

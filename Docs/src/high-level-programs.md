@@ -150,7 +150,7 @@ layout(binding = 0) uniform sampler2D diffuseMap;
 uniform sampler2D diffuseMap;
 ```
 
-@note as we cannot detect the presence of explicit binding, you must add the `has_sampler_binding true` option to the program definition, so your locations are not overriden
+@note as we cannot always detect the presence of explicit binding, you should add the `has_sampler_binding true` option to the program definition, so your locations are not overriden
 
 Binding the sampler in material script is done as:
 
@@ -572,6 +572,7 @@ Parameters can be specified using one of 4 commands as shown below. The same syn
 -   [param_named](#param_005fnamed)
 -   [param_named_auto](#param_005fnamed_005fauto)
 -   [shared_params_ref](#shared_005fparams_005fref)
+-   [use_linear_colours](#use_005flinear_005fcolours)
 
 <a name="param_005findexed"></a><a name="param_005findexed-1"></a>
 
@@ -647,6 +648,19 @@ Example: shared\_params\_ref mySharedParams
 
 The only required parameter is a name, which must be the name of an already defined shared parameter set. All named parameters which are present in both the program and the shared parameter set will be linked, and the shared parameters values will be used.
 
+<a name="use_005flinear_005fcolours"></a>
+
+## use_linear_colours
+
+@copydoc Ogre::GpuProgramParameters::setUseLinearColours
+
+@par
+Format: use_linear_colours &lt;true|false&gt;
+@par
+Example: use_linear_colours true
+
+This only affects auto parameters or parameters set via code having the Ogre::ColourValue type.
+
 # Declaring Shared Parameters {#Declaring-Shared-Parameters}
 
 Often, not every parameter you want to pass to a shader is unique to that program, and perhaps you want to give the same value to a number of different programs, and a number of different materials using that program. Shared parameter sets allow you to define a ’holding area’ for shared parameters that can then be referenced when you need them in particular shaders, while keeping the definition of that value in one place. To define a set of shared parameters, you do this:
@@ -654,17 +668,17 @@ Often, not every parameter you want to pass to a shader is unique to that progra
 ```cpp
 shared_params YourSharedParamsName
 {
-    shared_param_named mySharedParam1 float4 0.1 0.2 0.3 0.4
+    param_named mySharedParam1 float4 0.1 0.2 0.3 0.4
     ...
 }
 ```
 
 As you can see, you need to use the keyword ’shared\_params’ and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the [param_named](#param_005fnamed) syntax. The definition of these lines is:
 @par
-Format: shared\_param\_named &lt;param\_name&gt; &lt;param\_type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
+Format: param\_named &lt;name&gt; &lt;type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
 
-@param param_name must be unique within the set
-@param param_type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4.
+@param name must be unique within the set
+@param type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4.
 @param array_size allows you to define arrays of param\_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param\_type with whitespace).
 @param initial_values If you wish, you can also initialise the parameters by providing a list of values.
 

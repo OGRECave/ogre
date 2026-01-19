@@ -44,7 +44,7 @@ namespace Ogre {
         mSpecular(ColourValue::Black),
         mSpotOuter(Degree(40.0f)),
         mSpotInner(Degree(30.0f)),
-        mSpotFalloff(1.0f),
+        mSpotFalloff(2.0f),
         mSpotNearClip(0.0f),
         mAttenuation(100000.f, 1.f, 0.f, 0.f),
         mShadowFarDist(0),

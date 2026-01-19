@@ -102,6 +102,9 @@ bool ApplicationContextBase::initialiseRTShaderSystem()
     {
         mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
 
+        if(getRenderWindow()->isHardwareGammaEnabled())
+            mShaderGenerator->setTargetLinearColours(true);
+
         // Create and register the material manager listener if it doesn't exist yet.
         if (!mMaterialMgrListener) {
             mMaterialMgrListener = new SGTechniqueResolverListener(mShaderGenerator);
@@ -481,6 +484,9 @@ void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t window
         case JOYAXISMOTION:
         case CONTROLLERAXISMOTION:
             l.axisMoved(event.axis);
+            break;
+        case JOYHATMOTION:
+            l.hatMoved(event.hat);
             break;
         case CONTROLLERBUTTONDOWN:
             l.buttonPressed(event.cbutton);

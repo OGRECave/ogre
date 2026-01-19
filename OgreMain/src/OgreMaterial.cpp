@@ -98,9 +98,11 @@ namespace Ogre {
         mLodValues = rhs.mLodValues;
         mLodStrategy = rhs.mLodStrategy;
         mCompilationRequired = rhs.mCompilationRequired;
-        // illumination passes are not compiled right away so
-        // mIsLoaded state should still be the same as the original material
-        assert(isLoaded() == rhs.isLoaded());
+
+        // creating techniques moves us into unloaded state
+        // insertSupportedTechnique is equivalent to prepare
+        if(rhs.isLoaded())
+            load();
 
         return *this;
     }
@@ -227,7 +229,7 @@ namespace Ogre {
             mHandle = savedHandle;
             mGroup = savedGroup;
         }
-        mCompilationRequired = true;
+        _notifyNeedsRecompile();
 
     }
     //-----------------------------------------------------------------------
@@ -235,7 +237,7 @@ namespace Ogre {
     {
         Technique *t = OGRE_NEW Technique(this);
         mTechniques.push_back(t);
-        mCompilationRequired = true;
+        _notifyNeedsRecompile();
         return t;
     }
     //-----------------------------------------------------------------------
@@ -435,7 +437,7 @@ namespace Ogre {
     {
         mSupportedTechniques.clear();
         mBestTechniquesBySchemeList.clear();
-        mCompilationRequired = true;
+        _notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
     #define ALL_TECHNIQUES(fncall) for(auto t : mTechniques) t->fncall

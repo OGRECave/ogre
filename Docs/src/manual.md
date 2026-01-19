@@ -937,37 +937,35 @@ When implementing custom animable properties, you have to also implement a numbe
 
 @page Instancing Instancing
 
-Instancing significantly reduces the CPU overhead of submitting many separate draw calls and is a great technique for rendering trees, rocks, grass, RTS units and other groups of similar (but necessarily identical) objects.
+Modern graphics cards (GPUs) prefer to receive geometry in large
+batches. It is orders of magnitude faster to render 10 batches
+of 10,000 triangles than it is to render 10,000 batches of 10
+triangles, even though both result in the same number of on-screen
+triangles.
 
-OGRE supports a variety of techniques to speed up the rendering of many objects in the Scene.
+Therefore it is important when you are rendering a lot of geometry to
+batch things up into as few rendering calls as possible.
+
+%Ogre supports a variety of techniques to speed up the rendering of many objects in the Scene.
 
 <dl compact="compact">
 <dt>@ref Static-Geometry</dt>
-<dd>Pre-transforms and batches up meshes for efficient use as static geometry in a scene.</dd>
+<dd>@copybrief Ogre::StaticGeometry </dd>
 <dt>@ref Instance-Manager</dt>
-<dd>Instancing is a way of batching up geometry into a much more efficient form, but with some limitations, and still be able to move & animate it.</dd>
+<dd>Choose from different algorithms to batch up geometry and still be able to move & animate it. Requires manual setup and the algorithms have some limitations.</dd>
+<dt>[Auto-Instancing](@ref Instancing-in-Vertex-Programs)</dt>
+<dd>You can advertise instancing in you shaders and Ogre will batch the draw calls for you. Does not support animation.This is less efficient than the Explicit Instance Manager but requires no code changes and can be used with the RTSS.</dd>
 </dl>
 
 @tableofcontents
 
 # Static Geometry {#Static-Geometry}
-Modern graphics cards (GPUs) prefer to receive geometry in large batches.
-It is orders of magnitude faster to render 10 batches of 10,000 triangles than it is to render 10,000 batches of 10 triangles, even though both result in the same number of on-screen triangles.
 
-Therefore it is important when you are rendering a lot of geometry to batch things up into as few rendering calls as possible.
-This class allows you to build a batched object from a series of entities in order to benefit from this behaviour. Batching has implications of it's own though:
- - A geometry region cannot be subdivided; that means that the whole group will be displayed, or none of it will. This obivously has culling issues.
- - A single world transform must apply to the entire batch. Therefore once you have batched things, you can't move them around relative to each other.
-   That's why this class is most useful when dealing with static geometry (hence the name).
-   In addition, geometry is effectively duplicated, so if you add 3 entities based on the same mesh in different positions, they will use 3 times the geometry space than the movable version (which re-uses the same geometry).
-   So you trade memory and flexibility of movement for pure speed when using this class.
- - A single material must apply for each batch. In fact this class allows you to use multiple materials, but you should be aware that internally this means that there is one batch per material.
-   Therefore you won't gain as much benefit from the batching if you use many different materials; try to keep the number down.
+@copydetails Ogre::StaticGeometry
 
-@see Ogre::StaticGeometry
 @see [Tutorial - Static Geometry](@ref tut_StaticGeom)
 
-# Instance Manager {#Instance-Manager}
+# Explicit Instance Manager {#Instance-Manager}
 Instancing is a rendering technique to draw multiple instances of the same mesh using just one render call. There are two kinds of instancing:
 
 @par Software

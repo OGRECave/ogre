@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreTerrain.h"
+#include "OgreShaderGenerator.h"
 #include "OgreTerrainQuadTreeNode.h"
 #include "OgreStreamSerialiser.h"
 #include "OgreMath.h"
@@ -1896,21 +1897,25 @@ namespace Ogre
 
         if(synchronous)
         {
-            auto r = new WorkQueue::Request(0, 0, req, 0, 0);
-            auto res = handleRequest(r, NULL);
-            handleResponse(res, NULL);
-            delete res;
+            auto res = handleRequest(req);
+            handleResponse(res, req);
             return;
         }
 
+        auto p = std::make_shared<std::promise<void>>();
+        OgreAssertDbg(!mDerivedDataFuture.valid() ||
+                          mDerivedDataFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready,
+                      "Previous derived future must be finished");
+        mDerivedDataFuture = p->get_future();
+
         Root::getSingleton().getWorkQueue()->addTask(
-            [this, req]()
+            [this, req, p]()
             {
-                auto r = new WorkQueue::Request(0, 0, req, 0, 0);
-                auto res = handleRequest(r, NULL);
-                Root::getSingleton().getWorkQueue()->addMainThreadTask([this, res](){
-                    handleResponse(res, NULL);
-                    delete res;
+                auto lreq = req; // make a mutable copy
+                auto res = handleRequest(lreq);
+                p->set_value();
+                Root::getSingleton().getWorkQueue()->addMainThreadTask([this, res, lreq](){
+                    handleResponse(res, lreq);
                 });
             });
     }
@@ -1920,7 +1925,10 @@ namespace Ogre
         while (mDerivedDataUpdateInProgress || mGenerateMaterialInProgress || mPrepareInProgress)
         {
             // we need to wait for this to finish
-            OGRE_THREAD_SLEEP(50);
+            if (mDerivedDataUpdateInProgress && mDerivedDataFuture.valid())
+            {
+                mDerivedDataFuture.wait();
+            }
             Root::getSingleton().getWorkQueue()->processMainThreadTasks();
         }
 
@@ -2982,10 +2990,9 @@ namespace Ogre
             TerrainGlobalOptions::getSingleton().getUseVertexCompressionWhenAvailable();
     }
     //---------------------------------------------------------------------
-    WorkQueue::Response* Terrain::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
+    Terrain::DerivedDataResponse Terrain::handleRequest(DerivedDataRequest& ddr)
     {
         // Background thread (maybe)
-        DerivedDataRequest ddr = any_cast<DerivedDataRequest>(req->getData());
         DerivedDataResponse ddres;
         ddres.remainingTypeMask = ddr.typeMask & DERIVED_DATA_ALL;
 
@@ -3010,16 +3017,12 @@ namespace Ogre
         }
 
         ddres.terrain = ddr.terrain;
-        WorkQueue::Response* response = OGRE_NEW WorkQueue::Response(req, true, ddres);
-        return response;
+        return ddres;
     }
     //---------------------------------------------------------------------
-    void Terrain::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
+    void Terrain::handleResponse(const DerivedDataResponse& ddres, const DerivedDataRequest& ddreq)
     {
         // Main thread
-        DerivedDataResponse ddres = any_cast<DerivedDataResponse>(res->getData());
-        DerivedDataRequest ddreq = any_cast<DerivedDataRequest>(res->getRequest()->getData());
-
         if ((ddreq.typeMask & DERIVED_DATA_DELTAS) && 
             !(ddres.remainingTypeMask & DERIVED_DATA_DELTAS))
             finaliseHeightDeltas(ddres.deltaUpdateRect, false);
@@ -3532,6 +3535,9 @@ namespace Ogre
             mCompositeMap = TextureManager::getSingleton().createManual(
                 mMaterialName + "/comp", _getDerivedResourceGroup(), 
                 TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, MIP_DEFAULT, PF_BYTE_RGBA);
+
+            if(auto shaderGen = RTShader::ShaderGenerator::getSingletonPtr())
+                mCompositeMap->setHardwareGammaEnabled(shaderGen->getTargetLinearColours());
 
             mCompositeMapSizeActual = mCompositeMap->getWidth();
 

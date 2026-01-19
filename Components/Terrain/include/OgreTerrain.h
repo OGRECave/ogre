@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreTerrainLayerBlendMap.h"
 #include "OgreWorkQueue.h"
 #include "OgreTerrainLodManager.h"
+#include <future>
 
 namespace Ogre
 {
@@ -1592,11 +1593,6 @@ namespace Ogre
 
         void waitForDerivedProcesses();
     private:
-        /// WorkQueue::RequestHandler override
-        WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
-        /// WorkQueue::ResponseHandler override
-        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
-
         void generateMaterial();
 
         /** Gets the data size at a given LOD level.
@@ -1740,6 +1736,9 @@ namespace Ogre
             PixelBox* lightMapBox;
         };
 
+        DerivedDataResponse handleRequest(DerivedDataRequest& req);
+        void handleResponse(const DerivedDataResponse& res, const DerivedDataRequest& req);
+
         String mMaterialName;
         MaterialPtr mMaterial;
         TerrainMaterialGeneratorPtr mMaterialGenerator;
@@ -1802,6 +1801,8 @@ namespace Ogre
         size_t getDeltaBufVertexSize() const;
 
         TerrainLodManager* mLodManager;
+
+        std::future<void> mDerivedDataFuture;
 
     public:
         /** Increase Terrain's LOD level by 1

@@ -556,8 +556,13 @@ namespace Ogre {
             }
             else if(def.isSampler())
             {
-                if(mHasSamplerBinding)
+                GLint binding = 0;
+                if(values[3] != -1)
+                    OGRE_CHECK_GL_ERROR(glGetUniformiv(mGLProgramHandle, values[3], &binding));
+
+                if(binding > 0 || mHasSamplerBinding)
                     continue;
+
                 def.physicalIndex = mConstantDefs->registerCount;
                 mConstantDefs->registerCount += def.arraySize * def.elementSize;
                 // no index based referencing
@@ -576,14 +581,12 @@ namespace Ogre {
         GLint numBlocks = 0;
         OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(mGLProgramHandle, type, GL_ACTIVE_RESOURCES, &numBlocks));
 
-        auto& hbm = static_cast<GL3PlusHardwareBufferManager&>(HardwareBufferManager::getSingleton());
-
-        const GLenum blockProperties[3] = {GL_NUM_ACTIVE_VARIABLES, GL_NAME_LENGTH, GL_BUFFER_DATA_SIZE};
+        const GLenum blockProperties[4] = {GL_NUM_ACTIVE_VARIABLES, GL_NAME_LENGTH, GL_BUFFER_DATA_SIZE, GL_BUFFER_BINDING};
         for(int blockIdx = 0; blockIdx < numBlocks; ++blockIdx)
         {
-            GLint values[3];
-            OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(mGLProgramHandle, type, blockIdx, 3, blockProperties,
-                                                       3, NULL, values));
+            GLint values[4];
+            OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(mGLProgramHandle, type, blockIdx, 4, blockProperties,
+                                                       4, NULL, values));
             if(values[0] == 0) continue;
 
             std::vector<char> nameData(values[1]);
@@ -605,28 +608,13 @@ namespace Ogre {
                 continue;
             }
 
-            auto blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(name);
-
-            HardwareBufferPtr hwGlBuffer = blockSharedParams->_getHardwareBuffer();
-            if(!hwGlBuffer)
+            // slots 0 & 1 are reserved for defaultbuffer
+            int binding = type == GL_UNIFORM_BLOCK ? blockIdx + 2 : blockIdx;
+            if(values[3] > 0)
             {
-                size_t binding = 0;
-                if(type == GL_UNIFORM_BLOCK)
-                {
-                    binding = hbm.getUniformBufferCount() + 2; // slots 0 & 1 are reserved for defaultbuffer
-                    hwGlBuffer = hbm.createUniformBuffer(values[2]);
-                }
-                else
-                {
-                    binding = hbm.getShaderStorageBufferCount();
-                    hwGlBuffer = hbm.createShaderStorageBuffer(values[2]);
-                }
-
-                static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->setGLBufferBinding(int(binding));
-                blockSharedParams->_setHardwareBuffer(hwGlBuffer);
+                binding = values[3];
             }
-
-            int binding = static_cast<GL3PlusHardwareBuffer*>(hwGlBuffer.get())->getGLBufferBinding();
+            mBufferInfoMap[name] = {binding, type};
 
             if(type == GL_UNIFORM_BLOCK)
             {

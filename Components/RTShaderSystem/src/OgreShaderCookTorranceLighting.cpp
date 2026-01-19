@@ -32,11 +32,13 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     Function* psMain = psProgram->getEntryPointFunction();
 
     vsProgram->addDependency(FFP_LIB_TRANSFORM);
+    vsProgram->addPreprocessorDefines("USE_LINEAR_COLOURS"); // in case vertex colours are used
 
     psProgram->addDependency(FFP_LIB_TRANSFORM);
     psProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency("SGXLib_CookTorrance");
-    psProgram->addPreprocessorDefines(StringUtil::format("LIGHT_COUNT=%d", mLightCount));
+    psProgram->addPreprocessorDefines(StringUtil::format("USE_LINEAR_COLOURS,LIGHT_COUNT=%d", mLightCount));
+    psProgram->setUseLinearColours(true);
 
     // Resolve texture coordinates.
     auto uvSet = Parameter::SPC_TEXTURE_COORDINATE0 + mTexCoordSet;
@@ -79,7 +81,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     // insert after texturing
     auto vstage = vsMain->getStage(FFP_PS_COLOUR_BEGIN + 1);
-    auto fstage = psMain->getStage(FFP_PS_COLOUR_END + 50);
+    auto fstage = psMain->getStage(FFP_PS_PBR_LIGHTING_BEGIN);
 
     // Forward texture coordinates
     if(vsInTexcoord)
@@ -124,7 +126,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     fstage.callFunction("PBR_MakeParams", {In(baseColor), In(mrparams), InOut(pixelParams)});
 
-    fstage = psMain->getStage(FFP_PS_COLOUR_END + 60); // make gap to inject IBL here
+    fstage = psMain->getStage(FFP_PS_PBR_LIGHTING_END);
     if(mLightCount > 0)
     {
         auto lightPos = psProgram->resolveParameter(GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY, mLightCount);

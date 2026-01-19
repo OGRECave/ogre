@@ -1223,17 +1223,17 @@ namespace Ogre {
         /// @overload
         void setGpuProgram(GpuProgramType type, const String& name, bool resetParams = true);
         /// @overload
-        void setFragmentProgram(const String& name, bool resetParams = true);
+        void setFragmentProgram(const String& name, bool resetParams = true) { setGpuProgram(GPT_FRAGMENT_PROGRAM, name, resetParams); }
         /// @overload
-        void setGeometryProgram(const String& name, bool resetParams = true);
+        void setGeometryProgram(const String& name, bool resetParams = true) { setGpuProgram(GPT_GEOMETRY_PROGRAM, name, resetParams); }
         /// @overload
-        void setTessellationDomainProgram(const String& name, bool resetParams = true);
+        void setTessellationDomainProgram(const String& name, bool resetParams = true) { setGpuProgram(GPT_DOMAIN_PROGRAM, name, resetParams); }
         /// @overload
-        void setTessellationHullProgram(const String& name, bool resetParams = true);
+        void setTessellationHullProgram(const String& name, bool resetParams = true) { setGpuProgram(GPT_HULL_PROGRAM, name, resetParams); }
         /// @overload
-        void setVertexProgram(const String& name, bool resetParams = true);
+        void setVertexProgram(const String& name, bool resetParams = true) { setGpuProgram(GPT_VERTEX_PROGRAM, name, resetParams); }
         /// @overload
-        void setComputeProgram(const String& name, bool resetParams = true);
+        void setComputeProgram(const String& name, bool resetParams = true) { setGpuProgram(GPT_COMPUTE_PROGRAM, name, resetParams); }
 
         /** Gets the name of the program used by this pass. */
         const String& getGpuProgramName(GpuProgramType type) const;
@@ -1256,34 +1256,34 @@ namespace Ogre {
             designed for low-level programs; use the named parameter methods
             for setting high-level program parameters.
         */
-        void setGpuProgramParameters(GpuProgramType type, const GpuProgramParametersSharedPtr& params);
+        void setGpuProgramParameters(GpuProgramType type, const GpuProgramParametersPtr& params);
         /// @overload
-        void setVertexProgramParameters(GpuProgramParametersSharedPtr params);
+        void setVertexProgramParameters(GpuProgramParametersPtr params) { setGpuProgramParameters(GPT_VERTEX_PROGRAM, params); }
         /// @overload
-        void setFragmentProgramParameters(GpuProgramParametersSharedPtr params);
+        void setFragmentProgramParameters(GpuProgramParametersPtr params) { setGpuProgramParameters(GPT_FRAGMENT_PROGRAM, params); }
         /// @overload
-        void setGeometryProgramParameters(GpuProgramParametersSharedPtr params);
+        void setGeometryProgramParameters(GpuProgramParametersPtr params) { setGpuProgramParameters(GPT_GEOMETRY_PROGRAM, params); }
         /// @overload
-        void setTessellationHullProgramParameters(GpuProgramParametersSharedPtr params);
+        void setTessellationHullProgramParameters(GpuProgramParametersPtr params) { setGpuProgramParameters(GPT_HULL_PROGRAM, params); }
         /// @overload
-        void setTessellationDomainProgramParameters(GpuProgramParametersSharedPtr params);
+        void setTessellationDomainProgramParameters(GpuProgramParametersPtr params) { setGpuProgramParameters(GPT_DOMAIN_PROGRAM, params); }
         /// @overload
-        void setComputeProgramParameters(GpuProgramParametersSharedPtr params);
+        void setComputeProgramParameters(GpuProgramParametersPtr params) { setGpuProgramParameters(GPT_COMPUTE_PROGRAM, params); }
 
         /** Gets the Gpu program parameters used by this pass. */
-        const GpuProgramParametersSharedPtr& getGpuProgramParameters(GpuProgramType type) const;
+        const GpuProgramParametersPtr& getGpuProgramParameters(GpuProgramType type) const;
         /// @overload
-        GpuProgramParametersSharedPtr getVertexProgramParameters(void) const;
+        GpuProgramParametersPtr getVertexProgramParameters(void) const { return getGpuProgramParameters(GPT_VERTEX_PROGRAM); }
         /// @overload
-        GpuProgramParametersSharedPtr getFragmentProgramParameters(void) const;
+        GpuProgramParametersPtr getFragmentProgramParameters(void) const { return getGpuProgramParameters(GPT_FRAGMENT_PROGRAM); }
         /// @overload
-        GpuProgramParametersSharedPtr getGeometryProgramParameters(void) const;
+        GpuProgramParametersPtr getGeometryProgramParameters(void) const { return getGpuProgramParameters(GPT_GEOMETRY_PROGRAM); }
         /// @overload
-        GpuProgramParametersSharedPtr getTessellationHullProgramParameters(void) const;
+        GpuProgramParametersPtr getTessellationHullProgramParameters(void) const { return getGpuProgramParameters(GPT_HULL_PROGRAM); }
         /// @overload
-        GpuProgramParametersSharedPtr getTessellationDomainProgramParameters(void) const;
+        GpuProgramParametersPtr getTessellationDomainProgramParameters(void) const { return getGpuProgramParameters(GPT_DOMAIN_PROGRAM); }
         /// @overload
-        GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
+        GpuProgramParametersPtr getComputeProgramParameters(void) const { return getGpuProgramParameters(GPT_COMPUTE_PROGRAM); }
         /// @}
 
         /** Splits this Pass to one which can be handled in the number of

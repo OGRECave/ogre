@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLFBORenderTexture.h"
+#include "OgreGLFrameBufferObject.h"
 #include "OgreGLPixelFormat.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -34,60 +35,6 @@ THE SOFTWARE.
 #include "OgreGLHardwarePixelBuffer.h"
 
 namespace Ogre {
-
-//-----------------------------------------------------------------------------    
-    GLFBORenderTexture::GLFBORenderTexture(const String &name,
-        const GLSurfaceDesc &target, bool writeGamma):
-        GLRenderTexture(name, target, writeGamma),
-        mFB(target.numSamples)
-    {
-        // Bind target to surface 0 and initialise
-        mFB.bindSurface(0, target);
-        // Get attributes
-        mWidth = mFB.getWidth();
-        mHeight = mFB.getHeight();
-        mFSAA = mFB.getFSAA();
-    }
-
-    void GLFBORenderTexture::getCustomAttribute(const String& name, void* pData)
-    {
-        if( name == GLRenderTexture::CustomAttributeString_FBO )
-        {
-            *static_cast<GLFrameBufferObject **>(pData) = &mFB;
-        }
-        else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
-        {
-            *static_cast<GLContext**>(pData) = mFB.getContext();
-        }
-        else if (name == "GL_FBOID")
-        {
-            *static_cast<GLuint*>(pData) = mFB.getGLFBOID();
-        }
-        else if (name == "GL_MULTISAMPLEFBOID")
-        {
-            *static_cast<GLuint*>(pData) = mFB.getGLMultisampleFBOID();
-        }
-    }
-
-    void GLFBORenderTexture::swapBuffers()
-    {
-        mFB.swapBuffers();
-    }
-    //-----------------------------------------------------------------------------
-    bool GLFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
-    {
-        bool result;
-        if( (result = GLRenderTexture::attachDepthBuffer( depthBuffer )) )
-            mFB.attachDepthBuffer( depthBuffer );
-
-        return result;
-    }
-    //-----------------------------------------------------------------------------
-    void GLFBORenderTexture::_detachDepthBuffer()
-    {
-        mFB.detachDepthBuffer();
-        GLRenderTexture::_detachDepthBuffer();
-    }
    
 /// Size of probe texture
 #define PROBE_SIZE 16
@@ -473,7 +420,8 @@ static const uchar depthBits[] =
     GLFBORenderTexture *GLFBOManager::createRenderTexture(const String &name, 
         const GLSurfaceDesc &target, bool writeGamma)
     {
-        GLFBORenderTexture *retval = new GLFBORenderTexture(name, target, writeGamma);
+        GLFBORenderTexture* retval =
+            new GLFBORenderTexture(name, target, writeGamma, new GLFrameBufferObject(target.numSamples));
         return retval;
     }
     //---------------------------------------------------------------------

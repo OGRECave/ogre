@@ -41,6 +41,7 @@ Program::Program(GpuProgramType type)
     mSkeletalAnimation  = false;
     mColumnMajorMatrices = true;
     mInstancing         = false;
+    mUseLinearColours  = false;
 }
 
 //-----------------------------------------------------------------------------

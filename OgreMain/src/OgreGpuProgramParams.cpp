@@ -597,94 +597,27 @@ namespace Ogre
 
         for (const CopyDataEntry& e : mCopyDataList)
         {
-            if (e.dstDefinition->isFloat())
+            // dst type cannot be double, so src will never be double either
+            if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_4X4))
             {
                 const float* pSrc = sharedParams->getFloatPointer(e.srcDefinition->physicalIndex);
                 float* pDst = mParams->getFloatPointer(e.dstDefinition->physicalIndex);
 
-                // Deal with matrix transposition here!!!
-                // transposition is specific to the dest param set, shared params don't do it
-                if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_4X4))
+                // for each matrix that needs to be transposed and copied,
+                for (size_t iMat = 0; iMat < e.dstDefinition->arraySize; ++iMat)
                 {
-                    // for each matrix that needs to be transposed and copied,
-                    for (size_t iMat = 0; iMat < e.dstDefinition->arraySize; ++iMat)
-                    {
-                        for (int row = 0; row < 4; ++row)
-                            for (int col = 0; col < 4; ++col)
-                                pDst[row * 4 + col] = pSrc[col * 4 + row];
-                        pSrc += 16;
-                        pDst += 16;
-                    }
-                }
-                else
-                {
-                    if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
-                    {
-                        // simple copy
-                        memcpy(pDst, pSrc, sizeof(float) * e.dstDefinition->elementSize * e.dstDefinition->arraySize);
-                    }
-                    else
-                    {
-                        // target params may be padded to 4 elements, shared params are packed
-                        assert(e.dstDefinition->elementSize % 4 == 0);
-                        size_t iterations = e.dstDefinition->elementSize / 4
-                            * e.dstDefinition->arraySize;
-                        assert(iterations > 0);
-                        size_t valsPerIteration = e.srcDefinition->elementSize;
-                        for (size_t l = 0; l < iterations; ++l)
-                        {
-                            memcpy(pDst, pSrc, sizeof(float) * valsPerIteration);
-                            pSrc += valsPerIteration;
-                            pDst += 4;
-                        }
-                    }
+                    for (int row = 0; row < 4; ++row)
+                        for (int col = 0; col < 4; ++col)
+                            pDst[row * 4 + col] = pSrc[col * 4 + row];
+                    pSrc += 16;
+                    pDst += 16;
                 }
             }
-            else if (e.dstDefinition->isDouble())
+            else
             {
-                const double* pSrc = sharedParams->getDoublePointer(e.srcDefinition->physicalIndex);
-                double* pDst = mParams->getDoublePointer(e.dstDefinition->physicalIndex);
-
-                // Deal with matrix transposition here!!!
-                // transposition is specific to the dest param set, shared params don't do it
-                if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_DOUBLE_4X4))
-                {
-                    // for each matrix that needs to be transposed and copied,
-                    for (size_t iMat = 0; iMat < e.dstDefinition->arraySize; ++iMat)
-                    {
-                        for (int row = 0; row < 4; ++row)
-                            for (int col = 0; col < 4; ++col)
-                                pDst[row * 4 + col] = pSrc[col * 4 + row];
-                        pSrc += 16;
-                        pDst += 16;
-                    }
-                }
-                else
-                {
-                    if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
-                    {
-                        // simple copy
-                        memcpy(pDst, pSrc, sizeof(double) * e.dstDefinition->elementSize * e.dstDefinition->arraySize);
-                    }
-                    else
-                    {
-                        // target params may be padded to 4 elements, shared params are packed
-                        assert(e.dstDefinition->elementSize % 4 == 0);
-                        size_t iterations = e.dstDefinition->elementSize / 4
-                            * e.dstDefinition->arraySize;
-                        assert(iterations > 0);
-                        size_t valsPerIteration = e.srcDefinition->elementSize;
-                        for (size_t l = 0; l < iterations; ++l)
-                        {
-                            memcpy(pDst, pSrc, sizeof(double) * valsPerIteration);
-                            pSrc += valsPerIteration;
-                            pDst += 4;
-                        }
-                    }
-                }
-            }
-            else if (e.dstDefinition->isInt())
-            {
+                OgreAssertDbg(!e.dstDefinition->isSampler() && !e.dstDefinition->isDouble() &&
+                                  !e.dstDefinition->isSpecialization(),
+                              "expected 4 byte type");
                 const int* pSrc = sharedParams->getIntPointer(e.srcDefinition->physicalIndex);
                 int* pDst = mParams->getIntPointer(e.dstDefinition->physicalIndex);
 
@@ -695,48 +628,14 @@ namespace Ogre
                 }
                 else
                 {
-                    // target params may be padded to 4 elements, shared params are packed
-                    assert(e.dstDefinition->elementSize % 4 == 0);
-                    size_t iterations = (e.dstDefinition->elementSize / 4)
-                        * e.dstDefinition->arraySize;
-                    assert(iterations > 0);
-                    size_t valsPerIteration = e.srcDefinition->elementSize;
-                    for (size_t l = 0; l < iterations; ++l)
+                    // element wise copy
+                    for (uint32 l = 0; l < e.dstDefinition->arraySize; ++l)
                     {
-                        memcpy(pDst, pSrc, sizeof(int) * valsPerIteration);
-                        pSrc += valsPerIteration;
-                        pDst += 4;
+                        memcpy(pDst, pSrc, sizeof(int) * e.dstDefinition->elementSize);
+                        pSrc += e.srcDefinition->elementSize;
+                        pDst += e.dstDefinition->elementSize;
                     }
                 }
-            }
-            else if (e.dstDefinition->isUnsignedInt() || e.dstDefinition->isBool()) 
-            {
-                const uint* pSrc = sharedParams->getUnsignedIntPointer(e.srcDefinition->physicalIndex);
-                uint* pDst = mParams->getUnsignedIntPointer(e.dstDefinition->physicalIndex);
-
-                if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
-                {
-                    // simple copy
-                    memcpy(pDst, pSrc, sizeof(uint) * e.dstDefinition->elementSize * e.dstDefinition->arraySize);
-                }
-                else
-                {
-                    // target params may be padded to 4 elements, shared params are packed
-                    assert(e.dstDefinition->elementSize % 4 == 0);
-                    size_t iterations = (e.dstDefinition->elementSize / 4)
-                        * e.dstDefinition->arraySize;
-                    assert(iterations > 0);
-                    size_t valsPerIteration = e.srcDefinition->elementSize;
-                    for (size_t l = 0; l < iterations; ++l)
-                    {
-                        memcpy(pDst, pSrc, sizeof(uint) * valsPerIteration);
-                        pSrc += valsPerIteration;
-                        pDst += 4;
-                    }
-                }
-            }
-            else {
-                //TODO add error
             }
         }
     }
@@ -751,6 +650,7 @@ namespace Ogre
         , mTransposeMatrices(false)
         , mIgnoreMissingParams(false)
         , mActivePassIterationIndex(std::numeric_limits<size_t>::max())
+        , mUseLinearColours(false)
     {
         static_assert((sizeof(AutoConstantDictionary) / sizeof(AutoConstantDefinition) - 5) == ACT_MATERIAL_LOD_INDEX,
                       "AutoConstantDictionary out of sync");
@@ -780,6 +680,7 @@ namespace Ogre
         mTransposeMatrices = oth.mTransposeMatrices;
         mIgnoreMissingParams  = oth.mIgnoreMissingParams;
         mActivePassIterationIndex = oth.mActivePassIterationIndex;
+        mUseLinearColours = oth.mUseLinearColours;
 
         return *this;
     }
@@ -1005,6 +906,9 @@ namespace Ogre
     void GpuProgramParameters::_writeRawConstant(size_t physicalIndex,
                                                  const ColourValue& colour, size_t count)
     {
+        if(mUseLinearColours)
+            return _writeRawConstants(physicalIndex, colour.gammaToLinear().ptr(), std::min(count, (size_t)4));
+
         // write either the number requested (for packed types) or up to 4
         _writeRawConstants(physicalIndex, colour.ptr(), std::min(count, (size_t)4));
     }
@@ -1646,7 +1550,8 @@ namespace Ogre
                                       ac.elementCount);
                     break;
                 case ACT_SURFACE_SPECULAR_COLOUR:
-                    _writeRawConstant(ac.physicalIndex, source->getSurfaceSpecularColour(),
+                    // we also pass metal-roughness here, so avoid any gamma correction
+                    _writeRawConstants(ac.physicalIndex, source->getSurfaceSpecularColour().ptr(),
                                       ac.elementCount);
                     break;
                 case ACT_SURFACE_EMISSIVE_COLOUR:
@@ -2081,9 +1986,8 @@ namespace Ogre
                                           source->getLightSpecularColour(l), ac.elementCount);
                     break;
                 case ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY:
-                    for (size_t l = 0; l < ac.data; ++l)
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(ColourValue),
-                                          source->getLightDiffuseColourWithPower(l), ac.elementCount);
+                    _writeRawConstants(ac.physicalIndex, source->getLightDiffuseColourPowerScaledArray(ac.data),
+                                       ac.data);
                     break;
 
                 case ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED_ARRAY:
@@ -2110,23 +2014,11 @@ namespace Ogre
                     break;
 
                 case ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY:
-                    for (size_t l = 0; l < ac.data; ++l)
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
-                                          source->getViewMatrix() *
-                                              source->getLightAs4DVector(l),
-                                          ac.elementCount);
+                    _writeRawConstants(ac.physicalIndex, source->getLightPositionViewSpaceArray(ac.data), ac.data);
                     break;
 
                 case ACT_LIGHT_DIRECTION_VIEW_SPACE_ARRAY:
-                    m3 = source->getInverseTransposeViewMatrix().linear();
-                    for (size_t l = 0; l < ac.data; ++l)
-                    {
-                        vec3 = m3 * source->getLightDirection(l);
-                        vec3.normalise();
-                        // Set as 4D vector for compatibility
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
-                                          Vector4f(vec3.x, vec3.y, vec3.z, 0.0f), ac.elementCount);
-                    }
+                    _writeRawConstants(ac.physicalIndex, source->getLightDirectionViewSpaceArray(ac.data), ac.data);
                     break;
 
                 case ACT_LIGHT_POWER_SCALE_ARRAY:
@@ -2136,18 +2028,10 @@ namespace Ogre
                     break;
 
                 case ACT_LIGHT_ATTENUATION_ARRAY:
-                    for (size_t l = 0; l < ac.data; ++l)
-                    {
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f),
-                                          source->getLightAttenuation(l), ac.elementCount);
-                    }
+                    _writeRawConstants(ac.physicalIndex, source->getLightAttenuationArray(ac.data), ac.data);
                     break;
                 case ACT_SPOTLIGHT_PARAMS_ARRAY:
-                    for (size_t l = 0 ; l < ac.data; ++l)
-                    {
-                        _writeRawConstant(ac.physicalIndex + l*sizeof(Vector4f), source->getSpotlightParams(l),
-                                          ac.elementCount);
-                    }
+                    _writeRawConstants(ac.physicalIndex, source->getSpotlightParamsArray(ac.data), ac.data);
                     break;
                 case ACT_DERIVED_LIGHT_DIFFUSE_COLOUR:
                     _writeRawConstant(ac.physicalIndex,
@@ -2467,6 +2351,7 @@ namespace Ogre
         mRegisters = source.mRegisters;
         mAutoConstants = source.getAutoConstantList();
         mCombinedVariability = source.mCombinedVariability;
+        mUseLinearColours = source.mUseLinearColours;
         copySharedParamSetUsage(source.mSharedParamSets);
     }
     //---------------------------------------------------------------------

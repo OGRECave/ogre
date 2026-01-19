@@ -1083,9 +1083,13 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     // Clear the viewport if required
     if (mCurrentViewport->getClearEveryFrame())
     {
+        ColourValue clearColour = mCurrentViewport->getBackgroundColour();
+        if(mAutoParamDataSource->getCurrentRenderTarget()->isHardwareGammaEnabled())
+            clearColour = clearColour.gammaToLinear();
+
         mDestRenderSystem->clearFrameBuffer(
             mCurrentViewport->getClearBuffers(),
-            mCurrentViewport->getBackgroundColour(),
+            clearColour,
             mCurrentViewport->getDepthClear() );
     }
 

@@ -51,7 +51,6 @@ namespace Ogre
 {
     VulkanWindow::VulkanWindow( const String &title, uint32 width, uint32 height, bool fullscreenMode ) :
         mLowestLatencyVSync( false ),
-        mHwGamma( false ),
         mDevice( 0 ),
         mTexture( 0 ),
         mDepthTexture( 0 ),

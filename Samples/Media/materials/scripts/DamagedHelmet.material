@@ -1,7 +1,7 @@
 import glTF2/PBR from glTF2_PBR.material
 import Filament from filament.material
 
-material DamagedHelmet : glTF2/PBR
+material DamagedHelmet_glTF : glTF2/PBR
 {
     set $Albedo Default_albedo.jpg
     set $AmbientOcclusion Default_AO.jpg
@@ -22,7 +22,7 @@ material DamagedHelmet_Filament : Filament
     set $IBL_SPECULAR studio_garden.jpg
 }
 
-material DamagedHelmet_RTSS {
+material DamagedHelmet {
     technique
     {
         pass

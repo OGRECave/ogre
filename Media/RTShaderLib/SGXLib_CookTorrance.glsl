@@ -169,7 +169,6 @@ vec3 evaluateLight(
 
 void PBR_MakeParams(in vec3 baseColor, in vec2 mrParam, inout PixelParams pixel)
 {
-    baseColor = pow(baseColor, vec3_splat(2.2));
     pixel.baseColor = baseColor;
 
     float perceptualRoughness = mrParam.x;
@@ -206,8 +205,6 @@ void PBR_Lights(
                 in PixelParams pixel,
                 inout vec3 vOutColour)
 {
-    vOutColour = pow(vOutColour, vec3_splat(2.2)); // gamma to linear
-
     // Energy compensation for multiple scattering in a microfacet model
     // See "Multiple-Scattering Microfacet BSDFs with the Smith Model"
     pixel.energyCompensation = 1.0 + pixel.f0 * (1.0 / pixel.dfg.y - 1.0);
@@ -237,10 +234,5 @@ void PBR_Lights(
     }
 
     vOutColour += pixel.baseColor * pow(ambient.rgb, vec3_splat(2.2));
-
-    // linear to gamma
-    vOutColour = pow(vOutColour, vec3_splat(1.0/2.2));
-
-    vOutColour = saturate(vOutColour);
 }
 #endif

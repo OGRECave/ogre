@@ -101,6 +101,9 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* psMain   = psProgram->getEntryPointFunction();    
     
+    vsProgram->addDependency("RTSLib_Colour");
+    psProgram->addDependency("RTSLib_Colour");
+
     // Create vertex shader colour invocations.
     ParameterPtr vsDiffuse;
     ParameterPtr vsSpecular;
@@ -109,6 +112,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     if (mVSInputDiffuse)
     {
         vsDiffuse = mVSInputDiffuse;
+        vsStage.callFunction("ENABLE_LINEAR_COLOUR", vsDiffuse);
     }
     else
     {
@@ -165,6 +169,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     psMain->getStage(FFP_PS_COLOUR_END)
         .add(In(mPSOutputDiffuse).xyz(), In(psSpecular).xyz(), Out(mPSOutputDiffuse).xyz());
 
+    psMain->getStage(FFP_PS_POST_PROCESS).callFunction("COLOUR_TRANSFER", mPSOutputDiffuse);
     return true;
 }
 

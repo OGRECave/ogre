@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLES2FBORenderTexture.h"
+#include "OgreGLES2FrameBufferObject.h"
 #include "OgreGLES2PixelFormat.h"
 #include "OgreLogManager.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
@@ -40,39 +41,14 @@ namespace Ogre {
 //-----------------------------------------------------------------------------    
     GLES2FBORenderTexture::GLES2FBORenderTexture(const String &name,
         const GLSurfaceDesc &target, bool writeGamma):
-        GLRenderTexture(name, target, writeGamma)
+        GLFBORenderTexture(name, target, writeGamma, new GLES2FrameBufferObject())
     {
-        mFB.setRenderTargetPool(mDepthBufferPoolId);
-        // Bind target to surface 0 and initialise
-        mFB.bindSurface(0, target);
-
-        // Get attributes
-        mWidth = mFB.getWidth();
-        mHeight = mFB.getHeight();
-        mFSAA = mFB.getFSAA();
-    }
-    
-    void GLES2FBORenderTexture::getCustomAttribute(const String& name, void* pData)
-    {
-        if(name == GLRenderTexture::CustomAttributeString_FBO)
-        {
-            *static_cast<GLES2FrameBufferObject **>(pData) = &mFB;
-        }
-        else if(name == GLRenderTexture::CustomAttributeString_GLCONTEXT)
-        {
-            *static_cast<GLContext**>(pData) = mFB.getContext();
-        }
     }
 
-    void GLES2FBORenderTexture::swapBuffers()
-    {
-        mFB.swapBuffers();
-    }
-    
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2FBORenderTexture::notifyOnContextLost()
     {
-        mFB.notifyOnContextLost();
+        static_cast<GLES2FrameBufferObject*>(mFB.get())->notifyOnContextLost();
     }
     
     void GLES2FBORenderTexture::notifyOnContextReset()
@@ -81,27 +57,11 @@ namespace Ogre {
         target.buffer = static_cast<GLHardwarePixelBufferCommon*>(mBuffer);
         target.zoffset = mZOffset;
         
-        mFB.notifyOnContextReset(target);
+        static_cast<GLES2FrameBufferObject*>(mFB.get())->notifyOnContextReset(target);
         
-        static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->_createDepthBufferFor(this);
+        Root::getSingletonPtr()->getRenderSystem()->_createDepthBufferFor(this);
     }
 #endif
-    
-    //-----------------------------------------------------------------------------
-    bool GLES2FBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
-    {
-        bool result;
-        if( (result = GLRenderTexture::attachDepthBuffer( depthBuffer )) )
-            mFB.attachDepthBuffer( depthBuffer );
-
-        return result;
-    }
-    //-----------------------------------------------------------------------------
-    void GLES2FBORenderTexture::_detachDepthBuffer()
-    {
-        mFB.detachDepthBuffer();
-        GLRenderTexture::_detachDepthBuffer();
-    }
    
     // Size of probe texture
     #define PROBE_SIZE 16

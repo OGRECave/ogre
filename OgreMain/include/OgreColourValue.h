@@ -155,6 +155,9 @@ namespace Ogre {
             return ret;
         }
 
+        /// Convert from gamma space to linear space
+        ColourValue gammaToLinear() const { return ColourValue(powf(r, 2.2f), powf(g, 2.2f), powf(b, 2.2f), a); }
+
         /// Array accessor operator
         float operator [] ( const size_t i ) const
         {

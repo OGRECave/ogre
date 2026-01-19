@@ -19,6 +19,10 @@ Since 14.3, textures defined in compositor scripts can explicitly set the FSAA l
 
 Since 14.3, `float16` vertex elements are supported via the `VET_HALFx` types. Note, that `VET_HALF3` is not supported on D3D11 and D3D9 and is padded to `VET_HALF4` on loading there.
 
+Since 14.5, multi-sample textures are supported via the `TEX_TYPE_2D_MULTISAMPLE` texture type.
+
+Since 14.5, `GpuProgramParameters::setUseLinearColours` can be used to specify that automatic sRGB to linear conversion should be applied to colour parameters when setting them.
+
 ### OgreUnifiedShader.h
 
 Sampler definitions now implicitly include the `uniform` keyword to support Vulkan; i.e. this will generate an error:
@@ -33,6 +37,7 @@ You opt-in to this syntax with Ogre 13, by defining `USE_OGRE_FROM_FUTURE` befor
 
 Since Ogre 14.5, relaxed precision (i.e. `mediump`) is used on Vulkan in fragment shaders to improve performance.
 This means that shader code now behaves equivalently to OpenGL ES.
+On D3D11, one can opt-in to this behaviour by defining `USE_OGRE_FROM_FUTURE` before including `OgreUnifiedShader.h`.
 
 ### Task-based WorkQueue
 
@@ -160,6 +165,8 @@ pass
 ```
 
 Additionally `parallax_occlusion` mapping is now supported by using the respective keyword. It is also available with the Terrain Component.
+
+Since 14.5, the lighting can be done in linear space by setting `ShaderGenerator::setTargetLinearColours`. This is enabled automatically by the `ApplicationContext` when the sRGB gamma correction is enabled and by the CookTorrance sub-renderstate.
 
 ## Terrain
 

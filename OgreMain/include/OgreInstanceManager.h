@@ -41,7 +41,15 @@ namespace Ogre
     *  @{
     */
 
-    /** This is the main starting point for the new instancing system.
+    /** This is the main starting point for the manual instancing system.
+
+        Instancing allows to save both memory and draw calls. While
+        StaticGeometry stores 500 times the same object in a batch to display 500
+        objects, a hardware instancing implementation stores the object once,
+        and then re-uses the vertex data with different shader parameter.
+        You can move the batched objects independently of one another which
+        you cannot do with StaticGeometry.
+
         Each InstanceManager can control one technique and one mesh, but it can manage
         multiple materials at the same time.
         @ref SceneManager::createInstanceManager, which creates this InstanceManager. Each one

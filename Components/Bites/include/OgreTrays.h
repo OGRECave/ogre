@@ -739,7 +739,10 @@ namespace OgreBites
     /**
     Main class to manage a cursor, backdrop, trays and widgets.
     */
-    class _OgreBitesExport TrayManager : public TrayListener, public Ogre::ResourceGroupListener, public InputListener
+    class _OgreBitesExport TrayManager
+#ifndef SWIG
+        : public TrayListener, public Ogre::ResourceGroupListener, public InputListener
+#endif
     {
     public:
 

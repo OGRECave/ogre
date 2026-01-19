@@ -2270,11 +2270,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, const GpuProgramParametersPtr& params, uint16 mask)
     {
-        if (mask & (uint16)GPV_GLOBAL)
-        {
-            params->_updateSharedParams();
-        }
-
         if (!mBoundProgram[gptype])
             return;
 
@@ -2289,17 +2284,26 @@ namespace Ogre
         auto& bufferInfoMap = mBoundProgram[gptype]->getBufferInfoMap();
         for (const auto& usage : params->getSharedParameters())
         {
-            if(const auto& buf = usage.getSharedParams()->_getHardwareBuffer())
-            {
-                // hardware baked cbuffer
-                auto it = bufferInfoMap.find(usage.getName());
-                if(it == bufferInfoMap.end())
-                    continue; // TODO: error?
+            auto it = bufferInfoMap.find(usage.getName());
+            auto bufSize = usage.getSharedParams()->getConstantList().size();
+            if(it == bufferInfoMap.end() || bufSize == 0)
+                continue; // TODO: error?
 
-                size_t slot = it->second;
-                buffers.resize(std::max(slot + 1, buffers.size()));
-                buffers[slot] = static_cast<D3D11HardwareBuffer*>(buf.get())->getD3DBuffer();
+            auto hwBuffer = usage.getSharedParams()->_getHardwareBuffer();
+            if (!hwBuffer || hwBuffer->getSizeInBytes() < bufSize)
+            {
+                hwBuffer = mHardwareBufferManager->createUniformBuffer(bufSize);
+                usage.getSharedParams()->_setHardwareBuffer(hwBuffer);
             }
+
+            size_t slot = it->second;
+            buffers.resize(std::max(slot + 1, buffers.size()));
+            buffers[slot] = static_cast<D3D11HardwareBuffer*>(hwBuffer.get())->getD3DBuffer();
+        }
+
+        if (mask & (uint16)GPV_GLOBAL)
+        {
+            params->_updateSharedParams();
         }
 
         // Do everything here in Dx11, since deal with via buffers anyway so number of calls

@@ -323,7 +323,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 
     if(mLateAddBlend && colourBlend.operation == LBX_ADD)
     {
-        groupOrder = FFP_PS_COLOUR_END + 50 + 20; // after PBR lighting
+        groupOrder = FFP_PS_PBR_LIGHTING_END + 10;
     }
 
     // Build colours blend
@@ -356,6 +356,21 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 }
 
 //-----------------------------------------------------------------------
+static bool canHaveGammaColour(TextureUnitState* tus) {
+    bool targetLinear = ShaderGenerator::getSingleton().getTargetLinearColours();
+
+    if (tus->getContentType() == TextureUnitState::CONTENT_COMPOSITOR && targetLinear)
+        return false;
+
+    if(tus->isHardwareGammaEnabled())
+        return false;
+
+    if(PixelUtil::isFloatingPoint(tus->getDesiredFormat()))
+        return false;
+
+    return true;
+}
+
 void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain,
                                               const ParameterPtr& texel, int groupOrder)
 {
@@ -371,6 +386,8 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
     if (textureUnitParams->mTexCoordCalcMethod != TEXCALC_PROJECTIVE_TEXTURE)
     {
         stage.sampleTexture(textureUnitParams->mTextureSampler, textureUnitParams->mPSInputTexCoord, texel);
+        if (canHaveGammaColour(textureUnitParams->mTextureUnitState))
+            stage.callFunction("ENABLE_LINEAR_COLOUR", texel);
         return;
     }
 
