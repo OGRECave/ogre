@@ -233,6 +233,6 @@ void PBR_Lights(
         vOutColour += lightVal;
     }
 
-    vOutColour += pixel.baseColor * pow(ambient.rgb, vec3_splat(2.2));
+    vOutColour += pixel.baseColor * ambient.rgb;
 }
 #endif
