@@ -133,7 +133,6 @@ bool ImageBasedLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     auto invViewMat = psProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX);
 
-    
     auto fstage = psMain->getStage(FFP_PS_PBR_LIGHTING_BEGIN + 5);
 
     //Add second texture if set.
