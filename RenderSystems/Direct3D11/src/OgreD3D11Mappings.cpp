@@ -749,7 +749,7 @@ namespace Ogre
 		    flags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
         if(textype == TEX_TYPE_CUBE_MAP)
-            flags |= D3D11_RESOURCE_MISC_TEXTURECUBE;        
+            flags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
 
         return flags;
     }

@@ -29,6 +29,7 @@ struct PixelParams
     vec3  f0;
     vec3  dfg;
     vec3  energyCompensation;
+    float ao;
 };
 
 float clampNoV(float NoV) {
@@ -154,6 +155,11 @@ vec3 evaluateLight(
     vec3 Fr = (D * V) * F;
     vec3 Fd = pixel.diffuseColor * Fd_Lambert();
 
+    //Apply AO
+    Fd *= pixel.ao;
+    float specAO = clamp(pixel.ao + (1.0 - pixel.ao) * (1.0 - pixel.perceptualRoughness), 0.0, 1.0);
+    Fr *= specAO;
+
     // https://google.github.io/filament/Filament.md.html#materialsystem/improvingthebrdfs/energylossinspecularreflectance
     vec3 color = NoL * lightColor * (Fr * pixel.energyCompensation + Fd);
 
@@ -167,9 +173,10 @@ vec3 evaluateLight(
     return color;
 }
 
-void PBR_MakeParams(in vec3 baseColor, in vec2 mrParam, inout PixelParams pixel)
+void PBR_MakeParams(in vec3 baseColor, in vec2 mrParam, in float ao, inout PixelParams pixel)
 {
     pixel.baseColor = baseColor;
+    pixel.ao = ao;
 
     float perceptualRoughness = mrParam.x;
     // Clamp the roughness to a minimum value to avoid divisions by 0 during lighting
@@ -233,6 +240,6 @@ void PBR_Lights(
         vOutColour += lightVal;
     }
 
-    vOutColour += pixel.baseColor * pow(ambient.rgb, vec3_splat(2.2));
+    vOutColour += pixel.baseColor * pow(ambient.rgb, vec3_splat(2.2)) * pixel.ao;
 }
 #endif

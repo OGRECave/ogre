@@ -97,6 +97,8 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     // add the lighting computation
     auto mrparams = psMain->resolveLocalParameter(GCT_FLOAT2, "metalRoughness");
+    auto ao = psMain->resolveLocalParameter(GCT_FLOAT1, "ao");
+    fstage.assign(1.0f, ao); //Default to no AO.
     if(!mMetalRoughnessMapName.empty())
     {
         auto metalRoughnessSampler =
@@ -106,6 +108,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
         // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
         fstage.sampleTexture(metalRoughnessSampler, psInTexcoord, mrSample);
         fstage.assign(In(mrSample).mask(Operand::OPM_YZ), mrparams);
+        fstage.assign(In(mrSample).x(), ao);
     }
     else
     {
@@ -124,7 +127,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     fstage.assign(Vector3(0), Out(outDiffuse).xyz());
     fstage.mul(In(diffuse).w(), In(outDiffuse).w(), Out(outDiffuse).w()); // forward alpha
 
-    fstage.callFunction("PBR_MakeParams", {In(baseColor), In(mrparams), InOut(pixelParams)});
+    fstage.callFunction("PBR_MakeParams", {In(baseColor), In(mrparams), In(ao), InOut(pixelParams)});
 
     fstage = psMain->getStage(FFP_PS_PBR_LIGHTING_END);
     if(mLightCount > 0)

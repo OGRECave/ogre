@@ -145,7 +145,7 @@ bool ImageBasedLighting::createCpuSubPrograms(ProgramSet* programSet)
     }
     else
     {
-        fstage.callFunction("evaluateIBL", {InOut(pixel), In(viewNormal), In(viewPos), In(invViewMat), In(dfgLUTSampler), 
+        fstage.callFunction("evaluateIBL", {InOut(pixel), In(viewNormal), In(viewPos), In(invViewMat), In(dfgLUTSampler),
                             In(iblEnvSampler), In(iblEnvSpecularSampler), In(iblEnvSize).w(), In(mLuminanceParam), InOut(outDiffuse).xyz()});
     }
 
