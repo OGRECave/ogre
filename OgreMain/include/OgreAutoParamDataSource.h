@@ -136,6 +136,12 @@ namespace Ogre {
 
         SceneNode mDummyNode;
         Light mBlankLight;
+        /// Last light sets
+        uint32 mLastLightHash;
+        /// Gpu params that need rebinding (mask of GpuParamVariability)
+        uint16 mGpuParamsDirty;
+        bool mCurrentUseIdentityView;
+        bool mCurrentUseIdentityProj;
     public:
         AutoParamDataSource();
         /** Updates the current renderable */
@@ -288,6 +294,9 @@ namespace Ogre {
         int getMaterialLodIndex() const;
         void setPassNumber(const int passNumber);
         void incPassNumber(void);
+        void markGpuParamsDirty(uint16 mask) { mGpuParamsDirty |= mask; }
+        uint16 getGpuParamsDirty() const { return mGpuParamsDirty; }
+        void resetGpuParamsDirty() { mGpuParamsDirty = 0; }
         void updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const;
     };
     /** @} */
