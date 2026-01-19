@@ -266,14 +266,8 @@ void Gizmo::computeDrag(Ogre::Ray& ray,
         Ogre::Real delta =
             (hitLocal - mDragStartHitLocal).dotProduct(mDragAxisLocal);
 
-        Ogre::Vector3 gizmoScale =
-            mGizmoNode->_getDerivedScale();
-
-        Ogre::Real axisScale =
-            std::abs(mDragAxisLocal.dotProduct(gizmoScale));
-
         mParentNode->setPosition(
-            mInitialObjectPos + mDragAxisWorld * (delta * axisScale)
+            mInitialObjectPos + mDragAxisWorld * (delta * 1)
         );
 
         return;
@@ -973,7 +967,15 @@ void CameraGizmo::snapCamera(Ogre::ManualObject* face) const
 void CameraGizmo::highlightFace(Ogre::ManualObject* face)
 {
     if (!face)
+    {
+        mGizmoObjects[0]->setMaterialName(0, "MAT_CAMERA_GIZMO_X");
+        mGizmoObjects[1]->setMaterialName(0, "MAT_CAMERA_GIZMO_X");
+        mGizmoObjects[2]->setMaterialName(0, "MAT_CAMERA_GIZMO_Y");
+        mGizmoObjects[3]->setMaterialName(0, "MAT_CAMERA_GIZMO_Y");
+        mGizmoObjects[4]->setMaterialName(0, "MAT_CAMERA_GIZMO_Z");
+        mGizmoObjects[5]->setMaterialName(0, "MAT_CAMERA_GIZMO_Z");
         return;
+    }
 
     int faceIndex = -1;
 
