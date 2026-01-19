@@ -24,7 +24,7 @@ int ImageBasedLighting::getExecutionOrder() const { return FFP_LIGHTING + 10; }
 
 bool ImageBasedLighting::setParameter(const String& name, const String& value)
 {
-    if (name == "texture" && !value.empty())
+    if ((name == "texture" || name == "texture_diffuse") && !value.empty())
     {
         mEnvMapName = value;
         return true;
@@ -34,7 +34,12 @@ bool ImageBasedLighting::setParameter(const String& name, const String& value)
         mIsLuminanceParamDirty = true;
         return StringConverter::parse(value, mLuminance);
     }
-
+    else if (name == "texture_specular" && !value.empty())
+    {
+        //If set, the shader will use seperate "diffuse irradiance" and "specular ggx" cubemaps for IBL.
+        mEnvMapNameSpecular = value;
+        return true;
+    }
     return false;
 }
 
@@ -42,6 +47,7 @@ void ImageBasedLighting::copyFrom(const SubRenderState& rhs)
 {
     const ImageBasedLighting& rhsIBL = static_cast<const ImageBasedLighting&>(rhs);
     mEnvMapName = rhsIBL.mEnvMapName;
+    mEnvMapNameSpecular = rhsIBL.mEnvMapNameSpecular;
     mLuminance = rhsIBL.mLuminance;
 }
 
@@ -65,6 +71,15 @@ bool ImageBasedLighting::preAddToRenderState(const RenderState* renderState, Pas
     tus->setTextureName(mEnvMapName, TEX_TYPE_CUBE_MAP);
     tus->setHardwareGammaEnabled(true);
     mEnvMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
+
+    // Check for dual cubemaps (diffuse irradiance plus specular convoluted). Add second texture if applicable.
+    if (mEnvMapNameSpecular != "")
+    {
+        tus = dstPass->createTextureUnitState();
+        tus->setTextureName(mEnvMapNameSpecular, TEX_TYPE_CUBE_MAP);
+        tus->setHardwareGammaEnabled(true);
+        mEnvMapSamplerIndexSpecular = dstPass->getNumTextureUnitStates() - 1;
+    }
 
     return true;
 }
@@ -101,15 +116,37 @@ bool ImageBasedLighting::createCpuSubPrograms(ProgramSet* programSet)
 
     auto dfgLUTSampler = psProgram->resolveParameter(GCT_SAMPLER2D, "dfgLUTSampler", mDfgLUTSamplerIndex);
     auto iblEnvSampler = psProgram->resolveParameter(GCT_SAMPLERCUBE, "iblEnvSampler", mEnvMapSamplerIndex);
+    Ogre::RTShader::UniformParameterPtr iblEnvSpecularSampler = NULL;
+    Ogre::RTShader::UniformParameterPtr iblEnvSize = NULL;
 
-    auto iblEnvSize = psProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_SIZE, mEnvMapSamplerIndex);
+    // Add secondary cubemap if applicable.
+    if (mEnvMapNameSpecular != "")
+    {
+        psProgram->addPreprocessorDefines("HAS_DUAL_TEXTURE");
+        iblEnvSpecularSampler = psProgram->resolveParameter(GCT_SAMPLERCUBE, "iblEnvSpecularSampler", mEnvMapSamplerIndexSpecular);
+        iblEnvSize = psProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_SIZE, mEnvMapSamplerIndexSpecular);
+    }
+    else
+    {
+        iblEnvSize = psProgram->resolveParameter(GpuProgramParameters::ACT_TEXTURE_SIZE, mEnvMapSamplerIndex);
+    }
+
     auto invViewMat = psProgram->resolveParameter(GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX);
 
     auto fstage = psMain->getStage(FFP_PS_PBR_LIGHTING_BEGIN + 5);
 
-    fstage.callFunction("evaluateIBL",
-                        {InOut(pixel), In(viewNormal), In(viewPos), In(invViewMat), In(dfgLUTSampler), In(iblEnvSampler),
-                         In(iblEnvSize).w(), In(mLuminanceParam), InOut(outDiffuse).xyz()});
+    //Add second texture if set.
+    if (mEnvMapNameSpecular == "")
+    {
+        fstage.callFunction("evaluateIBL",
+                            {InOut(pixel), In(viewNormal), In(viewPos), In(invViewMat), In(dfgLUTSampler),
+                             In(iblEnvSampler), In(iblEnvSize).w(), In(mLuminanceParam), InOut(outDiffuse).xyz()});
+    }
+    else
+    {
+        fstage.callFunction("evaluateIBL", {InOut(pixel), In(viewNormal), In(viewPos), In(invViewMat), In(dfgLUTSampler),
+                            In(iblEnvSampler), In(iblEnvSpecularSampler), In(iblEnvSize).w(), In(mLuminanceParam), InOut(outDiffuse).xyz()});
+    }
 
     return true;
 }
@@ -134,13 +171,13 @@ SubRenderState* ImageBasedLightingFactory::createInstance(const ScriptProperty& 
     if (prop.name != "image_based_lighting" || prop.values.size() < 2)
         return NULL;
 
-    if(prop.values[0] != "texture")
+    if (prop.values[0] != "texture" && prop.values[0] != "texture_diffuse")
     {
         translator->emitError();
         return NULL;
     }
     auto ret = static_cast<ImageBasedLighting*>(createOrRetrieveInstance(translator));
-    ret->setParameter("texture", prop.values[1]);
+    ret->setParameter(prop.values[0], prop.values[1]);
 
     if (prop.values.size() < 4)
         return ret;
@@ -152,6 +189,18 @@ SubRenderState* ImageBasedLightingFactory::createInstance(const ScriptProperty& 
     }
 
     ret->setParameter("luminance", prop.values[3]);
+
+    if (prop.values.size() < 6)
+    return ret;
+
+    //If this is set "texture" is then used as a diffuse texture only
+    if (prop.values[4] != "texture_specular")
+    {
+        translator->emitError();
+        return NULL;
+    }
+
+    ret->setParameter("texture_specular", prop.values[5]);
 
     return ret;
 }

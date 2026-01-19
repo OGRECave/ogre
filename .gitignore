@@ -14,7 +14,7 @@ cmake-build-*/
 /mingw/
 /.cache/
 /_skbuild/
-
+/buildrelease/
 # Meta data of macOS's Finder.app
 .DS_Store
 

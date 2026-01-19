@@ -745,8 +745,8 @@ namespace Ogre
 
         UINT flags = 0;
 
-		if((bindflags & D3D11_BIND_SHADER_RESOURCE) && (bindflags & D3D11_BIND_RENDER_TARGET))
-			flags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	    if((bindflags & D3D11_BIND_SHADER_RESOURCE) && (bindflags & D3D11_BIND_RENDER_TARGET) && (usage & TU_AUTOMIPMAP))
+		    flags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
         if(textype == TEX_TYPE_CUBE_MAP)
             flags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
