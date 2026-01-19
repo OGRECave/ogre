@@ -369,7 +369,7 @@ void Gizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
 {
     Ogre::ManualObject* mMesh = manager->createManualObject("AxisGizmoManualObject");
 
-    mMesh->begin("AxisGizmo_Material", Ogre::RenderOperation::OT_LINE_LIST);
+    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_LINE_LIST);
     mMesh->position(0, 0, 0);
     mMesh->position(3, 0, 0);
 
@@ -387,7 +387,7 @@ void Gizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
 
     int index_pos = 0;
 
-    mMesh->begin("AxisGizmo_Material", Ogre::RenderOperation::OT_LINE_STRIP);
+    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_LINE_STRIP);
 
     for (float theta = start; theta < end; theta += division)
     {
@@ -397,7 +397,7 @@ void Gizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
 
     mMesh->end();
 
-    mMesh->begin("AxisGizmo_Material", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
     mMesh->position(2.85f, 0, 0);
 
@@ -431,7 +431,7 @@ void Gizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
 
     // ROTATE GIZMO
 
-    mMesh->begin("AxisGizmo_Material", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
     Ogre::Quaternion q1;
     q1.FromAngleAxis(Ogre::Degree(-90), Ogre::Vector3(0, 0, 1));
@@ -507,7 +507,7 @@ void Gizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
 
     // SCALE GIZMO
 
-    mMesh->begin("AxisGizmo_Material", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
     mMesh->position(2.85f, 0, 0);
 
@@ -599,7 +599,7 @@ void Gizmo::createPlaneMesh(Ogre::SceneManager* manager, Ogre::String name)
 {
     Ogre::ManualObject* mMesh = manager->createManualObject("OgitorAxisPlaneGizmoManualObject");
 
-    mMesh->begin("AxisGizmo_Material", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
     mMesh->position(0, 1, 0);
     mMesh->position(1, 1, 0);
@@ -688,8 +688,6 @@ bool Gizmo::pickAxis(Ogre::Ray& ray)
     case G_TRANSLATE:
     case G_SCALE:
     {
-
-
         Ogre::Real dx = rayLineDistance(ray, origin, xAxis, axisLen);
         Ogre::Real dy = rayLineDistance(ray, origin, yAxis, axisLen);
         Ogre::Real dz = rayLineDistance(ray, origin, zAxis, axisLen);
@@ -834,36 +832,43 @@ bool Gizmo::pickRotateRing(
 CameraGizmo::CameraGizmo(
     Ogre::RenderWindow* window,
     Ogre::Camera* mainCamera,
+    Ogre::SceneNode* cameraNode,
     CameraMan* cameraMan)
 {
-    Ogre::SceneManager* gizmoSM = Ogre::Root::getSingleton().createSceneManager();
+    auto gizmoSm = Ogre::Root::getSingleton().createSceneManager();
 
     mCameraMan = cameraMan;
     mCamera = mainCamera;
-    mGizmoNode = gizmoSM->getRootSceneNode()->createChildSceneNode("GizmoRoot");
+    mCameraNode = cameraNode;
+    mGizmoNode = gizmoSm->getRootSceneNode()->createChildSceneNode("GizmoRoot");
 
-    mGizmoCamera = gizmoSM->createCamera("GizmoCamera");
-    mGizmoCameraNode = gizmoSM->createSceneNode("GizmoCameraNode");
+    mGizmoCamera = gizmoSm->createCamera("GizmoCamera");
+    mGizmoCameraNode = gizmoSm->createSceneNode("GizmoCameraNode");
 
     mGizmoCameraNode->attachObject(mGizmoCamera);
-    gizmoSM->getRootSceneNode()->addChild(mGizmoCameraNode);
+    gizmoSm->getRootSceneNode()->addChild(mGizmoCameraNode);
 
     mGizmoCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
-    mGizmoCamera->setOrthoWindow(2.0f, 2.0f);
     mGizmoCamera->setNearClipDistance(0.01f);
     mGizmoCamera->setFarClipDistance(10.0f);
     Ogre::Viewport* vp = window->addViewport(
         mGizmoCamera,
         1,          // higher Z-order than main viewport
-        0.75f, 0.75f,
-        0.25f, 0.25f
+        0.80f, 0.0f,
+        0.20f, 0.20f
     );
+    float aspect = vp->getActualWidth() / float(vp->getActualHeight());
+
+    float size = 2.0f;
+    mGizmoCamera->setOrthoWindow(size * aspect, size);
     vp->setOverlaysEnabled(false);
     vp->setClearEveryFrame(false);
 
     // Always look down -Z
     mGizmoCameraNode->setPosition(0, 0, 2);
-    createMesh(gizmoSM, "AxisGizmosMesh");
+    createMesh(gizmoSm, "AxisGizmosMesh");
+
+    mRayQuery = gizmoSm->createRayQuery(Ogre::Ray());
 }
 
 void CameraGizmo::updateOrientation()
@@ -873,17 +878,34 @@ void CameraGizmo::updateOrientation()
     );
 }
 
-void CameraGizmo::updateViewport()
+Ogre::ManualObject* CameraGizmo::pickFace(float nx, float ny)
 {
-    Ogre::Viewport* vp = mGizmoCamera->getViewport();
-    float aspect = vp->getActualWidth() / float(vp->getActualHeight());
+    float vx = (nx - 0.80f) / 0.20f;
+    float vy = ny / 0.20f;
+    const Ogre::Ray ray = mGizmoCamera->getCameraToViewportRay(vx, vy);
+    mRayQuery->setRay(ray);
+    mRayQuery->setQueryMask(QUERYFLAG_GIZMO);
+    mRayQuery->setSortByDistance(true);
 
-    float size = 2.0f;
-    mGizmoCamera->setOrthoWindow(size * aspect, size);
+    auto& results = mRayQuery->execute();
+    for (auto& hit : results)
+    {
+        if (!hit.movable)
+            continue;
+
+        if (hit.movable->getQueryFlags() & QUERYFLAG_GIZMO)
+        {
+            auto* face = dynamic_cast<Ogre::ManualObject*>(hit.movable);
+
+            highlightFace(face);
+            return face;
+        }
+    }
+    highlightFace(nullptr);
+    return nullptr;
 }
 
-
-void CameraGizmo::snapCamera(Ogre::ManualObject* face)
+void CameraGizmo::snapCamera(Ogre::ManualObject* face) const
 {
     using namespace Ogre;
 
@@ -908,12 +930,12 @@ void CameraGizmo::snapCamera(Ogre::ManualObject* face)
     switch (faceIndex)
     {
     case 0: // +X
-        yaw   = Degree(-90);
+        yaw   = Degree(90);
         pitch = Degree(0);
         break;
 
     case 1: // -X
-        yaw   = Degree(90);
+        yaw   = Degree(-90);
         pitch = Degree(0);
         break;
 
@@ -928,12 +950,12 @@ void CameraGizmo::snapCamera(Ogre::ManualObject* face)
         break;
 
     case 4: // +Z (front)
-        yaw   = Degree(180);
+        yaw   = Degree(0);
         pitch = Degree(0);
         break;
 
     case 5: // -Z (back)
-        yaw   = Degree(0);
+        yaw   = Degree(180);
         pitch = Degree(0);
         break;
     default:;
@@ -966,6 +988,7 @@ void CameraGizmo::highlightFace(Ogre::ManualObject* face)
 
     if (faceIndex == mOldFaceIndex)
         return;
+    mOldFaceIndex = faceIndex;
     mGizmoObjects[0]->setMaterialName(0, "MAT_CAMERA_GIZMO_X");
     mGizmoObjects[1]->setMaterialName(0, "MAT_CAMERA_GIZMO_X");
     mGizmoObjects[2]->setMaterialName(0, "MAT_CAMERA_GIZMO_Y");
@@ -978,11 +1001,11 @@ void CameraGizmo::highlightFace(Ogre::ManualObject* face)
         return;
     }
     mGizmoObjects[0]->setMaterialName(0, faceIndex == 0 ? "MAT_CAMERA_GIZMO_X_L" : "MAT_CAMERA_GIZMO_X");
-    mGizmoObjects[1]->setMaterialName(0, faceIndex == 1 ? "MAT_CAMERA_GIZMO_Y_L" : "MAT_CAMERA_GIZMO_Y");
-    mGizmoObjects[2]->setMaterialName(0, faceIndex == 2 ? "MAT_CAMERA_GIZMO_Z_L" : "MAT_CAMERA_GIZMO_Z");
-    mGizmoObjects[3]->setMaterialName(0, faceIndex == 3 ? "MAT_CAMERA_GIZMO_XY_L" : "MAT_CAMERA_GIZMO_XY");
-    mGizmoObjects[4]->setMaterialName(0, faceIndex == 4 ? "MAT_CAMERA_GIZMO_YZ_L" : "MAT_CAMERA_GIZMO_YZ");
-    mGizmoObjects[5]->setMaterialName(0, faceIndex == 5 ? "MAT_CAMERA_GIZMO_ZX_L" : "MAT_CAMERA_GIZMO_ZX");
+    mGizmoObjects[1]->setMaterialName(0, faceIndex == 1 ? "MAT_CAMERA_GIZMO_X_L" : "MAT_CAMERA_GIZMO_X");
+    mGizmoObjects[2]->setMaterialName(0, faceIndex == 2 ? "MAT_CAMERA_GIZMO_Y_L" : "MAT_CAMERA_GIZMO_Y");
+    mGizmoObjects[3]->setMaterialName(0, faceIndex == 3 ? "MAT_CAMERA_GIZMO_Y_L" : "MAT_CAMERA_GIZMO_Y");
+    mGizmoObjects[4]->setMaterialName(0, faceIndex == 4 ? "MAT_CAMERA_GIZMO_Z_L" : "MAT_CAMERA_GIZMO_Z");
+    mGizmoObjects[5]->setMaterialName(0, faceIndex == 5 ? "MAT_CAMERA_GIZMO_Z_L" : "MAT_CAMERA_GIZMO_Z");
 }
 
 void CameraGizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
@@ -1005,75 +1028,8 @@ void CameraGizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
         mo->triangle(base + 0, base + 2, base + 3);
     };
 
-    auto createPlusGlyph =
-        [&](const String& n)
-    {
-        ManualObject* mo = manager->createManualObject(n);
-        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
-
-        addQuad(mo, -0.05f, -0.30f, 0.05f, 0.30f); // vertical
-        addQuad(mo, -0.30f, -0.05f, 0.30f, 0.05f); // horizontal
-
-        mo->end();
-        return mo;
-    };
-
-    auto createMinusGlyph =
-        [&](const String& n)
-    {
-        ManualObject* mo = manager->createManualObject(n);
-        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
-
-        addQuad(mo, -0.30f, -0.05f, 0.30f, 0.05f);
-
-        mo->end();
-        return mo;
-    };
-
-    auto createXGlyph =
-        [&](const String& n)
-    {
-        ManualObject* mo = manager->createManualObject(n);
-        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
-
-        addQuad(mo, -0.30f, -0.05f, 0.30f, 0.05f);
-        addQuad(mo, -0.05f, -0.30f, 0.05f, 0.30f);
-
-        mo->end();
-        return mo;
-    };
-
-    auto createYGlyph =
-        [&](const String& n)
-    {
-        ManualObject* mo = manager->createManualObject(n);
-        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
-
-        addQuad(mo, -0.05f, -0.30f, 0.05f, 0.05f);
-        addQuad(mo, -0.30f, 0.05f, 0.30f, 0.15f);
-
-        mo->end();
-        return mo;
-    };
-
-    auto createZGlyph =
-        [&](const String& n)
-    {
-        ManualObject* mo = manager->createManualObject(n);
-        mo->begin("Gizmo/Glyph", RenderOperation::OT_TRIANGLE_LIST);
-
-        addQuad(mo, -0.30f,  0.20f, 0.30f,  0.30f);
-        addQuad(mo, -0.30f, -0.05f, 0.30f,  0.05f);
-        addQuad(mo, -0.30f, -0.30f, 0.30f, -0.20f);
-
-        mo->end();
-        return mo;
-    };
-
     auto createFace =
         [&](const String& n,
-            ManualObject* sign,
-            ManualObject* axis,
             const String& materialName,
             const int index)
     {
@@ -1092,33 +1048,23 @@ void CameraGizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
         faceNode->attachObject(quad);
         mGizmoObjects[index] = quad;
 
-        // Sign glyph
-        SceneNode* signNode = faceNode->createChildSceneNode();
-        signNode->attachObject(sign);
-        signNode->setPosition(-0.25f, 0.0f, 0.01f);
-
-        // Axis glyph
-        SceneNode* axisNode = faceNode->createChildSceneNode();
-        axisNode->attachObject(axis);
-        axisNode->setPosition(0.25f, 0.0f, 0.01f);
-
         return faceNode;
     };
-    SceneNode* px = createFace(name + "_PX", createPlusGlyph (name + "_Plus1"), createXGlyph (name + "_X1"), "MAT_CAMERA_GIZMO_X", 0);
+    SceneNode* px = createFace(name + "_PX", "MAT_CAMERA_GIZMO_X", 0);
     px->setPosition(0.5f, 0, 0);
     px->yaw(Degree(-90));
-    SceneNode* nx = createFace(name + "_NX", createMinusGlyph(name + "_Minus1"), createXGlyph (name + "_X2"), "MAT_CAMERA_GIZMO_X", 1);
+    SceneNode* nx = createFace(name + "_NX", "MAT_CAMERA_GIZMO_X", 1);
     nx->setPosition(-0.5f, 0, 0);
     nx->yaw(Degree(90));
-    SceneNode* py = createFace(name + "_PY", createPlusGlyph (name + "_Plus2"), createYGlyph (name + "_Y1"), "MAT_CAMERA_GIZMO_Y", 2);
+    SceneNode* py = createFace(name + "_PY", "MAT_CAMERA_GIZMO_Y", 2);
     py->setPosition(0, 0.5f, 0);
     py->pitch(Degree(90));
-    SceneNode* ny = createFace(name + "_NY", createMinusGlyph(name + "_Minus2"), createYGlyph (name + "_Y2"), "MAT_CAMERA_GIZMO_Y", 3);
+    SceneNode* ny = createFace(name + "_NY", "MAT_CAMERA_GIZMO_Y", 3);
     ny->setPosition(0, -0.5f, 0);
     ny->pitch(Degree(-90));
-    SceneNode* pz = createFace(name + "_PZ", createPlusGlyph (name + "_Plus3"), createZGlyph (name + "_Z1"), "MAT_CAMERA_GIZMO_Z", 4);
+    SceneNode* pz = createFace(name + "_PZ", "MAT_CAMERA_GIZMO_Z", 4);
     pz->setPosition(0, 0, 0.5f);
-    SceneNode* nz = createFace(name + "_NZ", createMinusGlyph(name + "_Minus3"), createZGlyph (name + "_Z2"), "MAT_CAMERA_GIZMO_Z", 5);
+    SceneNode* nz = createFace(name + "_NZ", "MAT_CAMERA_GIZMO_Z", 5);
     nz->setPosition(0, 0, -0.5f);
     nz->yaw(Degree(180));
 }

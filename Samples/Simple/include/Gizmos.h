@@ -61,7 +61,7 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         node4->setPosition(75, 0, 0);
         mSelectedEnt = ent;
         mGizmo = new Gizmo(mSceneMgr, node, G_TRANSLATE);
-        mCameraGizmo = new CameraGizmo(mWindow, mCamera, &*mCameraMan);
+        mCameraGizmo = new CameraGizmo(mWindow, mCamera, mCameraNode, &*mCameraMan);
 
         // create a checkbox to toggle light movement
         mTranslate = mTrayMgr->createButton(TL_TOPLEFT, "Translate", "Translate");
@@ -91,7 +91,11 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         Ray ray = mCamera->getCameraToViewportRay(nx, ny);
         mRayQuery->setRay(ray);
         mGizmo->pickAxis(ray);
-        pickEntity();
+        if (nx >= 0.80f && nx <= 1.0f &&
+               ny >= 0.00f && ny <= 0.20f)
+        {
+            mCameraGizmo->pickFace(nx, ny);
+        }
         return true;
     }
 
@@ -109,6 +113,11 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
                 mGizmo->startDrag(mCamera->getCameraToViewportRay(nx, ny), mCamera->getDerivedDirection());
                 return true;
             }
+            if (nx >= 0.80f && nx <= 1.0f &&
+                   ny >= 0.00f && ny <= 0.20f)
+            {
+                mCameraGizmo->snapCamera(mCameraGizmo->pickFace(nx, ny));
+            }
             selectEntity(pickEntity());
             if (mCameraMan->mousePressed(evt))
             {
@@ -117,6 +126,7 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         }
         return false;
     }
+
     bool mouseReleased(const MouseButtonEvent& evt) override
     {
         if (evt.button == BUTTON_LEFT)

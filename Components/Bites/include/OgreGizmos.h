@@ -109,19 +109,21 @@ public:
     CameraGizmo(
         Ogre::RenderWindow* window,
         Ogre::Camera* mainCamera,
+        Ogre::SceneNode* mSceneNode,
         CameraMan* cameraMan);
 
     void highlightFace(Ogre::ManualObject* face);
 
-    void snapCamera(Ogre::ManualObject* face);
+    void snapCamera(Ogre::ManualObject* face) const;
 
     void updateOrientation();
 
-    void updateViewport();
+    Ogre::ManualObject* pickFace(float vx, float vy);
 
 protected:
     void createMesh(Ogre::SceneManager* manager, Ogre::String name);
 
+    Ogre::RaySceneQuery* mRayQuery{};
     Ogre::SceneNode* mGizmoNode{};
     CameraMan* mCameraMan;
     Ogre::Camera* mGizmoCamera;
