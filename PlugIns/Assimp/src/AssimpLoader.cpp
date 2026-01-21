@@ -43,6 +43,7 @@ THE SOFTWARE.
 #include <assimp/IOStream.hpp>
 #include <assimp/IOSystem.hpp>
 #include <assimp/DefaultIOSystem.h>
+#include <assimp/GltfMaterial.h>
 
 #include <Ogre.h>
 
@@ -1088,7 +1089,11 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
         rs->addTemplateSubRenderState(srs);
     }
 
-    if (getTextureName(mat, aiTextureType_UNKNOWN, scene, meshName, basename))
+    aiTextureType metalRoughnessType = aiTextureType_UNKNOWN;
+    // regards to assimp devs for this nice macro, requiring this statement to unpack
+    if(metalRoughnessType = AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE) {}
+
+    if (getTextureName(mat, metalRoughnessType, scene, meshName, basename))
     {
         if (verbose)
         {
@@ -1097,12 +1102,12 @@ static MaterialPtr createMaterial(const aiMaterial* mat, const Ogre::String &gro
 
         shaderGen->createShaderBasedTechnique(omat->getTechnique(0), MSN_SHADERGEN);
         auto rs = shaderGen->getRenderState(MSN_SHADERGEN, *omat, 0);
-        auto srs = shaderGen->createSubRenderState("CookTorranceLighting");
+        auto srs = shaderGen->createSubRenderState(RTShader::SRS_COOK_TORRANCE_LIGHTING);
 
         srs->setParameter("texture", basename);
         rs->addTemplateSubRenderState(srs);
 
-        srs = shaderGen->createSubRenderState("FFP_Texturing");
+        srs = shaderGen->createSubRenderState(RTShader::SRS_TEXTURING);
         srs->setParameter("late_add_blend", "true");
         rs->addTemplateSubRenderState(srs);
     }
