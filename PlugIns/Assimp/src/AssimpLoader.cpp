@@ -446,7 +446,10 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
             auto stream = std::make_shared<MemoryDataStream>(tex->pcData, tex->mWidth, false);
             try
             {
-                img.load(stream, tex->achFormatHint);
+                auto format = String(tex->achFormatHint);
+                if (format == "web") // fixup assimp truncation
+                    format = "webp";
+                img.load(stream, format);
             }
             catch (Exception& e)
             {
