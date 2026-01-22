@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -963,8 +964,11 @@ namespace Ogre {
             // if usage is write only,
             if ( !vbuf->hasShadowBuffer() && (vbuf->getUsage() & HBU_DETAIL_WRITE_ONLY) )
             {
-                // can't do it
-                return Real(0.0f);
+                // we can do it!
+                DefaultHardwareBufferManagerBase bfrMgr;
+                HardwareVertexBufferPtr shadowBuffer = bfrMgr.createVertexBuffer(vbuf->getVertexSize(), vbuf->getNumVertices(), Ogre::HBU_CPU_ONLY);
+                shadowBuffer->copyData(*vbuf);
+                vbuf = shadowBuffer;
             }
             vertexPositions.resize( vertexData->vertexCount );
             HardwareBufferLockGuard vertexLock(vbuf, HardwareBuffer::HBL_READ_ONLY);
