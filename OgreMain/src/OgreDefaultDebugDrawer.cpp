@@ -6,11 +6,12 @@
 #include "OgreStableHeaders.h"
 #include "OgreDefaultDebugDrawer.h"
 #include "OgreTagPoint.h"
+#include "OgreViewport.h"
 
 namespace Ogre
 {
 
-DefaultDebugDrawer::DefaultDebugDrawer() : mLines(""), mAxes(""), mDrawType(0), mStatic(false), mBoneAxesSize(1.0f) {}
+DefaultDebugDrawer::DefaultDebugDrawer() : mCamera(nullptr), mLines(""), mAxes(""), mDrawType(0), mStatic(false), mBoneAxesSize(1.0f) {}
 
 void DefaultDebugDrawer::preFindVisibleObjects(SceneManager* source,
                                                SceneManager::IlluminationRenderStage irs, Viewport* v)
@@ -21,6 +22,8 @@ void DefaultDebugDrawer::preFindVisibleObjects(SceneManager* source,
         mDrawType |= DT_AXES;
     if (source->getShowBoundingBoxes())
         mDrawType |= DT_WIREBOX;
+
+    mCamera = v->getCamera();
 }
 void DefaultDebugDrawer::beginLines()
 {
@@ -95,6 +98,40 @@ void DefaultDebugDrawer::drawFrustum(const Frustum* frust)
     int idx[] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 2, 6, 1, 5, 0, 4, 3, 7};
     for (int i : idx)
         mLines.index(base + i);
+}
+void DefaultDebugDrawer::drawBoundingSphere(const Sphere & sphere)
+{
+    if (!mCamera)
+    {
+        return;
+    }
+
+    const Vector3 & center = sphere.getCenter();
+    float radius = sphere.getRadius();
+
+    const Vector3 & camPos = mCamera->getParentSceneNode()->_getDerivedPosition();
+    Vector3 axis = camPos - center;
+    float distance = axis.normalise();
+
+    // Unlike std's, Ogre's ACos tolerates domain errors
+    const Radian facetAngle = 2 * Math::ACos(1.0f - (0.001f * distance / radius));
+    int facetCount = (int)std::ceil(Math::TWO_PI / facetAngle.valueRadians());
+
+    // Calculate an arbitrary radial orthogonal to the axis
+    // TODO: replace this with something smarter
+    Vector3 radial = radius * (axis + Vector3::UNIT_X).crossProduct(axis).normalisedCopy();
+
+    beginLines();
+    int base = mLines.getCurrentVertexCount();
+
+    for (int i = 0; i < facetCount; ++i)
+    {
+        Radian angle(Math::TWO_PI * i / (float)facetCount);
+        mLines.position(center + Quaternion(angle , axis) * radial);
+        mLines.colour(ColourValue::White);
+        mLines.index(base + i);
+        mLines.index(base + ((i + 1) % facetCount));
+    }
 }
 void DefaultDebugDrawer::drawAxis2D(const Affine3& pose, const Matrix3& rot, float scale, const ColourValue& col)
 {

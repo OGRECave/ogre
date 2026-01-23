@@ -3394,6 +3394,7 @@ namespace Ogre {
         virtual void drawSceneNode(const SceneNode* node) = 0;
         virtual void drawBone(const Node* node, const Affine3 & transform = Affine3::IDENTITY) = 0;
         virtual void drawFrustum(const Frustum* frust) = 0;
+        virtual void drawBoundingSphere(const Sphere & sphere) = 0;
     };
 
     /** Default implementation of IntersectionSceneQuery. */

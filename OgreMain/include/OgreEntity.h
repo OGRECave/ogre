@@ -159,6 +159,8 @@ namespace Ogre {
         bool mPreparedForShadowVolumes : 1;
         /// Flag determines whether or not to display skeleton.
         bool mDisplaySkeleton : 1;
+        /// Flag determines whether or not to display bounding sphere.
+        bool mDisplayBoundingSphere : 1;
         /// Current state of the hardware animation as represented by the entities parameters.
         bool mCurrentHWAnimationState : 1;
         /// Flag indicating whether to skip automatic updating of the Skeleton's AnimationState.
@@ -456,13 +458,21 @@ namespace Ogre {
         */
         AnimationStateSet* getAllAnimationStates(void) const;
 
-        /** Tells the Entity whether or not it should display it's skeleton, if it has one.
+        /** Tells the Entity whether or not it should display its skeleton, if it has one.
         */
         void setDisplaySkeleton(bool display);
 
         /** Returns whether or not the entity is currently displaying its skeleton.
         */
         bool getDisplaySkeleton(void) const;
+
+        /** Tells the Entity whether or not it should display its bounding sphere.
+        */
+        void setDisplayBoundingSphere(bool display);
+
+        /** Returns whether or not the entity is currently displaying its bounding sphere.
+        */
+        bool getDisplayBoundingSphere(void) const;
 
         /** Returns the number of manual levels of detail that this entity supports.
 
