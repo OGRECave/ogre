@@ -25,12 +25,9 @@
  THE SOFTWARE.
  -----------------------------------------------------------------------------
  */
-#include "OgreRoot.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-
-#include <algorithm>
 
 #include "OgreWin32GLSupport.h"
 #include "OgreWin32Window.h"
@@ -456,8 +453,15 @@ namespace Ogre {
             format = ChoosePixelFormat(hdc, &pfd);
         }
 
+        if(!format)
+            return false;
 
-        return (format && SetPixelFormat(hdc, format, &pfd));
+        DescribePixelFormat(hdc, format, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
+        LogManager::getSingleton().logMessage(
+            StringUtil::format("Win32GLSupport: colourBufferSize=%d/%d/%d/%d gamma=%d FSAA=%d", pfd.cRedBits,
+                               pfd.cGreenBits, pfd.cBlueBits, pfd.cAlphaBits, useHwGamma ? 1 : 0, multisample));
+
+        return SetPixelFormat(hdc, format, &pfd);
     }
 
     HGLRC Win32GLSupport::createNewContext(HDC hdc, HGLRC shareList)
