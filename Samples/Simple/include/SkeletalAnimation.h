@@ -46,12 +46,15 @@ public:
             {
             case kVisualiseNone:
                 mModelNodes[ i ]->showBoundingBox( false );
+                mEntities[ i ]->setDisplayBoundingSphere( false );
                 break;
             case kVisualiseOne:
                 mModelNodes[ i ]->showBoundingBox( i == mBoundingBoxModelIndex );
+                mEntities[ i ]->setDisplayBoundingSphere( i == mBoundingBoxModelIndex );
                 break;
             case kVisualiseAll:
                 mModelNodes[ i ]->showBoundingBox( true );
+                mEntities[ i ]->setDisplayBoundingSphere( true );
                 break;
             }
         }
@@ -256,6 +259,7 @@ protected:
             // create and attach a jaiqua entity
             ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
             ent->setMaterialName("jaiqua");
+            mEntities.push_back(ent);
             sn->attachObject(ent);
         
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
@@ -364,6 +368,7 @@ protected:
     String mBoneBoundingBoxesItemName;
 
     std::vector<SceneNode*> mModelNodes;
+    std::vector<Entity*> mEntities;
     std::vector<AnimationState*> mAnimStates;
 
     Vector3 mSneakStartPos;
