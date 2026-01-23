@@ -55,6 +55,7 @@ public:
                 break;
             }
         }
+        mSceneMgr->setDisplaySceneNodes(mode != kVisualiseNone);
     }
     void enableBoneBoundingBoxMode( bool enable )
     {
@@ -172,7 +173,8 @@ protected:
         renderState->addTemplateSubRenderState(srs);
 
         // set shadow properties
-        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+        // TODO: figure out why enabling shadows causes debug SceneNode drawing to block camera
+//        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
         mSceneMgr->setShadowTextureCount(2);
         mSceneMgr->setShadowTextureSize(512);
 #endif
