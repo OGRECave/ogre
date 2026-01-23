@@ -413,7 +413,7 @@ namespace Ogre {
         if (hwGamma && !mHasHardwareGamma)
             return false;
         
-        if ((multisample || hwGamma) && mWglChoosePixelFormat)
+        if (mWglChoosePixelFormat)
         {
 
             // Use WGL to test extended caps (multisample, sRGB)
@@ -421,20 +421,23 @@ namespace Ogre {
             attribList.push_back(WGL_DRAW_TO_WINDOW_ARB); attribList.push_back(true);
             attribList.push_back(WGL_SUPPORT_OPENGL_ARB); attribList.push_back(true);
             attribList.push_back(WGL_DOUBLE_BUFFER_ARB); attribList.push_back(true);
-            attribList.push_back(WGL_SAMPLE_BUFFERS_ARB); attribList.push_back(true);
             attribList.push_back(WGL_ACCELERATION_ARB); attribList.push_back(WGL_FULL_ACCELERATION_ARB);
             attribList.push_back(WGL_COLOR_BITS_ARB); attribList.push_back(pfd.cColorBits);
             attribList.push_back(WGL_ALPHA_BITS_ARB); attribList.push_back(pfd.cAlphaBits);
             attribList.push_back(WGL_DEPTH_BITS_ARB); attribList.push_back(24);
             attribList.push_back(WGL_STENCIL_BITS_ARB); attribList.push_back(8);
-            attribList.push_back(WGL_SAMPLES_ARB); attribList.push_back(multisample);
-			
+
+            if(multisample)
+            {
+                attribList.push_back(WGL_SAMPLE_BUFFERS_ARB); attribList.push_back(true);
+                attribList.push_back(WGL_SAMPLES_ARB); attribList.push_back(multisample);
+            }
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			if (stereo)
 				attribList.push_back(WGL_STEREO_ARB); attribList.push_back(true);
 #endif
 
-            if (useHwGamma && mHasHardwareGamma)
+            if (hwGamma)
             {
                 attribList.push_back(WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT); attribList.push_back(true);
             }
@@ -445,7 +448,7 @@ namespace Ogre {
             UINT nformats;
             // ChoosePixelFormatARB proc address was obtained when setting up a dummy GL context in initialiseWGL()
             // since glew hasn't been initialized yet, we have to cheat and use the previously obtained address
-            if (!mWglChoosePixelFormat(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
+            if (!mWglChoosePixelFormat(hdc, attribList.data(), NULL, 1, &format, &nformats) || nformats <= 0)
                 return false;
         }
         else
