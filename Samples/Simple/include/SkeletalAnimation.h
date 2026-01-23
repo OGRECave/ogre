@@ -45,20 +45,22 @@ public:
             switch (mVisualiseBoundingBoxMode)
             {
             case kVisualiseNone:
+                mModelNodes[ i ]->setDisplaySceneNode( false );
                 mModelNodes[ i ]->showBoundingBox( false );
                 mEntities[ i ]->setDisplayBoundingSphere( false );
                 break;
             case kVisualiseOne:
+                mModelNodes[ i ]->setDisplaySceneNode( i == mBoundingBoxModelIndex );
                 mModelNodes[ i ]->showBoundingBox( i == mBoundingBoxModelIndex );
                 mEntities[ i ]->setDisplayBoundingSphere( i == mBoundingBoxModelIndex );
                 break;
             case kVisualiseAll:
+                mModelNodes[ i ]->setDisplaySceneNode( true );
                 mModelNodes[ i ]->showBoundingBox( true );
                 mEntities[ i ]->setDisplayBoundingSphere( true );
                 break;
             }
         }
-        mSceneMgr->setDisplaySceneNodes(mode != kVisualiseNone);
     }
     void enableBoneBoundingBoxMode( bool enable )
     {
