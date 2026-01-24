@@ -212,6 +212,9 @@ namespace Ogre {
         if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
             miscParams.emplace("gamma", opt->second.currentValue);
 
+        if((opt = mOptions.find("HDR Display")) != end)
+            miscParams.emplace("hdrDisplay", opt->second.currentValue);
+
         if((opt = mOptions.find("Colour Depth")) != end)
             miscParams.emplace("colourDepth", opt->second.currentValue);
 
@@ -874,6 +877,14 @@ namespace Ogre {
         optSRGB.possibleValues.push_back("Yes");
         optSRGB.currentValue = optSRGB.possibleValues[0];
         mOptions[optSRGB.name] = optSRGB;
+
+        ConfigOption optHDRDisplay;
+        optHDRDisplay.name = "HDR Display";
+        optHDRDisplay.immutable = false;
+        optHDRDisplay.possibleValues.push_back("No");
+        optHDRDisplay.possibleValues.push_back("Yes");
+        optHDRDisplay.currentValue = optHDRDisplay.possibleValues[0];
+        mOptions[optHDRDisplay.name] = optHDRDisplay;
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         ConfigOption optStereoMode;

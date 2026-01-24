@@ -233,6 +233,7 @@ namespace Ogre
         | VSync | true | "vsync" in  @ref _createRenderWindow |
         | VSync Interval | 1 | "vsyncInterval" in  @ref _createRenderWindow |
         | sRGB Gamma Conversion | false | "gamma" in  @ref _createRenderWindow  |
+        | HDR Display | false | "hdrDisplay" in  @ref _createRenderWindow  |
         | FSAA | 0 | concatenation of "FSAA" and "FSAAHint" as in  @ref _createRenderWindow  |
         | Video Mode | - | Window resolution |
         | Display Frequency | - | "displayFrequency" in  @ref _createRenderWindow |
@@ -390,6 +391,7 @@ namespace Ogre
         | hidden | true, false | false | hide the created window | |
         | FSAA | Positive integer (usually 0, 2, 4, 8, 16) | 0 | Full screen antialiasing factor |  |
         | gamma | true, false | false | Enable hardware conversion from linear colour space to gamma colour space on rendering to the window. |  |
+        | hdrDisplay | true, false | false | Enable hardware HDR display output if available. This enables rendering to 10bit or higher formats where supported by the hardware and OS. Note that this does not enable HDR rendering within the frame, only the final output conversion. |  |
         | vsync | true, false | false | Synchronize buffer swaps to monitor vsync, eliminating tearing at the expense of a fixed frame rate |  |
         | vsyncInterval | 1, 2, 3, 4 | 1 | If vsync is enabled, the minimum number of vertical blanks that should occur between renders. For example if vsync is enabled, the refresh rate is 60 and this is set to 2, then the frame rate will be locked at 30. |  |
         | Full Screen | true, false | false | Specify whether to create the window in full screen mode | |
