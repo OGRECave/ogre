@@ -47,6 +47,10 @@ THE SOFTWARE.
 #include <VersionHelpers.h>
 #endif
 
+#if defined(_WIN32_WINNT_WIN10) && _WIN32_WINNT >= _WIN32_WINNT_WIN10
+#include <dxgi1_4.h>
+#endif
+
 #define OGRE_D3D11_WIN_CLASS_NAME "OgreD3D11Wnd"
 
 namespace Ogre
@@ -63,6 +67,7 @@ namespace Ogre
         mActive = false;
         mSizing = false;
         mHidden = false;
+        mHdrDisplay = false;
     }
     //---------------------------------------------------------------------
     D3D11RenderWindowBase::~D3D11RenderWindowBase()
@@ -112,6 +117,16 @@ namespace Ogre
             opt = miscParams->find("gamma");
             if(opt != miscParams->end())
                 mHwGamma = StringConverter::parseBool(opt->second);
+
+#if defined(_WIN32_WINNT_WIN10) && _WIN32_WINNT >= _WIN32_WINNT_WIN10
+            // hdrDisplay?
+            opt = miscParams->find("hdrDisplay");
+            if(opt != miscParams->end())
+            {
+                mHdrDisplay = StringConverter::parseBool(opt->second);
+                mHwGamma = mHdrDisplay; // hdr implies hw gamma
+            }
+#endif
         }
 
         mName = name;
@@ -667,6 +682,9 @@ namespace Ogre
             opt = miscParams->find("useFlipMode");
             if(opt != miscParams->end())
                 mUseFlipMode = IsWindows8OrGreater() && StringConverter::parseBool(opt->second);
+
+            if (mHdrDisplay && IsWindows8OrGreater())
+                mUseFlipMode = true;
 #endif
             // vsync    [parseBool]
             opt = miscParams->find("vsync");
@@ -893,6 +911,23 @@ namespace Ogre
 
         // Create swap chain            
         HRESULT hr = mDevice.GetDXGIFactory()->CreateSwapChain(pDXGIDevice, &mSwapChainDesc, mpSwapChain.ReleaseAndGetAddressOf());
+
+#if defined(_WIN32_WINNT_WIN10) && _WIN32_WINNT >= _WIN32_WINNT_WIN10
+        if (SUCCEEDED(hr) && mHdrDisplay && mUseFlipMode)
+        {
+            ComPtr<IDXGISwapChain3> swapChain3;
+            if (SUCCEEDED(mpSwapChain.As(&swapChain3)))
+            {
+                UINT colorSpaceSupport = 0;
+                DXGI_COLOR_SPACE_TYPE colorSpace = DXGI_COLOR_SPACE_RGB_FULL_G10_NONE_P709;
+                if (SUCCEEDED(swapChain3->CheckColorSpaceSupport(colorSpace, &colorSpaceSupport)) &&
+                    (colorSpaceSupport & DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG_PRESENT))
+                {
+                    swapChain3->SetColorSpace1(colorSpace);
+                }
+            }
+        }
+#endif
 
         return hr;
     }
