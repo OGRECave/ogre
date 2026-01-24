@@ -47,6 +47,7 @@ namespace Ogre {
 
             ::EGLConfig mEglConfig;
             ::EGLSurface mEglSurface;
+            bool mHdrDisplay;
 
             ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, NativeWindowType win);
 
