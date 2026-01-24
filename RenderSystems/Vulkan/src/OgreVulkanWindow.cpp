@@ -51,6 +51,7 @@ namespace Ogre
 {
     VulkanWindow::VulkanWindow( const String &title, uint32 width, uint32 height, bool fullscreenMode ) :
         mLowestLatencyVSync( false ),
+        mHdrDisplay( false ),
         mDevice( 0 ),
         mTexture( 0 ),
         mDepthTexture( 0 ),
@@ -80,6 +81,19 @@ namespace Ogre
             vkGetPhysicalDeviceSurfaceFormatsKHR(mDevice->mPhysicalDevice, mSurfaceKHR, &numFormats, formats.data()));
 
         PixelFormatGpu pixelFormat = PF_UNKNOWN;
+
+        if (mHdrDisplay)
+        {
+            for (size_t i = 0; i < numFormats; ++i)
+            {
+                if (formats[i].format == VK_FORMAT_R16G16B16A16_SFLOAT &&
+                    formats[i].colorSpace == VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT)
+                {
+                    return PF_FLOAT16_RGBA;
+                }
+            }
+        }
+
         for( size_t i = 0; i < numFormats && pixelFormat == PF_UNKNOWN; ++i )
         {
             switch( formats[i].format )
@@ -172,6 +186,10 @@ namespace Ogre
         swapchainCreateInfo.minImageCount = minImageCount;
         swapchainCreateInfo.imageFormat = VulkanMappings::get(mTexture->getFormat());
         swapchainCreateInfo.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+        if (mHdrDisplay && swapchainCreateInfo.imageFormat == VK_FORMAT_R16G16B16A16_SFLOAT)
+        {
+            swapchainCreateInfo.imageColorSpace = VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT;
+        }
         swapchainCreateInfo.imageExtent.width = getWidth();
         swapchainCreateInfo.imageExtent.height = getHeight();
         swapchainCreateInfo.imageArrayLayers = 1u;
@@ -463,6 +481,12 @@ namespace Ogre
             opt = miscParams->find( "gamma" );
             if( opt != end )
                 mHwGamma = StringConverter::parseBool( opt->second );
+            opt = miscParams->find( "hdrDisplay" );
+            if( opt != end )
+            {
+                mHdrDisplay = StringConverter::parseBool( opt->second );
+                mHwGamma = mHdrDisplay; // hdr implies hw gamma
+            }
         }
 
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
