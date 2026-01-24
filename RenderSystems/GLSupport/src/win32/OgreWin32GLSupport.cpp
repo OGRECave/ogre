@@ -37,6 +37,7 @@
 #include <GL/wglext.h>
 
 static PFNWGLCREATECONTEXTATTRIBSARBPROC _wglCreateContextAttribsARB = 0;
+static PFNWGLCHOOSEPIXELFORMATARBPROC _wglChoosePixelFormat = 0;
 
 static int glMajorMax = 0;
 static int glMinorMax = 0;
@@ -50,10 +51,6 @@ namespace Ogre {
     Win32GLSupport::Win32GLSupport(int profile)
         : GLNativeSupport(profile)
         , mInitialWindow(0)
-        , mHasPixelFormatARB(false)
-        , mHasMultisample(false)
-        , mHasHardwareGamma(false)
-        , mWglChoosePixelFormat(0)
     {
         // immediately test WGL_ARB_pixel_format and FSAA support
         // so we can set configuration options appropriately
@@ -175,7 +172,11 @@ namespace Ogre {
 
         if(!mInitialWindow) {
             mInitialWindow = window;
-            initialiseExtensions();
+            auto stream = LogManager::getSingleton().stream();
+            stream << "Supported WGL extensions:";
+            for(auto& ext : extensionList)
+                stream << " " << ext;
+            stream <<  Log::Stream::Flush();
         }
 
         return window;
@@ -192,18 +193,14 @@ namespace Ogre {
         mInitialWindow = 0; // Since there is no removeWindow, although there should be...
     }
 
-    void Win32GLSupport::initialiseExtensions()
+    void Win32GLSupport::initialiseExtensions(HDC hdc)
     {
-        assert(mInitialWindow);
-
         // Check for W32 specific extensions probe function
         PFNWGLGETEXTENSIONSSTRINGARBPROC _wglGetExtensionsStringARB = 
             (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
         if(!_wglGetExtensionsStringARB)
             return;
-        const char *wgl_extensions = _wglGetExtensionsStringARB(mInitialWindow->getHDC());
-        LogManager::getSingleton().stream()
-            << "Supported WGL extensions: " << wgl_extensions;
+        const char *wgl_extensions = _wglGetExtensionsStringARB(hdc);
         // Parse them, and add them to the main list
         StringStream ext;
         String instr;
@@ -309,27 +306,10 @@ namespace Ogre {
             _wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)
                 wglGetProcAddress("wglCreateContextAttribsARB");
 
-            PFNWGLGETEXTENSIONSSTRINGARBPROC _wglGetExtensionsStringARB =
-                (PFNWGLGETEXTENSIONSSTRINGARBPROC)
-                wglGetProcAddress("wglGetExtensionsStringARB");
-            
             // check for pixel format and multisampling support
-            if (_wglGetExtensionsStringARB)
-            {
-                std::istringstream wglexts(_wglGetExtensionsStringARB(hdc));
-                std::string ext;
-                while (wglexts >> ext)
-                {
-                    if (ext == "WGL_ARB_pixel_format")
-                        mHasPixelFormatARB = true;
-                    else if (ext == "WGL_ARB_multisample")
-                        mHasMultisample = true;
-                    else if (ext == "WGL_EXT_framebuffer_sRGB")
-                        mHasHardwareGamma = true;
-                }
-            }
+            initialiseExtensions(hdc);
 
-            if (mHasPixelFormatARB && mHasMultisample)
+            if (checkExtension("WGL_ARB_multisample"))
             {
                 // enumerate all formats w/ multisampling
                 static const int iattr[] = {
@@ -353,10 +333,10 @@ namespace Ogre {
                 // when a valid GL context does not exist and glew is not initialized yet.
                 PFNWGLGETPIXELFORMATATTRIBIVARBPROC wglGetPixelFormatAttribiv = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribivARB");
 
-                mWglChoosePixelFormat = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+                _wglChoosePixelFormat = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
 
 
-                if (mWglChoosePixelFormat(hdc, iattr, 0, 256, formats, &count))
+                if (_wglChoosePixelFormat(hdc, iattr, 0, 256, formats, &count))
                 {
                     // determine what multisampling levels are offered
                     int query = WGL_SAMPLES_ARB, samples;
@@ -385,7 +365,7 @@ namespace Ogre {
         return DefWindowProc(hwnd, umsg, wp, lp);
     }
 
-    bool Win32GLSupport::selectPixelFormat(HDC hdc, int colourDepth, int multisample, bool hwGamma, bool stereo)
+    bool Win32GLSupport::selectPixelFormat(HDC hdc, int colourDepth, int multisample, bool hwGamma, bool stereo, bool hdrDisplay)
     {
         PIXELFORMATDESCRIPTOR pfd;
         memset(&pfd, 0, sizeof(pfd));
@@ -407,13 +387,16 @@ namespace Ogre {
 
         int useHwGamma = hwGamma;
 
-        if (multisample && (!mHasMultisample || !mHasPixelFormatARB))
+        if (multisample && !checkExtension("WGL_ARB_multisample"))
             return false;
 
-        if (hwGamma && !mHasHardwareGamma)
+        if (hwGamma && !checkExtension("WGL_EXT_framebuffer_sRGB"))
+            return false;
+
+        if (hdrDisplay && !checkExtension("WGL_ARB_pixel_format_float"))
             return false;
         
-        if (mWglChoosePixelFormat)
+        if (_wglChoosePixelFormat)
         {
 
             // Use WGL to test extended caps (multisample, sRGB)
@@ -432,6 +415,12 @@ namespace Ogre {
                 attribList.push_back(WGL_SAMPLE_BUFFERS_ARB); attribList.push_back(true);
                 attribList.push_back(WGL_SAMPLES_ARB); attribList.push_back(multisample);
             }
+
+            if(hdrDisplay)
+            {
+                attribList.push_back(WGL_PIXEL_TYPE_ARB); attribList.push_back(WGL_TYPE_RGBA_FLOAT_ARB);
+            }
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			if (stereo)
 				attribList.push_back(WGL_STEREO_ARB); attribList.push_back(true);
@@ -448,7 +437,7 @@ namespace Ogre {
             UINT nformats;
             // ChoosePixelFormatARB proc address was obtained when setting up a dummy GL context in initialiseWGL()
             // since glew hasn't been initialized yet, we have to cheat and use the previously obtained address
-            if (!mWglChoosePixelFormat(hdc, attribList.data(), NULL, 1, &format, &nformats) || nformats <= 0)
+            if (!_wglChoosePixelFormat(hdc, attribList.data(), NULL, 1, &format, &nformats) || nformats <= 0)
                 return false;
         }
         else
