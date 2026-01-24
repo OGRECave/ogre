@@ -236,17 +236,12 @@ protected:
 
     void setupModels()
     {
+        tweakJaiquaMesh();
         tweakSneakAnim();
 
         SceneNode* sn = NULL;
         Entity* ent = NULL;
         AnimationState* as = NULL;
-
-        // make sure we can get the buffers for bbox calculations
-        MeshManager::getSingleton().load("jaiqua.mesh",
-                                         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                         HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
-                                         HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, true, true);
 
         auto& controllerMgr = ControllerManager::getSingleton();
 
@@ -306,16 +301,81 @@ protected:
         }
         mStatusPanel->setParamValue("Skinning", value);
     }
-    
+
+    /*-----------------------------------------------------------------------------
+    | The jaiqua mesh has the vertices baked quite a distance from local origin.
+    | This moves the mesh to the origin and moves the skeleton's Spineroot bone.
+    -----------------------------------------------------------------------------*/
+    void tweakJaiquaMesh()
+    {
+        // make sure we can get the buffers for bbox calculations
+        // TODO: figure out why buffers don't get shadow buffers even though we ask for them...
+        MeshPtr mesh = MeshManager::getSingleton().load("jaiqua.mesh",
+                                                        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                        HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+                                                        HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, true, true);
+
+        // Get root bone's binding position
+
+        Skeleton * skeleton = mesh->getSkeleton().get();
+        Bone * rootBone = skeleton->getBone("Spineroot");
+        const Vector3 bindPos = rootBone->getInitialPosition();
+        rootBone->setPosition(0.0f, bindPos.y, 0.0f);
+        skeleton->setBindingPose();
+
+        // Move all the vertices
+        // There's no shared vertices and only 1 submesh
+
+        const VertexData* vertexData = mesh->getSubMeshes()[0]->vertexData;
+        const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+        HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
+        DefaultHardwareBufferManagerBase bfrMgr;
+        HardwareVertexBufferPtr shadowBuffer = bfrMgr.createVertexBuffer(vbuf->getVertexSize(), vbuf->getNumVertices(), Ogre::HBU_CPU_ONLY);
+        shadowBuffer->copyData(*vbuf);
+
+        HardwareBufferLockGuard vertexLock(shadowBuffer, HardwareBuffer::HBL_NORMAL);
+        unsigned char* vertex = static_cast<unsigned char*>(vertexLock.pData);
+        float* pFloat;
+
+        for(size_t i = 0; i < vertexData->vertexCount; ++i)
+        {
+            posElem->baseVertexPointerToElement(vertex, &pFloat);
+            pFloat[0] -= bindPos.x;
+            pFloat[2] -= bindPos.z;
+            vertex += shadowBuffer->getVertexSize();
+        }
+
+        vertexLock.unlock();
+
+        vbuf->copyData(*shadowBuffer);
+    }
+
     /*-----------------------------------------------------------------------------
     | The jaiqua sneak animation doesn't loop properly. This method tweaks the
     | animation to loop properly by altering the Spineroot bone track.
+    | We also move the Sneak animation to start closer to the origin.
     -----------------------------------------------------------------------------*/
     void tweakSneakAnim()
     {
         // get the skeleton, animation, and the node track iterator
         SkeletonPtr skel = static_pointer_cast<Skeleton>(SkeletonManager::getSingleton().load("jaiqua.skeleton",
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
+
+        // Move Sneak animation closer to origin
+        
+        Bone * rootBone = skel->getBone("Spineroot");
+        Animation * animation = skel->getAnimation("Sneak");
+        NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+        const Vector3 start = rootTrack->getNodeKeyFrame(0)->getTranslate();
+
+        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+        {
+            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+            kf->setTranslate(kf->getTranslate() - start);
+        }
+
+        // Tweak Sneak animation
 
         for (const auto& it : skel->getAnimation("Sneak")->_getNodeTrackList()) // for every node track...
         {
