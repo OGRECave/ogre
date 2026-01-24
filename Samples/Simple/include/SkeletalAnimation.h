@@ -142,6 +142,15 @@ public:
                 mModelNodes[i]->rotate(rot);
 
                 mAnimStates[i]->setTimePosition(0);   // reset animation time
+
+                if (mBoneBoundingBoxes)
+                {
+                    /* With mUpdateBoundingBoxFromSkeleton set, Entity::getBoundingBox() uses the
+                    skeleton from one frame earlier, which is close enough during smooth animation,
+                    but when we jump a moving animation back to the begininng we need to force it to
+                    update the bone positions to avoid culling glitches. TODO: can this be remedied? */
+                    mEntities[i]->getSkeleton()->setAnimationState(*mAnimStates[i]->getParent());
+                }
             }
         }
 
