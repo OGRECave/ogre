@@ -170,6 +170,11 @@ namespace Ogre {
                 mCSAA = Ogre::StringConverter::parseInt(opt->second);
             }
 
+            if ((opt = miscParams->find("gamma")) != end)
+            {
+                mHwGamma = StringConverter::parseBool(opt->second);
+            }
+
             if ((opt = miscParams->find("preserveContext")) != end &&
                 StringConverter::parseBool(opt->second))
             {
@@ -203,7 +208,6 @@ namespace Ogre {
         if (!mEglConfig)
         {
             _notifySurfaceCreated(mWindow, config);
-            mHwGamma = false;
         }
         
         mContext = createEGLContext(eglContext);
