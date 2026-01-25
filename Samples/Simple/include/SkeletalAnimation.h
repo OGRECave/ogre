@@ -171,12 +171,15 @@ public:
         mInfo["Help"] = "Controls:\n"
             "WASD to move the camera.  Mouse to look around.\n"
             "V toggle visualise bounding boxes.\n"
-            "B toggle bone-based bounding boxes on/off.";
+            "B toggle bone-based bounding boxes on/off.\n"
+            "M toggle move-method periodic/continuous.";
         mStatusPanel = NULL;
         mVisualiseBoundingBoxMode = kVisualiseNone;
         mBoundingBoxModelIndex = 0;
         mBoneBoundingBoxes = false;
+        mMoveMethod = MovingAnimationStateControllerValue::kMovePeriodic;
         mBoneBoundingBoxesItemName = "Bone AABBs";
+        mMoveMethodItemName = "Move Method";
     }
 
     void setVisualiseBoundingBoxMode( VisualiseBoundingBoxMode mode )
@@ -226,6 +229,29 @@ public:
             mStatusPanel->setParamValue(mBoneBoundingBoxesItemName, mBoneBoundingBoxes ? "On" : "Off");
         }
     }
+    void setMoveMethod( MovingAnimationStateControllerValue::MoveMethod method )
+    {
+        mMoveMethod = method;
+        // update move method mode for all models
+        for (int iModel = 0; iModel < NUM_MODELS; iModel++)
+        {
+            mControllers[iModel]->setMoveMethod(method);
+        }
+        // update status panel
+        if ( mStatusPanel )
+        {
+            switch (method)
+            {
+            case MovingAnimationStateControllerValue::kMovePeriodic:
+                mStatusPanel->setParamValue(mMoveMethodItemName, "Periodic");
+                break;
+            case MovingAnimationStateControllerValue::kMoveContinuous:
+                mStatusPanel->setParamValue(mMoveMethodItemName, "Continuous");
+                break;
+            }
+
+        }
+    }
     bool keyPressed(const KeyboardEvent& evt) override
     {   
         if ( !mTrayMgr->isDialogVisible() )
@@ -257,6 +283,24 @@ public:
                     return true;
                 }
                 break;
+
+
+            case 'm':
+                {
+                    // Toggle move method for all models.
+                    switch (mMoveMethod)
+                    {
+                    case MovingAnimationStateControllerValue::kMovePeriodic:
+                        setMoveMethod(MovingAnimationStateControllerValue::kMoveContinuous);
+                        break;
+                    case MovingAnimationStateControllerValue::kMoveContinuous:
+                        setMoveMethod(MovingAnimationStateControllerValue::kMovePeriodic);
+                        break;
+                    }
+                    return true;
+                }
+                break;
+
             default:
                 break;
             }
@@ -393,12 +437,14 @@ protected:
         names.push_back("Help");
         names.push_back("Skinning");
         names.push_back(mBoneBoundingBoxesItemName);
+        names.push_back(mMoveMethodItemName);
         
         // create a params panel to display the help and skinning mode
         mStatusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 200, names);
         mStatusPanel->setParamValue("Help", "H / F1");
         String value = "Software";
         enableBoneBoundingBoxMode( false );  // update status panel entry
+        setMoveMethod( MovingAnimationStateControllerValue::kMoveContinuous );  // update status panel entry
 
         // make sure we query the correct scheme
         MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());
@@ -545,8 +591,10 @@ protected:
     VisualiseBoundingBoxMode mVisualiseBoundingBoxMode;
     int mBoundingBoxModelIndex;  // which model to show the bounding box for
     bool mBoneBoundingBoxes;
+    MovingAnimationStateControllerValue::MoveMethod mMoveMethod;
     ParamsPanel* mStatusPanel;
     String mBoneBoundingBoxesItemName;
+    String mMoveMethodItemName;
 
     std::vector<SceneNode*> mModelNodes;
     std::vector<Entity*> mEntities;
