@@ -255,7 +255,7 @@ namespace Ogre {
     {
         mWindow = reinterpret_cast<EGLNativeWindowType>(window);
         
-        if (mPreserveContext)
+        if (mPreserveContext) // always false on first call
         {
             mEglDisplay = mGLSupport->getGLDisplay();
 
@@ -263,11 +263,13 @@ namespace Ogre {
             eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
             EGL_CHECK_ERROR
 
+            mWidth = ANativeWindow_getWidth(mWindow);
+            mHeight = ANativeWindow_getHeight(mWindow);
             if (mScale != 1.0f)
             {
-                int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
-                int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
-                ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
+                mWidth = (int)(mWidth * mScale);
+                mHeight = (int)(mHeight * mScale);
+                ANativeWindow_setBuffersGeometry(mWindow, mWidth, mHeight, format);
             }
             else
             {
@@ -359,11 +361,13 @@ namespace Ogre {
             eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
             EGL_CHECK_ERROR
 
+            mWidth = ANativeWindow_getWidth(mWindow);
+            mHeight = ANativeWindow_getHeight(mWindow);
             if (mScale != 1.0f)
             {
-                int nwidth = (int)((float)ANativeWindow_getWidth(mWindow) * mScale);
-                int nheight = (int)((float)ANativeWindow_getHeight(mWindow) * mScale);
-                ANativeWindow_setBuffersGeometry(mWindow, nwidth, nheight, format);
+                mWidth = (int)(mWidth * mScale);
+                mHeight = (int)(mHeight * mScale);
+                ANativeWindow_setBuffersGeometry(mWindow, mWidth, mHeight, format);
             }
             else
             {
@@ -372,10 +376,16 @@ namespace Ogre {
 
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
 
+            // sync with config dialog
+            auto rs = Root::getSingletonPtr()->getRenderSystem();
+            rs->setConfigOption("FSAA", std::to_string(mMSAA));
+            rs->setConfigOption("Content Scaling Factor", StringUtil::format("%.1f", 1.0f / mScale));
+            rs->setConfigOption("sRGB Gamma Conversion", mHwGamma ? "Yes" : "No");
+            rs->setConfigOption("Video Mode", StringUtil::format("%dx%d", mWidth, mHeight));
             if (config)
             {
                 bool isLandscape = (int)AConfiguration_getOrientation((AConfiguration*)config) == 2;
-                Root::getSingletonPtr()->getRenderSystem()->setConfigOption("Orientation", isLandscape ? "Landscape" : "Portrait");
+                rs->setConfigOption("Orientation", isLandscape ? "Landscape" : "Portrait");
             }
         }
         
