@@ -56,7 +56,7 @@ public:
 
     bool isDragging() const;
 
-protected:
+private:
     static void createMesh(Ogre::SceneManager* manager, Ogre::String name);
 
     static void createPlaneMesh(Ogre::SceneManager* manager, Ogre::String name);
