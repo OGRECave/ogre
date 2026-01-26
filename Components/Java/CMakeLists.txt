@@ -112,5 +112,6 @@ if(${Java_FOUND})
 endif()
 
 if(ANDROID)
-	set_target_properties(OgreJNI PROPERTIES LINK_FLAGS -s) # strip symbols
+	# strip symbols, align page size to 16k
+	set_target_properties(OgreJNI PROPERTIES LINK_FLAGS "-s -Wl,-z,max-page-size=16384")
 endif()
