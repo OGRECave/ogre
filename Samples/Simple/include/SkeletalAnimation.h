@@ -564,7 +564,7 @@ protected:
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
 
         // Move Sneak animation closer to origin
-        
+
         Bone * rootBone = skel->getBone("Spineroot");
         Animation * animation = skel->getAnimation("Sneak");
         NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
