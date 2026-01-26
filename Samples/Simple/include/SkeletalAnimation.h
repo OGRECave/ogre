@@ -258,6 +258,16 @@ public:
     void setMoveMethod( MovingAnimationStateControllerValue::MoveMethod method )
     {
         mMoveMethod = method;
+
+        if (method == MovingAnimationStateControllerValue::kMovePeriodic)
+        {
+            mEntities[0]->getMesh()->_setBounds(mSneakBoundsMoving);
+        }
+        else if (method == MovingAnimationStateControllerValue::kMoveContinuous)
+        {
+            mEntities[0]->getMesh()->_setBounds(mSneakBoundsStationary);
+        }
+
         // update move method mode for all models
         for (int iModel = 0; iModel < NUM_MODELS; iModel++)
         {
@@ -458,6 +468,8 @@ protected:
             mControllers.push_back((MovingAnimationStateControllerValue*)controller.get());
         }
 
+        generateBoundingBoxes();
+
         // create name and value for skinning mode
         StringVector names;
         names.push_back("Help");
@@ -604,6 +616,42 @@ protected:
         animation->setLength(ANIM_CHOP);
     }
 
+    void generateBoundingBoxes()
+    {
+        // This is a hacky way to generate bounding boxes
+        // for the Sneak animation with movement and without.
+
+        mSneakBoundsMoving.setNull();
+        mSneakBoundsStationary.setNull();
+
+        Entity * entity = mEntities[0];
+        Skeleton * skeleton = entity->getSkeleton();
+        Bone * rootBone = skeleton->getBone("Spineroot");
+        Animation * animation = skeleton->getAnimation("Sneak");
+        AnimationState * as = entity->getAnimationState("Sneak");
+
+        entity->setUpdateBoundingBoxFromSkeleton(true);
+
+        // Use root track's keyframes for our resolution.
+
+        NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+        {
+            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+            const Vector3 rootPos = kf->getTranslate();
+
+            as->setTimePosition(kf->getTime());
+            skeleton->setAnimationState(*as->getParent());
+            AxisAlignedBox bbox = entity->getBoundingBox();
+
+            mSneakBoundsMoving.merge(bbox);
+
+            bbox.setExtents(bbox.getMinimum() - rootPos, bbox.getMaximum() - rootPos);
+            mSneakBoundsStationary.merge(bbox);
+        }
+    }
+
     void cleanupContent() override
     {
         mModelNodes.clear();
@@ -626,6 +674,8 @@ protected:
     std::vector<Entity*> mEntities;
     std::vector<MovingAnimationStateControllerValue*> mControllers;
 
+    AxisAlignedBox mSneakBoundsMoving;
+    AxisAlignedBox mSneakBoundsStationary;
     Vector3 mSneakTranslate;
     Quaternion mSneakRotation;
     NodeAnimationTrack* mSneakSpinerootTrack;
