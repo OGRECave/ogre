@@ -554,8 +554,6 @@ namespace Ogre {
         uint8 mWorldGeometryRenderQueue;
         
         unsigned long mLastFrameNumber;
-        bool mResetIdentityView;
-        bool mResetIdentityProj;
 
         bool mFlipCullingOnNegativeScale;
         CullingMode mPassCullingMode;
@@ -708,17 +706,10 @@ namespace Ogre {
         /// Internal method for firing destruction event
         void fireSceneManagerDestroyed();
 
-        /** Internal method used by _renderSingleObject to set the world transform */
-        void setWorldTransform(Renderable* rend);
-
         /** Internal method used by _renderSingleObject to render a single light pass */
         void issueRenderWithLights(Renderable* rend, const Pass* pass,
                                    const LightList* pLightListToUse,
                                    bool lightScissoringClipping);
-
-        /** Internal method used by _renderSingleObject to deal with renderables
-            which override the camera's own view / projection matrices. */
-        void resetViewProjMode();
 
         typedef std::map<String, MovableObjectCollection*> MovableObjectCollectionMap;
         MovableObjectCollectionMap mMovableObjectCollectionMap;
@@ -1007,11 +998,6 @@ namespace Ogre {
 
         /// Whether to use camera-relative rendering
         bool mCameraRelativeRendering;
-
-        /// Last light sets
-        uint32 mLastLightHash;
-        /// Gpu params that need rebinding (mask of GpuParamVariability)
-        uint16 mGpuParamsDirty;
 
         /** Render a group in the ordinary way */
         void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
