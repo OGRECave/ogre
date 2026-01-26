@@ -94,6 +94,10 @@ namespace Ogre {
 
         // Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
+
+        if(mFormat == PF_BYTE_RGB && mHwGamma)
+            mFormat = PF_BYTE_RGBA; // we want a colour renderable format for mipmaps, so switch to RGBA
+
         GLenum texTarget = getGLES2TextureTarget();
 
         // Generate texture name
