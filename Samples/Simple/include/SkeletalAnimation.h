@@ -12,7 +12,7 @@ using namespace Ogre;
 using namespace OgreBites;
 
 
-class MovingAnimationStateControllerValue : public ControllerValue<float>
+class AnimationUpdater : public ControllerValue<float>
 {
 public:
 
@@ -22,7 +22,7 @@ public:
         kMoveContinuous,
     };
 
-    MovingAnimationStateControllerValue(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
+    AnimationUpdater(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
     : mAnimationState(animationState)
     , mEntity(entity)
     , mTrack(track)
@@ -62,7 +62,7 @@ public:
 
     static ControllerValueRealPtr create(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
     {
-        return std::make_shared<MovingAnimationStateControllerValue>(animationState, entity, track);
+        return std::make_shared<AnimationUpdater>(animationState, entity, track);
     }
 
     void setMoveMethod(MoveMethod method)
@@ -203,7 +203,7 @@ public:
         mVisualiseBoundingBoxMode = kVisualiseNone;
         mBoundingBoxModelIndex = 0;
         mBoneBoundingBoxes = false;
-        mMoveMethod = MovingAnimationStateControllerValue::kMovePeriodic;
+        mMoveMethod = AnimationUpdater::kMovePeriodic;
         mBoneBoundingBoxesItemName = "Bone AABBs";
         mMoveMethodItemName = "Move Method";
     }
@@ -255,15 +255,15 @@ public:
             mStatusPanel->setParamValue(mBoneBoundingBoxesItemName, mBoneBoundingBoxes ? "On" : "Off");
         }
     }
-    void setMoveMethod( MovingAnimationStateControllerValue::MoveMethod method )
+    void setMoveMethod( AnimationUpdater::MoveMethod method )
     {
         mMoveMethod = method;
 
-        if (method == MovingAnimationStateControllerValue::kMovePeriodic)
+        if (method == AnimationUpdater::kMovePeriodic)
         {
             mEntities[0]->getMesh()->_setBounds(mSneakBoundsMoving);
         }
-        else if (method == MovingAnimationStateControllerValue::kMoveContinuous)
+        else if (method == AnimationUpdater::kMoveContinuous)
         {
             mEntities[0]->getMesh()->_setBounds(mSneakBoundsStationary);
         }
@@ -278,10 +278,10 @@ public:
         {
             switch (method)
             {
-            case MovingAnimationStateControllerValue::kMovePeriodic:
+            case AnimationUpdater::kMovePeriodic:
                 mStatusPanel->setParamValue(mMoveMethodItemName, "Periodic");
                 break;
-            case MovingAnimationStateControllerValue::kMoveContinuous:
+            case AnimationUpdater::kMoveContinuous:
                 mStatusPanel->setParamValue(mMoveMethodItemName, "Continuous");
                 break;
             }
@@ -326,11 +326,11 @@ public:
                     // Toggle move method for all models.
                     switch (mMoveMethod)
                     {
-                    case MovingAnimationStateControllerValue::kMovePeriodic:
-                        setMoveMethod(MovingAnimationStateControllerValue::kMoveContinuous);
+                    case AnimationUpdater::kMovePeriodic:
+                        setMoveMethod(AnimationUpdater::kMoveContinuous);
                         break;
-                    case MovingAnimationStateControllerValue::kMoveContinuous:
-                        setMoveMethod(MovingAnimationStateControllerValue::kMovePeriodic);
+                    case AnimationUpdater::kMoveContinuous:
+                        setMoveMethod(AnimationUpdater::kMovePeriodic);
                         break;
                     }
                     return true;
@@ -459,13 +459,13 @@ protected:
             as->setEnabled(true);
             as->setLoop(true);
 
-            auto controller = MovingAnimationStateControllerValue::create(as, ent, mSneakSpinerootTrack);
+            auto controller = AnimationUpdater::create(as, ent, mSneakSpinerootTrack);
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
                                            controller,
                                            ScaleControllerFunction::create(Math::RangeRandom(0.5, 1.5)));
 
-            mControllers.push_back((MovingAnimationStateControllerValue*)controller.get());
+            mControllers.push_back((AnimationUpdater*)controller.get());
         }
 
         generateBoundingBoxes();
@@ -482,7 +482,7 @@ protected:
         mStatusPanel->setParamValue("Help", "H / F1");
         String value = "Software";
         enableBoneBoundingBoxMode( false );  // update status panel entry
-        setMoveMethod( MovingAnimationStateControllerValue::kMoveContinuous );  // update status panel entry
+        setMoveMethod( AnimationUpdater::kMoveContinuous );  // update status panel entry
 
         // make sure we query the correct scheme
         MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());
@@ -665,14 +665,14 @@ protected:
     VisualiseBoundingBoxMode mVisualiseBoundingBoxMode;
     int mBoundingBoxModelIndex;  // which model to show the bounding box for
     bool mBoneBoundingBoxes;
-    MovingAnimationStateControllerValue::MoveMethod mMoveMethod;
+    AnimationUpdater::MoveMethod mMoveMethod;
     ParamsPanel* mStatusPanel;
     String mBoneBoundingBoxesItemName;
     String mMoveMethodItemName;
 
     std::vector<SceneNode*> mModelNodes;
     std::vector<Entity*> mEntities;
-    std::vector<MovingAnimationStateControllerValue*> mControllers;
+    std::vector<AnimationUpdater*> mControllers;
 
     AxisAlignedBox mSneakBoundsMoving;
     AxisAlignedBox mSneakBoundsStationary;
