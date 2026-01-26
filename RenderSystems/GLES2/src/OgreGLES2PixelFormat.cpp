@@ -303,8 +303,7 @@ namespace Ogre {
 
         switch(ret)
         {
-        case GL_RGB8:
-            return GL_SRGB8;
+        case GL_RGB8: // return GL_SRGB8; not colour renderable in GLES3, so no mipmaps, no RTT
         case GL_RGBA8:
             return GL_SRGB8_ALPHA8;
         case GL_COMPRESSED_RGBA_ASTC_4x4_KHR:
