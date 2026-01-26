@@ -67,7 +67,7 @@ public:
 
     void setMoveMethod(MoveMethod method)
     {
-        if (mMethod == kMoveContinuous)
+        if (mMethod == kMoveContinuous && method != kMoveContinuous)
         {
             SceneNode* sceneNode = mEntity->getParentSceneNode();
             sceneNode->rotate(mAppliedRotation.Inverse());
@@ -374,7 +374,7 @@ protected:
 
         // set shadow properties
         // TODO: figure out why enabling shadows causes debug SceneNode drawing to block camera
-//        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
         mSceneMgr->setShadowTextureCount(2);
         mSceneMgr->setShadowTextureSize(512);
 #endif
@@ -478,7 +478,7 @@ protected:
         names.push_back(mMoveMethodItemName);
         
         // create a params panel to display the help and skinning mode
-        mStatusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 200, names);
+        mStatusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 240, names);
         mStatusPanel->setParamValue("Help", "H / F1");
         String value = "Software";
         enableBoneBoundingBoxMode( false );  // update status panel entry
@@ -569,8 +569,8 @@ protected:
         Animation * animation = skel->getAnimation("Sneak");
         NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
 
-        const Vector3 start = rootTrack->getNodeKeyFrame(0)->getTranslate();
-        // TODO: shouldn't change y coord
+        Vector3 start = rootTrack->getNodeKeyFrame(0)->getTranslate();
+        start.y = 0.0f;
         for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
         {
             TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
