@@ -61,6 +61,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 
     file(MAKE_DIRECTORY "${NDKOUT}/app/src/main/assets")
     file(MAKE_DIRECTORY "${NDKOUT}/app/src/main/res")
+    file(MAKE_DIRECTORY "${NDKOUT}/gradle/wrapper")
 
     foreach(ACTIVITY_NAME ${MAIN_ACTIVITY} ${EXTRA_ACTIVITIES})
         if(EXTRA_ACTIVITIES)
@@ -74,7 +75,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
         <activity android:name=\"${ACTIVITY_NAME}\"
         android:label=\"${LABEL}\"
         android:configChanges=\"orientation|screenSize|keyboardHidden\"
-        android:exported=\"false\"
+        android:exported=\"true\"
         android:theme=\"@android:style/Theme.Black.NoTitleBar.Fullscreen\">
             <meta-data android:name=\"android.app.lib_name\" android:value=\"${ANDROID_MOD_NAME}\" />
             <intent-filter>
@@ -87,5 +88,6 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     configure_file("${OGRE_TEMPLATES_DIR}/app.gradle.in" "${NDKOUT}/app/build.gradle" @ONLY)
     configure_file("${OGRE_TEMPLATES_DIR}/project.gradle" "${NDKOUT}/build.gradle" @ONLY)
     configure_file("${OGRE_TEMPLATES_DIR}/gradle.properties" "${NDKOUT}/gradle.properties" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/gradle-wrapper.properties" "${NDKOUT}/gradle/wrapper/gradle-wrapper.properties" @ONLY)
     file(WRITE "${NDKOUT}/settings.gradle" "include ':app'")
 endmacro(create_android_proj)
