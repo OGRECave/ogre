@@ -113,6 +113,7 @@ if (ANDROID)
       ${PROJECT_SOURCE_DIR}/Samples/Browser/src/android_main.cpp)
 
     add_library(SampleBrowser SHARED ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+    target_link_options(SampleBrowser PRIVATE "-Wl,-z,max-page-size=16384")
 else()
     set(SOURCE_FILES ${PROJECT_SOURCE_DIR}/Samples/Browser/src/main.cpp)
     add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
