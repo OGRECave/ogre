@@ -26,13 +26,20 @@ public:
     : mAnimationState(animationState)
     , mEntity(entity)
     , mTrack(track)
-    , mTranslation(Ogre::Vector3::ZERO)
-    , mRotation(Ogre::Quaternion::IDENTITY)
     , mMethod(kMovePeriodic)
+    , mAppliedTranslation(Ogre::Vector3::ZERO)
+    , mAppliedRotation(Ogre::Quaternion::IDENTITY)
     {
         assert(animationState);
         assert(entity);
         assert(track);
+
+        // Rotation is applied in the bone's space so we need its initial orientation.
+        // Bone intial position will interpretted in our dynamic orientation so we need that initial position.
+
+        Bone * rootBone = entity->getSkeleton()->getBone(track->getHandle());
+        mInitialOrientation = rootBone->getInitialOrientation();
+        mInitialPosition = rootBone->getInitialPosition();
 
         // Measure total transformation for root.
 
@@ -41,7 +48,8 @@ public:
         mTranslation = tkfEnd->getTranslate() - tkfBeg->getTranslate();
         mTranslation.y = 0.0f;
 
-        mRotation = tkfEnd->getRotation() * tkfBeg->getRotation().Inverse();
+        mRotation = mInitialOrientation * tkfEnd->getRotation() * tkfBeg->getRotation().Inverse() * mInitialOrientation.Inverse();
+        // TODO: there's probably a smarter way to limit rotation to y-axis
         Matrix3 mat;
         mRotation.ToRotationMatrix(mat);
         Radian yAngle, zAngle, xAngle;
@@ -59,6 +67,16 @@ public:
 
     void setMoveMethod(MoveMethod method)
     {
+        if (mMethod == kMoveContinuous)
+        {
+            SceneNode* sceneNode = mEntity->getParentSceneNode();
+            sceneNode->rotate(mAppliedRotation.Inverse());
+            sceneNode->translate(-mAppliedTranslation, Node::TS_LOCAL);
+
+            mAppliedRotation = Quaternion::IDENTITY;
+            mAppliedTranslation = Vector3::ZERO;
+        }
+
         mMethod = method;
 
         // If we move the SceneNode continuously then disable moving the bone, otherwise enable.
@@ -99,11 +117,8 @@ public:
         {
             // Unapply transform from last frame
 
-            TransformKeyFrame tkf(0, 0);
-            mTrack->getInterpolatedKeyFrame(lastTime, &tkf);
-
-            sceneNode->rotate(tkf.getRotation().Inverse());
-            sceneNode->translate(-tkf.getTranslate(), Node::TS_LOCAL);
+            sceneNode->rotate(mAppliedRotation.Inverse());
+            sceneNode->translate(-mAppliedTranslation, Node::TS_LOCAL);
         }
 
         // Apply periodic loop transforms
@@ -128,8 +143,15 @@ public:
             TransformKeyFrame tkf(0, 0);
             mTrack->getInterpolatedKeyFrame(thisTime, &tkf);
 
-            sceneNode->translate(tkf.getTranslate(), Node::TS_LOCAL);
-            sceneNode->rotate(tkf.getRotation());
+            // We need SnOri and SnPos such that
+            // SnOri * BoneBindOri = BoneBindOri * BoneAnimOri
+            // SnPos + SnOri * BoneBindPos = BoneBindPos + BoneAnimPos
+
+            mAppliedRotation = mInitialOrientation * tkf.getRotation() * mInitialOrientation.Inverse();
+            mAppliedTranslation = mInitialPosition + tkf.getTranslate() - mAppliedRotation * mInitialPosition;
+
+            sceneNode->translate(mAppliedTranslation, Node::TS_LOCAL);
+            sceneNode->rotate(mAppliedRotation);
         }
 
         if (looped && mEntity->getUpdateBoundingBoxFromSkeleton())
@@ -146,10 +168,14 @@ private:
     AnimationState* mAnimationState;
     Entity* mEntity;
     NodeAnimationTrack* mTrack;
+    MoveMethod mMethod;
+    Vector3 mInitialPosition;
+    Quaternion mInitialOrientation;
     Vector3 mTranslation;
     Quaternion mRotation;
     Quaternion mRotationInverse;
-    MoveMethod mMethod;
+    Vector3 mAppliedTranslation;
+    Quaternion mAppliedRotation;
 };
 
 
@@ -532,7 +558,7 @@ protected:
         NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
 
         const Vector3 start = rootTrack->getNodeKeyFrame(0)->getTranslate();
-
+        // TODO: shouldn't change y coord
         for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
         {
             TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
