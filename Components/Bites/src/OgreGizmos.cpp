@@ -308,231 +308,148 @@ bool Gizmo::isDragging() const { return mDragging; }
 
 void Gizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
 {
-    Ogre::ManualObject* mMesh = manager->createManualObject("AxisGizmoManualObject");
+    using namespace Ogre;
 
-    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_LINE_LIST);
-    mMesh->position(0, 0, 0);
-    mMesh->position(3, 0, 0);
+    ManualObject* mMesh = manager->createManualObject("AxisGizmoManualObject");
 
-    mMesh->index(0);
-    mMesh->index(1);
+    constexpr float radius   = 0.22f;
+    constexpr float accuracy = 8.0f;
+    constexpr float PI       = Math::PI;
+
+    auto addLine = [&](const Vector3& a, const Vector3& b)
+    {
+        mMesh->position(a); mMesh->position(b);
+        mMesh->index(0);    mMesh->index(1);
+    };
+
+    auto addCircle = [&](float x)
+    {
+        for (float t = 0; t < 2 * PI; t += PI / accuracy)
+            mMesh->position(x, radius * cos(t), radius * sin(t));
+    };
+
+    auto addFan = [&](int center, int start, int count)
+    {
+        for (int i = 0; i < count - 1; ++i)
+        {
+            mMesh->index(center);
+            mMesh->index(start + i);
+            mMesh->index(start + i + 1);
+        }
+        mMesh->index(center);
+        mMesh->index(start + count - 1);
+        mMesh->index(start);
+    };
+
+    auto addRotatedCircle = [&](const Quaternion& q, const Vector3& t, float x)
+    {
+        Vector3 p(x, 0, 0);
+        mMesh->position(q * p + t);
+
+        for (float a = 0; a < 2 * PI; a += PI / accuracy)
+        {
+            p = Vector3(x, radius * cos(a), radius * sin(a));
+            mMesh->position(q * p + t);
+        }
+
+        p = Vector3(-x, 0, 0);
+        mMesh->position(q * p + t);
+    };
+
+    // ----------------------------------------------------
+    // AXIS LINE
+    // ----------------------------------------------------
+    mMesh->begin("MAT_GIZMO_X", RenderOperation::OT_LINE_LIST);
+    addLine(Vector3::ZERO, Vector3(3, 0, 0));
     mMesh->end();
 
-    float const radius = 0.22f;
-    float const accuracy = 8;
-    float MPI = Ogre::Math::PI;
+    // ----------------------------------------------------
+    // ARC
+    // ----------------------------------------------------
+    const float division = (PI / 2.0f) / 16.0f;
+    const float start    = division * 3;
+    const float end      = division * 14;
 
-    float division = (MPI / 2.0f) / 16.0f;
-    float start = division * 3;
-    float end = division * 14;
-
-    int index_pos = 0;
-
-    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_LINE_STRIP);
-
-    for (float theta = start; theta < end; theta += division)
+    mMesh->begin("MAT_GIZMO_X", RenderOperation::OT_LINE_STRIP);
+    int arcBase = 0;
+    for (float t = start; t < end; t += division)
     {
-        mMesh->position(0, 3.0f * cos(theta), 3.0f * sin(theta));
-        mMesh->index(index_pos++);
+        mMesh->position(0, 3 * cos(t), 3 * sin(t));
+        mMesh->index(arcBase++);
     }
+    mMesh->end();
+
+    // ----------------------------------------------------
+    // TRANSLATE GIZMO (ARROW)
+    // ----------------------------------------------------
+    mMesh->begin("MAT_GIZMO_X", RenderOperation::OT_TRIANGLE_LIST);
+
+    int base = 0;
+    mMesh->position(2.85f, 0, 0);      // center
+    addCircle(2.95f);                  // ring
+    mMesh->position(3.45f, 0, 0);      // tip
+
+    addFan(base, base + 1, 16);
+    addFan(base + 17, base + 1, 16);
 
     mMesh->end();
 
-    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_TRIANGLE_LIST);
-
-    mMesh->position(2.85f, 0, 0);
-
-    for (float theta = 0; theta < 2 * MPI; theta += MPI / accuracy)
-    {
-        mMesh->position(2.95f, radius * cos(theta), radius * sin(theta));
-    }
-    mMesh->position(3.45f, 0, 0);
-
-    for (int inside = 1; inside < 16; inside++)
-    {
-        mMesh->index(0);
-        mMesh->index(inside);
-        mMesh->index(inside + 1);
-    }
-    mMesh->index(0);
-    mMesh->index(16);
-    mMesh->index(1);
-
-    for (int outside = 1; outside < 16; outside++)
-    {
-        mMesh->index(17);
-        mMesh->index(outside);
-        mMesh->index(outside + 1);
-    }
-    mMesh->index(17);
-    mMesh->index(16);
-    mMesh->index(1);
-
-    mMesh->end();
-
+    // ----------------------------------------------------
     // ROTATE GIZMO
+    // ----------------------------------------------------
+    mMesh->begin("MAT_GIZMO_X", RenderOperation::OT_TRIANGLE_LIST);
 
-    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+    Quaternion q1(Degree(-90), Vector3::UNIT_Z);
+    Quaternion q2(Degree(90),  Vector3::UNIT_Y);
 
-    Ogre::Quaternion q1;
-    q1.FromAngleAxis(Ogre::Degree(-90), Ogre::Vector3(0, 0, 1));
-    Ogre::Quaternion q2;
-    q2.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(0, 1, 0));
+    Vector3 t1(0, 3 * cos(end),   3 * sin(end));
+    Vector3 t2(0, 3 * cos(start), 3 * sin(start) - 0.25f);
 
-    Ogre::Vector3 translate1(0, 3.0f * cos(end), 3.0f * sin(end));
-    Ogre::Vector3 translate2(0, 3.0f * cos(start), 3.0f * sin(start) - 0.25f);
+    int rotBase = 0;
+    addRotatedCircle(q1, t1, -0.3f);
+    addRotatedCircle(q2, t2, -0.3f);
 
-    Ogre::Vector3 pos(-0.3f, 0, 0);
-    mMesh->position(q1 * pos + translate1);
-
-    for (float theta = 0; theta < 2 * MPI; theta += MPI / accuracy)
-    {
-        pos = Ogre::Vector3(-0.3f, radius * cos(theta), radius * sin(theta));
-        mMesh->position(q1 * pos + translate1);
-    }
-    pos = Ogre::Vector3(0.3f, 0, 0);
-    mMesh->position(q1 * pos + translate1);
-
-    pos = Ogre::Vector3(-0.3f, 0, 0);
-    mMesh->position(q2 * pos + translate2);
-
-    for (float theta = 0; theta < 2 * MPI; theta += MPI / accuracy)
-    {
-        pos = Ogre::Vector3(-0.3f, radius * cos(theta), radius * sin(theta));
-        mMesh->position(q2 * pos + translate2);
-    }
-    pos = Ogre::Vector3(0.3f, 0, 0);
-    mMesh->position(q2 * pos + translate2);
-
-    for (int inside = 1; inside < 16; inside++)
-    {
-        mMesh->index(0);
-        mMesh->index(inside);
-        mMesh->index(inside + 1);
-    }
-    mMesh->index(0);
-    mMesh->index(16);
-    mMesh->index(1);
-
-    for (int outside = 1; outside < 16; outside++)
-    {
-        mMesh->index(17);
-        mMesh->index(outside);
-        mMesh->index(outside + 1);
-    }
-    mMesh->index(17);
-    mMesh->index(16);
-    mMesh->index(1);
-
-    for (int inside = 19; inside < 34; inside++)
-    {
-        mMesh->index(18);
-        mMesh->index(inside);
-        mMesh->index(inside + 1);
-    }
-    mMesh->index(18);
-    mMesh->index(34);
-    mMesh->index(19);
-
-    for (int outside = 19; outside < 34; outside++)
-    {
-        mMesh->index(35);
-        mMesh->index(outside);
-        mMesh->index(outside + 1);
-    }
-    mMesh->index(35);
-    mMesh->index(34);
-    mMesh->index(19);
+    addFan(rotBase,      rotBase + 1, 16);
+    addFan(rotBase + 17, rotBase + 1, 16);
+    addFan(rotBase + 18, rotBase + 19, 16);
+    addFan(rotBase + 35, rotBase + 19, 16);
 
     mMesh->end();
 
+    // ----------------------------------------------------
     // SCALE GIZMO
+    // ----------------------------------------------------
+    mMesh->begin("MAT_GIZMO_X", RenderOperation::OT_TRIANGLE_LIST);
 
-    mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_TRIANGLE_LIST);
-
+    int scaleBase = 0;
     mMesh->position(2.85f, 0, 0);
-
-    for (float theta = 0; theta < 2 * MPI; theta += MPI / accuracy)
-    {
-        mMesh->position(2.85f, radius * cos(theta), radius * sin(theta));
-    }
+    addCircle(2.85f);
     mMesh->position(3.45f, 0, 0);
 
-    mMesh->position(3.40f, 0.20f, 0.20f);
-    mMesh->position(3.40f, 0.20f, -0.20f);
-    mMesh->position(3.40f, -0.20f, -0.20f);
-    mMesh->position(3.40f, -0.20f, 0.20f);
-    mMesh->position(3.50f, 0.20f, 0.20f);
-    mMesh->position(3.50f, 0.20f, -0.20f);
-    mMesh->position(3.50f, -0.20f, -0.20f);
-    mMesh->position(3.50f, -0.20f, 0.20f);
+    static const Vector3 cube[] = {
+        {3.40f,  0.20f,  0.20f}, {3.40f,  0.20f, -0.20f},
+        {3.40f, -0.20f, -0.20f}, {3.40f, -0.20f,  0.20f},
+        {3.50f,  0.20f,  0.20f}, {3.50f,  0.20f, -0.20f},
+        {3.50f, -0.20f, -0.20f}, {3.50f, -0.20f,  0.20f}
+    };
 
-    for (int inside = 1; inside < 16; inside++)
-    {
-        mMesh->index(0);
-        mMesh->index(inside);
-        mMesh->index(inside + 1);
-    }
-    mMesh->index(0);
-    mMesh->index(16);
-    mMesh->index(1);
+    for (auto& v : cube) mMesh->position(v);
 
-    for (int outside = 1; outside < 16; outside++)
-    {
-        mMesh->index(17);
-        mMesh->index(outside);
-        mMesh->index(outside + 1);
-    }
-    mMesh->index(17);
-    mMesh->index(16);
-    mMesh->index(1);
+    addFan(scaleBase,      scaleBase + 1, 16);
+    addFan(scaleBase + 17, scaleBase + 1, 16);
 
-    mMesh->index(18);
-    mMesh->index(19);
-    mMesh->index(20);
-    mMesh->index(18);
-    mMesh->index(20);
-    mMesh->index(21);
+    const int faces[][6] = {
+        {18,19,20, 18,20,21}, {22,23,24, 22,24,25},
+        {18,22,25, 18,25,21}, {19,23,24, 19,24,20},
+        {18,22,23, 18,23,19}, {21,20,24, 21,24,25}
+    };
 
-    mMesh->index(22);
-    mMesh->index(23);
-    mMesh->index(24);
-    mMesh->index(22);
-    mMesh->index(24);
-    mMesh->index(25);
-
-    mMesh->index(18);
-    mMesh->index(22);
-    mMesh->index(25);
-    mMesh->index(18);
-    mMesh->index(25);
-    mMesh->index(21);
-
-    mMesh->index(19);
-    mMesh->index(23);
-    mMesh->index(24);
-    mMesh->index(19);
-    mMesh->index(24);
-    mMesh->index(20);
-
-    mMesh->index(18);
-    mMesh->index(22);
-    mMesh->index(23);
-    mMesh->index(18);
-    mMesh->index(23);
-    mMesh->index(19);
-
-    mMesh->index(21);
-    mMesh->index(20);
-    mMesh->index(24);
-    mMesh->index(21);
-    mMesh->index(24);
-    mMesh->index(25);
+    for (auto& f : faces)
+        for (int i : f) mMesh->index(i);
 
     mMesh->end();
 
-    mMesh->convertToMesh(name, Ogre::RGN_DEFAULT);
-
+    mMesh->convertToMesh(name, RGN_DEFAULT);
     manager->destroyManualObject(mMesh);
 }
 
@@ -542,17 +459,12 @@ void Gizmo::createPlaneMesh(Ogre::SceneManager* manager, Ogre::String name)
 
     mMesh->begin("MAT_GIZMO_X", Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
-    mMesh->position(0, 1, 0);
-    mMesh->position(1, 1, 0);
-    mMesh->position(1, 0, 0);
-    mMesh->position(0, 0, 0);
+    for (auto& v : { Ogre::Vector3(0,1,0), Ogre::Vector3(1,1,0),
+                     Ogre::Vector3(1,0,0), Ogre::Vector3(0,0,0) })
+        mMesh->position(v);
 
-    mMesh->index(0);
-    mMesh->index(1);
-    mMesh->index(2);
-    mMesh->index(0);
-    mMesh->index(2);
-    mMesh->index(3);
+    for (int i : { 0,1,2, 0,2,3 })
+        mMesh->index(i);
 
     mMesh->end();
 
