@@ -99,7 +99,8 @@ set(SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSGTechniqueResolverListener.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStaticPluginLoader.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreTrays.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreWindowEventUtilities.cpp")
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreWindowEventUtilities.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreGizmos.cpp")
 
 if(SDL2_FOUND OR EMSCRIPTEN)
   list(APPEND SOURCES  "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreApplicationContextSDL.cpp")
