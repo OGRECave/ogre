@@ -23,7 +23,6 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
 
     void setupContent() override
     {
-
         mRayQuery = mSceneMgr->createRayQuery(Ray());
         mRayQuery->setSortByDistance(true);
         mViewport->setBackgroundColour(ColourValue(0.8f, 0.8f, 0.8f, 1.0f));
