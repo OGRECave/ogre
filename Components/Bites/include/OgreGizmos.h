@@ -133,6 +133,14 @@ public:
 protected:
     void createMesh(Ogre::SceneManager* manager, Ogre::String name);
 
+    static void addCircle(Ogre::Real x, Ogre::MeshPtr mesh);
+
+    static void addLine(const Ogre::Vector3& a, const Ogre::Vector3& b, Ogre::MeshPtr mesh);
+
+    static void addFan(int center, int start, int count, Ogre::MeshPtr mesh);
+
+    static void addRotatedCircle(const Ogre::Quaternion& q, const Ogre::Vector3& t, Ogre::Real x, Ogre::MeshPtr mesh);
+
     Ogre::RaySceneQuery* mRayQuery{};
     Ogre::SceneNode* mGizmoNode{};
     CameraMan* mCameraMan;
