@@ -107,7 +107,6 @@ class _OgreBitesExport CameraGizmo
 public:
     CameraGizmo(
         Ogre::RenderWindow* window,
-        Ogre::Camera* mainCamera,
         Ogre::SceneNode* mSceneNode,
         CameraMan* cameraMan);
 
@@ -127,7 +126,6 @@ protected:
     CameraMan* mCameraMan;
     Ogre::Camera* mGizmoCamera;
     Ogre::SceneNode* mGizmoCameraNode;
-    Ogre::Camera* mCamera;
     Ogre::Node* mCameraNode{};
     int mOldFaceIndex{};
     Ogre::ManualObject* mGizmoObjects[6]{};

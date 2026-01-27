@@ -42,7 +42,6 @@ Gizmo::Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, Gizmo
     mGizmoEntities[4] = sceneManager->createEntity("scbwu", "AxisPlaneMesh", Ogre::RGN_INTERNAL);
     mGizmoEntities[5] = sceneManager->createEntity("scbwv", "AxisPlaneMesh", Ogre::RGN_INTERNAL);
 
-    // XX arrows
     int i = 0;
     for (auto matName : {"MAT_GIZMO_X", "MAT_GIZMO_Y", "MAT_GIZMO_Z", "MAT_GIZMO_XY", "MAT_GIZMO_YZ", "MAT_GIZMO_ZX"})
     {
@@ -782,13 +781,12 @@ bool Gizmo::pickRotateRing(const Ogre::Ray& ray, const Ogre::Vector3& center,
     return Ogre::Math::Abs(d - radius) < scaledTolerance;
 }
 
-CameraGizmo::CameraGizmo(Ogre::RenderWindow* window, Ogre::Camera* mainCamera, Ogre::SceneNode* cameraNode,
+CameraGizmo::CameraGizmo(Ogre::RenderWindow* window, Ogre::SceneNode* cameraNode,
                          CameraMan* cameraMan)
 {
     auto gizmoSm = Ogre::Root::getSingleton().createSceneManager();
 
     mCameraMan = cameraMan;
-    mCamera = mainCamera;
     mCameraNode = cameraNode;
     mGizmoNode = gizmoSm->getRootSceneNode()->createChildSceneNode("GizmoRoot");
 

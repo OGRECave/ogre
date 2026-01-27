@@ -56,7 +56,7 @@ class _OgreSampleClassExport Sample_Gizmos : public SdkSample
         node3->setPosition(25, 0, 0);
         mSelectedEnt = ent;
         mGizmo = new Gizmo(mSceneMgr, node, G_TRANSLATE);
-        mCameraGizmo = new CameraGizmo(mWindow, mCamera, mCameraNode, &*mCameraMan);
+        mCameraGizmo = new CameraGizmo(mWindow, mCameraNode, &*mCameraMan);
 
         // create a checkbox to toggle light movement
         mTranslate = mTrayMgr->createButton(TL_TOPLEFT, "Translate", "Translate");
