@@ -364,7 +364,7 @@ fragment_program Examples/TextureArrayPSglsl glsl glslang
 
 fragment_program Examples/TextureArrayPSglsles glsles
 {
-	source Example_TextureArrayPS.glsles
+	source Example_TextureArrayPS.glsl
 	syntax glsl300es
 }
 

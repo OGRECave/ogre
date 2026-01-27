@@ -1,3 +1,4 @@
+OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 #ifdef OGRE_GLSL
 #extension GL_EXT_texture_array : enable
 #endif
