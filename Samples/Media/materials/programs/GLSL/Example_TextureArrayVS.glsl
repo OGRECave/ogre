@@ -1,3 +1,4 @@
+OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
 #include <OgreUnifiedShader.h>
 
 OGRE_UNIFORMS(
