@@ -295,67 +295,58 @@ namespace Ogre {
                 EGL_NONE
             };
 
-            bool bAASuccess = false;
             if (mCSAA)
             {
-                try
-                {
-                    int CSAAminAttribs[] = {
-                        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                        EGL_BUFFER_SIZE, mMinBufferSize,
-                        EGL_DEPTH_SIZE, 16,
-                        EGL_COVERAGE_BUFFERS_NV, 1,
-                        EGL_COVERAGE_SAMPLES_NV, mCSAA,
-                        EGL_NONE
-                    };
-                    int CSAAmaxAttribs[] = {
-                        EGL_BUFFER_SIZE, mMaxBufferSize,
-                        EGL_DEPTH_SIZE, mMaxDepthSize,
-                        EGL_STENCIL_SIZE, mMaxStencilSize,
-                        EGL_COVERAGE_BUFFERS_NV, 1,
-                        EGL_COVERAGE_SAMPLES_NV, mCSAA,
-                        EGL_NONE
-                    };
-                    mEglConfig = mGLSupport->selectGLConfig(CSAAminAttribs, CSAAmaxAttribs);
-                    bAASuccess = true;
-                }
-                catch (Exception& e)
+                int CSAAminAttribs[] = {
+                    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                    EGL_BUFFER_SIZE, mMinBufferSize,
+                    EGL_DEPTH_SIZE, 16,
+                    EGL_COVERAGE_BUFFERS_NV, 1,
+                    EGL_COVERAGE_SAMPLES_NV, mCSAA,
+                    EGL_NONE
+                };
+                int CSAAmaxAttribs[] = {
+                    EGL_BUFFER_SIZE, mMaxBufferSize,
+                    EGL_DEPTH_SIZE, mMaxDepthSize,
+                    EGL_STENCIL_SIZE, mMaxStencilSize,
+                    EGL_COVERAGE_BUFFERS_NV, 1,
+                    EGL_COVERAGE_SAMPLES_NV, mCSAA,
+                    EGL_NONE
+                };
+                mEglConfig = mGLSupport->selectGLConfig(CSAAminAttribs, CSAAmaxAttribs);
+                if (!mEglConfig)
                 {
                     LogManager::getSingleton().logMessage("AndroidEGLWindow::_createInternalResources: setting CSAA failed");
                 }
             }
 
-            if (mMSAA && !bAASuccess)
+            if (mMSAA && !mEglConfig)
             {
-                try
-                {
-                    int MSAAminAttribs[] = {
-                        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                        EGL_BUFFER_SIZE, mMinBufferSize,
-                        EGL_DEPTH_SIZE, 16,
-                        EGL_SAMPLE_BUFFERS, 1,
-                        EGL_SAMPLES, mMSAA,
-                        EGL_NONE
-                    };
-                    int MSAAmaxAttribs[] = {
-                        EGL_BUFFER_SIZE, mMaxBufferSize,
-                        EGL_DEPTH_SIZE, mMaxDepthSize,
-                        EGL_STENCIL_SIZE, mMaxStencilSize,
-                        EGL_SAMPLE_BUFFERS, 1,
-                        EGL_SAMPLES, mMSAA,
-                        EGL_NONE
-                    };
-                    mEglConfig = mGLSupport->selectGLConfig(MSAAminAttribs, MSAAmaxAttribs);
-                    bAASuccess = true;
-                }
-                catch (Exception& e)
+                int MSAAminAttribs[] = {
+                    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                    EGL_BUFFER_SIZE, mMinBufferSize,
+                    EGL_DEPTH_SIZE, 16,
+                    EGL_SAMPLE_BUFFERS, 1,
+                    EGL_SAMPLES, mMSAA,
+                    EGL_NONE
+                };
+                int MSAAmaxAttribs[] = {
+                    EGL_BUFFER_SIZE, mMaxBufferSize,
+                    EGL_DEPTH_SIZE, mMaxDepthSize,
+                    EGL_STENCIL_SIZE, mMaxStencilSize,
+                    EGL_SAMPLE_BUFFERS, 1,
+                    EGL_SAMPLES, mMSAA,
+                    EGL_NONE
+                };
+                mEglConfig = mGLSupport->selectGLConfig(MSAAminAttribs, MSAAmaxAttribs);
+                if (!mEglConfig)
                 {
                     LogManager::getSingleton().logMessage("AndroidEGLWindow::_createInternalResources: setting MSAA failed");
                 }
             }
 
             mEglDisplay = mGLSupport->getGLDisplay();
-            if (!bAASuccess) mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
+            if (!mEglConfig) mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
 
             EGLint format;
             eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
