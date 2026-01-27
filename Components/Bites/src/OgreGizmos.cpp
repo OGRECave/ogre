@@ -1,6 +1,5 @@
-#include "../include/OgreGizmos.h"
+#include "OgreGizmos.h"
 #include "OgreManualObject.h"
-#include "OgreMaterialManager.h"
 #include "OgreRenderWindow.h"
 #include "OgreRoot.h"
 #include "OgreSceneManager.h"
@@ -8,7 +7,6 @@
 #include "OgreTechnique.h"
 #include "OgreViewport.h"
 #include <OgreEntity.h>
-#include <iostream>
 
 namespace OgreBites
 {
@@ -37,53 +35,29 @@ Gizmo::Gizmo(Ogre::SceneManager* sceneManager, Ogre::SceneNode* sceneNode, Gizmo
     mGizmoZ->setOrientation(q1 * q2);
 
     // Entities
-    mGizmoEntities[0] = sceneManager->createEntity("scbwx", "AxisGizmosMesh", Ogre::RGN_DEFAULT);
-    mGizmoEntities[1] = sceneManager->createEntity("scbwy", "AxisGizmosMesh", Ogre::RGN_DEFAULT);
-    mGizmoEntities[2] = sceneManager->createEntity("scbwz", "AxisGizmosMesh", Ogre::RGN_DEFAULT);
-    mGizmoEntities[3] = sceneManager->createEntity("scbwt", "AxisPlaneMesh", Ogre::RGN_DEFAULT);
-    mGizmoEntities[4] = sceneManager->createEntity("scbwu", "AxisPlaneMesh", Ogre::RGN_DEFAULT);
-    mGizmoEntities[5] = sceneManager->createEntity("scbwv", "AxisPlaneMesh", Ogre::RGN_DEFAULT);
+    mGizmoEntities[0] = sceneManager->createEntity("scbwx", "AxisGizmosMesh", Ogre::RGN_INTERNAL);
+    mGizmoEntities[1] = sceneManager->createEntity("scbwy", "AxisGizmosMesh", Ogre::RGN_INTERNAL);
+    mGizmoEntities[2] = sceneManager->createEntity("scbwz", "AxisGizmosMesh", Ogre::RGN_INTERNAL);
+    mGizmoEntities[3] = sceneManager->createEntity("scbwt", "AxisPlaneMesh", Ogre::RGN_INTERNAL);
+    mGizmoEntities[4] = sceneManager->createEntity("scbwu", "AxisPlaneMesh", Ogre::RGN_INTERNAL);
+    mGizmoEntities[5] = sceneManager->createEntity("scbwv", "AxisPlaneMesh", Ogre::RGN_INTERNAL);
 
     // XX arrows
-    mGizmoEntities[0]->setCastShadows(false);
-    mGizmoEntities[0]->setMaterialName("MAT_GIZMO_X");
-    mGizmoEntities[0]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[0]->setQueryFlags(QUERYFLAG_GIZMO);
+    int i = 0;
+    for (auto matName : {"MAT_GIZMO_X", "MAT_GIZMO_Y", "MAT_GIZMO_Z", "MAT_GIZMO_XY", "MAT_GIZMO_YZ", "MAT_GIZMO_ZX"})
+    {
+        mGizmoEntities[i]->setCastShadows(false);
+        mGizmoEntities[i]->setMaterialName(matName);
+        mGizmoEntities[i]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
+        mGizmoEntities[i]->setQueryFlags(QUERYFLAG_GIZMO);
+        i++;
+    }
+
     mGizmoX->attachObject(mGizmoEntities[0]);
-
-    // YY arrows
-    mGizmoEntities[1]->setCastShadows(false);
-    mGizmoEntities[1]->setMaterialName("MAT_GIZMO_Y");
-    mGizmoEntities[1]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[1]->setQueryFlags(QUERYFLAG_GIZMO);
     mGizmoY->attachObject(mGizmoEntities[1]);
-
-    // ZZ arrows
-    mGizmoEntities[2]->setCastShadows(false);
-    mGizmoEntities[2]->setMaterialName("MAT_GIZMO_Z");
-    mGizmoEntities[2]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[2]->setQueryFlags(QUERYFLAG_GIZMO);
     mGizmoZ->attachObject(mGizmoEntities[2]);
-
-    // XY Plane
-    mGizmoEntities[3]->setCastShadows(false);
-    mGizmoEntities[3]->setMaterialName("MAT_GIZMO_XY");
-    mGizmoEntities[3]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[3]->setQueryFlags(QUERYFLAG_GIZMO);
     mGizmoX->attachObject(mGizmoEntities[3]);
-
-    // YZ Plane
-    mGizmoEntities[4]->setCastShadows(false);
-    mGizmoEntities[4]->setMaterialName("MAT_GIZMO_YZ");
-    mGizmoEntities[4]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[4]->setQueryFlags(QUERYFLAG_GIZMO);
     mGizmoY->attachObject(mGizmoEntities[4]);
-
-    // ZX Plane
-    mGizmoEntities[5]->setCastShadows(false);
-    mGizmoEntities[5]->setMaterialName("MAT_GIZMO_ZX");
-    mGizmoEntities[5]->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_LATE);
-    mGizmoEntities[5]->setQueryFlags(QUERYFLAG_GIZMO);
     mGizmoZ->attachObject(mGizmoEntities[5]);
 
     // Call once to derive bounding boxes
@@ -196,10 +170,6 @@ void Gizmo::setMode(GizmoMode mode)
     {
         break;
     }
-    case G_AXIS:
-    {
-        break;
-    }
     }
     mGizmoNode->setInheritOrientation(mMode == G_SCALE || mMode == G_ROTATE);
 }
@@ -214,41 +184,37 @@ bool Gizmo::isGizmoEntity(Ogre::Entity* ent) const
     return false;
 }
 
-void Gizmo::startDrag(const Ogre::Ray& startRay,
-                      const Ogre::Vector3& cameraDir)
+void Gizmo::startDrag(const Ogre::Ray& startRay, const Ogre::Vector3& cameraDir)
 {
     mDragging = true;
 
-    mInitialObjectPos   = mParentNode->getPosition();
-    mInitialObjectRot   = mParentNode->getOrientation();
+    mInitialObjectPos = mParentNode->getPosition();
+    mInitialObjectRot = mParentNode->getOrientation();
     mInitialObjectScale = mParentNode->getScale();
 
     mDragAxisLocal = Ogre::Vector3::ZERO;
 
-    if (mActiveAxis & AXIS_X) mDragAxisLocal += Ogre::Vector3::UNIT_X;
-    if (mActiveAxis & AXIS_Y) mDragAxisLocal += Ogre::Vector3::UNIT_Y;
-    if (mActiveAxis & AXIS_Z) mDragAxisLocal += Ogre::Vector3::UNIT_Z;
+    if (mActiveAxis & AXIS_X)
+        mDragAxisLocal += Ogre::Vector3::UNIT_X;
+    if (mActiveAxis & AXIS_Y)
+        mDragAxisLocal += Ogre::Vector3::UNIT_Y;
+    if (mActiveAxis & AXIS_Z)
+        mDragAxisLocal += Ogre::Vector3::UNIT_Z;
 
     if (mDragAxisLocal.isZeroLength())
         return;
 
     mDragAxisLocal.normalise();
 
-    mDragAxisWorld =
-        mGizmoNode->_getDerivedOrientation() * mDragAxisLocal;
+    mDragAxisWorld = mGizmoNode->_getDerivedOrientation() * mDragAxisLocal;
     mDragAxisWorld.normalise();
 
     Ogre::Ray localRay = startRay;
 
-    mDragStartHitLocal =
-        computePlaneHit(localRay,
-                        mDragAxisLocal,
-                        cameraDir,
-                        Ogre::Vector3::ZERO);
+    mDragStartHitLocal = computePlaneHit(localRay, mDragAxisLocal, cameraDir, Ogre::Vector3::ZERO);
 }
 
-void Gizmo::computeDrag(Ogre::Ray& ray,
-                        const Ogre::Vector3& cameraDir)
+void Gizmo::computeDrag(Ogre::Ray& ray, const Ogre::Vector3& cameraDir)
 {
     if (!mDragging || !mActiveAxis)
         return;
@@ -257,18 +223,11 @@ void Gizmo::computeDrag(Ogre::Ray& ray,
 
     if (mMode == G_TRANSLATE)
     {
-        Ogre::Vector3 hitLocal =
-            computePlaneHit(localRay,
-                            mDragAxisLocal,
-                            cameraDir,
-                            Ogre::Vector3::ZERO);
+        Ogre::Vector3 hitLocal = computePlaneHit(localRay, mDragAxisLocal, cameraDir, Ogre::Vector3::ZERO);
 
-        Ogre::Real delta =
-            (hitLocal - mDragStartHitLocal).dotProduct(mDragAxisLocal);
+        Ogre::Real delta = (hitLocal - mDragStartHitLocal).dotProduct(mDragAxisLocal);
 
-        mParentNode->setPosition(
-            mInitialObjectPos + mDragAxisWorld * (delta * 1)
-        );
+        mParentNode->setPosition(mInitialObjectPos + mDragAxisWorld * (delta * 1));
 
         return;
     }
@@ -283,49 +242,38 @@ void Gizmo::computeDrag(Ogre::Ray& ray,
 
         Ogre::Vector3 hitLocal = localRay.getPoint(r.second);
 
-        Ogre::Vector3 v0 =
-            (mDragStartHitLocal).normalisedCopy();
-        Ogre::Vector3 v1 =
-            (hitLocal).normalisedCopy();
+        Ogre::Vector3 v0 = (mDragStartHitLocal).normalisedCopy();
+        Ogre::Vector3 v1 = (hitLocal).normalisedCopy();
 
-        Ogre::Real cosTheta =
-            Ogre::Math::Clamp(v0.dotProduct(v1), -1.0f, 1.0f);
+        Ogre::Real cosTheta = Ogre::Math::Clamp(v0.dotProduct(v1), -1.0f, 1.0f);
 
-        Ogre::Real sinTheta =
-            v0.crossProduct(v1).dotProduct(mDragAxisLocal);
+        Ogre::Real sinTheta = v0.crossProduct(v1).dotProduct(mDragAxisLocal);
 
         Ogre::Radian angle = Ogre::Math::ATan2(sinTheta, cosTheta);
 
-
         // Rotate in WORLD space
-        mParentNode->setOrientation(
-            mInitialObjectRot *
-            Ogre::Quaternion(angle, mDragAxisWorld)
-        );
+        mParentNode->setOrientation(mInitialObjectRot * Ogre::Quaternion(angle, mDragAxisWorld));
         return;
     }
 
     if (mMode == G_SCALE)
     {
-        Ogre::Vector3 hitLocal =
-            computePlaneHit(localRay,
-                            mDragAxisLocal,
-                            cameraDir,
-                            Ogre::Vector3::ZERO);
+        Ogre::Vector3 hitLocal = computePlaneHit(localRay, mDragAxisLocal, cameraDir, Ogre::Vector3::ZERO);
 
-        Ogre::Real startDist =
-            mDragStartHitLocal.dotProduct(mDragAxisLocal);
-        Ogre::Real currDist =
-            hitLocal.dotProduct(mDragAxisLocal);
+        Ogre::Real startDist = mDragStartHitLocal.dotProduct(mDragAxisLocal);
+        Ogre::Real currDist = hitLocal.dotProduct(mDragAxisLocal);
 
         Ogre::Real delta = currDist - startDist;
         Ogre::Real scaleFactor = 1.0f + delta;
 
         Ogre::Vector3 newScale = mInitialObjectScale;
 
-        if (mActiveAxis & AXIS_X) newScale.x *= scaleFactor;
-        if (mActiveAxis & AXIS_Y) newScale.y *= scaleFactor;
-        if (mActiveAxis & AXIS_Z) newScale.z *= scaleFactor;
+        if (mActiveAxis & AXIS_X)
+            newScale.x *= std::min(scaleFactor, 0.1f);
+        if (mActiveAxis & AXIS_Y)
+            newScale.y *= std::min(scaleFactor, 0.1f);
+        if (mActiveAxis & AXIS_Z)
+            newScale.z *= std::min(scaleFactor, 0.1f);
 
         mParentNode->setScale(newScale);
     }
@@ -651,7 +599,7 @@ void Gizmo::scaleToParent()
     // Compute size
     Ogre::Vector3 size = worldAABB.getSize();
 
-    Ogre::Real maxExtent = std::max({ size.x, size.y, size.z });
+    Ogre::Real maxExtent = std::max({size.x, size.y, size.z});
 
     // Avoid degenerate scale
     if (maxExtent < Ogre::Real(1e-6))
@@ -662,7 +610,6 @@ void Gizmo::scaleToParent()
     Ogre::Real scale = maxExtent * gizmoScaleFactor;
 
     mGizmoNode->setScale(Ogre::Vector3(scale));
-    std::cout << scale << std::endl;
 }
 
 bool Gizmo::pickAxis(Ogre::Ray& ray)
@@ -675,7 +622,7 @@ bool Gizmo::pickAxis(Ogre::Ray& ray)
     Ogre::Vector3 zAxis = q * Ogre::Vector3::UNIT_Z;
 
     Ogre::Real axisLen = 4.0f * mGizmoNode->getScale().x;
-    Ogre::Real axisRadius = 0.3f  * mGizmoNode->getScale().x;
+    Ogre::Real axisRadius = 0.3f * mGizmoNode->getScale().x;
 
     switch (mMode)
     {
@@ -686,32 +633,51 @@ bool Gizmo::pickAxis(Ogre::Ray& ray)
         Ogre::Real dy = rayLineDistance(ray, origin, yAxis, axisLen);
         Ogre::Real dz = rayLineDistance(ray, origin, zAxis, axisLen);
 
-        Ogre::Real minD = std::min({ dx, dy, dz });
+        Ogre::Real minD = std::min({dx, dy, dz});
 
         if (minD > axisRadius)
-        {mActiveAxis = AXIS_NONE; break;}
+        {
+            mActiveAxis = AXIS_NONE;
+            break;
+        }
 
-        if (minD == dx) {mActiveAxis = AXIS_X; break;}
-        if (minD == dy) {mActiveAxis = AXIS_Y; break;}
+        if (minD == dx)
+        {
+            mActiveAxis = AXIS_X;
+            break;
+        }
+        if (minD == dy)
+        {
+            mActiveAxis = AXIS_Y;
+            break;
+        }
         mActiveAxis = AXIS_Z;
         break;
     }
     case G_ROTATE:
     {
         constexpr Ogre::Real ringRadius = 3.0f;
-        constexpr Ogre::Real tolerance  = 0.2f;
+        constexpr Ogre::Real tolerance = 0.2f;
 
         if (pickRotateRing(ray, origin, xAxis, ringRadius, tolerance))
-        {mActiveAxis = AXIS_X; break;}
+        {
+            mActiveAxis = AXIS_X;
+            break;
+        }
         if (pickRotateRing(ray, origin, yAxis, ringRadius, tolerance))
-        {mActiveAxis = AXIS_Y; break;}
+        {
+            mActiveAxis = AXIS_Y;
+            break;
+        }
         if (pickRotateRing(ray, origin, zAxis, ringRadius, tolerance))
-        {mActiveAxis = AXIS_Z; break;}
+        {
+            mActiveAxis = AXIS_Z;
+            break;
+        }
 
         mActiveAxis = AXIS_NONE;
         break;
     }
-
 
     default:
         mActiveAxis = AXIS_NONE;
@@ -744,13 +710,10 @@ void Gizmo::highlightAxis(AXIS axis)
     mGizmoEntities[5]->setMaterialName((axis == AXIS_XZ) ? "MAT_GIZMO_ZX_L" : "MAT_GIZMO_ZX");
 }
 
-Ogre::Real Gizmo::rayLineDistance(
-    const Ogre::Ray& ray,
-    const Ogre::Vector3& lineOrigin,
-    const Ogre::Vector3& lineDir,
-    Ogre::Real lineLength)
+Ogre::Real Gizmo::rayLineDistance(const Ogre::Ray& ray, const Ogre::Vector3& lineOrigin, const Ogre::Vector3& lineDir,
+                                  Ogre::Real lineLength)
 {
-    const Ogre::Vector3 u = ray.getDirection();      // normalized
+    const Ogre::Vector3 u = ray.getDirection(); // normalized
     const Ogre::Vector3 v = lineDir.normalisedCopy() * lineLength;
     const Ogre::Vector3 w0 = ray.getOrigin() - lineOrigin;
 
@@ -780,20 +743,16 @@ Ogre::Ray Gizmo::toLocalRay(const Ogre::Ray& worldRay) const
     Ogre::Matrix4 inv = mGizmoNode->_getFullTransform().inverse();
 
     Ogre::Vector3 localOrigin = inv * worldRay.getOrigin();
-    Ogre::Vector3 localDir =
-        inv.linear().inverse().transpose() * worldRay.getDirection();
+    Ogre::Vector3 localDir = inv.linear().inverse().transpose() * worldRay.getDirection();
 
     localDir.normalise();
 
     return Ogre::Ray(localOrigin, localDir);
 }
 
-bool Gizmo::pickRotateRing(
-    const Ogre::Ray& ray,
-    const Ogre::Vector3& center,
-    const Ogre::Vector3& axis,   // must be normalized
-    Ogre::Real radius,
-    Ogre::Real tolerance)
+bool Gizmo::pickRotateRing(const Ogre::Ray& ray, const Ogre::Vector3& center,
+                           const Ogre::Vector3& axis, // must be normalized
+                           Ogre::Real radius, Ogre::Real tolerance)
 {
     // 1. Reject near-parallel rays (huge stability win)
     Ogre::Real ndotd = Ogre::Math::Abs(axis.dotProduct(ray.getDirection()));
@@ -823,11 +782,8 @@ bool Gizmo::pickRotateRing(
     return Ogre::Math::Abs(d - radius) < scaledTolerance;
 }
 
-CameraGizmo::CameraGizmo(
-    Ogre::RenderWindow* window,
-    Ogre::Camera* mainCamera,
-    Ogre::SceneNode* cameraNode,
-    CameraMan* cameraMan)
+CameraGizmo::CameraGizmo(Ogre::RenderWindow* window, Ogre::Camera* mainCamera, Ogre::SceneNode* cameraNode,
+                         CameraMan* cameraMan)
 {
     auto gizmoSm = Ogre::Root::getSingleton().createSceneManager();
 
@@ -845,12 +801,9 @@ CameraGizmo::CameraGizmo(
     mGizmoCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
     mGizmoCamera->setNearClipDistance(0.01f);
     mGizmoCamera->setFarClipDistance(10.0f);
-    Ogre::Viewport* vp = window->addViewport(
-        mGizmoCamera,
-        1,          // higher Z-order than main viewport
-        0.80f, 0.0f,
-        0.20f, 0.20f
-    );
+    Ogre::Viewport* vp = window->addViewport(mGizmoCamera,
+                                             1, // higher Z-order than main viewport
+                                             0.80f, 0.0f, 0.20f, 0.20f);
     float aspect = vp->getActualWidth() / float(vp->getActualHeight());
 
     float size = 2.0f;
@@ -867,9 +820,7 @@ CameraGizmo::CameraGizmo(
 
 void CameraGizmo::updateOrientation()
 {
-    mGizmoNode->setOrientation(
-        mCameraMan->getCamera()->getOrientation().Inverse()
-    );
+    mGizmoNode->setOrientation(mCameraMan->getCamera()->getOrientation().Inverse());
 }
 
 Ogre::ManualObject* CameraGizmo::pickFace(float nx, float ny)
@@ -924,32 +875,32 @@ void CameraGizmo::snapCamera(Ogre::ManualObject* face) const
     switch (faceIndex)
     {
     case 0: // +X
-        yaw   = Degree(90);
+        yaw = Degree(90);
         pitch = Degree(0);
         break;
 
     case 1: // -X
-        yaw   = Degree(-90);
+        yaw = Degree(-90);
         pitch = Degree(0);
         break;
 
     case 2: // +Y (top)
-        yaw   = Degree(0);
+        yaw = Degree(0);
         pitch = Degree(90);
         break;
 
     case 3: // -Y (bottom)
-        yaw   = Degree(0);
+        yaw = Degree(0);
         pitch = Degree(-90);
         break;
 
     case 4: // +Z (front)
-        yaw   = Degree(0);
+        yaw = Degree(0);
         pitch = Degree(0);
         break;
 
     case 5: // -Z (back)
-        yaw   = Degree(180);
+        yaw = Degree(180);
         pitch = Degree(0);
         break;
     default:;
@@ -961,7 +912,6 @@ void CameraGizmo::snapCamera(Ogre::ManualObject* face) const
     Real dist = camPos.distance(target);
 
     mCameraMan->setYawPitchDist(yaw, pitch, dist);
-
 }
 
 void CameraGizmo::highlightFace(Ogre::ManualObject* face)
@@ -1014,11 +964,7 @@ void CameraGizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
 {
     using namespace Ogre;
 
-    auto addQuad =
-        [](ManualObject* mo,
-           float x0, float y0,
-           float x1, float y1,
-           float z = 0.0f)
+    auto addQuad = [](ManualObject* mo, float x0, float y0, float x1, float y1, float z = 0.0f)
     {
         mo->position(x0, y0, z);
         mo->position(x1, y0, z);
@@ -1030,10 +976,7 @@ void CameraGizmo::createMesh(Ogre::SceneManager* manager, Ogre::String name)
         mo->triangle(base + 0, base + 2, base + 3);
     };
 
-    auto createFace =
-        [&](const String& n,
-            const String& materialName,
-            const int index)
+    auto createFace = [&](const String& n, const String& materialName, const int index)
     {
         SceneNode* faceNode = mGizmoNode->createChildSceneNode(n);
 

@@ -12,7 +12,6 @@ constexpr uint32_t QUERYFLAG_GIZMO = 1 << 1;
 enum GizmoMode /// enum for different kinds of gizmo
 {
     G_NONE,
-    G_AXIS,
     G_TRANSLATE,
     G_ROTATE,
     G_SCALE,
