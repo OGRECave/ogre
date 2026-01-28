@@ -105,7 +105,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             https://download.savannah.gnu.org/releases/freetype/freetype-2.14.1.tar.gz
             ${PROJECT_BINARY_DIR}/freetype-2.14.1.tar.gz)
         execute_process(COMMAND ${CMAKE_COMMAND}
-            -E tar xf freetype-2.13.2.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+            -E tar xf freetype-2.14.1.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         # patch toolchain for iOS
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy
             ${PROJECT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
