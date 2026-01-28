@@ -102,14 +102,14 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     if (NOT FREETYPE_FOUND)
         message(STATUS "Building freetype")
         file(DOWNLOAD
-            https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.gz
-            ${PROJECT_BINARY_DIR}/freetype-2.13.2.tar.gz)
+            https://download.savannah.gnu.org/releases/freetype/freetype-2.14.1.tar.gz
+            ${PROJECT_BINARY_DIR}/freetype-2.14.1.tar.gz)
         execute_process(COMMAND ${CMAKE_COMMAND}
             -E tar xf freetype-2.13.2.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         # patch toolchain for iOS
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy
             ${PROJECT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
-            freetype-2.13.2/builds/cmake/iOS.cmake
+            freetype-2.14.1/builds/cmake/iOS.cmake
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
@@ -117,13 +117,13 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
             -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
             -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE
-            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.12
             # workaround for broken iOS toolchain in freetype
-            -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.13.2
-            ${PROJECT_BINARY_DIR}/freetype-2.13.2
-            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.13.2/objs)
+            -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.14.1
+            ${PROJECT_BINARY_DIR}/freetype-2.14.1
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.14.1/objs)
         execute_process(COMMAND ${CMAKE_COMMAND}
-            --build ${PROJECT_BINARY_DIR}/freetype-2.13.2/objs ${BUILD_COMMAND_OPTS})
+            --build ${PROJECT_BINARY_DIR}/freetype-2.14.1/objs ${BUILD_COMMAND_OPTS})
     endif()
 
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
