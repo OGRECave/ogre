@@ -45,7 +45,8 @@ namespace Ogre {
           mNativeDisplay(EGL_DEFAULT_DISPLAY),
           mEglDisplay(EGL_NO_DISPLAY),
           mEglConfig(0),
-          mEglSurface(0)
+          mEglSurface(0),
+          mHdrDisplay(false)
     {
         mActive = true;//todo
     }
@@ -212,14 +213,26 @@ namespace Ogre {
     {
         ::EGLSurface surface;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        int* gamma_attribs = NULL;
-#else
-        int gamma_attribs[] = {EGL_GL_COLORSPACE_KHR, EGL_GL_COLORSPACE_SRGB_KHR, EGL_NONE};
-#endif
-        mHwGamma = mHwGamma && mGLSupport->checkExtension("EGL_KHR_gl_colorspace");
+        int* attrib_list = NULL;
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
+        int attribs[] = {EGL_GL_COLORSPACE_KHR, EGL_GL_COLORSPACE_SRGB_KHR, EGL_NONE};
 
-        surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, mHwGamma ? gamma_attribs : NULL);
+        if (mHdrDisplay && mGLSupport->checkExtension("EGL_EXT_gl_colorspace_scrgb_linear"))
+        {
+            attribs[1] = EGL_GL_COLORSPACE_SCRGB_LINEAR_EXT;
+            attrib_list = attribs;
+            mHwGamma = true; // hdr implies hw gamma
+        }
+
+        if (!attrib_list) // Fallback to sRGB if not HDR or HDR not supported
+        {
+            mHwGamma = mHwGamma && mGLSupport->checkExtension("EGL_KHR_gl_colorspace");
+            if (mHwGamma)
+                attrib_list = attribs;
+        }
+#endif
+
+        surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, attrib_list);
         EGL_CHECK_ERROR
 
         if (surface == EGL_NO_SURFACE)
