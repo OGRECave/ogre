@@ -36,6 +36,7 @@ namespace Ogre {
         , mGlobalIndex(-1)
         , mYawFixed(false)
         , mIsInSceneGraph(false)
+        , mDisplaySceneNode(false)
         , mShowBoundingBox(false)
     {
         needUpdate();

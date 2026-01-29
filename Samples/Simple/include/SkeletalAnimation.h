@@ -11,6 +11,174 @@
 using namespace Ogre;
 using namespace OgreBites;
 
+
+class AnimationUpdater : public ControllerValue<float>
+{
+public:
+
+    enum MoveMethod
+    {
+        kMovePeriodic,
+        kMoveContinuous,
+    };
+
+    AnimationUpdater(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
+    : mAnimationState(animationState)
+    , mEntity(entity)
+    , mTrack(track)
+    , mMethod(kMovePeriodic)
+    , mAppliedTranslation(Ogre::Vector3::ZERO)
+    , mAppliedRotation(Ogre::Quaternion::IDENTITY)
+    {
+        assert(animationState);
+        assert(entity);
+        assert(track);
+
+        // Rotation is applied in the bone's space so we need its initial orientation.
+        // Bone intial position will interpretted in our dynamic orientation so we need that initial position.
+
+        Bone * rootBone = entity->getSkeleton()->getBone(track->getHandle());
+        mInitialOrientation = rootBone->getInitialOrientation();
+        mInitialPosition = rootBone->getInitialPosition();
+
+        // Measure total transformation for root.
+
+        TransformKeyFrame * tkfBeg = track->getNodeKeyFrame(0);
+        TransformKeyFrame * tkfEnd = track->getNodeKeyFrame(track->getNumKeyFrames() - 1);
+        mTranslation = tkfEnd->getTranslate() - tkfBeg->getTranslate();
+        mTranslation.y = 0.0f;
+
+        mRotation = mInitialOrientation * tkfEnd->getRotation() * tkfBeg->getRotation().Inverse() * mInitialOrientation.Inverse();
+        // TODO: there's probably a smarter way to limit rotation to y-axis
+        Matrix3 mat;
+        mRotation.ToRotationMatrix(mat);
+        Radian yAngle, zAngle, xAngle;
+        mat.ToEulerAnglesYZX(yAngle, zAngle, xAngle);
+        mat.FromEulerAnglesYZX(yAngle, Ogre::Radian(0.0f), Ogre::Radian(0.0f));
+        mRotation.FromRotationMatrix(mat);
+
+        mRotationInverse = mRotation.Inverse();
+    }
+
+    static ControllerValueRealPtr create(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
+    {
+        return std::make_shared<AnimationUpdater>(animationState, entity, track);
+    }
+
+    void setMoveMethod(MoveMethod method)
+    {
+        if (mMethod == kMoveContinuous && method != kMoveContinuous)
+        {
+            SceneNode* sceneNode = mEntity->getParentSceneNode();
+            sceneNode->rotate(mAppliedRotation.Inverse());
+            sceneNode->translate(-mAppliedTranslation, Node::TS_LOCAL);
+
+            mAppliedRotation = Quaternion::IDENTITY;
+            mAppliedTranslation = Vector3::ZERO;
+        }
+
+        mMethod = method;
+
+        // If we move the SceneNode continuously then disable moving the bone, otherwise enable.
+
+        if ((mMethod == kMoveContinuous) && !mAnimationState->hasBlendMask())
+        {
+            mAnimationState->createBlendMask(mEntity->getSkeleton()->getNumBones(), 1.0f);
+        }
+        if (mAnimationState->hasBlendMask())
+        {
+            mAnimationState->setBlendMaskEntry(mTrack->getHandle(), (mMethod == kMoveContinuous) ? 0.0f : 1.0f);
+        }
+    }
+
+    float getValue(void) const override
+    {
+        return mAnimationState->getTimePosition() / mAnimationState->getLength();
+    }
+
+    void setValue(float timeDelta) override
+    {
+        // Don't assume AnimationState::addTime()'s internal time-updating (ie modulo) implementation.
+
+        float lastTime = mAnimationState->getTimePosition();
+        mAnimationState->addTime(timeDelta);
+        float thisTime = mAnimationState->getTimePosition();
+
+        float length = mAnimationState->getLength();
+        bool loop = mAnimationState->getLoop();
+        int loops = loop ? (int)std::round((lastTime + timeDelta - thisTime) / length) : 0;
+        bool looped = loops;
+
+        // Apply Movement
+
+        SceneNode* sceneNode = mEntity->getParentSceneNode();
+
+        if (mMethod == kMoveContinuous)
+        {
+            // Unapply transform from last frame
+
+            sceneNode->rotate(mAppliedRotation.Inverse());
+            sceneNode->translate(-mAppliedTranslation, Node::TS_LOCAL);
+        }
+
+        // Apply periodic loop transforms
+
+        while (loops < 0)
+        {
+            sceneNode->rotate(mRotationInverse);
+            sceneNode->translate(-mTranslation, Node::TS_LOCAL);
+            loops++;
+        }
+        while (loops > 0)
+        {
+            sceneNode->translate(mTranslation, Node::TS_LOCAL);
+            sceneNode->rotate(mRotation);
+            loops--;
+        }
+
+        if (mMethod == kMoveContinuous)
+        {
+            // Apply transform from this frame
+
+            TransformKeyFrame tkf(0, 0);
+            mTrack->getInterpolatedKeyFrame(thisTime, &tkf);
+
+            // We need SnOri and SnPos such that
+            // SnOri * BoneBindOri = BoneBindOri * BoneAnimOri
+            // SnPos + SnOri * BoneBindPos = BoneBindPos + BoneAnimPos
+
+            mAppliedRotation = mInitialOrientation * tkf.getRotation() * mInitialOrientation.Inverse();
+            mAppliedTranslation = mInitialPosition + tkf.getTranslate() - mAppliedRotation * mInitialPosition;
+
+            sceneNode->translate(mAppliedTranslation, Node::TS_LOCAL);
+            sceneNode->rotate(mAppliedRotation);
+        }
+
+        if (looped && mEntity->getUpdateBoundingBoxFromSkeleton())
+        {
+            /* With mUpdateBoundingBoxFromSkeleton set, Entity::getBoundingBox() uses the
+            skeleton from one frame earlier, which is close enough during smooth animation,
+            but when we jump a moving animation back to the begininng we need to force it to
+            update the bone positions to avoid culling glitches. TODO: can this be remedied? */
+            mEntity->getSkeleton()->setAnimationState(*mAnimationState->getParent());
+        }
+    }
+
+private:
+    AnimationState* mAnimationState;
+    Entity* mEntity;
+    NodeAnimationTrack* mTrack;
+    MoveMethod mMethod;
+    Vector3 mInitialPosition;
+    Quaternion mInitialOrientation;
+    Vector3 mTranslation;
+    Quaternion mRotation;
+    Quaternion mRotationInverse;
+    Vector3 mAppliedTranslation;
+    Quaternion mAppliedRotation;
+};
+
+
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
     enum VisualiseBoundingBoxMode
@@ -29,12 +197,15 @@ public:
         mInfo["Help"] = "Controls:\n"
             "WASD to move the camera.  Mouse to look around.\n"
             "V toggle visualise bounding boxes.\n"
-            "B toggle bone-based bounding boxes on/off.";
+            "B toggle bone-based bounding boxes on/off.\n"
+            "M toggle move-method periodic/continuous.";
         mStatusPanel = NULL;
         mVisualiseBoundingBoxMode = kVisualiseNone;
         mBoundingBoxModelIndex = 0;
         mBoneBoundingBoxes = false;
+        mMoveMethod = AnimationUpdater::kMovePeriodic;
         mBoneBoundingBoxesItemName = "Bone AABBs";
+        mMoveMethodItemName = "Move Method";
     }
 
     void setVisualiseBoundingBoxMode( VisualiseBoundingBoxMode mode )
@@ -45,13 +216,19 @@ public:
             switch (mVisualiseBoundingBoxMode)
             {
             case kVisualiseNone:
+                mModelNodes[ i ]->setDisplaySceneNode( false );
                 mModelNodes[ i ]->showBoundingBox( false );
+                mEntities[ i ]->setDisplayBoundingSphere( false );
                 break;
             case kVisualiseOne:
+                mModelNodes[ i ]->setDisplaySceneNode( i == mBoundingBoxModelIndex );
                 mModelNodes[ i ]->showBoundingBox( i == mBoundingBoxModelIndex );
+                mEntities[ i ]->setDisplayBoundingSphere( i == mBoundingBoxModelIndex );
                 break;
             case kVisualiseAll:
+                mModelNodes[ i ]->setDisplaySceneNode( true );
                 mModelNodes[ i ]->showBoundingBox( true );
+                mEntities[ i ]->setDisplayBoundingSphere( true );
                 break;
             }
         }
@@ -76,6 +253,39 @@ public:
         if ( mStatusPanel )
         {
             mStatusPanel->setParamValue(mBoneBoundingBoxesItemName, mBoneBoundingBoxes ? "On" : "Off");
+        }
+    }
+    void setMoveMethod( AnimationUpdater::MoveMethod method )
+    {
+        mMoveMethod = method;
+
+        if (method == AnimationUpdater::kMovePeriodic)
+        {
+            mEntities[0]->getMesh()->_setBounds(mSneakBoundsMoving);
+        }
+        else if (method == AnimationUpdater::kMoveContinuous)
+        {
+            mEntities[0]->getMesh()->_setBounds(mSneakBoundsStationary);
+        }
+
+        // update move method mode for all models
+        for (int iModel = 0; iModel < NUM_MODELS; iModel++)
+        {
+            mControllers[iModel]->setMoveMethod(method);
+        }
+        // update status panel
+        if ( mStatusPanel )
+        {
+            switch (method)
+            {
+            case AnimationUpdater::kMovePeriodic:
+                mStatusPanel->setParamValue(mMoveMethodItemName, "Periodic");
+                break;
+            case AnimationUpdater::kMoveContinuous:
+                mStatusPanel->setParamValue(mMoveMethodItemName, "Continuous");
+                break;
+            }
+
         }
     }
     bool keyPressed(const KeyboardEvent& evt) override
@@ -109,39 +319,30 @@ public:
                     return true;
                 }
                 break;
+
+
+            case 'm':
+                {
+                    // Toggle move method for all models.
+                    switch (mMoveMethod)
+                    {
+                    case AnimationUpdater::kMovePeriodic:
+                        setMoveMethod(AnimationUpdater::kMoveContinuous);
+                        break;
+                    case AnimationUpdater::kMoveContinuous:
+                        setMoveMethod(AnimationUpdater::kMovePeriodic);
+                        break;
+                    }
+                    return true;
+                }
+                break;
+
             default:
                 break;
             }
         }
         return SdkSample::keyPressed(evt);
     }
-
-    bool frameRenderingQueued(const FrameEvent& evt) override
-    {
-        for (int i = 0; i < NUM_MODELS; i++)
-        {
-            if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
-            {
-                /* We need reposition the scene node origin, since the animation includes translation.
-                Position is calculated from an offset to the end position, and rotation is calculated
-                from how much the animation turns the character. */
-
-                Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
-
-                // find current end position and the offset
-                Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
-                Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
-
-                mModelNodes[i]->setPosition(currEnd + offset);
-                mModelNodes[i]->rotate(rot);
-
-                mAnimStates[i]->setTimePosition(0);   // reset animation time
-            }
-        }
-
-        return SdkSample::frameRenderingQueued(evt);
-    }
-
 
 protected:
 
@@ -172,6 +373,7 @@ protected:
         renderState->addTemplateSubRenderState(srs);
 
         // set shadow properties
+        // TODO: figure out why enabling shadows causes debug SceneNode drawing to block camera
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
         mSceneMgr->setShadowTextureCount(2);
         mSceneMgr->setShadowTextureSize(512);
@@ -229,17 +431,12 @@ protected:
 
     void setupModels()
     {
+        tweakJaiquaMesh();
         tweakSneakAnim();
 
         SceneNode* sn = NULL;
         Entity* ent = NULL;
         AnimationState* as = NULL;
-
-        // make sure we can get the buffers for bbox calculations
-        MeshManager::getSingleton().load("jaiqua.mesh",
-                                         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                         HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
-                                         HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, true, true);
 
         auto& controllerMgr = ControllerManager::getSingleton();
 
@@ -254,30 +451,38 @@ protected:
             // create and attach a jaiqua entity
             ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
             ent->setMaterialName("jaiqua");
+            mEntities.push_back(ent);
             sn->attachObject(ent);
         
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
             as->setEnabled(true);
-            as->setLoop(false);
+            as->setLoop(true);
+
+            auto controller = AnimationUpdater::create(as, ent, mSneakSpinerootTrack);
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
-                                           AnimationStateControllerValue::create(as, true),
+                                           controller,
                                            ScaleControllerFunction::create(Math::RangeRandom(0.5, 1.5)));
-            mAnimStates.push_back(as);
+
+            mControllers.push_back((AnimationUpdater*)controller.get());
         }
+
+        generateBoundingBoxes();
 
         // create name and value for skinning mode
         StringVector names;
         names.push_back("Help");
         names.push_back("Skinning");
         names.push_back(mBoneBoundingBoxesItemName);
+        names.push_back(mMoveMethodItemName);
         
         // create a params panel to display the help and skinning mode
-        mStatusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 200, names);
+        mStatusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 240, names);
         mStatusPanel->setParamValue("Help", "H / F1");
         String value = "Software";
         enableBoneBoundingBoxMode( false );  // update status panel entry
+        setMoveMethod( AnimationUpdater::kMoveContinuous );  // update status panel entry
 
         // make sure we query the correct scheme
         MaterialManager::getSingleton().setActiveScheme(mViewport->getMaterialScheme());
@@ -298,10 +503,59 @@ protected:
         }
         mStatusPanel->setParamValue("Skinning", value);
     }
-    
+
+    /*-----------------------------------------------------------------------------
+    | The jaiqua mesh has the vertices baked quite a distance from local origin.
+    | This moves the mesh to the origin and moves the skeleton's Spineroot bone.
+    -----------------------------------------------------------------------------*/
+    void tweakJaiquaMesh()
+    {
+        // make sure we can get the buffers for bbox calculations
+        // TODO: figure out why buffers don't get shadow buffers even though we ask for them...
+        MeshPtr mesh = MeshManager::getSingleton().load("jaiqua.mesh",
+                                                        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                        HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+                                                        HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, true, true);
+
+        // Get root bone's binding position
+
+        Skeleton * skeleton = mesh->getSkeleton().get();
+        Bone * rootBone = skeleton->getBone("Spineroot");
+        const Vector3 bindPos = rootBone->getInitialPosition();
+        rootBone->setPosition(0.0f, bindPos.y, 0.0f);
+        skeleton->setBindingPose();
+
+        // Move all the vertices
+        // There's no shared vertices and only 1 submesh
+
+        const VertexData* vertexData = mesh->getSubMeshes()[0]->vertexData;
+        const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+        HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
+        DefaultHardwareBufferManagerBase bfrMgr;
+        HardwareVertexBufferPtr shadowBuffer = bfrMgr.createVertexBuffer(vbuf->getVertexSize(), vbuf->getNumVertices(), Ogre::HBU_CPU_ONLY);
+        shadowBuffer->copyData(*vbuf);
+
+        HardwareBufferLockGuard vertexLock(shadowBuffer, HardwareBuffer::HBL_NORMAL);
+        unsigned char* vertex = static_cast<unsigned char*>(vertexLock.pData);
+        float* pFloat;
+
+        for(size_t i = 0; i < vertexData->vertexCount; ++i)
+        {
+            posElem->baseVertexPointerToElement(vertex, &pFloat);
+            pFloat[0] -= bindPos.x;
+            pFloat[2] -= bindPos.z;
+            vertex += shadowBuffer->getVertexSize();
+        }
+
+        vertexLock.unlock();
+
+        vbuf->copyData(*shadowBuffer);
+    }
+
     /*-----------------------------------------------------------------------------
     | The jaiqua sneak animation doesn't loop properly. This method tweaks the
     | animation to loop properly by altering the Spineroot bone track.
+    | We also move the Sneak animation to start closer to the origin.
     -----------------------------------------------------------------------------*/
     void tweakSneakAnim()
     {
@@ -309,7 +563,23 @@ protected:
         SkeletonPtr skel = static_pointer_cast<Skeleton>(SkeletonManager::getSingleton().load("jaiqua.skeleton",
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
 
-        for (const auto& it : skel->getAnimation("Sneak")->_getNodeTrackList()) // for every node track...
+        // Move Sneak animation closer to origin
+
+        Bone * rootBone = skel->getBone("Spineroot");
+        Animation * animation = skel->getAnimation("Sneak");
+        NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+        Vector3 start = rootTrack->getNodeKeyFrame(0)->getTranslate();
+        start.y = 0.0f;
+        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+        {
+            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+            kf->setTranslate(kf->getTranslate() - start);
+        }
+
+        // Tweak Sneak animation
+
+        for (const auto& it : animation->_getNodeTrackList()) // for every node track...
         {
             NodeAnimationTrack* track = it.second;
 
@@ -329,9 +599,7 @@ protected:
 
             if (bone->getName() == "Spineroot")   // adjust spine root relative to new location
             {
-                mSneakStartPos = startKf->getTranslate() + bone->getInitialPosition();
-                mSneakEndPos = oldKf.getTranslate() + bone->getInitialPosition();
-                mSneakStartPos.y = mSneakEndPos.y;
+                mSneakSpinerootTrack = track;
 
                 newKf->setTranslate(oldKf.getTranslate());
                 newKf->setRotation(oldKf.getRotation());
@@ -344,12 +612,51 @@ protected:
                 newKf->setScale(startKf->getScale());
             }
         }
+
+        animation->setLength(ANIM_CHOP);
+    }
+
+    void generateBoundingBoxes()
+    {
+        // This is a hacky way to generate bounding boxes
+        // for the Sneak animation with movement and without.
+
+        mSneakBoundsMoving.setNull();
+        mSneakBoundsStationary.setNull();
+
+        Entity * entity = mEntities[0];
+        Skeleton * skeleton = entity->getSkeleton();
+        Bone * rootBone = skeleton->getBone("Spineroot");
+        Animation * animation = skeleton->getAnimation("Sneak");
+        AnimationState * as = entity->getAnimationState("Sneak");
+
+        entity->setUpdateBoundingBoxFromSkeleton(true);
+
+        // Use root track's keyframes for our resolution.
+
+        NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+        {
+            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+            const Vector3 rootPos = kf->getTranslate();
+
+            as->setTimePosition(kf->getTime());
+            skeleton->setAnimationState(*as->getParent());
+            AxisAlignedBox bbox = entity->getBoundingBox();
+
+            mSneakBoundsMoving.merge(bbox);
+
+            bbox.setExtents(bbox.getMinimum() - rootPos, bbox.getMaximum() - rootPos);
+            mSneakBoundsStationary.merge(bbox);
+        }
     }
 
     void cleanupContent() override
     {
         mModelNodes.clear();
-        mAnimStates.clear();
+        mEntities.clear();
+        mControllers.clear();
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
@@ -358,14 +665,20 @@ protected:
     VisualiseBoundingBoxMode mVisualiseBoundingBoxMode;
     int mBoundingBoxModelIndex;  // which model to show the bounding box for
     bool mBoneBoundingBoxes;
+    AnimationUpdater::MoveMethod mMoveMethod;
     ParamsPanel* mStatusPanel;
     String mBoneBoundingBoxesItemName;
+    String mMoveMethodItemName;
 
     std::vector<SceneNode*> mModelNodes;
-    std::vector<AnimationState*> mAnimStates;
+    std::vector<Entity*> mEntities;
+    std::vector<AnimationUpdater*> mControllers;
 
-    Vector3 mSneakStartPos;
-    Vector3 mSneakEndPos;
+    AxisAlignedBox mSneakBoundsMoving;
+    AxisAlignedBox mSneakBoundsStationary;
+    Vector3 mSneakTranslate;
+    Quaternion mSneakRotation;
+    NodeAnimationTrack* mSneakSpinerootTrack;
 };
 
 #endif
