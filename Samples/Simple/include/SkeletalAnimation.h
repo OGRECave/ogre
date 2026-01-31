@@ -11,14 +11,37 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-
+/*  The AnimationUpdater advances an AnimationState by the elapsed time each frame.
+    In addition, it applies the transforms from a specified NodeAnimationTrack to the
+    Entity's parent SceneNode instead of to the Skeleton's Bone.
+ */
 class AnimationUpdater : public ControllerValue<float>
 {
 public:
 
+    /*  How often to move/rotate the SceneNode.
+        The continuous method is usually preferable.
+        The option is here mainly for demonstration purposes.
+     */
     enum MoveMethod
     {
+        /*  Move/rotate the SceneNode every time the Animation loops.
+            During an Animation with root movement, the model will move away from its origin,
+            making the SceneNode's position a poorer approximation of its location, and less
+            useful for collision detection, direction finding, event triggering, etc.
+            In addition, the Entity's bounding box either needs to be large enough to contain
+            the entire animation (reducing culling effectiveness) or needs to be continuously
+            updated at the expense of processing power.
+            Even with a constantly updated bounding box, the bounding sphere remains centered
+            on the SceneNode's position, requiring it to be unecessarily large.
+         */
         kMovePeriodic,
+
+        /*  Move/rotate the SceneNode every frame.
+            The model remains centered on its SceneNode. The bounding box and sphere can be
+            tight fitting and do not need to be updated. The only per-frame overhead is that
+            of calculating and updating the SceneNode's transform each frame.
+         */
         kMoveContinuous,
     };
 
@@ -511,7 +534,6 @@ protected:
     void tweakJaiquaMesh()
     {
         // make sure we can get the buffers for bbox calculations
-        // TODO: figure out why buffers don't get shadow buffers even though we ask for them...
         MeshPtr mesh = MeshManager::getSingleton().load("jaiqua.mesh",
                                                         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                         HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
