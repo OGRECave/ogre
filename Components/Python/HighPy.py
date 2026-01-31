@@ -5,6 +5,7 @@
 
 import os
 import math
+from typing import Union
 
 import Ogre
 import Ogre.Bites
@@ -264,11 +265,11 @@ def window_pixel_data(window_name: str, compositor_name: str | None = None, text
 
     return ret, shape
 
-def imshow(window_name: str, img_path: str | os.PathLike):
+def imshow(window_name: str, img_src: Union[str, os.PathLike, memoryview, "np.ndarray"]):
     """!
     show an image in the window
     @param window_name: name of the window
-    @param img_path: path to the image file
+    @param img_src: image data (gray or BGR) or path to the image file
     """
     assert _ctx is not None, "call window_create first"
     assert window_name in _ctx.windows, f"no window named: {window_name}"
@@ -278,7 +279,17 @@ def imshow(window_name: str, img_path: str | os.PathLike):
         window_data.background = _create_image_background(_ctx.windows[window_name].scn_mgr, window_name)
 
     img = Ogre.Image()
-    img.load(str(img_path), Ogre.RGN_DEFAULT)
+
+    inchannels = 0
+    if hasattr(img_src, "shape"):
+        inchannels = img_src.shape[2]
+
+    if inchannels == 3: # assume BGR, matching OpenCV format
+        img.loadDynamicImage(img_src, img_src.shape[1], img_src.shape[0], Ogre.PF_R8G8B8)
+    elif inchannels == 1:
+        img.loadDynamicImage(img_src, img_src.shape[1], img_src.shape[0], Ogre.PF_BYTE_L)
+    else: # load from file
+        img.load(str(img_src), Ogre.RGN_DEFAULT)
 
     window_data.background.loadImage(img)
 
