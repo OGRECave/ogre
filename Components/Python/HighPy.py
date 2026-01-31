@@ -5,6 +5,8 @@
 
 import os
 import math
+import struct
+
 from typing import Union
 
 import Ogre
@@ -226,8 +228,7 @@ def window_pixel_data(window_name: str, compositor_name: str | None = None, text
     @param compositor_name: name of the compositor
     @param texture_name: name of the texture
     @param mrt_index: index of the MRT
-    @retval 0: bytearray holding the pixel data
-    @retval 1: tuple `(bytes per pixel, height, width, channels)`
+    @return: pixel data as a memoryview
     """
     assert _ctx is not None, "call window_create first"
     assert window_name in _ctx.windows, f"no window named: {window_name}"
@@ -248,22 +249,25 @@ def window_pixel_data(window_name: str, compositor_name: str | None = None, text
         dst_type = tex.getFormat()
         rtarget = tex.getBuffer().getRenderTarget()
 
+    dtype = 'B'
     if dst_type == Ogre.PF_BYTE_RGB:
-        shape = (1, rtarget.getHeight(), rtarget.getWidth(), 3)
+        shape = (rtarget.getHeight(), rtarget.getWidth(), 3)
     elif dst_type == Ogre.PF_BYTE_RGBA:
-        shape = (1, rtarget.getHeight(), rtarget.getWidth(), 4)
+        shape = (rtarget.getHeight(), rtarget.getWidth(), 4)
     elif dst_type == Ogre.PF_L16 or dst_type == Ogre.PF_DEPTH16:
-        shape = (2, rtarget.getHeight(), rtarget.getWidth(), 1)
+        shape = (rtarget.getHeight(), rtarget.getWidth(), 1)
+        dtype = 'H'
     elif dst_type == Ogre.PF_FLOAT32_R or dst_type == Ogre.PF_DEPTH32F:
-        shape = (4, rtarget.getHeight(), rtarget.getWidth(), 1)
+        shape = (rtarget.getHeight(), rtarget.getWidth(), 1)
+        dtype = 'f'
     else:
         raise ValueError(f"unsupported format: {Ogre.PixelUtil.getFormatName(dst_type)}")
 
-    ret = bytearray(math.prod(shape))
-    pb = Ogre.PixelBox(shape[2], shape[1], 1, dst_type, ret)
+    buf = bytearray(math.prod(shape) * struct.calcsize(dtype))
+    pb = Ogre.PixelBox(shape[1], shape[0], 1, dst_type, buf)
     rtarget.copyContentsToMemory(pb, pb)
 
-    return ret, shape
+    return memoryview(buf).cast(dtype, shape)
 
 def imshow(window_name: str, img_src: Union[str, os.PathLike, memoryview, "np.ndarray"]):
     """!
