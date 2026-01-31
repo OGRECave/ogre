@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGLStateCacheManager.h"
 #include "OgreRoot.h"
 #include "OgreGLRenderSystem.h"
+#include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre {
 
@@ -55,6 +56,11 @@ namespace Ogre {
 
         // Initialise mapped buffer and set usage
         glBufferDataARB(mTarget, mSizeInBytes, NULL, GLHardwareBufferManager::getGLUsage(usage));
+
+        if (useShadowBuffer)
+        {
+            mShadowBuffer = std::make_unique<DefaultHardwareBuffer>(mSizeInBytes);
+        }
 
         //std::cerr << "creating vertex buffer = " << mBufferId << std::endl;
     }
