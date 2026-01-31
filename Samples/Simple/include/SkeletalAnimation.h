@@ -284,11 +284,11 @@ public:
 
         if (method == AnimationUpdater::kMovePeriodic)
         {
-            mEntities[0]->getMesh()->_setBounds(mSneakBoundsMoving);
+            mEntities[0]->getMesh()->_setBounds(mSneakBoundsRootBoneMoving);
         }
         else if (method == AnimationUpdater::kMoveContinuous)
         {
-            mEntities[0]->getMesh()->_setBounds(mSneakBoundsStationary);
+            mEntities[0]->getMesh()->_setBounds(mSneakBoundsRootBoneStatic);
         }
 
         // update move method mode for all models
@@ -643,9 +643,6 @@ protected:
         // This is a hacky way to generate bounding boxes
         // for the Sneak animation with movement and without.
 
-        mSneakBoundsMoving.setNull();
-        mSneakBoundsStationary.setNull();
-
         Entity * entity = mEntities[0];
         Skeleton * skeleton = entity->getSkeleton();
         Bone * rootBone = skeleton->getBone("Spineroot");
@@ -658,19 +655,44 @@ protected:
 
         NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
 
+        // First with the root bone moving.
+
+        mSneakBoundsRootBoneMoving.setNull();
+
         for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
         {
             TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
-            const Vector3 rootPos = kf->getTranslate();
 
             as->setTimePosition(kf->getTime());
             skeleton->setAnimationState(*as->getParent());
             AxisAlignedBox bbox = entity->getBoundingBox();
 
-            mSneakBoundsMoving.merge(bbox);
+            mSneakBoundsRootBoneMoving.merge(bbox);
+        }
 
-            bbox.setExtents(bbox.getMinimum() - rootPos, bbox.getMaximum() - rootPos);
-            mSneakBoundsStationary.merge(bbox);
+        // Then with the root bone static.
+
+        mSneakBoundsRootBoneStatic.setNull();
+
+        // We can't just subtract the root bone's position from the bounding boxes in the
+        // moving version above because there are other bones (with no vertices) that stay
+        // near the origin, inflating the bounding box. So we mask out the root movement.
+
+        if (!as->hasBlendMask())
+        {
+            as->createBlendMask(skeleton->getNumBones(), 1.0f);
+        }
+        as->setBlendMaskEntry(rootTrack->getHandle(), 0.0f);
+
+        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+        {
+            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+
+            as->setTimePosition(kf->getTime());
+            skeleton->setAnimationState(*as->getParent());
+            AxisAlignedBox bbox = entity->getBoundingBox();
+
+            mSneakBoundsRootBoneStatic.merge(bbox);
         }
     }
 
@@ -696,8 +718,8 @@ protected:
     std::vector<Entity*> mEntities;
     std::vector<AnimationUpdater*> mControllers;
 
-    AxisAlignedBox mSneakBoundsMoving;
-    AxisAlignedBox mSneakBoundsStationary;
+    AxisAlignedBox mSneakBoundsRootBoneMoving;
+    AxisAlignedBox mSneakBoundsRootBoneStatic;
     Vector3 mSneakTranslate;
     Quaternion mSneakRotation;
     NodeAnimationTrack* mSneakSpinerootTrack;
