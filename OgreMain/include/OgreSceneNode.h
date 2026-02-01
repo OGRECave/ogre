@@ -101,6 +101,8 @@ namespace Ogre {
         /// Is this node a current part of the scene graph?
         bool mIsInSceneGraph : 1;
     private: // private in 1.13
+        /// Flag that determines if the axes of the node should be displayed
+        bool mDisplaySceneNode : 1;
         /// Flag that determines if the bounding box of the node should be displayed
         bool mShowBoundingBox : 1;
 
@@ -312,18 +314,25 @@ namespace Ogre {
          */
         void saveChildren(const String& filename);
 
+        /** Allows the showing of the node's axes.
+
+            Use this to show or hide the axes of the node.
+        */
+        void setDisplaySceneNode(bool bDisplay) { mDisplaySceneNode = bDisplay; }
+
+        /** This allows debug drawers to determine if the node's axes
+            should be added to the rendering queue.
+        */
+        bool getDisplaySceneNode() const { return mDisplaySceneNode; }
+
         /** Allows the showing of the node's bounding box.
 
             Use this to show or hide the bounding box of the node.
         */
         void showBoundingBox(bool bShow) { mShowBoundingBox = bShow; }
 
-        /** This allows scene managers to determine if the node's bounding box
+        /** This allows debug drawers to determine if the node's bounding box
             should be added to the rendering queue.
-
-            Scene Managers that implement their own _findVisibleObjects will have to 
-            check this flag and then use _addBoundingBoxToQueue to add the bounding box
-            wireframe.
         */
         bool getShowBoundingBox() const { return mShowBoundingBox; }
 
