@@ -205,7 +205,7 @@ void DefaultDebugDrawer::drawSceneNode(const SceneNode* node)
     if (aabb.isInfinite()) {
         return;
     }
-    if (mDrawType & DT_AXES)
+    if (node->getDisplaySceneNode() || (mDrawType & DT_AXES))
     {
         // remove scale here as it will be in full transform below too
         Vector3f hs(aabb.getHalfSize() / node->_getDerivedScale());
