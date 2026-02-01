@@ -45,13 +45,19 @@ public:
             switch (mVisualiseBoundingBoxMode)
             {
             case kVisualiseNone:
+                mModelNodes[ i ]->setDisplaySceneNode( false );
                 mModelNodes[ i ]->showBoundingBox( false );
+                mEntities[ i ]->showBoundingSphere( false );
                 break;
             case kVisualiseOne:
+                mModelNodes[ i ]->setDisplaySceneNode( i == mBoundingBoxModelIndex );
                 mModelNodes[ i ]->showBoundingBox( i == mBoundingBoxModelIndex );
+                mEntities[ i ]->showBoundingSphere( i == mBoundingBoxModelIndex );
                 break;
             case kVisualiseAll:
+                mModelNodes[ i ]->setDisplaySceneNode( true );
                 mModelNodes[ i ]->showBoundingBox( true );
+                mEntities[ i ]->showBoundingSphere( true );
                 break;
             }
         }
@@ -136,6 +142,14 @@ public:
                 mModelNodes[i]->rotate(rot);
 
                 mAnimStates[i]->setTimePosition(0);   // reset animation time
+
+                /* Bounding boxes are updated using skeleton's position from previous frame
+                (and are always slightly off). This update will cause the root bone to jump
+                back to its starting position and would be very off, so we force an update. */
+                if (mBoneBoundingBoxes)
+                {
+                    mEntities[i]->_updateSkeleton();
+                }
             }
         }
 
@@ -254,6 +268,7 @@ protected:
             // create and attach a jaiqua entity
             ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
             ent->setMaterialName("jaiqua");
+            mEntities.push_back(ent);
             sn->attachObject(ent);
         
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
@@ -362,6 +377,7 @@ protected:
     String mBoneBoundingBoxesItemName;
 
     std::vector<SceneNode*> mModelNodes;
+    std::vector<Entity*> mEntities;
     std::vector<AnimationState*> mAnimStates;
 
     Vector3 mSneakStartPos;
