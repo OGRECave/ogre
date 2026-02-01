@@ -12,6 +12,7 @@ namespace Ogre
 
 class _OgreExport DefaultDebugDrawer : public DebugDrawer
 {
+    Camera * mCamera;
     ManualObject mLines;
     ManualObject mAxes;
     int mDrawType;
@@ -39,6 +40,7 @@ public:
     void drawFrustum(const Frustum* frust) override;
     /// Allows the rendering of a wireframe bounding box.
     void drawWireBox(const AxisAlignedBox& aabb, const ColourValue& colour = ColourValue::White);
+    void drawSphere(const Sphere & sphere) override;
     /// draw coordinate axes
     void drawAxes(const Affine3& pose, float size = 1.0f);
     /// Specifes the size of the axes drawn by drawBone()
