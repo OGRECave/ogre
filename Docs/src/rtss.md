@@ -1,25 +1,32 @@
 # Runtime Shader Generation {#rtss}
 
-With D3D11 and GL3, support for fixed pipeline functionality was removed. Meaning you can only render objects using shaders.
+The Run Time Shader System (RTSS) is the %Ogre answer for managing Shaders and their variations. Initially created as a drop-in replacement for the Fixed-Function Pipeline (FFP) on RenderSystems that lacked it, it has since evolved into a general framework for defining shader functionality within @ref Material-Scripts without the need to manually write shader code.
 
-While @ref High-level-Programs offer you maximal control and flexibility over how your objects are rendered, writing and maintaining them is also a very time consuming task.
+While @ref High-level-Programs provide maximal control and flexibility, writing and maintaining them can be time-consuming.
+Although RTSS-generated shaders may be slightly less optimized than hand-tuned code, they offer significant advantages:
 
-The Run Time Shader System or RTSS for short is the %Ogre way of managing Shaders and their variations. Initially it was created as a drop-in-replacement to the Fixed-Function Pipeline (FFP) for RenderSystems that lacked it.
-However, since then it grew to a general way to express shader functionality in @ref Material-Scripts without having to manually write shaders.
+*   **Reduced development time:** Managing shader variations for scenes with dynamic lights, fog, and varying material attributes can quickly lead to an explosion in the number of required shaders (often exceeding 100). RTSS handles this complexity automatically.
+*   **Reusability:** Shader extensions are modular and independent, allowing them to be easily reused across different materials.
+*   **Extensibility:** Benefit from a library of community-created effects. Unlike manually merging shader code, which often requires significant adjustments, using the extensions library is straightforward.
 
-While the resulting shaders are less optimized, they offer the following advantages:
+RTSS leverages Ogre's technique scheme mechanism to generate techniques on the fly when a requested scheme is missing.
+For example, if the FFP is unavailable, the Ogre::MSN_SHADERGEN scheme is requested. Since materials typically define techniques for Ogre::MSN_DEFAULT, RTSS intercepts the request, creates a new technique for Ogre::MSN_SHADERGEN, and generates the corresponding shaders.
+For standard Fixed Function properties, RTSS automatically parses the existing `pass` and `texture_unit` definitions from the Ogre::MSN_DEFAULT technique, requiring no changes to your materials.
 
-* Save development time e.g. when your target scene has dynamic lights and the number changes, fog changes and the number of material attributes increases the total count of needed shaders dramatically. It can easily cross 100 and it becomes a time consuming development task.
-* Reusable code - once you've written the shader extension you can use it anywhere due to its independent nature.
-* Custom shaders extension library - enjoy the shared library of effects created by the community. Unlike hand written shader code, which may require many adjustments to be plugged into your own shader code, using the extensions library requires minimum changes.
+To access advanced features beyond standard FFP capabilities, you can define `rtshader_system` blocks with specific properties.
 
-For fixed function function properties, the RTSS will read the standard `pass` and `texture_unit` definitions, so no changes are required. To enable features that go beyond the possibilities of the FFP, you have to define an additional `rtshader_system` block with the respective properties.
+@par
+Format: `rtshader_system [dstTechniqueSchemeName]`
+@par
+Example: `rtshader_system HDR`
 
-For instance, the FFP only allows per-vertex lighting. To request per-pixel lighting, you would add the following block to a pass:
+@param dstTechniqueSchemeName the target scheme name. Default is `ShaderGeneratorDefaultScheme`.
 
-@snippet Samples/Media/materials/scripts/RTShaderSystem.material rtss_per_pixel
+For instance, the FFP only allows Phong lighting. To request PBR lighting, you would add the following block to a pass:
 
-To modify the default lighting stage [see below](@ref rtss_custom_api). For more examples see `Media/RTShaderLib/materials/RTShaderSystem.material`.
+@snippet Samples/Media/materials/scripts/Examples.material rtss_pbr
+
+To modify the default lighting stage [see below](@ref rtss_custom_api).
 
 @tableofcontents
 
@@ -395,18 +402,18 @@ to set a fixed number of lights the materials should consider.
 
 # The RTSS in Depth {#rtss_indepth}
 
-When the user asks the system to generate shaders for a given technique he has to provide a name for the target technique scheme. The system then creates a new technique based on the source technique but with a different scheme name.
+To enable the RTSS for a viewport, you simply call Ogre::Viewport::setMaterialScheme.
+The system then automatically manages the shader generation and keeps them up to date.
 
-The idea behind this concept is to use Ogre's built-in mechanism of material schemes, so all the user has to do in order to use the new technique is to call Ogre::Viewport::setMaterialScheme.
+Before each viewport update, the RTSS validates all associated shader-based techniques. This primarily involves synchronizing with the active scene lights and fog settings. If the current shaders are out of date (e.g. number of lights changed), they are regenerated.
 
-Before each viewport update, the system performs a validation step of all associated shader based techniques it created. This step includes automatic synchronization with the scene lights and fog states. When the system detects that a scheme is out of date it generates the appropriate shaders for each technique new.
+The shader generation process consists of the following steps:
 
-The following steps are executed in order to generate shaders for a given technique:
-
-* For each pass in the technique the system builds a set of sub render states that describe the logic process of the rendering pipeline from the draw call submission until the final pixel color.
-* Each render state is translated into a set of logic shader programs (currently only pixel and vertex shader).
-The logic programs are then sent to specific shader language writers that produce source code for the respective shader language. The source code is used to create the GPU programs that are applied to the destination pass.
-Before rendering of an object that uses generated shaders the system allows each sub render state to update the GPU constants associated with it.
+*   **SubRenderState Construction:** For each pass in the technique, the system builds a set of SubRenderState components. These describe the logic of the rendering pipeline from the draw call submission to the final pixel color.
+*   **Logic Program Translation:** The RenderState is translated into a set of logic shader programs (pixel and vertex).
+*   **Source Code Generation:** The logic programs are passed to a specific `ProgramWriter` (e.g. for GLSL or HLSL) which produces the final source code.
+*   **GPU Program Creation:** The source code is compiled into GPU programs and assigned to the destination pass.
+*   **Uniform Update:** Before an object is rendered, each `SubRenderState` is given the opportunity to update its associated GPU constants.
 
 ## Main components {#rtss__components}
 The following is a partial list of components within the RTSS. These components are listed as they have great importance in understanding controlling and later extending the RTSS system.
@@ -479,8 +486,9 @@ The passes of this new technique will receive shaders generated and updated by t
 To use the generated technique, change the material scheme of your viewport(s) to the scheme name you passed as argument to this method.
 
 ```cpp
+Ogre::MaterialPtr mat = ...;
 // Create shader based technique from the default technique of the given material.
-mShaderGenerator->createShaderBasedTechnique("Examples/BeachStones", Ogre::MSN_DEFAULT, Ogre::MSN_SHADERGEN);
+mShaderGenerator->createShaderBasedTechnique(*mat, Ogre::MSN_DEFAULT, Ogre::MSN_SHADERGEN);
 
 // Apply the shader generated based techniques.
 mViewport->setMaterialScheme(Ogre::MSN_SHADERGEN);
