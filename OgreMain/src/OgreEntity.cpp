@@ -1269,6 +1269,11 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    void Entity::_updateSkeleton(void)
+    {
+        mSkeletonInstance->setAnimationState(*mAnimationState);
+    }
+    //-----------------------------------------------------------------------
     bool Entity::_isAnimated(void) const
     {
         return (mAnimationState && mAnimationState->hasEnabledAnimationState()) ||
