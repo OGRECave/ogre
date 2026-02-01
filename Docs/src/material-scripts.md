@@ -158,7 +158,7 @@ Format: technique name
 
 Techniques have only a small number of attributes of their own:
 
--   [scheme](#scheme)
+-   [scheme](#technique_scheme)
 -   [lod_index](#lod_005findex) (and also see [lod_distances](#lod_005fdistances) in the parent material)
 -   [shadow_caster_material](#shadow_005fcaster_005fmaterial)
 -   [shadow_receiver_material](#shadow_005freceiver_005fmaterial)
@@ -167,7 +167,7 @@ Techniques have only a small number of attributes of their own:
 
 <a name="scheme"></a><a name="scheme-1"></a>
 
-## scheme
+## scheme {#technique_scheme}
 
 Sets the ’scheme’ this Technique belongs to. Material schemes are used to control top-level switching from one set of techniques to another. For example, you might have a fully HDR-enabled pipeline for top machines, rendering all objects using unclamped shaders, and a simpler pipeline for others; this can be implemented using schemes. The active scheme is typically controlled at a viewport level, and the active one defaults to ’Default’.
 

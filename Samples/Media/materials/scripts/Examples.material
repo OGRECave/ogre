@@ -1244,6 +1244,7 @@ material Examples/PBR_Sphere
 {
 	technique
 	{
+//![rtss_pbr]
 		pass
 		{
 			rtshader_system
@@ -1251,6 +1252,7 @@ material Examples/PBR_Sphere
                 lighting_stage metal_roughness
 			}
 		}
+//![rtss_pbr]
 	}
 }
 
