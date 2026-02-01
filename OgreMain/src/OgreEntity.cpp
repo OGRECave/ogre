@@ -42,6 +42,7 @@ namespace Ogre {
           mVertexAnimationAppliedThisFrame(false),
           mPreparedForShadowVolumes(false),
           mDisplaySkeleton(false),
+          mShowBoundingSphere(false),
           mCurrentHWAnimationState(false),
           mSkipAnimStateUpdates(false),
           mAlwaysUpdateMainSkeleton(false),
@@ -675,6 +676,11 @@ namespace Ogre {
             {
                 mManager->getDebugDrawer()->drawBone(bone, mParentNode->_getFullTransform());
             }
+        }
+        // HACK to display bounding sphere
+        if (mShowBoundingSphere && mManager && mManager->getDebugDrawer())
+        {
+            mManager->getDebugDrawer()->drawSphere(getWorldBoundingSphere());
         }
     }
     //-----------------------------------------------------------------------
@@ -1318,6 +1324,16 @@ namespace Ogre {
     bool Entity::getDisplaySkeleton(void) const
     {
         return mDisplaySkeleton;
+    }
+    //-----------------------------------------------------------------------
+    void Entity::showBoundingSphere(bool show)
+    {
+        mShowBoundingSphere = show;
+    }
+    //-----------------------------------------------------------------------
+    bool Entity::getShowBoundingSphere(void) const
+    {
+        return mShowBoundingSphere;
     }
     //-----------------------------------------------------------------------
     size_t Entity::getNumManualLodLevels(void) const
