@@ -11,7 +11,7 @@
 namespace Ogre
 {
 
-DefaultDebugDrawer::DefaultDebugDrawer() : mCamera(nullptr), mLines(""), mAxes(""), mDrawType(0), mStatic(false), mBoneAxesSize(1.0f) {}
+DefaultDebugDrawer::DefaultDebugDrawer() : mCameraNode(nullptr), mLines(""), mAxes(""), mDrawType(0), mStatic(false), mBoneAxesSize(1.0f) {}
 
 void DefaultDebugDrawer::preFindVisibleObjects(SceneManager* source,
                                                SceneManager::IlluminationRenderStage irs, Viewport* v)
@@ -23,7 +23,7 @@ void DefaultDebugDrawer::preFindVisibleObjects(SceneManager* source,
     if (source->getShowBoundingBoxes())
         mDrawType |= DT_WIREBOX;
 
-    mCamera = v->getCamera();
+    mCameraNode = v->getCamera()->getParentSceneNode();
 }
 void DefaultDebugDrawer::beginLines()
 {
@@ -101,7 +101,7 @@ void DefaultDebugDrawer::drawFrustum(const Frustum* frust)
 }
 void DefaultDebugDrawer::drawSphere(const Sphere & sphere)
 {
-    if (!mCamera)
+    if (!mCameraNode)
     {
         return;
     }
@@ -109,7 +109,7 @@ void DefaultDebugDrawer::drawSphere(const Sphere & sphere)
     const Vector3 & center = sphere.getCenter();
     float radius = sphere.getRadius();
 
-    const Vector3 & camPos = mCamera->getParentSceneNode()->_getDerivedPosition();
+    const Vector3 & camPos = mCameraNode->_getDerivedPosition();
     Vector3 axis = camPos - center;
     float distance = axis.normalise();
 
@@ -121,7 +121,7 @@ void DefaultDebugDrawer::drawSphere(const Sphere & sphere)
     // TODO: only draw visible arcs (very big or close spheres could have very many facets)
 
     // Calculate an arbitrary radial orthogonal to the axis
-    Vector3 notParallel = mCamera->getParentSceneNode()->_getDerivedOrientation().xAxis();
+    Vector3 notParallel = mCameraNode->_getDerivedOrientation().xAxis();
     Vector3 radial = radius * notParallel.crossProduct(axis).normalisedCopy();
 
     beginLines();
