@@ -260,7 +260,7 @@ public:
         }
     }
     bool keyPressed(const KeyboardEvent& evt) override
-    {   
+    {
         if ( !mTrayMgr->isDialogVisible() )
         {
             // Handle keypresses.
@@ -351,7 +351,7 @@ protected:
         ln->setDirection(-pos);
         l->setDiffuseColour(0.0, 0.0, 0.5);
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
-        
+
 
         // add a green spotlight.
         l = mSceneMgr->createLight(Light::LT_SPOTLIGHT);
@@ -359,7 +359,7 @@ protected:
         ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
         ln->attachObject(l);
         ln->setDirection(-pos);
-        l->setDiffuseColour(0.0, 0.5, 0.0);     
+        l->setDiffuseColour(0.0, 0.5, 0.0);
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
 
         // create a floor mesh resource
@@ -405,7 +405,7 @@ protected:
             ent->setMaterialName("jaiqua");
             mEntities.push_back(ent);
             sn->attachObject(ent);
-        
+
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
             as->setEnabled(true);
@@ -428,7 +428,7 @@ protected:
         names.push_back("Help");
         names.push_back("Skinning");
         names.push_back(mBoneBoundingBoxesItemName);
-        
+
         // create a params panel to display the help and skinning mode
         mStatusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 200, names);
         mStatusPanel->setParamValue("Help", "H / F1");
@@ -446,7 +446,7 @@ protected:
             if(bestTechnique)
             {
                 Pass* pass = bestTechnique->getPass(0);
-                if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) 
+                if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded())
                 {
                     value = "Hardware";
                 }
@@ -517,7 +517,7 @@ protected:
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
 
         // Move Sneak animation closer to origin
-        
+
         Bone * rootBone = skel->getBone("Spineroot");
         Animation * animation = skel->getAnimation("Sneak");
         NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
@@ -638,3 +638,4 @@ protected:
 };
 
 #endif
+
