@@ -32,9 +32,6 @@ public:
         TransformKeyFrame * tkfBeg = track->getNodeKeyFrame(0);
         TransformKeyFrame * tkfEnd = track->getNodeKeyFrame(track->getNumKeyFrames() - 1);
 
-        mTranslation = tkfEnd->getTranslate() - tkfBeg->getTranslate();
-        mTranslation.y = 0.0f;
-
         mRotation = tkfEnd->getRotation() * tkfBeg->getRotation().Inverse();
         // TODO: there's probably a smarter way to limit rotation to y-axis
         Matrix3 mat;
@@ -45,6 +42,17 @@ public:
         mRotation.FromRotationMatrix(mat);
 
         mRotationInverse = mRotation.Inverse();
+
+        mTranslation = tkfEnd->getTranslate() - tkfBeg->getTranslate();
+        mTranslation.y = 0.0f;
+
+        // Suppress root bone movement
+
+        if (!mAnimationState->hasBlendMask())
+        {
+            mAnimationState->createBlendMask(mEntity->getSkeleton()->getNumBones(), 1.0f);
+        }
+        mAnimationState->setBlendMaskEntry(mTrack->getHandle(), 0.0f);
     }
 
     static std::shared_ptr<AnimationUpdater> create(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
@@ -68,11 +76,18 @@ public:
         float length = mAnimationState->getLength();
         bool loop = mAnimationState->getLoop();
         int loops = loop ? (int)std::round((lastTime + timeDelta - thisTime) / length) : 0;
-        bool looped = loops;
 
         // Apply Movement
 
         SceneNode* sceneNode = mEntity->getParentSceneNode();
+        TransformKeyFrame tkf(0, 0);
+
+        // Unapply transform from last frame
+
+        mTrack->getInterpolatedKeyFrame(lastTime, &tkf);
+
+        sceneNode->rotate(tkf.getRotation().Inverse());
+        sceneNode->translate(-tkf.getTranslate(), Node::TS_LOCAL);
 
         // Apply periodic loop transforms
 
@@ -89,13 +104,12 @@ public:
             loops--;
         }
 
-        if (looped && mEntity->getUpdateBoundingBoxFromSkeleton())
-        {
-            /* Bounding boxes are updated using skeleton's position from previous frame
-            (and are always slightly off). This update will cause the root bone to jump
-            back to its starting position and would be very off, so we force an update. */
-            mEntity->getSkeleton()->setAnimationState(*mAnimationState->getParent());
-        }
+        // Apply transform from this frame
+
+        mTrack->getInterpolatedKeyFrame(thisTime, &tkf);
+
+        sceneNode->translate(tkf.getTranslate(), Node::TS_LOCAL);
+        sceneNode->rotate(tkf.getRotation());
     }
 
 private:
