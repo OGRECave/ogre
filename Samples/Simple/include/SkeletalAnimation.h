@@ -20,31 +20,44 @@ public:
     : mAnimationState(animationState)
     , mEntity(entity)
     , mTrack(track)
-    , mTranslation(Vector3::ZERO)
-    , mRotation(Quaternion::IDENTITY)
+    , mAppliedTranslation(Vector3::ZERO)
+    , mAppliedRotation(Quaternion::IDENTITY)
     {
         assert(animationState);
         assert(entity);
         assert(track);
+
+        // Get root bone binding pose.
+
+        Bone* rootBone = entity->getSkeleton()->getBone(track->getHandle());
+        mRootBindingPosition = rootBone->getInitialPosition();
+        mRootBindingOrientation = rootBone->getInitialOrientation();
+        mRootBindingOrientationInverse = mRootBindingOrientation.Inverse();
 
         // Measure total transformation for root.
 
         TransformKeyFrame * tkfBeg = track->getNodeKeyFrame(0);
         TransformKeyFrame * tkfEnd = track->getNodeKeyFrame(track->getNumKeyFrames() - 1);
 
-        mRotation = tkfEnd->getRotation() * tkfBeg->getRotation().Inverse();
+
+        Quaternion begRotation = mRootBindingOrientation * tkfBeg->getRotation() * mRootBindingOrientationInverse;
+        Quaternion endRotation = mRootBindingOrientation * tkfEnd->getRotation() * mRootBindingOrientationInverse;
+        mLoopRotation = endRotation * begRotation.Inverse();
+
         // TODO: there's probably a smarter way to limit rotation to y-axis
         Matrix3 mat;
-        mRotation.ToRotationMatrix(mat);
+        mLoopRotation.ToRotationMatrix(mat);
         Radian yAngle, zAngle, xAngle;
         mat.ToEulerAnglesYZX(yAngle, zAngle, xAngle);
         mat.FromEulerAnglesYZX(yAngle, Radian(0.0f), Radian(0.0f));
-        mRotation.FromRotationMatrix(mat);
+        mLoopRotation.FromRotationMatrix(mat);
 
-        mRotationInverse = mRotation.Inverse();
+        mLoopRotationInverse = mLoopRotation.Inverse();
 
-        mTranslation = tkfEnd->getTranslate() - tkfBeg->getTranslate();
-        mTranslation.y = 0.0f;
+        Vector3 begTranslation = mRootBindingPosition + tkfBeg->getTranslate() - begRotation * mRootBindingPosition;
+        Vector3 endTranslation = mRootBindingPosition + tkfEnd->getTranslate() - endRotation * mRootBindingPosition;
+        mLoopTranslation = endTranslation - mLoopRotation * begTranslation;
+        mLoopTranslation.y = 0.0f;
 
         // Suppress root bone movement
 
@@ -84,23 +97,21 @@ public:
 
         // Unapply transform from last frame
 
-        mTrack->getInterpolatedKeyFrame(lastTime, &tkf);
-
-        sceneNode->rotate(tkf.getRotation().Inverse());
-        sceneNode->translate(-tkf.getTranslate(), Node::TS_LOCAL);
+        sceneNode->rotate(mAppliedRotation.Inverse());
+        sceneNode->translate(-mAppliedTranslation, Node::TS_LOCAL);
 
         // Apply periodic loop transforms
 
         while (loops < 0)
         {
-            sceneNode->rotate(mRotationInverse);
-            sceneNode->translate(-mTranslation, Node::TS_LOCAL);
+            sceneNode->rotate(mLoopRotationInverse);
+            sceneNode->translate(-mLoopTranslation, Node::TS_LOCAL);
             loops++;
         }
         while (loops > 0)
         {
-            sceneNode->translate(mTranslation, Node::TS_LOCAL);
-            sceneNode->rotate(mRotation);
+            sceneNode->translate(mLoopTranslation, Node::TS_LOCAL);
+            sceneNode->rotate(mLoopRotation);
             loops--;
         }
 
@@ -108,17 +119,28 @@ public:
 
         mTrack->getInterpolatedKeyFrame(thisTime, &tkf);
 
-        sceneNode->translate(tkf.getTranslate(), Node::TS_LOCAL);
-        sceneNode->rotate(tkf.getRotation());
+        mAppliedRotation = mRootBindingOrientation * tkf.getRotation() * mRootBindingOrientationInverse;
+        mAppliedTranslation = mRootBindingPosition + tkf.getTranslate() - mAppliedRotation * mRootBindingPosition;
+
+        sceneNode->translate(mAppliedTranslation, Node::TS_LOCAL);
+        sceneNode->rotate(mAppliedRotation);
     }
 
 private:
     AnimationState* mAnimationState;
     Entity* mEntity;
     NodeAnimationTrack* mTrack;
-    Vector3 mTranslation;
-    Quaternion mRotation;
-    Quaternion mRotationInverse;
+
+    Vector3 mRootBindingPosition;
+    Quaternion mRootBindingOrientation;
+    Quaternion mRootBindingOrientationInverse;
+
+    Vector3 mLoopTranslation;
+    Quaternion mLoopRotation;
+    Quaternion mLoopRotationInverse;
+
+    Vector3 mAppliedTranslation;
+    Quaternion mAppliedRotation;
 };
 
 
