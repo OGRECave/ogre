@@ -12,7 +12,7 @@ namespace Ogre
 
 class _OgreExport DefaultDebugDrawer : public DebugDrawer
 {
-    Camera * mCamera;
+    SceneNode* mCameraNode;
     ManualObject mLines;
     ManualObject mAxes;
     int mDrawType;
