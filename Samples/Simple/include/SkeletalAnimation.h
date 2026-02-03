@@ -12,13 +12,35 @@ using namespace Ogre;
 using namespace OgreBites;
 
 
-class AnimationUpdater : public ControllerValue<float>
+/*  The RootMotionApplier applies the transforms from a specified
+    NodeAnimationTrack to an Entity's parent SceneNode instead of
+    to its Skeleton's Bone.
+
+    Won’t work if root bone has an ancestor that is not
+    origin-positioned, identity-oriented, and unity-scaled.
+
+    If root bone has a non-origin-positioned, non-identity-oriented,
+    or non-unity-scaled binding pose, playing multiple root-movement
+    animations will apply the binding pose to the SceneNode multiple
+    times (ie mess it up) (i think)
+
+    TODO:
+
+    - add setEnabled() or disable() or unapply() that unapplies all,
+      some, or no components of applied rotation.
+
+    - add option of which components of translation and rotation to
+      retain/reset when looping (instead of the currently hardcoded
+      reseting of translation.y and retaining of rotation.y)
+
+    - maybe implement scale for shrinking and growing animations lol
+*/
+class RootMotionApplier
 {
 public:
 
-    AnimationUpdater(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
-    : mAnimationState(animationState)
-    , mEntity(entity)
+    RootMotionApplier(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
+    : mEntity(entity)
     , mTrack(track)
     , mAppliedTranslation(Vector3::ZERO)
     , mAppliedRotation(Quaternion::IDENTITY)
@@ -38,7 +60,6 @@ public:
 
         TransformKeyFrame * tkfBeg = track->getNodeKeyFrame(0);
         TransformKeyFrame * tkfEnd = track->getNodeKeyFrame(track->getNumKeyFrames() - 1);
-
 
         Quaternion begRotation = mRootBindingOrientation * tkfBeg->getRotation() * mRootBindingOrientationInverse;
         Quaternion endRotation = mRootBindingOrientation * tkfEnd->getRotation() * mRootBindingOrientationInverse;
@@ -61,37 +82,15 @@ public:
 
         // Suppress root bone movement
 
-        if (!mAnimationState->hasBlendMask())
+        if (!animationState->hasBlendMask())
         {
-            mAnimationState->createBlendMask(mEntity->getSkeleton()->getNumBones(), 1.0f);
+            animationState->createBlendMask(entity->getSkeleton()->getNumBones(), 1.0f);
         }
-        mAnimationState->setBlendMaskEntry(mTrack->getHandle(), 0.0f);
+        animationState->setBlendMaskEntry(track->getHandle(), 0.0f);
     }
 
-    static std::shared_ptr<AnimationUpdater> create(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
+    void apply(int loops, float thisTime)
     {
-        return std::make_shared<AnimationUpdater>(animationState, entity, track);
-    }
-
-    float getValue(void) const override
-    {
-        return mAnimationState->getTimePosition() / mAnimationState->getLength();
-    }
-
-    void setValue(float timeDelta) override
-    {
-        // Don't assume AnimationState::addTime()'s internal time-updating (ie modulo) implementation.
-
-        float lastTime = mAnimationState->getTimePosition();
-        mAnimationState->addTime(timeDelta);
-        float thisTime = mAnimationState->getTimePosition();
-
-        float length = mAnimationState->getLength();
-        bool loop = mAnimationState->getLoop();
-        int loops = loop ? (int)std::round((lastTime + timeDelta - thisTime) / length) : 0;
-
-        // Apply Movement
-
         SceneNode* sceneNode = mEntity->getParentSceneNode();
         TransformKeyFrame tkf(0, 0);
 
@@ -127,7 +126,6 @@ public:
     }
 
 private:
-    AnimationState* mAnimationState;
     Entity* mEntity;
     NodeAnimationTrack* mTrack;
 
@@ -141,6 +139,50 @@ private:
 
     Vector3 mAppliedTranslation;
     Quaternion mAppliedRotation;
+};
+
+
+class AnimationUpdater : public ControllerValue<float>
+{
+public:
+    AnimationUpdater(AnimationState* animationState)
+    : mAnimationState(animationState)
+    {
+        assert(animationState);
+    }
+
+    float getValue(void) const override
+    {
+        return mAnimationState->getTimePosition() / mAnimationState->getLength();
+    }
+
+    void setValue(float timeDelta) override
+    {
+        // Don't assume AnimationState::addTime()'s internal time-updating (ie modulo) implementation.
+
+        float lastTime = mAnimationState->getTimePosition();
+        mAnimationState->addTime(timeDelta);
+        float thisTime = mAnimationState->getTimePosition();
+
+        float length = mAnimationState->getLength();
+        bool loop = mAnimationState->getLoop();
+        int loops = loop ? (int)std::round((lastTime + timeDelta - thisTime) / length) : 0;
+
+        // Apply Movement
+
+        if (mRootMotionApplier)
+        {
+            mRootMotionApplier->apply(loops, thisTime);
+        }
+    }
+
+    void setRootMotionApplier(std::unique_ptr<RootMotionApplier> rma) { mRootMotionApplier = std::move(rma); }
+
+    RootMotionApplier * getRootMotionApplier() { return mRootMotionApplier.get(); }
+
+private:
+    AnimationState* mAnimationState;
+    std::unique_ptr<RootMotionApplier> mRootMotionApplier;
 };
 
 
@@ -369,7 +411,8 @@ protected:
             as->setEnabled(true);
             as->setLoop(true);
 
-            auto updater = AnimationUpdater::create(as, ent, mSneakSpinerootTrack);
+            auto updater = std::make_shared<AnimationUpdater>(as);
+            updater->setRootMotionApplier(std::make_unique<RootMotionApplier>(as, ent, mSneakSpinerootTrack));
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
                                            updater,
