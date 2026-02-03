@@ -364,6 +364,7 @@ protected:
     void cleanupContent() override
     {
         mModelNodes.clear();
+        mEntities.clear();
         mAnimStates.clear();
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
