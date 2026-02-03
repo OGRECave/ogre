@@ -11,6 +11,103 @@
 using namespace Ogre;
 using namespace OgreBites;
 
+
+class AnimationUpdater : public ControllerValue<float>
+{
+public:
+
+    AnimationUpdater(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
+    : mAnimationState(animationState)
+    , mEntity(entity)
+    , mTrack(track)
+    , mTranslation(Vector3::ZERO)
+    , mRotation(Quaternion::IDENTITY)
+    {
+        assert(animationState);
+        assert(entity);
+        assert(track);
+
+        // Measure total transformation for root.
+
+        TransformKeyFrame * tkfBeg = track->getNodeKeyFrame(0);
+        TransformKeyFrame * tkfEnd = track->getNodeKeyFrame(track->getNumKeyFrames() - 1);
+
+        mTranslation = tkfEnd->getTranslate() - tkfBeg->getTranslate();
+        mTranslation.y = 0.0f;
+
+        mRotation = tkfEnd->getRotation() * tkfBeg->getRotation().Inverse();
+        // TODO: there's probably a smarter way to limit rotation to y-axis
+        Matrix3 mat;
+        mRotation.ToRotationMatrix(mat);
+        Radian yAngle, zAngle, xAngle;
+        mat.ToEulerAnglesYZX(yAngle, zAngle, xAngle);
+        mat.FromEulerAnglesYZX(yAngle, Radian(0.0f), Radian(0.0f));
+        mRotation.FromRotationMatrix(mat);
+
+        mRotationInverse = mRotation.Inverse();
+    }
+
+    static std::shared_ptr<AnimationUpdater> create(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
+    {
+        return std::make_shared<AnimationUpdater>(animationState, entity, track);
+    }
+
+    float getValue(void) const override
+    {
+        return mAnimationState->getTimePosition() / mAnimationState->getLength();
+    }
+
+    void setValue(float timeDelta) override
+    {
+        // Don't assume AnimationState::addTime()'s internal time-updating (ie modulo) implementation.
+
+        float lastTime = mAnimationState->getTimePosition();
+        mAnimationState->addTime(timeDelta);
+        float thisTime = mAnimationState->getTimePosition();
+
+        float length = mAnimationState->getLength();
+        bool loop = mAnimationState->getLoop();
+        int loops = loop ? (int)std::round((lastTime + timeDelta - thisTime) / length) : 0;
+        bool looped = loops;
+
+        // Apply Movement
+
+        SceneNode* sceneNode = mEntity->getParentSceneNode();
+
+        // Apply periodic loop transforms
+
+        while (loops < 0)
+        {
+            sceneNode->rotate(mRotationInverse);
+            sceneNode->translate(-mTranslation, Node::TS_LOCAL);
+            loops++;
+        }
+        while (loops > 0)
+        {
+            sceneNode->translate(mTranslation, Node::TS_LOCAL);
+            sceneNode->rotate(mRotation);
+            loops--;
+        }
+
+        if (looped && mEntity->getUpdateBoundingBoxFromSkeleton())
+        {
+            /* Bounding boxes are updated using skeleton's position from previous frame
+            (and are always slightly off). This update will cause the root bone to jump
+            back to its starting position and would be very off, so we force an update. */
+            mEntity->getSkeleton()->setAnimationState(*mAnimationState->getParent());
+        }
+    }
+
+private:
+    AnimationState* mAnimationState;
+    Entity* mEntity;
+    NodeAnimationTrack* mTrack;
+    Vector3 mTranslation;
+    Quaternion mRotation;
+    Quaternion mRotationInverse;
+};
+
+
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
     enum VisualiseBoundingBoxMode
@@ -121,35 +218,6 @@ public:
         }
         return SdkSample::keyPressed(evt);
     }
-
-    bool frameRenderingQueued(const FrameEvent& evt) override
-    {
-        for (int i = 0; i < NUM_MODELS; i++)
-        {
-            if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
-            {
-                /* We need reposition the scene node origin, since the animation includes translation.
-                Position is calculated from an offset to the end position, and rotation is calculated
-                from how much the animation turns the character. */
-
-                mModelNodes[i]->translate(mModelNodes[i]->getOrientation() * mSneakTranslate);
-                mModelNodes[i]->rotate(mSneakRotation);
-
-                mAnimStates[i]->setTimePosition(0);   // reset animation time
-
-                /* Bounding boxes are updated using skeleton's position from previous frame
-                (and are always slightly off). This update will cause the root bone to jump
-                back to its starting position and would be very off, so we force an update. */
-                if (mBoneBoundingBoxes)
-                {
-                    mEntities[i]->_updateSkeleton();
-                }
-            }
-        }
-
-        return SdkSample::frameRenderingQueued(evt);
-    }
-
 
 protected:
 
@@ -263,12 +331,15 @@ protected:
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
             as->setEnabled(true);
-            as->setLoop(false);
+            as->setLoop(true);
+
+            auto updater = AnimationUpdater::create(as, ent, mSneakSpinerootTrack);
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
-                                           AnimationStateControllerValue::create(as, true),
+                                           updater,
                                            ScaleControllerFunction::create(Math::RangeRandom(0.5, 1.5)));
-            mAnimStates.push_back(as);
+
+            mAnimUpdaters.push_back(updater.get());
         }
 
         // create name and value for skinning mode
@@ -381,7 +452,7 @@ protected:
 
         // Tweak Sneak animation
 
-        for (const auto& it : skel->getAnimation("Sneak")->_getNodeTrackList()) // for every node track...
+        for (const auto& it : animation->_getNodeTrackList()) // for every node track...
         {
             NodeAnimationTrack* track = it.second;
 
@@ -401,17 +472,7 @@ protected:
 
             if (bone->getName() == "Spineroot")   // adjust spine root relative to new location
             {
-                mSneakTranslate = oldKf.getTranslate() - startKf->getTranslate();
-                mSneakTranslate.y = 0.0f;
-
-                mSneakRotation = oldKf.getRotation() * startKf->getRotation().Inverse();
-                // TODO: there's probably a smarter way to limit rotation to y-axis
-                Matrix3 mat;
-                mSneakRotation.ToRotationMatrix(mat);
-                Radian yAngle, zAngle, xAngle;
-                mat.ToEulerAnglesYZX(yAngle, zAngle, xAngle);
-                mat.FromEulerAnglesYZX(yAngle, Ogre::Radian(0.0f), Ogre::Radian(0.0f));
-                mSneakRotation.FromRotationMatrix(mat);
+                mSneakSpinerootTrack = track;
 
                 newKf->setTranslate(oldKf.getTranslate());
                 newKf->setRotation(oldKf.getRotation());
@@ -424,13 +485,15 @@ protected:
                 newKf->setScale(startKf->getScale());
             }
         }
+
+        animation->setLength(ANIM_CHOP);
     }
 
     void cleanupContent() override
     {
         mModelNodes.clear();
         mEntities.clear();
-        mAnimStates.clear();
+        mAnimUpdaters.clear();
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
@@ -444,8 +507,9 @@ protected:
 
     std::vector<SceneNode*> mModelNodes;
     std::vector<Entity*> mEntities;
-    std::vector<AnimationState*> mAnimStates;
+    std::vector<AnimationUpdater*> mAnimUpdaters;
 
+    NodeAnimationTrack* mSneakSpinerootTrack;
     Vector3 mSneakTranslate;
     Quaternion mSneakRotation;
 };
