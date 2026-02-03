@@ -132,14 +132,8 @@ public:
                 Position is calculated from an offset to the end position, and rotation is calculated
                 from how much the animation turns the character. */
 
-                Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
-
-                // find current end position and the offset
-                Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
-                Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
-
-                mModelNodes[i]->setPosition(currEnd + offset);
-                mModelNodes[i]->rotate(rot);
+                mModelNodes[i]->translate(mModelNodes[i]->getOrientation() * mSneakTranslate);
+                mModelNodes[i]->rotate(mSneakRotation);
 
                 mAnimStates[i]->setTimePosition(0);   // reset animation time
 
@@ -407,9 +401,17 @@ protected:
 
             if (bone->getName() == "Spineroot")   // adjust spine root relative to new location
             {
-                mSneakStartPos = startKf->getTranslate() + bone->getInitialPosition();
-                mSneakEndPos = oldKf.getTranslate() + bone->getInitialPosition();
-                mSneakStartPos.y = mSneakEndPos.y;
+                mSneakTranslate = oldKf.getTranslate() - startKf->getTranslate();
+                mSneakTranslate.y = 0.0f;
+
+                mSneakRotation = oldKf.getRotation() * startKf->getRotation().Inverse();
+                // TODO: there's probably a smarter way to limit rotation to y-axis
+                Matrix3 mat;
+                mSneakRotation.ToRotationMatrix(mat);
+                Radian yAngle, zAngle, xAngle;
+                mat.ToEulerAnglesYZX(yAngle, zAngle, xAngle);
+                mat.FromEulerAnglesYZX(yAngle, Ogre::Radian(0.0f), Ogre::Radian(0.0f));
+                mSneakRotation.FromRotationMatrix(mat);
 
                 newKf->setTranslate(oldKf.getTranslate());
                 newKf->setRotation(oldKf.getRotation());
@@ -444,8 +446,8 @@ protected:
     std::vector<Entity*> mEntities;
     std::vector<AnimationState*> mAnimStates;
 
-    Vector3 mSneakStartPos;
-    Vector3 mSneakEndPos;
+    Vector3 mSneakTranslate;
+    Quaternion mSneakRotation;
 };
 
 #endif
