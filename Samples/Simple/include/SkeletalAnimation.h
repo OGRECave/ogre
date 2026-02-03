@@ -378,6 +378,8 @@ protected:
             mAnimUpdaters.push_back(updater.get());
         }
 
+        generateBoundingBox();
+
         // create name and value for skinning mode
         StringVector names;
         names.push_back("Help");
@@ -523,6 +525,48 @@ protected:
         }
 
         animation->setLength(ANIM_CHOP);
+    }
+
+    void generateBoundingBox()
+    {
+        // This is a hacky way to make a close-fitting bounding box
+        // for the Sneak animation with the root movement suppressed.
+
+        Entity * entity = mEntities[0];
+        Skeleton * skeleton = entity->getSkeleton();
+        Bone * rootBone = skeleton->getBone("Spineroot");
+        Animation * animation = skeleton->getAnimation("Sneak");
+        AnimationState * as = entity->getAnimationState("Sneak");
+        NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+        // Suppress root-bone movement.
+
+        if (!as->hasBlendMask())
+        {
+            as->createBlendMask(skeleton->getNumBones(), 1.0f);
+        }
+        as->setBlendMaskEntry(rootBone->getHandle(), 0.0f);
+        as->setEnabled(true);
+
+        // Generate bounding box from skeleton.
+
+        entity->setUpdateBoundingBoxFromSkeleton(true);
+
+        AxisAlignedBox sneakBounds;
+        sneakBounds.setNull();
+
+        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+        {
+            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+
+            as->setTimePosition(kf->getTime());
+            entity->_updateSkeleton();
+
+            AxisAlignedBox bbox = entity->getBoundingBox();
+            sneakBounds.merge(bbox);
+        }
+
+        entity->getMesh()->_setBounds(sneakBounds);
     }
 
     void cleanupContent() override
