@@ -459,13 +459,10 @@ protected:
     | The jaiqua mesh has the vertices baked quite a distance from local origin.
     | This moves the mesh to the origin and moves the skeleton's Spineroot bone.
     -----------------------------------------------------------------------------*/
-    void tweakJaiquaMesh()
+    static void tweakJaiquaMesh()
     {
         // Load the mesh with shadow buffers so we can access vertex data
-        MeshPtr mesh = MeshManager::getSingleton().load("jaiqua.mesh",
-                                                        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                        HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
-                                                        HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, true, true);
+        MeshPtr mesh = MeshManager::getSingleton().load("jaiqua.mesh", RGN_DEFAULT, HBU_CPU_TO_GPU, HBU_CPU_TO_GPU, true, true);
 
         // Get root bone's binding position
 
@@ -638,4 +635,3 @@ protected:
 };
 
 #endif
-
