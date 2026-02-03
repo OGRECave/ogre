@@ -176,7 +176,10 @@ public:
         }
     }
 
-    void setRootMotionApplier(std::unique_ptr<RootMotionApplier> rma) { mRootMotionApplier = std::move(rma); }
+    void setUseRootMotion(Entity* entity, NodeAnimationTrack* track)
+    {
+        mRootMotionApplier.reset(new RootMotionApplier(mAnimationState, entity, track));
+    }
 
     RootMotionApplier * getRootMotionApplier() { return mRootMotionApplier.get(); }
 
@@ -185,6 +188,145 @@ private:
     std::unique_ptr<RootMotionApplier> mRootMotionApplier;
 };
 
+
+/*-----------------------------------------------------------------------------
+| The jaiqua mesh has the vertices baked quite a distance from local origin.
+| This moves the mesh to the origin and moves the skeleton's Spineroot bone.
+-----------------------------------------------------------------------------*/
+static void tweakJaiquaMesh(const MeshPtr& mesh, Bone* rootBone)
+{
+    SkeletonPtr skeleton = mesh->getSkeleton();
+    // Get root bone's binding position
+    const Vector3 bindPos = rootBone->getInitialPosition();
+
+    // Re-bind it at origin (preserving y)
+
+    rootBone->setPosition(0.0f, bindPos.y, 0.0f);
+    skeleton->setBindingPose();
+
+    // Move all the vertices by the same amount
+    // There's no shared vertices and only 1 submesh
+
+    const VertexData* vertexData = mesh->getSubMeshes()[0]->vertexData;
+    const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+    HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
+    DefaultHardwareBufferManagerBase bfrMgr;
+    HardwareVertexBufferPtr shadowBuffer = bfrMgr.createVertexBuffer(vbuf->getVertexSize(), vbuf->getNumVertices(), Ogre::HBU_CPU_ONLY);
+    shadowBuffer->copyData(*vbuf);
+
+    HardwareBufferLockGuard vertexLock(shadowBuffer, HardwareBuffer::HBL_NORMAL);
+    unsigned char* vertex = static_cast<unsigned char*>(vertexLock.pData);
+    float* pFloat;
+
+    for(size_t i = 0; i < vertexData->vertexCount; ++i)
+    {
+        posElem->baseVertexPointerToElement(vertex, &pFloat);
+        pFloat[0] -= bindPos.x;
+        pFloat[2] -= bindPos.z;
+        vertex += shadowBuffer->getVertexSize();
+    }
+
+    vertexLock.unlock();
+
+    vbuf->copyData(*shadowBuffer);
+}
+
+/*-----------------------------------------------------------------------------
+| The jaiqua sneak animation doesn't loop properly. This method tweaks the
+| animation to loop properly by altering the Spineroot bone track.
+| We also move the Sneak animation to start closer to the origin.
+-----------------------------------------------------------------------------*/
+static void tweakSneakAnim(const SkeletonPtr& skel)
+{
+    // Move Sneak animation closer to origin
+    Bone * rootBone = skel->getBone("Spineroot");
+    Animation * animation = skel->getAnimation("Sneak");
+    NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+    Vector3 start = rootTrack->getNodeKeyFrame(0)->getTranslate();
+    start.y = 0.0f;
+
+    for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+    {
+        TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+        kf->setTranslate(kf->getTranslate() - start);
+    }
+
+    // Tweak Sneak animation
+    const float ANIM_CHOP = 8.0f;
+    for (const auto& it : animation->_getNodeTrackList()) // for every node track...
+    {
+        NodeAnimationTrack* track = it.second;
+
+        // get the keyframe at the chopping point
+        TransformKeyFrame oldKf(0, 0);
+        track->getInterpolatedKeyFrame(ANIM_CHOP, &oldKf);
+
+        // drop all keyframes after the chopping point
+        while (track->getKeyFrame(track->getNumKeyFrames()-1)->getTime() >= ANIM_CHOP - 0.3f)
+            track->removeKeyFrame(track->getNumKeyFrames()-1);
+
+        // create a new keyframe at chopping point, and get the first keyframe
+        TransformKeyFrame* newKf = track->createNodeKeyFrame(ANIM_CHOP);
+        TransformKeyFrame* startKf = track->getNodeKeyFrame(0);
+
+        Bone* bone = skel->getBone(track->getHandle());
+
+        if (bone->getName() == "Spineroot")   // adjust spine root relative to new location
+        {
+            newKf->setTranslate(oldKf.getTranslate());
+            newKf->setRotation(oldKf.getRotation());
+            newKf->setScale(oldKf.getScale());
+        }
+        else   // make all other bones loop back
+        {
+            newKf->setTranslate(startKf->getTranslate());
+            newKf->setRotation(startKf->getRotation());
+            newKf->setScale(startKf->getScale());
+        }
+    }
+
+    animation->setLength(ANIM_CHOP);
+}
+
+static void generateBoundingBox(Entity * entity)
+{
+    // This is a hacky way to make a close-fitting bounding box
+    // for the Sneak animation with the root movement suppressed.
+    Skeleton * skeleton = entity->getSkeleton();
+    Bone * rootBone = skeleton->getBone("Spineroot");
+    Animation * animation = skeleton->getAnimation("Sneak");
+    AnimationState * as = entity->getAnimationState("Sneak");
+    NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+    // Suppress root-bone movement.
+
+    if (!as->hasBlendMask())
+    {
+        as->createBlendMask(skeleton->getNumBones(), 1.0f);
+    }
+    as->setBlendMaskEntry(rootBone->getHandle(), 0.0f);
+    as->setEnabled(true);
+
+    // Generate bounding box from skeleton.
+
+    entity->setUpdateBoundingBoxFromSkeleton(true);
+
+    AxisAlignedBox sneakBounds = AxisAlignedBox::EXTENT_NULL;
+
+    for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+    {
+        TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+
+        as->setTimePosition(kf->getTime());
+        entity->_updateSkeleton();
+
+        AxisAlignedBox bbox = entity->getBoundingBox();
+        sneakBounds.merge(bbox);
+    }
+
+    entity->getMesh()->_setBounds(sneakBounds);
+}
 
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
@@ -195,14 +337,13 @@ class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
         kVisualiseAll
     };
 public:
-    Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
+    Sample_SkeletalAnimation() : NUM_MODELS(6)
     {
         mInfo["Title"] = "Skeletal Animation";
-        mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
+        mInfo["Description"] = "Demonstrates advanced skeletal animation techniques including root motion and hardware skinning.";
         mInfo["Thumbnail"] = "thumb_skelanim.png";
         mInfo["Category"] = "Animation";
         mInfo["Help"] = "Controls:\n"
-            "WASD to move the camera.  Mouse to look around.\n"
             "V toggle visualise bounding boxes.\n"
             "B toggle bone-based bounding boxes on/off.";
         mStatusPanel = NULL;
@@ -383,8 +524,15 @@ protected:
 
     void setupModels()
     {
-        tweakJaiquaMesh();
-        tweakSneakAnim();
+        // Load the mesh with shadow buffers so we can access vertex data
+        MeshPtr mesh = MeshManager::getSingleton().load("jaiqua.mesh", RGN_DEFAULT, HBU_CPU_TO_GPU, HBU_CPU_TO_GPU, true, true);
+        SkeletonPtr skeleton = mesh->getSkeleton();
+        Bone * rootBone = skeleton->getBone("Spineroot");
+        Animation * animation = skeleton->getAnimation("Sneak");
+        mSneakSpinerootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+        tweakJaiquaMesh(mesh, rootBone);
+        tweakSneakAnim(skeleton);
 
         SceneNode* sn = NULL;
         Entity* ent = NULL;
@@ -412,7 +560,7 @@ protected:
             as->setLoop(true);
 
             auto updater = std::make_shared<AnimationUpdater>(as);
-            updater->setRootMotionApplier(std::make_unique<RootMotionApplier>(as, ent, mSneakSpinerootTrack));
+            updater->setUseRootMotion(ent, mSneakSpinerootTrack);
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
                                            updater,
@@ -421,7 +569,7 @@ protected:
             mAnimUpdaters.push_back(updater.get());
         }
 
-        generateBoundingBox();
+        generateBoundingBox(mEntities[0]);
 
         // create name and value for skinning mode
         StringVector names;
@@ -455,160 +603,6 @@ protected:
         mStatusPanel->setParamValue("Skinning", value);
     }
 
-    /*-----------------------------------------------------------------------------
-    | The jaiqua mesh has the vertices baked quite a distance from local origin.
-    | This moves the mesh to the origin and moves the skeleton's Spineroot bone.
-    -----------------------------------------------------------------------------*/
-    static void tweakJaiquaMesh()
-    {
-        // Load the mesh with shadow buffers so we can access vertex data
-        MeshPtr mesh = MeshManager::getSingleton().load("jaiqua.mesh", RGN_DEFAULT, HBU_CPU_TO_GPU, HBU_CPU_TO_GPU, true, true);
-
-        // Get root bone's binding position
-
-        Skeleton * skeleton = mesh->getSkeleton().get();
-        Bone * rootBone = skeleton->getBone("Spineroot");
-        const Vector3 bindPos = rootBone->getInitialPosition();
-
-        // Re-bind it at origin (preserving y)
-
-        rootBone->setPosition(0.0f, bindPos.y, 0.0f);
-        skeleton->setBindingPose();
-
-        // Move all the vertices by the same amount
-        // There's no shared vertices and only 1 submesh
-
-        const VertexData* vertexData = mesh->getSubMeshes()[0]->vertexData;
-        const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
-        HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
-        DefaultHardwareBufferManagerBase bfrMgr;
-        HardwareVertexBufferPtr shadowBuffer = bfrMgr.createVertexBuffer(vbuf->getVertexSize(), vbuf->getNumVertices(), Ogre::HBU_CPU_ONLY);
-        shadowBuffer->copyData(*vbuf);
-
-        HardwareBufferLockGuard vertexLock(shadowBuffer, HardwareBuffer::HBL_NORMAL);
-        unsigned char* vertex = static_cast<unsigned char*>(vertexLock.pData);
-        float* pFloat;
-
-        for(size_t i = 0; i < vertexData->vertexCount; ++i)
-        {
-            posElem->baseVertexPointerToElement(vertex, &pFloat);
-            pFloat[0] -= bindPos.x;
-            pFloat[2] -= bindPos.z;
-            vertex += shadowBuffer->getVertexSize();
-        }
-
-        vertexLock.unlock();
-
-        vbuf->copyData(*shadowBuffer);
-    }
-
-    /*-----------------------------------------------------------------------------
-    | The jaiqua sneak animation doesn't loop properly. This method tweaks the
-    | animation to loop properly by altering the Spineroot bone track.
-    | We also move the Sneak animation to start closer to the origin.
-    -----------------------------------------------------------------------------*/
-    void tweakSneakAnim()
-    {
-        // get the skeleton, animation, and the node track iterator
-        SkeletonPtr skel = static_pointer_cast<Skeleton>(SkeletonManager::getSingleton().load("jaiqua.skeleton",
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
-
-        // Move Sneak animation closer to origin
-
-        Bone * rootBone = skel->getBone("Spineroot");
-        Animation * animation = skel->getAnimation("Sneak");
-        NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
-
-        Vector3 start = rootTrack->getNodeKeyFrame(0)->getTranslate();
-        start.y = 0.0f;
-
-        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
-        {
-            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
-            kf->setTranslate(kf->getTranslate() - start);
-        }
-
-        // Tweak Sneak animation
-
-        for (const auto& it : animation->_getNodeTrackList()) // for every node track...
-        {
-            NodeAnimationTrack* track = it.second;
-
-            // get the keyframe at the chopping point
-            TransformKeyFrame oldKf(0, 0);
-            track->getInterpolatedKeyFrame(ANIM_CHOP, &oldKf);
-
-            // drop all keyframes after the chopping point
-            while (track->getKeyFrame(track->getNumKeyFrames()-1)->getTime() >= ANIM_CHOP - 0.3f)
-                track->removeKeyFrame(track->getNumKeyFrames()-1);
-
-            // create a new keyframe at chopping point, and get the first keyframe
-            TransformKeyFrame* newKf = track->createNodeKeyFrame(ANIM_CHOP);
-            TransformKeyFrame* startKf = track->getNodeKeyFrame(0);
-
-            Bone* bone = skel->getBone(track->getHandle());
-
-            if (bone->getName() == "Spineroot")   // adjust spine root relative to new location
-            {
-                mSneakSpinerootTrack = track;
-
-                newKf->setTranslate(oldKf.getTranslate());
-                newKf->setRotation(oldKf.getRotation());
-                newKf->setScale(oldKf.getScale());
-            }
-            else   // make all other bones loop back
-            {
-                newKf->setTranslate(startKf->getTranslate());
-                newKf->setRotation(startKf->getRotation());
-                newKf->setScale(startKf->getScale());
-            }
-        }
-
-        animation->setLength(ANIM_CHOP);
-    }
-
-    void generateBoundingBox()
-    {
-        // This is a hacky way to make a close-fitting bounding box
-        // for the Sneak animation with the root movement suppressed.
-
-        Entity * entity = mEntities[0];
-        Skeleton * skeleton = entity->getSkeleton();
-        Bone * rootBone = skeleton->getBone("Spineroot");
-        Animation * animation = skeleton->getAnimation("Sneak");
-        AnimationState * as = entity->getAnimationState("Sneak");
-        NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
-
-        // Suppress root-bone movement.
-
-        if (!as->hasBlendMask())
-        {
-            as->createBlendMask(skeleton->getNumBones(), 1.0f);
-        }
-        as->setBlendMaskEntry(rootBone->getHandle(), 0.0f);
-        as->setEnabled(true);
-
-        // Generate bounding box from skeleton.
-
-        entity->setUpdateBoundingBoxFromSkeleton(true);
-
-        AxisAlignedBox sneakBounds;
-        sneakBounds.setNull();
-
-        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
-        {
-            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
-
-            as->setTimePosition(kf->getTime());
-            entity->_updateSkeleton();
-
-            AxisAlignedBox bbox = entity->getBoundingBox();
-            sneakBounds.merge(bbox);
-        }
-
-        entity->getMesh()->_setBounds(sneakBounds);
-    }
-
     void cleanupContent() override
     {
         mModelNodes.clear();
@@ -618,7 +612,6 @@ protected:
     }
 
     const int NUM_MODELS;
-    const Real ANIM_CHOP;
     VisualiseBoundingBoxMode mVisualiseBoundingBoxMode;
     int mBoundingBoxModelIndex;  // which model to show the bounding box for
     bool mBoneBoundingBoxes;
