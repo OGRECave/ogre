@@ -11,6 +11,181 @@
 using namespace Ogre;
 using namespace OgreBites;
 
+
+/*  The RootMotionApplier applies the transforms from a specified
+    NodeAnimationTrack to an Entity's parent SceneNode instead of
+    to its Skeleton's Bone.
+
+    Won’t work if root bone has an ancestor that is not
+    origin-positioned, identity-oriented, and unity-scaled.
+
+    If root bone has a non-origin-positioned, non-identity-oriented,
+    or non-unity-scaled binding pose, playing multiple root-movement
+    animations will apply the binding pose to the SceneNode multiple
+    times (ie mess it up) (i think)
+
+    TODO:
+
+    - add setEnabled() or disable() or unapply() that unapplies all,
+      some, or no components of applied rotation.
+
+    - add option of which components of translation and rotation to
+      retain/reset when looping (instead of the currently hardcoded
+      reseting of translation.y and retaining of rotation.y)
+
+    - maybe implement scale for shrinking and growing animations lol
+*/
+class RootMotionApplier
+{
+public:
+
+    RootMotionApplier(AnimationState* animationState, Entity* entity, NodeAnimationTrack* track)
+    : mEntity(entity)
+    , mTrack(track)
+    , mAppliedTranslation(Vector3::ZERO)
+    , mAppliedRotation(Quaternion::IDENTITY)
+    {
+        assert(animationState);
+        assert(entity);
+        assert(track);
+
+        // Get root bone binding pose.
+
+        Bone* rootBone = entity->getSkeleton()->getBone(track->getHandle());
+        mRootBindingPosition = rootBone->getInitialPosition();
+        mRootBindingOrientation = rootBone->getInitialOrientation();
+        mRootBindingOrientationInverse = mRootBindingOrientation.Inverse();
+
+        // Measure total transformation for root.
+
+        TransformKeyFrame * tkfBeg = track->getNodeKeyFrame(0);
+        TransformKeyFrame * tkfEnd = track->getNodeKeyFrame(track->getNumKeyFrames() - 1);
+
+        Quaternion begRotation = mRootBindingOrientation * tkfBeg->getRotation() * mRootBindingOrientationInverse;
+        Quaternion endRotation = mRootBindingOrientation * tkfEnd->getRotation() * mRootBindingOrientationInverse;
+        mLoopRotation = endRotation * begRotation.Inverse();
+
+        // TODO: there's probably a smarter way to limit rotation to y-axis
+        Matrix3 mat;
+        mLoopRotation.ToRotationMatrix(mat);
+        Radian yAngle, zAngle, xAngle;
+        mat.ToEulerAnglesYZX(yAngle, zAngle, xAngle);
+        mat.FromEulerAnglesYZX(yAngle, Radian(0.0f), Radian(0.0f));
+        mLoopRotation.FromRotationMatrix(mat);
+
+        mLoopRotationInverse = mLoopRotation.Inverse();
+
+        Vector3 begTranslation = mRootBindingPosition + tkfBeg->getTranslate() - begRotation * mRootBindingPosition;
+        Vector3 endTranslation = mRootBindingPosition + tkfEnd->getTranslate() - endRotation * mRootBindingPosition;
+        mLoopTranslation = endTranslation - mLoopRotation * begTranslation;
+        mLoopTranslation.y = 0.0f;
+
+        // Suppress root bone movement
+
+        if (!animationState->hasBlendMask())
+        {
+            animationState->createBlendMask(entity->getSkeleton()->getNumBones(), 1.0f);
+        }
+        animationState->setBlendMaskEntry(track->getHandle(), 0.0f);
+    }
+
+    void apply(int loops, float thisTime)
+    {
+        SceneNode* sceneNode = mEntity->getParentSceneNode();
+        TransformKeyFrame tkf(0, 0);
+
+        // Unapply transform from last frame
+
+        sceneNode->rotate(mAppliedRotation.Inverse());
+        sceneNode->translate(-mAppliedTranslation, Node::TS_LOCAL);
+
+        // Apply periodic loop transforms
+
+        while (loops < 0)
+        {
+            sceneNode->rotate(mLoopRotationInverse);
+            sceneNode->translate(-mLoopTranslation, Node::TS_LOCAL);
+            loops++;
+        }
+        while (loops > 0)
+        {
+            sceneNode->translate(mLoopTranslation, Node::TS_LOCAL);
+            sceneNode->rotate(mLoopRotation);
+            loops--;
+        }
+
+        // Apply transform from this frame
+
+        mTrack->getInterpolatedKeyFrame(thisTime, &tkf);
+
+        mAppliedRotation = mRootBindingOrientation * tkf.getRotation() * mRootBindingOrientationInverse;
+        mAppliedTranslation = mRootBindingPosition + tkf.getTranslate() - mAppliedRotation * mRootBindingPosition;
+
+        sceneNode->translate(mAppliedTranslation, Node::TS_LOCAL);
+        sceneNode->rotate(mAppliedRotation);
+    }
+
+private:
+    Entity* mEntity;
+    NodeAnimationTrack* mTrack;
+
+    Vector3 mRootBindingPosition;
+    Quaternion mRootBindingOrientation;
+    Quaternion mRootBindingOrientationInverse;
+
+    Vector3 mLoopTranslation;
+    Quaternion mLoopRotation;
+    Quaternion mLoopRotationInverse;
+
+    Vector3 mAppliedTranslation;
+    Quaternion mAppliedRotation;
+};
+
+
+class AnimationUpdater : public ControllerValue<float>
+{
+public:
+    AnimationUpdater(AnimationState* animationState)
+    : mAnimationState(animationState)
+    {
+        assert(animationState);
+    }
+
+    float getValue(void) const override
+    {
+        return mAnimationState->getTimePosition() / mAnimationState->getLength();
+    }
+
+    void setValue(float timeDelta) override
+    {
+        // Don't assume AnimationState::addTime()'s internal time-updating (ie modulo) implementation.
+
+        float lastTime = mAnimationState->getTimePosition();
+        mAnimationState->addTime(timeDelta);
+        float thisTime = mAnimationState->getTimePosition();
+
+        float length = mAnimationState->getLength();
+        bool loop = mAnimationState->getLoop();
+        int loops = loop ? (int)std::round((lastTime + timeDelta - thisTime) / length) : 0;
+
+        // Apply Movement
+
+        if (mRootMotionApplier)
+        {
+            mRootMotionApplier->apply(loops, thisTime);
+        }
+    }
+
+    void setRootMotionApplier(std::unique_ptr<RootMotionApplier> rma) { mRootMotionApplier = std::move(rma); }
+
+    RootMotionApplier * getRootMotionApplier() { return mRootMotionApplier.get(); }
+
+private:
+    AnimationState* mAnimationState;
+    std::unique_ptr<RootMotionApplier> mRootMotionApplier;
+};
+
+
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
     enum VisualiseBoundingBoxMode
@@ -85,7 +260,7 @@ public:
         }
     }
     bool keyPressed(const KeyboardEvent& evt) override
-    {   
+    {
         if ( !mTrayMgr->isDialogVisible() )
         {
             // Handle keypresses.
@@ -121,41 +296,6 @@ public:
         }
         return SdkSample::keyPressed(evt);
     }
-
-    bool frameRenderingQueued(const FrameEvent& evt) override
-    {
-        for (int i = 0; i < NUM_MODELS; i++)
-        {
-            if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
-            {
-                /* We need reposition the scene node origin, since the animation includes translation.
-                Position is calculated from an offset to the end position, and rotation is calculated
-                from how much the animation turns the character. */
-
-                Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
-
-                // find current end position and the offset
-                Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
-                Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
-
-                mModelNodes[i]->setPosition(currEnd + offset);
-                mModelNodes[i]->rotate(rot);
-
-                mAnimStates[i]->setTimePosition(0);   // reset animation time
-
-                /* Bounding boxes are updated using skeleton's position from previous frame
-                (and are always slightly off). This update will cause the root bone to jump
-                back to its starting position and would be very off, so we force an update. */
-                if (mBoneBoundingBoxes)
-                {
-                    mEntities[i]->_updateSkeleton();
-                }
-            }
-        }
-
-        return SdkSample::frameRenderingQueued(evt);
-    }
-
 
 protected:
 
@@ -211,7 +351,7 @@ protected:
         ln->setDirection(-pos);
         l->setDiffuseColour(0.0, 0.0, 0.5);
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
-        
+
 
         // add a green spotlight.
         l = mSceneMgr->createLight(Light::LT_SPOTLIGHT);
@@ -219,7 +359,7 @@ protected:
         ln = mSceneMgr->getRootSceneNode()->createChildSceneNode(pos);
         ln->attachObject(l);
         ln->setDirection(-pos);
-        l->setDiffuseColour(0.0, 0.5, 0.0);     
+        l->setDiffuseColour(0.0, 0.5, 0.0);
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
 
         // create a floor mesh resource
@@ -243,17 +383,12 @@ protected:
 
     void setupModels()
     {
+        tweakJaiquaMesh();
         tweakSneakAnim();
 
         SceneNode* sn = NULL;
         Entity* ent = NULL;
         AnimationState* as = NULL;
-
-        // make sure we can get the buffers for bbox calculations
-        MeshManager::getSingleton().load("jaiqua.mesh",
-                                         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                         HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
-                                         HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, true, true);
 
         auto& controllerMgr = ControllerManager::getSingleton();
 
@@ -270,24 +405,30 @@ protected:
             ent->setMaterialName("jaiqua");
             mEntities.push_back(ent);
             sn->attachObject(ent);
-        
+
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
             as->setEnabled(true);
-            as->setLoop(false);
+            as->setLoop(true);
+
+            auto updater = std::make_shared<AnimationUpdater>(as);
+            updater->setRootMotionApplier(std::make_unique<RootMotionApplier>(as, ent, mSneakSpinerootTrack));
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
-                                           AnimationStateControllerValue::create(as, true),
+                                           updater,
                                            ScaleControllerFunction::create(Math::RangeRandom(0.5, 1.5)));
-            mAnimStates.push_back(as);
+
+            mAnimUpdaters.push_back(updater.get());
         }
+
+        generateBoundingBox();
 
         // create name and value for skinning mode
         StringVector names;
         names.push_back("Help");
         names.push_back("Skinning");
         names.push_back(mBoneBoundingBoxesItemName);
-        
+
         // create a params panel to display the help and skinning mode
         mStatusPanel = mTrayMgr->createParamsPanel(TL_TOPLEFT, "HelpMessage", 200, names);
         mStatusPanel->setParamValue("Help", "H / F1");
@@ -305,7 +446,7 @@ protected:
             if(bestTechnique)
             {
                 Pass* pass = bestTechnique->getPass(0);
-                if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) 
+                if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded())
                 {
                     value = "Hardware";
                 }
@@ -313,10 +454,58 @@ protected:
         }
         mStatusPanel->setParamValue("Skinning", value);
     }
-    
+
+    /*-----------------------------------------------------------------------------
+    | The jaiqua mesh has the vertices baked quite a distance from local origin.
+    | This moves the mesh to the origin and moves the skeleton's Spineroot bone.
+    -----------------------------------------------------------------------------*/
+    static void tweakJaiquaMesh()
+    {
+        // Load the mesh with shadow buffers so we can access vertex data
+        MeshPtr mesh = MeshManager::getSingleton().load("jaiqua.mesh", RGN_DEFAULT, HBU_CPU_TO_GPU, HBU_CPU_TO_GPU, true, true);
+
+        // Get root bone's binding position
+
+        Skeleton * skeleton = mesh->getSkeleton().get();
+        Bone * rootBone = skeleton->getBone("Spineroot");
+        const Vector3 bindPos = rootBone->getInitialPosition();
+
+        // Re-bind it at origin (preserving y)
+
+        rootBone->setPosition(0.0f, bindPos.y, 0.0f);
+        skeleton->setBindingPose();
+
+        // Move all the vertices by the same amount
+        // There's no shared vertices and only 1 submesh
+
+        const VertexData* vertexData = mesh->getSubMeshes()[0]->vertexData;
+        const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+        HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
+        DefaultHardwareBufferManagerBase bfrMgr;
+        HardwareVertexBufferPtr shadowBuffer = bfrMgr.createVertexBuffer(vbuf->getVertexSize(), vbuf->getNumVertices(), Ogre::HBU_CPU_ONLY);
+        shadowBuffer->copyData(*vbuf);
+
+        HardwareBufferLockGuard vertexLock(shadowBuffer, HardwareBuffer::HBL_NORMAL);
+        unsigned char* vertex = static_cast<unsigned char*>(vertexLock.pData);
+        float* pFloat;
+
+        for(size_t i = 0; i < vertexData->vertexCount; ++i)
+        {
+            posElem->baseVertexPointerToElement(vertex, &pFloat);
+            pFloat[0] -= bindPos.x;
+            pFloat[2] -= bindPos.z;
+            vertex += shadowBuffer->getVertexSize();
+        }
+
+        vertexLock.unlock();
+
+        vbuf->copyData(*shadowBuffer);
+    }
+
     /*-----------------------------------------------------------------------------
     | The jaiqua sneak animation doesn't loop properly. This method tweaks the
     | animation to loop properly by altering the Spineroot bone track.
+    | We also move the Sneak animation to start closer to the origin.
     -----------------------------------------------------------------------------*/
     void tweakSneakAnim()
     {
@@ -324,7 +513,24 @@ protected:
         SkeletonPtr skel = static_pointer_cast<Skeleton>(SkeletonManager::getSingleton().load("jaiqua.skeleton",
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
 
-        for (const auto& it : skel->getAnimation("Sneak")->_getNodeTrackList()) // for every node track...
+        // Move Sneak animation closer to origin
+
+        Bone * rootBone = skel->getBone("Spineroot");
+        Animation * animation = skel->getAnimation("Sneak");
+        NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+        Vector3 start = rootTrack->getNodeKeyFrame(0)->getTranslate();
+        start.y = 0.0f;
+
+        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+        {
+            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+            kf->setTranslate(kf->getTranslate() - start);
+        }
+
+        // Tweak Sneak animation
+
+        for (const auto& it : animation->_getNodeTrackList()) // for every node track...
         {
             NodeAnimationTrack* track = it.second;
 
@@ -344,9 +550,7 @@ protected:
 
             if (bone->getName() == "Spineroot")   // adjust spine root relative to new location
             {
-                mSneakStartPos = startKf->getTranslate() + bone->getInitialPosition();
-                mSneakEndPos = oldKf.getTranslate() + bone->getInitialPosition();
-                mSneakStartPos.y = mSneakEndPos.y;
+                mSneakSpinerootTrack = track;
 
                 newKf->setTranslate(oldKf.getTranslate());
                 newKf->setRotation(oldKf.getRotation());
@@ -359,12 +563,57 @@ protected:
                 newKf->setScale(startKf->getScale());
             }
         }
+
+        animation->setLength(ANIM_CHOP);
+    }
+
+    void generateBoundingBox()
+    {
+        // This is a hacky way to make a close-fitting bounding box
+        // for the Sneak animation with the root movement suppressed.
+
+        Entity * entity = mEntities[0];
+        Skeleton * skeleton = entity->getSkeleton();
+        Bone * rootBone = skeleton->getBone("Spineroot");
+        Animation * animation = skeleton->getAnimation("Sneak");
+        AnimationState * as = entity->getAnimationState("Sneak");
+        NodeAnimationTrack * rootTrack = animation->getNodeTrack(rootBone->getHandle());
+
+        // Suppress root-bone movement.
+
+        if (!as->hasBlendMask())
+        {
+            as->createBlendMask(skeleton->getNumBones(), 1.0f);
+        }
+        as->setBlendMaskEntry(rootBone->getHandle(), 0.0f);
+        as->setEnabled(true);
+
+        // Generate bounding box from skeleton.
+
+        entity->setUpdateBoundingBoxFromSkeleton(true);
+
+        AxisAlignedBox sneakBounds;
+        sneakBounds.setNull();
+
+        for (size_t i = 0; i < rootTrack->getNumKeyFrames(); ++i)
+        {
+            TransformKeyFrame * kf = rootTrack->getNodeKeyFrame(i);
+
+            as->setTimePosition(kf->getTime());
+            entity->_updateSkeleton();
+
+            AxisAlignedBox bbox = entity->getBoundingBox();
+            sneakBounds.merge(bbox);
+        }
+
+        entity->getMesh()->_setBounds(sneakBounds);
     }
 
     void cleanupContent() override
     {
         mModelNodes.clear();
-        mAnimStates.clear();
+        mEntities.clear();
+        mAnimUpdaters.clear();
         MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
@@ -378,10 +627,11 @@ protected:
 
     std::vector<SceneNode*> mModelNodes;
     std::vector<Entity*> mEntities;
-    std::vector<AnimationState*> mAnimStates;
+    std::vector<AnimationUpdater*> mAnimUpdaters;
 
-    Vector3 mSneakStartPos;
-    Vector3 mSneakEndPos;
+    NodeAnimationTrack* mSneakSpinerootTrack;
+    Vector3 mSneakTranslate;
+    Quaternion mSneakRotation;
 };
 
 #endif
