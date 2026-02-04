@@ -150,7 +150,7 @@ void TimeEventDispatcher::dispatchForwardInclusive(float lastTime, float thisTim
         {
             if (ie->first >= lastTime && ie->first <= thisTime)
             {
-                dispatchEvent(ie->second, kTEDForward);
+                dispatchEvent(ie->second, TED_FORWARD);
             }
         }
     }
@@ -164,7 +164,7 @@ void TimeEventDispatcher::dispatchForwardExclusive(float lastTime, float thisTim
         {
             if (ie->first >= lastTime && ie->first < thisTime)
             {
-                dispatchEvent(ie->second, kTEDForward);
+                dispatchEvent(ie->second, TED_FORWARD);
             }
         }
     }
@@ -178,7 +178,7 @@ void TimeEventDispatcher::dispatchBackwardInclusive(float lastTime, float thisTi
         {
             if (ie->first <= lastTime && ie->first >= thisTime)
             {
-                dispatchEvent(ie->second, kTEDBackward);
+                dispatchEvent(ie->second, TED_BACKWARD);
             }
         }
     }
@@ -192,7 +192,7 @@ void TimeEventDispatcher::dispatchBackwardExclusive(float lastTime, float thisTi
         {
             if (ie->first <= lastTime && ie->first > thisTime)
             {
-                dispatchEvent(ie->second, kTEDBackward);
+                dispatchEvent(ie->second, TED_BACKWARD);
             }
         }
     }

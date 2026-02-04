@@ -19,8 +19,8 @@ typedef std::multimap<float, std::string> TimeEventList;
 
 enum TimeEventDirection
 {
-    kTEDForward,
-    kTEDBackward,
+    TED_FORWARD,
+    TED_BACKWARD,
 };
 
 
