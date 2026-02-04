@@ -709,7 +709,18 @@ protected:
 
         auto& controllerMgr = ControllerManager::getSingleton();
 
+        // Create footfall material and billboard set
+
         createFootfallMaterial("footfall", RGN_DEFAULT);
+
+        BillboardSet* footfallBbs = mSceneMgr->createBillboardSet();
+        footfallBbs->setMaterialName("footfall");
+        footfallBbs->setBillboardType(BBT_PERPENDICULAR_COMMON);
+        footfallBbs->setCommonDirection(Vector3::UNIT_Y);
+        footfallBbs->setCommonUpVector(Vector3::NEGATIVE_UNIT_Z);
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(footfallBbs);
+
+        // Create models and animation updaters
 
         for (int i = 0; i < NUM_MODELS; i++)
         {
