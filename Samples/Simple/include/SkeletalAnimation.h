@@ -535,18 +535,12 @@ static void generateBoundingBox(Entity * entity)
 
 static void createSoundwaveMaterial(const String & material_name, const String & group_name)
 {
-    // Make texture
+    // Make image
 
-    const String & texName = material_name + "-ring";
+    const int w = 128;
+    const int h = 128;
 
-    int w = 128;
-    int h = 128;
-
-    TexturePtr t = TextureManager::getSingleton().createManual(texName, group_name, TEX_TYPE_2D, w, h, 1, 0, PF_BYTE_RGBA, TU_DYNAMIC_WRITE_ONLY);
-
-    if (t->getFormat() != PF_BYTE_RGBA) printf("ERROR: Pixel format is not BYTE_RGBA which is what was requested!");
-
-    unsigned char * texData = (unsigned char *)t->getBuffer()->lock(HardwareBuffer::HBL_DISCARD);
+    Image image(PF_BYTE_RGBA, w, h);
 
     // Draw ring
 
@@ -555,6 +549,8 @@ static void createSoundwaveMaterial(const String & material_name, const String &
 
     for (int y = 0; y < h; ++y)
     {
+        uchar * lineData = image.getData(0, y);
+
         for (int x = 0; x < w; ++x)
         {
             float v;
@@ -572,32 +568,34 @@ static void createSoundwaveMaterial(const String & material_name, const String &
                 v = dd / rr;
             }
 
-            *(texData++) = (unsigned char)(255);
-            *(texData++) = (unsigned char)(255);
-            *(texData++) = (unsigned char)(255);
-            *(texData++) = (unsigned char)(255 * v);
+            *(lineData++) = (unsigned char)(255);
+            *(lineData++) = (unsigned char)(255);
+            *(lineData++) = (unsigned char)(255);
+            *(lineData++) = (unsigned char)(255 * v);
         }
     }
 
-    t->getBuffer()->unlock();
+    // Make texture from image
+
+    TexturePtr t = TextureManager::getSingleton().loadImage(material_name, group_name, image);
 
     // Make material
 
     MaterialPtr material = MaterialManager::getSingleton().create(material_name, RGN_DEFAULT);
-    material->setSpecular(ColourValue::Black);
 
     material->setCullingMode(CULL_NONE);
     material->setSceneBlending(SceneBlendType::SBT_TRANSPARENT_ALPHA);
+    material->setLightingEnabled(false);
     material->setDepthWriteEnabled(false);
     material->setDepthBias(0, 1);
 
     Pass * pass = material->getTechnique(0)->getPass(0);
 
-    pass->setVertexColourTracking(TVC_AMBIENT | TVC_DIFFUSE | TVC_EMISSIVE);
+    pass->setVertexColourTracking(TVC_EMISSIVE);
 
     // Attach the texture to the material texture unit (single layer) and setup properties
     TextureUnitState* tus = pass->createTextureUnitState();
-    tus->setTextureName(texName, TEX_TYPE_2D);
+    tus->setTexture(t);
 }
 
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
@@ -906,7 +904,7 @@ protected:
         mFootfallListeners.clear();
         MeshManager::getSingleton().remove("floor", RGN_DEFAULT);
         MaterialManager::getSingleton().remove("soundwave", RGN_DEFAULT);
-        TextureManager::getSingleton().remove("soundwave-ring", RGN_DEFAULT);
+        TextureManager::getSingleton().remove("soundwave", RGN_DEFAULT);
     }
 
     const int NUM_MODELS;
