@@ -223,8 +223,8 @@ public:
     : mBbs(bbs)
     , kSoundwaveColor(1.0f, 0.4f, 0.0f)
     , kSoundwaveSizeBeg(2.0f)
-    , kSoundwaveSizeEnd(80.0f)
-    , kSoundwaveTime(0.5f)
+    , kSoundwaveSizeEnd(10.0f)
+    , kSoundwaveTime(0.3f)
     {}
 
     static std::shared_ptr<SoundwaveUpdater> create(BillboardSet* bbs)
@@ -258,12 +258,10 @@ private:
 
             if (size <= kSoundwaveSizeEnd)
             {
-                ColourValue color = kSoundwaveColor;
                 float d = (size - kSoundwaveSizeBeg) / (kSoundwaveSizeEnd - kSoundwaveSizeBeg);
-                color.a = (1.0f - d);// * (1.0f - d);
 
                 bb->setDimensions(size, size);
-                bb->setColour(color);
+                bb->setColour(kSoundwaveColor * (1.0f - d));
                 ++i;
             }
             else
@@ -540,38 +538,25 @@ static void createSoundwaveMaterial(const String & material_name, const String &
     const int w = 128;
     const int h = 128;
 
-    Image image(PF_BYTE_RGBA, w, h);
+    Image image(PF_BYTE_L, w, h);
+    image.setTo(ColourValue::Black);
 
     // Draw ring
-
     float r = (w - 1) / 2.0f;
     float rr = r * r;
 
     for (int y = 0; y < h; ++y)
     {
-        uchar * lineData = image.getData(0, y);
-
         for (int x = 0; x < w; ++x)
         {
-            float v;
-
             float dx = x - r;
             float dy = y - r;
             float dd = dx * dx + dy * dy;
 
             if (dd > rr)
-            {
-                v = 0.0f;
-            }
-            else
-            {
-                v = dd / rr;
-            }
+                continue;
 
-            *(lineData++) = (unsigned char)(255);
-            *(lineData++) = (unsigned char)(255);
-            *(lineData++) = (unsigned char)(255);
-            *(lineData++) = (unsigned char)(255 * v);
+            *image.getData(x, y) = 255 * dd / rr;
         }
     }
 
@@ -584,7 +569,7 @@ static void createSoundwaveMaterial(const String & material_name, const String &
     MaterialPtr material = MaterialManager::getSingleton().create(material_name, RGN_DEFAULT);
 
     material->setCullingMode(CULL_NONE);
-    material->setSceneBlending(SceneBlendType::SBT_TRANSPARENT_ALPHA);
+    material->setSceneBlending(SBT_ADD);
     material->setLightingEnabled(false);
     material->setDepthWriteEnabled(false);
     material->setDepthBias(0, 1);
