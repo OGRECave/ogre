@@ -7,6 +7,7 @@
 #include "OgreShaderExHardwareSkinning.h"
 #endif
 #include "OgreBillboard.h"
+#include "TimeEvents.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -174,6 +175,13 @@ public:
         {
             mRootMotionApplier->apply(loops, thisTime);
         }
+
+        // Dispatch Events
+
+        if (mTimeEventDispatcher)
+        {
+            mTimeEventDispatcher->dispatch(lastTime, thisTime, loops, length);
+        }
     }
 
     void setUseRootMotion(Entity* entity, NodeAnimationTrack* track)
@@ -183,9 +191,130 @@ public:
 
     RootMotionApplier * getRootMotionApplier() { return mRootMotionApplier.get(); }
 
+    void setUseTimeEvents(bool use)
+    {
+        if (use)
+        {
+            if (!mTimeEventDispatcher)
+            {
+                mTimeEventDispatcher.reset(new TimeEventDispatcher);
+            }
+        }
+        else
+        {
+            mTimeEventDispatcher.reset();
+        }
+    }
+
+    TimeEventDispatcher * getTimeEventDispatcher() { return mTimeEventDispatcher.get(); }
+
 private:
     AnimationState* mAnimationState;
     std::unique_ptr<RootMotionApplier> mRootMotionApplier;
+    std::unique_ptr<TimeEventDispatcher> mTimeEventDispatcher;
+};
+
+
+class SoundwaveUpdater : public ControllerValue<float>
+{
+public:
+
+    SoundwaveUpdater(BillboardSet * bbs)
+    : mBbs(bbs)
+    , kSoundwaveColor(1.0f, 0.4f, 0.0f)
+    , kSoundwaveSizeBeg(2.0f)
+    , kSoundwaveSizeEnd(80.0f)
+    , kSoundwaveTime(0.5f)
+    {}
+
+    static std::shared_ptr<SoundwaveUpdater> create(BillboardSet* bbs)
+    {
+        return std::make_shared<SoundwaveUpdater>(bbs);
+    }
+
+    void addSoundwave(const Vector3 & pos)
+    {
+        Billboard * bb = mBbs->createBillboard(pos, kSoundwaveColor);
+        bb->setDimensions(kSoundwaveSizeBeg, kSoundwaveSizeBeg);
+        mBbs->_updateBounds();
+    }
+
+private:
+
+    float getValue(void) const override
+    {
+        return 0.0f;
+    }
+
+    void setValue(float timeDelta) override
+    {
+        float grow = (kSoundwaveSizeEnd - kSoundwaveSizeBeg) * timeDelta / kSoundwaveTime;
+
+        for (int i = 0; i < mBbs->getNumBillboards(); /* conditional inc in loop */)
+        {
+            Billboard * bb = mBbs->getBillboard(i);
+
+            float size = bb->getOwnWidth() + grow;
+
+            if (size <= kSoundwaveSizeEnd)
+            {
+                ColourValue color = kSoundwaveColor;
+                float d = (size - kSoundwaveSizeBeg) / (kSoundwaveSizeEnd - kSoundwaveSizeBeg);
+                color.a = (1.0f - d);// * (1.0f - d);
+
+                bb->setDimensions(size, size);
+                bb->setColour(color);
+                ++i;
+            }
+            else
+            {
+                mBbs->removeBillboard(i);
+            }
+        }
+    }
+
+    BillboardSet * mBbs;
+
+    const ColourValue kSoundwaveColor;
+    const float kSoundwaveSizeBeg;
+    const float kSoundwaveSizeEnd;
+    const float kSoundwaveTime;
+};
+
+
+class FootfallListener final : public TimeEventListener
+{
+public:
+    FootfallListener(Entity * entity, SoundwaveUpdater * soundwaveUpdater)
+    : mEntity(entity)
+    , mSoundwaveUpdater(soundwaveUpdater)
+    {}
+
+private:
+    void eventOccurred(const std::string & name, TimeEventDirection direction) override
+    {
+        Bone * toe;
+        if (name == "footfall-l")
+        {
+            toe = mEntity->getSkeleton()->getBone("Ltoe");
+        }
+        else if (name == "footfall-r")
+        {
+            toe = mEntity->getSkeleton()->getBone("Rtoe");
+        }
+        else
+        {
+            return;
+        }
+
+        Vector3 toePos = mEntity->getParentSceneNode()->convertLocalToWorldPosition(toe->_getDerivedPosition());
+        toePos.y = 0.0f;
+
+        mSoundwaveUpdater->addSoundwave(toePos);
+    }
+
+    Entity * mEntity;
+    SoundwaveUpdater * mSoundwaveUpdater;
 };
 
 
@@ -289,6 +418,82 @@ static void tweakSneakAnim(const SkeletonPtr& skel)
     animation->setLength(ANIM_CHOP);
 }
 
+static void insertFootfallEvents(Entity * entity, TimeEventList & eventList)
+{
+    /*  This function creates events coinciding with the footfalls in the sneak animation.
+        Events are just strings associated with a timestamp that will be triggered during
+        the playback of an animation and dispatched to a user-provided TimeEventListener.
+
+        Normally these would be manually created along with the animation itself. Here we
+        create them programmatically by stepping through the animation, applying the pose
+        to a skeleton, and looking for when each toe bone crosses the y=0 plane.
+     */
+
+    SkeletonInstance * skeleton = entity->getSkeleton();
+    Bone * lToeBone = skeleton->getBone("Ltoe");
+    Bone * rToeBone = skeleton->getBone("Rtoe");
+    Animation * animation = skeleton->getAnimation("Sneak");
+    AnimationState * as = entity->getAnimationState("Sneak");
+
+    // We want the root transforms applied.
+
+    if (as->hasBlendMask())
+    {
+        as->setBlendMaskEntry(skeleton->getBone("Spineroot")->getHandle(), 1.0f);
+    }
+
+    // Get ending position before loop to compare with start position.
+
+    as->setTimePosition(as->getLength());
+    entity->_updateSkeleton();
+
+    float lToePrevY = lToeBone->_getDerivedPosition().y;
+    float rToePrevY = rToeBone->_getDerivedPosition().y;
+
+    // This particular animation has keyframes for all tracks on a regular
+    // framerate so we can use keyframe times from any track for sampling.
+
+    NodeAnimationTrack * lToeTrack = animation->getNodeTrack(lToeBone->getHandle());
+
+    for (size_t i = 0; i < lToeTrack->getNumKeyFrames(); ++i)
+    {
+        TransformKeyFrame * tkf = lToeTrack->getNodeKeyFrame(i);
+        float time = tkf->getTime();
+
+        as->setTimePosition(time);
+        entity->_updateSkeleton();
+
+        float lToeY = lToeBone->_getDerivedPosition().y;
+        float rToeY = rToeBone->_getDerivedPosition().y;
+
+//        printf("t: %f   l: %f   r: %f\n", tkf->getTime(), lToeY, rToeY);
+
+        if ((lToePrevY > 0.0f) && (lToeY < 0.0f))
+        {
+            eventList.insert(std::make_pair(time, "footfall-l"));
+        }
+        if ((rToePrevY > 0.0f) && (rToeY < 0.0f))
+        {
+            eventList.insert(std::make_pair(time, "footfall-r"));
+        }
+
+        lToePrevY = lToeY;
+        rToePrevY = rToeY;
+    }
+
+    /*
+    // Do it manually
+
+    eventList.clear();
+
+    mFootfallEvents.insert(std::make_pair(0.666667f, "footfall-l"));
+    mFootfallEvents.insert(std::make_pair(2.000000f, "footfall-r"));
+    mFootfallEvents.insert(std::make_pair(3.500000f, "footfall-l"));
+    mFootfallEvents.insert(std::make_pair(4.166667f, "footfall-r"));
+    mFootfallEvents.insert(std::make_pair(4.666667f, "footfall-l"));
+     */
+}
+
 static void generateBoundingBox(Entity * entity)
 {
     // This is a hacky way to make a close-fitting bounding box
@@ -326,6 +531,71 @@ static void generateBoundingBox(Entity * entity)
     }
 
     entity->getMesh()->_setBounds(sneakBounds);
+}
+
+static void createSoundwaveMaterial(const String & material_name, const String & group_name)
+{
+    // Make image
+
+    const int w = 128;
+    const int h = 128;
+
+    Image image(PF_BYTE_RGBA, w, h);
+
+    // Draw ring
+
+    float r = (w - 1) / 2.0f;
+    float rr = r * r;
+
+    for (int y = 0; y < h; ++y)
+    {
+        uchar * lineData = image.getData(0, y);
+
+        for (int x = 0; x < w; ++x)
+        {
+            float v;
+
+            float dx = x - r;
+            float dy = y - r;
+            float dd = dx * dx + dy * dy;
+
+            if (dd > rr)
+            {
+                v = 0.0f;
+            }
+            else
+            {
+                v = dd / rr;
+            }
+
+            *(lineData++) = (unsigned char)(255);
+            *(lineData++) = (unsigned char)(255);
+            *(lineData++) = (unsigned char)(255);
+            *(lineData++) = (unsigned char)(255 * v);
+        }
+    }
+
+    // Make texture from image
+
+    TexturePtr t = TextureManager::getSingleton().loadImage(material_name, group_name, image);
+
+    // Make material
+
+    MaterialPtr material = MaterialManager::getSingleton().create(material_name, RGN_DEFAULT);
+
+    material->setCullingMode(CULL_NONE);
+    material->setSceneBlending(SceneBlendType::SBT_TRANSPARENT_ALPHA);
+    material->setLightingEnabled(false);
+    material->setDepthWriteEnabled(false);
+    material->setDepthBias(0, 1);
+
+    Pass * pass = material->getTechnique(0)->getPass(0);
+
+    pass->setVertexColourTracking(TVC_EMISSIVE);
+
+    // Attach the texture to the material texture unit (single layer) and setup properties
+    TextureUnitState* tus = pass->createTextureUnitState();
+    tus->setTexture(t);
 }
 
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
@@ -504,7 +774,7 @@ protected:
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
 
         // create a floor mesh resource
-        MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        MeshManager::getSingleton().createPlane("floor", RGN_DEFAULT,
             Plane(Vector3::UNIT_Y, -1), 250, 250, 25, 25, true, 1, 15, 15, Vector3::UNIT_Z);
 
         // add a floor to our scene using the floor mesh we created
@@ -529,7 +799,7 @@ protected:
         SkeletonPtr skeleton = mesh->getSkeleton();
         Bone * rootBone = skeleton->getBone("Spineroot");
         Animation * animation = skeleton->getAnimation("Sneak");
-        mSneakSpinerootTrack = animation->getNodeTrack(rootBone->getHandle());
+        NodeAnimationTrack * sneakRootTrack = animation->getNodeTrack(rootBone->getHandle());
 
         tweakJaiquaMesh(mesh, rootBone);
         tweakSneakAnim(skeleton);
@@ -539,6 +809,22 @@ protected:
         AnimationState* as = NULL;
 
         auto& controllerMgr = ControllerManager::getSingleton();
+
+        // Create soundwave material, billboard set, and updater.
+
+        createSoundwaveMaterial("soundwave", RGN_DEFAULT);
+
+        BillboardSet* soundwaveBbs = mSceneMgr->createBillboardSet();
+        soundwaveBbs->setMaterialName("soundwave");
+        soundwaveBbs->setBillboardType(BBT_PERPENDICULAR_COMMON);
+        soundwaveBbs->setCommonDirection(Vector3::UNIT_Y);
+        soundwaveBbs->setCommonUpVector(Vector3::NEGATIVE_UNIT_Z);
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(soundwaveBbs);
+
+        std::shared_ptr<SoundwaveUpdater> soundwaveUpdater = SoundwaveUpdater::create(soundwaveBbs);
+        controllerMgr.createFrameTimePassthroughController(soundwaveUpdater);
+
+        // Create models, animation updaters, and footfall listeners.
 
         for (int i = 0; i < NUM_MODELS; i++)
         {
@@ -554,13 +840,19 @@ protected:
             mEntities.push_back(ent);
             sn->attachObject(ent);
 
+            mFootfallListeners.push_back(std::make_unique<FootfallListener>(ent, soundwaveUpdater.get()));
+
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
             as->setEnabled(true);
             as->setLoop(true);
 
             auto updater = std::make_shared<AnimationUpdater>(as);
-            updater->setUseRootMotion(ent, mSneakSpinerootTrack);
+            updater->setUseRootMotion(ent, sneakRootTrack);
+            updater->setUseTimeEvents(true);
+            TimeEventDispatcher * ted = updater->getTimeEventDispatcher();
+            ted->addEventList(&mSneakEvents);
+            ted->addListener(mFootfallListeners[i].get());
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
                                            updater,
@@ -569,6 +861,7 @@ protected:
             mAnimUpdaters.push_back(updater.get());
         }
 
+        insertFootfallEvents(mEntities[0], mSneakEvents);
         generateBoundingBox(mEntities[0]);
 
         // create name and value for skinning mode
@@ -608,7 +901,10 @@ protected:
         mModelNodes.clear();
         mEntities.clear();
         mAnimUpdaters.clear();
-        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        mFootfallListeners.clear();
+        MeshManager::getSingleton().remove("floor", RGN_DEFAULT);
+        MaterialManager::getSingleton().remove("soundwave", RGN_DEFAULT);
+        TextureManager::getSingleton().remove("soundwave", RGN_DEFAULT);
     }
 
     const int NUM_MODELS;
@@ -621,10 +917,9 @@ protected:
     std::vector<SceneNode*> mModelNodes;
     std::vector<Entity*> mEntities;
     std::vector<AnimationUpdater*> mAnimUpdaters;
+    std::vector<std::unique_ptr<FootfallListener>> mFootfallListeners;
 
-    NodeAnimationTrack* mSneakSpinerootTrack;
-    Vector3 mSneakTranslate;
-    Quaternion mSneakRotation;
+    TimeEventList mSneakEvents;
 };
 
 #endif
