@@ -215,27 +215,27 @@ private:
 };
 
 
-class FootfallUpdater : public ControllerValue<float>
+class SoundwaveUpdater : public ControllerValue<float>
 {
 public:
 
-    FootfallUpdater(BillboardSet * bbs)
+    SoundwaveUpdater(BillboardSet * bbs)
     : mBbs(bbs)
-    , kFootfallColor(1.0f, 0.4f, 0.0f)
-    , kFootfallSizeBeg(2.0f)
-    , kFootfallSizeEnd(80.0f)
-    , kFootfallTime(0.5f)
+    , kSoundwaveColor(1.0f, 0.4f, 0.0f)
+    , kSoundwaveSizeBeg(2.0f)
+    , kSoundwaveSizeEnd(80.0f)
+    , kSoundwaveTime(0.5f)
     {}
 
-    static std::shared_ptr<FootfallUpdater> create(BillboardSet* bbs)
+    static std::shared_ptr<SoundwaveUpdater> create(BillboardSet* bbs)
     {
-        return std::make_shared<FootfallUpdater>(bbs);
+        return std::make_shared<SoundwaveUpdater>(bbs);
     }
 
-    void addFootfall(const Vector3 & pos)
+    void addSoundwave(const Vector3 & pos)
     {
-        Billboard * bb = mBbs->createBillboard(pos, kFootfallColor);
-        bb->setDimensions(kFootfallSizeBeg, kFootfallSizeBeg);
+        Billboard * bb = mBbs->createBillboard(pos, kSoundwaveColor);
+        bb->setDimensions(kSoundwaveSizeBeg, kSoundwaveSizeBeg);
         mBbs->_updateBounds();
     }
 
@@ -248,7 +248,7 @@ private:
 
     void setValue(float timeDelta) override
     {
-        float grow = (kFootfallSizeEnd - kFootfallSizeBeg) * timeDelta / kFootfallTime;
+        float grow = (kSoundwaveSizeEnd - kSoundwaveSizeBeg) * timeDelta / kSoundwaveTime;
 
         for (int i = 0; i < mBbs->getNumBillboards(); /* conditional inc in loop */)
         {
@@ -256,10 +256,10 @@ private:
 
             float size = bb->getOwnWidth() + grow;
 
-            if (size <= kFootfallSizeEnd)
+            if (size <= kSoundwaveSizeEnd)
             {
-                ColourValue color = kFootfallColor;
-                float d = (size - kFootfallSizeBeg) / (kFootfallSizeEnd - kFootfallSizeBeg);
+                ColourValue color = kSoundwaveColor;
+                float d = (size - kSoundwaveSizeBeg) / (kSoundwaveSizeEnd - kSoundwaveSizeBeg);
                 color.a = (1.0f - d);// * (1.0f - d);
 
                 bb->setDimensions(size, size);
@@ -275,19 +275,19 @@ private:
 
     BillboardSet * mBbs;
 
-    const ColourValue kFootfallColor;
-    const float kFootfallSizeBeg;
-    const float kFootfallSizeEnd;
-    const float kFootfallTime;
+    const ColourValue kSoundwaveColor;
+    const float kSoundwaveSizeBeg;
+    const float kSoundwaveSizeEnd;
+    const float kSoundwaveTime;
 };
 
 
 class FootfallListener final : public TimeEventListener
 {
 public:
-    FootfallListener(Entity * entity, FootfallUpdater * footfallUpdater)
+    FootfallListener(Entity * entity, SoundwaveUpdater * soundwaveUpdater)
     : mEntity(entity)
-    , mFootfallUpdater(footfallUpdater)
+    , mSoundwaveUpdater(soundwaveUpdater)
     {}
 
 private:
@@ -310,11 +310,11 @@ private:
         Vector3 toePos = mEntity->getParentSceneNode()->convertLocalToWorldPosition(toe->_getDerivedPosition());
         toePos.y = 0.0f;
 
-        mFootfallUpdater->addFootfall(toePos);
+        mSoundwaveUpdater->addSoundwave(toePos);
     }
 
     Entity * mEntity;
-    FootfallUpdater * mFootfallUpdater;
+    SoundwaveUpdater * mSoundwaveUpdater;
 };
 
 
@@ -533,7 +533,7 @@ static void generateBoundingBox(Entity * entity)
     entity->getMesh()->_setBounds(sneakBounds);
 }
 
-static void createFootfallMaterial(const String & material_name, const String & group_name)
+static void createSoundwaveMaterial(const String & material_name, const String & group_name)
 {
     // Make texture
 
@@ -812,19 +812,19 @@ protected:
 
         auto& controllerMgr = ControllerManager::getSingleton();
 
-        // Create footfall material, billboard set, and updater.
+        // Create soundwave material, billboard set, and updater.
 
-        createFootfallMaterial("footfall", RGN_DEFAULT);
+        createSoundwaveMaterial("soundwave", RGN_DEFAULT);
 
-        BillboardSet* footfallBbs = mSceneMgr->createBillboardSet();
-        footfallBbs->setMaterialName("footfall");
-        footfallBbs->setBillboardType(BBT_PERPENDICULAR_COMMON);
-        footfallBbs->setCommonDirection(Vector3::UNIT_Y);
-        footfallBbs->setCommonUpVector(Vector3::NEGATIVE_UNIT_Z);
-        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(footfallBbs);
+        BillboardSet* soundwaveBbs = mSceneMgr->createBillboardSet();
+        soundwaveBbs->setMaterialName("soundwave");
+        soundwaveBbs->setBillboardType(BBT_PERPENDICULAR_COMMON);
+        soundwaveBbs->setCommonDirection(Vector3::UNIT_Y);
+        soundwaveBbs->setCommonUpVector(Vector3::NEGATIVE_UNIT_Z);
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(soundwaveBbs);
 
-        std::shared_ptr<FootfallUpdater> footfallUpdater = FootfallUpdater::create(footfallBbs);
-        controllerMgr.createFrameTimePassthroughController(footfallUpdater);
+        std::shared_ptr<SoundwaveUpdater> soundwaveUpdater = SoundwaveUpdater::create(soundwaveBbs);
+        controllerMgr.createFrameTimePassthroughController(soundwaveUpdater);
 
         // Create models, animation updaters, and footfall listeners.
 
@@ -842,7 +842,7 @@ protected:
             mEntities.push_back(ent);
             sn->attachObject(ent);
 
-            mFootfallListeners.push_back(std::make_unique<FootfallListener>(ent, footfallUpdater.get()));
+            mFootfallListeners.push_back(std::make_unique<FootfallListener>(ent, soundwaveUpdater.get()));
 
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
@@ -905,8 +905,8 @@ protected:
         mAnimUpdaters.clear();
         mFootfallListeners.clear();
         MeshManager::getSingleton().remove("floor", RGN_DEFAULT);
-        MaterialManager::getSingleton().remove("footfall", RGN_DEFAULT);
-        TextureManager::getSingleton().remove("footfall-ring", RGN_DEFAULT);
+        MaterialManager::getSingleton().remove("soundwave", RGN_DEFAULT);
+        TextureManager::getSingleton().remove("soundwave-ring", RGN_DEFAULT);
     }
 
     const int NUM_MODELS;
