@@ -250,7 +250,7 @@ private:
     {
         float grow = (kFootfallSizeEnd - kFootfallSizeBeg) * timeDelta / kFootfallTime;
 
-        for (int i = 0; i < mBbs->getNumBillboards(); /* conditional inc in loop*/)
+        for (int i = 0; i < mBbs->getNumBillboards(); /* conditional inc in loop */)
         {
             Billboard * bb = mBbs->getBillboard(i);
 
@@ -260,7 +260,7 @@ private:
             {
                 ColourValue color = kFootfallColor;
                 float d = (size - kFootfallSizeBeg) / (kFootfallSizeEnd - kFootfallSizeBeg);
-                color.a = 1.0f - d * d;
+                color.a = (1.0f - d);// * (1.0f - d);
 
                 bb->setDimensions(size, size);
                 bb->setColour(color);
@@ -539,8 +539,8 @@ static void createFootfallMaterial(const String & material_name, const String & 
 
     const String & texName = material_name + "-ring";
 
-    int w = 64;
-    int h = 64;
+    int w = 128;
+    int h = 128;
 
     TexturePtr t = TextureManager::getSingleton().createManual(texName, group_name, TEX_TYPE_2D, w, h, 1, 0, PF_BYTE_RGBA, TU_DYNAMIC_WRITE_ONLY);
 
@@ -905,6 +905,8 @@ protected:
         mAnimUpdaters.clear();
         mFootfallListeners.clear();
         MeshManager::getSingleton().remove("floor", RGN_DEFAULT);
+        MaterialManager::getSingleton().remove("footfall", RGN_DEFAULT);
+        TextureManager::getSingleton().remove("footfall-ring", RGN_DEFAULT);
     }
 
     const int NUM_MODELS;
