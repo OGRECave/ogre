@@ -215,6 +215,109 @@ private:
 };
 
 
+class FootfallUpdater : public ControllerValue<float>
+{
+public:
+
+    FootfallUpdater(BillboardSet * bbs)
+    : mBbs(bbs)
+    , kFootfallColor(1.0f, 0.4f, 0.0f)
+    , kFootfallSizeBeg(2.0f)
+    , kFootfallSizeEnd(80.0f)
+    , kFootfallTime(0.5f)
+    {}
+
+    static std::shared_ptr<FootfallUpdater> create(BillboardSet* bbs)
+    {
+        return std::make_shared<FootfallUpdater>(bbs);
+    }
+
+    void addFootfall(const Vector3 & pos)
+    {
+        Billboard * bb = mBbs->createBillboard(pos, kFootfallColor);
+        bb->setDimensions(kFootfallSizeBeg, kFootfallSizeBeg);
+        mBbs->_updateBounds();
+    }
+
+private:
+
+    float getValue(void) const override
+    {
+        return 0.0f;
+    }
+
+    void setValue(float timeDelta) override
+    {
+        float grow = (kFootfallSizeEnd - kFootfallSizeBeg) * timeDelta / kFootfallTime;
+
+        for (int i = 0; i < mBbs->getNumBillboards(); /* conditional inc in loop*/)
+        {
+            Billboard * bb = mBbs->getBillboard(i);
+
+            float size = bb->getOwnWidth() + grow;
+
+            if (size <= kFootfallSizeEnd)
+            {
+                ColourValue color = kFootfallColor;
+                float d = (size - kFootfallSizeBeg) / (kFootfallSizeEnd - kFootfallSizeBeg);
+                color.a = 1.0f - d * d;
+
+                bb->setDimensions(size, size);
+                bb->setColour(color);
+                ++i;
+            }
+            else
+            {
+                mBbs->removeBillboard(i);
+            }
+        }
+    }
+
+    BillboardSet * mBbs;
+
+    const ColourValue kFootfallColor;
+    const float kFootfallSizeBeg;
+    const float kFootfallSizeEnd;
+    const float kFootfallTime;
+};
+
+
+class FootfallListener final : public TimeEventListener
+{
+public:
+    FootfallListener(Entity * entity, FootfallUpdater * footfallUpdater)
+    : mEntity(entity)
+    , mFootfallUpdater(footfallUpdater)
+    {}
+
+private:
+    void eventOccurred(const std::string & name, TimeEventDirection direction) override
+    {
+        Bone * toe;
+        if (name == "footfall-l")
+        {
+            toe = mEntity->getSkeleton()->getBone("Ltoe");
+        }
+        else if (name == "footfall-r")
+        {
+            toe = mEntity->getSkeleton()->getBone("Rtoe");
+        }
+        else
+        {
+            return;
+        }
+
+        Vector3 toePos = mEntity->getParentSceneNode()->convertLocalToWorldPosition(toe->_getDerivedPosition());
+        toePos.y = 0.0f;
+
+        mFootfallUpdater->addFootfall(toePos);
+    }
+
+    Entity * mEntity;
+    FootfallUpdater * mFootfallUpdater;
+};
+
+
 /*-----------------------------------------------------------------------------
 | The jaiqua mesh has the vertices baked quite a distance from local origin.
 | This moves the mesh to the origin and moves the skeleton's Spineroot bone.
@@ -709,7 +812,7 @@ protected:
 
         auto& controllerMgr = ControllerManager::getSingleton();
 
-        // Create footfall material and billboard set
+        // Create footfall material, billboard set, and updater.
 
         createFootfallMaterial("footfall", RGN_DEFAULT);
 
@@ -720,7 +823,10 @@ protected:
         footfallBbs->setCommonUpVector(Vector3::NEGATIVE_UNIT_Z);
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(footfallBbs);
 
-        // Create models and animation updaters
+        std::shared_ptr<FootfallUpdater> footfallUpdater = FootfallUpdater::create(footfallBbs);
+        controllerMgr.createFrameTimePassthroughController(footfallUpdater);
+
+        // Create models, animation updaters, and footfall listeners.
 
         for (int i = 0; i < NUM_MODELS; i++)
         {
@@ -736,6 +842,8 @@ protected:
             mEntities.push_back(ent);
             sn->attachObject(ent);
 
+            mFootfallListeners.push_back(std::make_unique<FootfallListener>(ent, footfallUpdater.get()));
+
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
             as->setEnabled(true);
@@ -746,6 +854,7 @@ protected:
             updater->setUseTimeEvents(true);
             TimeEventDispatcher * ted = updater->getTimeEventDispatcher();
             ted->addEventList(&mSneakEvents);
+            ted->addListener(mFootfallListeners[i].get());
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
                                            updater,
@@ -794,6 +903,7 @@ protected:
         mModelNodes.clear();
         mEntities.clear();
         mAnimUpdaters.clear();
+        mFootfallListeners.clear();
         MeshManager::getSingleton().remove("floor", RGN_DEFAULT);
     }
 
@@ -807,6 +917,7 @@ protected:
     std::vector<SceneNode*> mModelNodes;
     std::vector<Entity*> mEntities;
     std::vector<AnimationUpdater*> mAnimUpdaters;
+    std::vector<std::unique_ptr<FootfallListener>> mFootfallListeners;
 
     TimeEventList mSneakEvents;
 };
