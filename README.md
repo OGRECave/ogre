@@ -6,17 +6,36 @@
 
 ![](Other/ogre_header.svg)
 
-## OGRE - scene-oriented, flexible 3D engine
+## The High-Performance Rendering Backend
 
-**OGRE (Object-Oriented Graphics Rendering Engine)** is a powerful, open-source 3D rendering engine that empowers you to create stunning games, simulations, and visualizations without getting bogged down in low-level graphics APIs.
+**OGRE (Object-Oriented Graphics Rendering Engine)** is a proven, modular C++ renderer for custom engine development. It empowers engine programmers and industrial simulation developers to build high-performance 3D applications in C++ and Python efficiently.
 
-Focus on creating your world, not on boilerplate code. OGRE's scene-oriented approach and clean C++ architecture provide an intuitive framework, abstracting the complexities of Direct3D and OpenGL so you can be more productive.
+Start with a battle-tested, flexible rendering backend that scales from embedded robotics to high-end visualization tools. OGRE abstracts Vulkan, Direct3D, and OpenGL so you can focus on your engine's logic.
 
 [Get Started](#get-started-now) -
 [Tutorials](https://ogrecave.github.io/ogre/api/latest/tutorials.html) -
 [Documentation](https://ogrecave.github.io/ogre/api/latest/manual.html) -
 [Community Support](http://forums.ogre3d.org/) -
 [What's New?](Docs/14-Notes.md)
+
+## Instant Prototyping with Python
+
+Experience rapid prototyping with our high-level Python bindings ([HighPy](https://ogrecave.github.io/ogre/api/latest/namespace_python_1_1_high_py.html)). Get a PBR scene running in seconds:
+
+```python
+# pip install ogre-python
+import Ogre.HighPy as ohi
+
+# Create a window
+ohi.window_create("Ogre", window_size=(1280, 720))
+
+# Load a mesh (glTF 2.0, OBJ, or Ogre Mesh)
+ohi.mesh_show("Ogre", "DamagedHelmet.glb", position=(0, 0, -3))
+ohi.point_light("Ogre", position=(0, 10, 0))
+# Main Loop
+while ohi.window_draw("Ogre") != 27: # Press ESC to exit
+    pass
+```
 
 
 ## Features
@@ -52,11 +71,10 @@ For a complete list of capabilities, see our [features page](http://www.ogre3d.o
 
 ## Get started now
 
-Ready to try OGRE? You can be up and running in minutes.
+Ready to try OGRE? Get up and running in minutes.
 
-* **Try it Online:** [Launch the Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/) right in your browser.
+* **Try it Online:** [Launch the WebAssembly Demo](https://ogrecave.github.io/ogre/emscripten/) right in your browser.
 * **Download for Windows:** [Get the latest SDK](https://dl.cloudsmith.io/public/ogrecave/ogre/raw/versions/master/ogre-sdk-master-msvc142-x64.zip) with pre-compiled demos.
-* **Install on Linux:** Use our [Snap Package](https://snapcraft.io/ogre) for easy installation.
 * **Get it on Android:** Find our sample browser on [F-Droid](https://f-droid.org/packages/org.ogre.browser/).
 
 
@@ -64,15 +82,17 @@ For detailed instructions on compiling from source, see our [**Building OGRE gui
 
 ## Who is using it?
 
-Trusted by both open-source communities and commercial studios:
+Trusted by commercial studios and open-source communities for games, simulators, and tools:
 
-**Open Source & Research**
+**Industrial & Robotics**
+- [Gazebo - Robot simulation](http://gazebosim.org/)
+- [ROS 3D visualization tool (rviz)](http://wiki.ros.org/rviz)
+- [Surgical Image Toolkit](https://github.com/IRCAD/sight#applications)
+- [OpenCV OVIS visualization module](https://docs.opencv.org/master/d2/d17/group__ovis.html)
+
+**Open Source Games**
 - [Stunt Rally 2.x - 3D Racing Game with Track Editor](https://github.com/stuntrally/stuntrally/)
 - [Rigs of Rods - Soft Body Physics Simulator](https://rigsofrods.org/)
-- [Gazebo - Robot simulation](http://gazebosim.org/)
-- [OpenCV OVIS visualization module](https://docs.opencv.org/master/d2/d17/group__ovis.html)
-- [ROS 3D visualization tool](http://wiki.ros.org/rviz)
-- [Surgical Image Toolkit](https://github.com/IRCAD/sight#applications)
 
 **Commercial Games**
 - [Hob](http://store.steampowered.com/app/404680/Hob/)
@@ -80,10 +100,10 @@ Trusted by both open-source communities and commercial studios:
 - [Battlezone 98 Redux](http://store.steampowered.com/app/301650/Battlezone_98_Redux/)
 
 ## Join Our Community
-We believe in the power of collaboration. Whether you're a seasoned developer or just starting, you are welcome in the OGRE community.
+We believe in the power of collaboration.
 
-* **Ask a question** in our [Forums](http://forums.ogre3d.org/) or on [Gitter](https://gitter.im/OGRECave/ogre).
-* **Contribute to the engine** by creating a [pull request](https://github.com/OGRECave/ogre/pulls). We welcome everything from bug fixes and documentation to new features.
+* **Engine Programming Q&A**: Ask technical questions in our [Forums](http://forums.ogre3d.org/) or on [Gitter](https://gitter.im/OGRECave/ogre).
+* **Contribute**: Check out [good first issues](https://github.com/OGRECave/ogre/labels/good%20first%20issue) to get started. We welcome everything from bug fixes to new features.
 * **Support the project** via [Patreon](https://www.patreon.com/ogre1) to help fund continued development.
 
 ## Licensing
