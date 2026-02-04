@@ -7,6 +7,7 @@
 #include "OgreShaderExHardwareSkinning.h"
 #endif
 #include "OgreBillboard.h"
+#include "TimeEvents.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -174,6 +175,13 @@ public:
         {
             mRootMotionApplier->apply(loops, thisTime);
         }
+
+        // Dispatch Events
+
+        if (mTimeEventDispatcher)
+        {
+            mTimeEventDispatcher->dispatch(lastTime, thisTime, loops, length);
+        }
     }
 
     void setUseRootMotion(Entity* entity, NodeAnimationTrack* track)
@@ -183,9 +191,27 @@ public:
 
     RootMotionApplier * getRootMotionApplier() { return mRootMotionApplier.get(); }
 
+    void setUseTimeEvents(bool use)
+    {
+        if (use)
+        {
+            if (!mTimeEventDispatcher)
+            {
+                mTimeEventDispatcher.reset(new TimeEventDispatcher);
+            }
+        }
+        else
+        {
+            mTimeEventDispatcher.reset();
+        }
+    }
+
+    TimeEventDispatcher * getTimeEventDispatcher() { return mTimeEventDispatcher.get(); }
+
 private:
     AnimationState* mAnimationState;
     std::unique_ptr<RootMotionApplier> mRootMotionApplier;
+    std::unique_ptr<TimeEventDispatcher> mTimeEventDispatcher;
 };
 
 
