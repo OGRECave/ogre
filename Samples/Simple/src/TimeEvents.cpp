@@ -7,6 +7,8 @@
 
 #include "TimeEvents.h"
 
+#include <algorithm>
+
 
 void TimeEventDispatcher::addEventList(const TimeEventList * list)
 {
