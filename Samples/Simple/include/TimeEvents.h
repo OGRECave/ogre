@@ -19,39 +19,39 @@ typedef std::multimap<float, std::string> TimeEventList;
 
 enum TimeEventDirection
 {
-	kTEDForward,
-	kTEDBackward,
+    kTEDForward,
+    kTEDBackward,
 };
 
 
 class TimeEventListener
 {
 public:
-	virtual void eventOccurred(const std::string & name, TimeEventDirection direction) {}
+    virtual void eventOccurred(const std::string & name, TimeEventDirection direction) {}
 };
 
 
 class TimeEventDispatcher
 {
 public:
-	void addEventList(const TimeEventList * list);
-	void removeEventList(const TimeEventList * list);
+    void addEventList(const TimeEventList * list);
+    void removeEventList(const TimeEventList * list);
 
-	void addListener(TimeEventListener * listener);
-	void removeListener(TimeEventListener * listener);
+    void addListener(TimeEventListener * listener);
+    void removeListener(TimeEventListener * listener);
 
-	void dispatch(float lastTime, float thisTime, int loops, float length);
-	
+    void dispatch(float lastTime, float thisTime, int loops, float length);
+
 private:
-	void dispatchForwardInclusive(float lastTime, float thisTime);
-	void dispatchForwardExclusive(float lastTime, float thisTime);
-	void dispatchBackwardInclusive(float lastTime, float thisTime);
-	void dispatchBackwardExclusive(float lastTime, float thisTime);
+    void dispatchForwardInclusive(float lastTime, float thisTime);
+    void dispatchForwardExclusive(float lastTime, float thisTime);
+    void dispatchBackwardInclusive(float lastTime, float thisTime);
+    void dispatchBackwardExclusive(float lastTime, float thisTime);
 
-	void dispatchEvent(const std::string & name, TimeEventDirection direction);
+    void dispatchEvent(const std::string & name, TimeEventDirection direction);
 
-	std::vector<const TimeEventList *> mEventLists;
-	std::vector<TimeEventListener *> mListeners;
+    std::vector<const TimeEventList *> mEventLists;
+    std::vector<TimeEventListener *> mListeners;
 };
 
 
