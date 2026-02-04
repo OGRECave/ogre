@@ -430,6 +430,73 @@ static void generateBoundingBox(Entity * entity)
     entity->getMesh()->_setBounds(sneakBounds);
 }
 
+static void createFootfallMaterial(const String & material_name, const String & group_name)
+{
+    // Make texture
+
+    const String & texName = material_name + "-ring";
+
+    int w = 64;
+    int h = 64;
+
+    TexturePtr t = TextureManager::getSingleton().createManual(texName, group_name, TEX_TYPE_2D, w, h, 1, 0, PF_BYTE_RGBA, TU_DYNAMIC_WRITE_ONLY);
+
+    if (t->getFormat() != PF_BYTE_RGBA) printf("ERROR: Pixel format is not BYTE_RGBA which is what was requested!");
+
+    unsigned char * texData = (unsigned char *)t->getBuffer()->lock(HardwareBuffer::HBL_DISCARD);
+
+    // Draw ring
+
+    float r = (w - 1) / 2.0f;
+    float rr = r * r;
+
+    for (int y = 0; y < h; ++y)
+    {
+        for (int x = 0; x < w; ++x)
+        {
+            float v;
+
+            float dx = x - r;
+            float dy = y - r;
+            float dd = dx * dx + dy * dy;
+
+            if (dd > rr)
+            {
+                v = 0.0f;
+            }
+            else
+            {
+                v = dd / rr;
+            }
+
+            *(texData++) = (unsigned char)(255);
+            *(texData++) = (unsigned char)(255);
+            *(texData++) = (unsigned char)(255);
+            *(texData++) = (unsigned char)(255 * v);
+        }
+    }
+
+    t->getBuffer()->unlock();
+
+    // Make material
+
+    MaterialPtr material = MaterialManager::getSingleton().create(material_name, RGN_DEFAULT);
+    material->setSpecular(ColourValue::Black);
+
+    material->setCullingMode(CULL_NONE);
+    material->setSceneBlending(SceneBlendType::SBT_TRANSPARENT_ALPHA);
+    material->setDepthWriteEnabled(false);
+    material->setDepthBias(0, 1);
+
+    Pass * pass = material->getTechnique(0)->getPass(0);
+
+    pass->setVertexColourTracking(TVC_AMBIENT | TVC_DIFFUSE | TVC_EMISSIVE);
+
+    // Attach the texture to the material texture unit (single layer) and setup properties
+    TextureUnitState* tus = pass->createTextureUnitState();
+    tus->setTextureName(texName, TEX_TYPE_2D);
+}
+
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
     enum VisualiseBoundingBoxMode
@@ -641,6 +708,8 @@ protected:
         AnimationState* as = NULL;
 
         auto& controllerMgr = ControllerManager::getSingleton();
+
+        createFootfallMaterial("footfall", RGN_DEFAULT);
 
         for (int i = 0; i < NUM_MODELS; i++)
         {
