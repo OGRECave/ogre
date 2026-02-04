@@ -315,6 +315,82 @@ static void tweakSneakAnim(const SkeletonPtr& skel)
     animation->setLength(ANIM_CHOP);
 }
 
+static void insertFootfallEvents(Entity * entity, TimeEventList & eventList)
+{
+    /*  This function creates events coinciding with the footfalls in the sneak animation.
+        Events are just strings associated with a timestamp that will be triggered during
+        the playback of an animation and dispatched to a user-provided TimeEventListener.
+
+        Normally these would be manually created along with the animation itself. Here we
+        create them programmatically by stepping through the animation, applying the pose
+        to a skeleton, and looking for when each toe bone crosses the y=0 plane.
+     */
+
+    SkeletonInstance * skeleton = entity->getSkeleton();
+    Bone * lToeBone = skeleton->getBone("Ltoe");
+    Bone * rToeBone = skeleton->getBone("Rtoe");
+    Animation * animation = skeleton->getAnimation("Sneak");
+    AnimationState * as = entity->getAnimationState("Sneak");
+
+    // We want the root transforms applied.
+
+    if (as->hasBlendMask())
+    {
+        as->setBlendMaskEntry(skeleton->getBone("Spineroot")->getHandle(), 1.0f);
+    }
+
+    // Get ending position before loop to compare with start position.
+
+    as->setTimePosition(as->getLength());
+    entity->_updateSkeleton();
+
+    float lToePrevY = lToeBone->_getDerivedPosition().y;
+    float rToePrevY = rToeBone->_getDerivedPosition().y;
+
+    // This particular animation has keyframes for all tracks on a regular
+    // framerate so we can use keyframe times from any track for sampling.
+
+    NodeAnimationTrack * lToeTrack = animation->getNodeTrack(lToeBone->getHandle());
+
+    for (size_t i = 0; i < lToeTrack->getNumKeyFrames(); ++i)
+    {
+        TransformKeyFrame * tkf = lToeTrack->getNodeKeyFrame(i);
+        float time = tkf->getTime();
+
+        as->setTimePosition(time);
+        entity->_updateSkeleton();
+
+        float lToeY = lToeBone->_getDerivedPosition().y;
+        float rToeY = rToeBone->_getDerivedPosition().y;
+
+//        printf("t: %f   l: %f   r: %f\n", tkf->getTime(), lToeY, rToeY);
+
+        if ((lToePrevY > 0.0f) && (lToeY < 0.0f))
+        {
+            eventList.insert(std::make_pair(time, "footfall-l"));
+        }
+        if ((rToePrevY > 0.0f) && (rToeY < 0.0f))
+        {
+            eventList.insert(std::make_pair(time, "footfall-r"));
+        }
+
+        lToePrevY = lToeY;
+        rToePrevY = rToeY;
+    }
+
+    /*
+    // Do it manually
+
+    eventList.clear();
+
+    mFootfallEvents.insert(std::make_pair(0.666667f, "footfall-l"));
+    mFootfallEvents.insert(std::make_pair(2.000000f, "footfall-r"));
+    mFootfallEvents.insert(std::make_pair(3.500000f, "footfall-l"));
+    mFootfallEvents.insert(std::make_pair(4.166667f, "footfall-r"));
+    mFootfallEvents.insert(std::make_pair(4.666667f, "footfall-l"));
+     */
+}
+
 static void generateBoundingBox(Entity * entity)
 {
     // This is a hacky way to make a close-fitting bounding box
@@ -587,6 +663,9 @@ protected:
 
             auto updater = std::make_shared<AnimationUpdater>(as);
             updater->setUseRootMotion(ent, sneakRootTrack);
+            updater->setUseTimeEvents(true);
+            TimeEventDispatcher * ted = updater->getTimeEventDispatcher();
+            ted->addEventList(&mSneakEvents);
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
                                            updater,
@@ -595,6 +674,7 @@ protected:
             mAnimUpdaters.push_back(updater.get());
         }
 
+        insertFootfallEvents(mEntities[0], mSneakEvents);
         generateBoundingBox(mEntities[0]);
 
         // create name and value for skinning mode
@@ -647,6 +727,8 @@ protected:
     std::vector<SceneNode*> mModelNodes;
     std::vector<Entity*> mEntities;
     std::vector<AnimationUpdater*> mAnimUpdaters;
+
+    TimeEventList mSneakEvents;
 };
 
 #endif
