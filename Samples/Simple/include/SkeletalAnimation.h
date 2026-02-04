@@ -504,7 +504,7 @@ protected:
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
 
         // create a floor mesh resource
-        MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        MeshManager::getSingleton().createPlane("floor", RGN_DEFAULT,
             Plane(Vector3::UNIT_Y, -1), 250, 250, 25, 25, true, 1, 15, 15, Vector3::UNIT_Z);
 
         // add a floor to our scene using the floor mesh we created
@@ -529,7 +529,7 @@ protected:
         SkeletonPtr skeleton = mesh->getSkeleton();
         Bone * rootBone = skeleton->getBone("Spineroot");
         Animation * animation = skeleton->getAnimation("Sneak");
-        mSneakSpinerootTrack = animation->getNodeTrack(rootBone->getHandle());
+        NodeAnimationTrack * sneakRootTrack = animation->getNodeTrack(rootBone->getHandle());
 
         tweakJaiquaMesh(mesh, rootBone);
         tweakSneakAnim(skeleton);
@@ -560,7 +560,7 @@ protected:
             as->setLoop(true);
 
             auto updater = std::make_shared<AnimationUpdater>(as);
-            updater->setUseRootMotion(ent, mSneakSpinerootTrack);
+            updater->setUseRootMotion(ent, sneakRootTrack);
 
             controllerMgr.createController(controllerMgr.getFrameTimeSource(),
                                            updater,
@@ -608,7 +608,7 @@ protected:
         mModelNodes.clear();
         mEntities.clear();
         mAnimUpdaters.clear();
-        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().remove("floor", RGN_DEFAULT);
     }
 
     const int NUM_MODELS;
@@ -621,10 +621,6 @@ protected:
     std::vector<SceneNode*> mModelNodes;
     std::vector<Entity*> mEntities;
     std::vector<AnimationUpdater*> mAnimUpdaters;
-
-    NodeAnimationTrack* mSneakSpinerootTrack;
-    Vector3 mSneakTranslate;
-    Quaternion mSneakRotation;
 };
 
 #endif
