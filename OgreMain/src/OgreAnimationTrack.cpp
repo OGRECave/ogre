@@ -422,11 +422,11 @@ namespace Ogre {
 
                 // Translation
                 base = k1->getTranslate();
-                kret->setTranslate( base + ((k2->getTranslate() - base) * t) );
+                kret->setTranslate(Math::lerp(base, k2->getTranslate(), t));
 
                 // Scale
                 base = k1->getScale();
-                kret->setScale( base + ((k2->getScale() - base) * t) );
+                kret->setScale(Math::lerp(base, k2->getScale(), t));
                 break;
 
             case Animation::IM_SPLINE:
@@ -504,9 +504,9 @@ namespace Ogre {
         if (scale != Vector3::UNIT_SCALE)
         {
             if (scl != 1.0f)
-                scale = Vector3::UNIT_SCALE + (scale - Vector3::UNIT_SCALE) * scl;
+                scale = Math::lerp(Vector3::UNIT_SCALE, scale, scl);
             else if (weight != 1.0f)
-                scale = Vector3::UNIT_SCALE + (scale - Vector3::UNIT_SCALE) * weight;
+                scale = Math::lerp(Vector3::UNIT_SCALE, scale, weight);
         }
         node->scale(scale);
 
@@ -741,8 +741,7 @@ namespace Ogre {
                     }
                 }
                 // Interpolate influence
-                Real influence = startInfluence + t*(endInfluence - startInfluence);
-                
+                Real influence = Math::lerp(startInfluence, endInfluence, t);
                 vkfOut->addPoseReference(p1.poseIndex, influence);
                 
                 
@@ -875,7 +874,7 @@ namespace Ogre {
                     }
                 }
                 // Interpolate influence
-                float influence = startInfluence + t*(endInfluence - startInfluence);
+                float influence = Math::lerp(startInfluence, endInfluence, t);
                 // Scale by animation weight
                 influence = weight * influence;
                 // Get pose

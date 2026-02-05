@@ -406,7 +406,7 @@ namespace Ogre
         */
         template <typename V, typename T> static V lerp(const V& v0, const V& v1, const T& t)
         {
-            return v0 * (1 - t) + v1 * t;
+            return v0 + t * (v1 - v0);
         }
 
         /** Inverse linear interpolation.
@@ -492,7 +492,7 @@ namespace Ogre
             @return
                 A random number in the range from [fLow,fHigh].
          */
-        static float RangeRandom(float fLow, float fHigh) { return (fHigh - fLow) * UnitRandom() + fLow; }
+        static float RangeRandom(float fLow, float fHigh) { return lerp(fLow, fHigh, UnitRandom()); }
 
         /** Generate a random number in the range [-1,1].
             @return

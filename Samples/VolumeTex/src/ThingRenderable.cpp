@@ -39,7 +39,7 @@ void ThingRenderable::addTime(float t)
     for(size_t x=0; x<mCount; x++)
     {
         Quaternion dest = things[x] * orbits[x];
-        things[x] = things[x] + t * (dest - things[x]);
+        things[x] = Math::lerp(things[x], dest, t);
         things[x].normalise();
     }
     fillBuffer();
