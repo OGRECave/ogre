@@ -324,8 +324,8 @@ namespace Ogre
 
         assert(ifirst != mKeys.end());
 
-        Real alpha = (input - mKeys[idx])/(mKeys[idx + 1] - mKeys[idx]);
-        return mValues[idx] + alpha * (mValues[idx + 1] - mValues[idx]);
+        Real alpha = Math::inverseLerp(mKeys[idx], mKeys[idx + 1], input);
+        return Math::lerp(mValues[idx], mValues[idx + 1], alpha);
     }
 }
 

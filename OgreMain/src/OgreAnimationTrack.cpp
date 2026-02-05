@@ -121,7 +121,7 @@ namespace Ogre {
         }
         else
         {
-            return (timePos - t1) / (t2 - t1);
+            return Math::inverseLerp(t1, t2, timePos);
         }
     }
     //---------------------------------------------------------------------

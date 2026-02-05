@@ -206,8 +206,7 @@ aiVector3D getTranslate(aiNodeAnim* node_anim, KeyframesMap& keyframes, Keyframe
         // got 2 keys can interpolate
         if (frontKey && backKey)
         {
-            float prop =
-                (float)(((double)it->first - frontKey->mTime) / (backKey->mTime - frontKey->mTime));
+            float prop = (float)(Math::inverseLerp<double>(frontKey->mTime, backKey->mTime, it->first));
             prop /= ticksPerSecond;
             vect = Math::lerp(frontKey->mValue, backKey->mValue, prop);
         }
@@ -255,8 +254,7 @@ aiQuaternion getRotate(aiNodeAnim* node_anim, KeyframesMap& keyframes, Keyframes
         // got 2 keys can interpolate
         if (frontKey && backKey)
         {
-            float prop =
-                (float)(((double)it->first - frontKey->mTime) / (backKey->mTime - frontKey->mTime));
+            float prop = (float)(Math::inverseLerp<double>(frontKey->mTime, backKey->mTime, it->first));
             prop /= ticksPerSecond;
             aiQuaternion::Interpolate(rot, frontKey->mValue, backKey->mValue, prop);
         }
@@ -304,8 +302,7 @@ aiVector3D getScale(aiNodeAnim* node_anim, KeyframesMap& keyframes, KeyframesMap
         // got 2 keys can interpolate
         if (frontKey && backKey)
         {
-            float prop =
-                (float)(((double)it->first - frontKey->mTime) / (backKey->mTime - frontKey->mTime));
+            float prop = (float)(Math::inverseLerp<double>(frontKey->mTime, backKey->mTime, it->first));
             prop /= ticksPerSecond;
             vect = Math::lerp(frontKey->mValue, backKey->mValue, prop);
         }

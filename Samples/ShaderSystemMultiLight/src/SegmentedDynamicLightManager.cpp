@@ -260,7 +260,7 @@ unsigned int SegmentedDynamicLightManager::calcGridColumn(Real i_Position,
     Real i_BoundStart, Real i_BoundEnd)
 {
     int index = (unsigned int)
-        (((i_Position - i_BoundStart) / (i_BoundEnd - i_BoundStart)) * SDL_SEGMENT_DIVISIONS);
+        ((Math::inverseLerp(i_Position, i_BoundStart, i_BoundEnd)) * SDL_SEGMENT_DIVISIONS);
     return (unsigned int)Math::Clamp<int>(index, 0 ,SDL_SEGMENT_DIVISIONS - 1);
 }
 
