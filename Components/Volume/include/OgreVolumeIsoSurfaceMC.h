@@ -89,8 +89,8 @@ namespace Volume {
                 normal.z = val0.z;
                 return v0;
             }
-            Real mu = (ISO_LEVEL - val0.w) / (val1.w - val0.w);
-            Vector4 normal4 = val0 + mu * (val1 - val0);
+            Real mu = Math::inverseLerp(val0.w, val1.w, ISO_LEVEL);
+            Vector4 normal4 = Math::lerp(val0, val1, mu);
             normal.x = normal4.x;
             normal.y = normal4.y;
             normal.z = normal4.z;

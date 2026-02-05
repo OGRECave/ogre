@@ -258,7 +258,7 @@ private:
 
             if (size <= kSoundwaveSizeEnd)
             {
-                float d = (size - kSoundwaveSizeBeg) / (kSoundwaveSizeEnd - kSoundwaveSizeBeg);
+                float d = Math::inverseLerp(kSoundwaveSizeBeg, kSoundwaveSizeEnd, size);
 
                 bb->setDimensions(size, size);
                 bb->setColour(kSoundwaveColor * (1.0f - d));

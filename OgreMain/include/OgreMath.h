@@ -409,6 +409,17 @@ namespace Ogre
             return v0 * (1 - t) + v1 * t;
         }
 
+        /** Inverse linear interpolation.
+
+           Returns the fraction t such that lerp(v0, v1, t) == val.
+           t = (val - v0) / (v1 - v0).
+           Result is not clamped.
+        */
+        template <typename V> static V inverseLerp(const V& v0, const V& v1, const V& val)
+        {
+            return (val - v0) / (v1 - v0);
+        }
+
         /** Sine function.
             @param fValue
                 Angle in radians

@@ -858,7 +858,7 @@ void Slider::setValue(float value, bool notifyListener)
 
     if (mListener && notifyListener) mListener->sliderMoved(this);
 
-    if (!mDragging) mHandle->setLeft((int)((mValue - mMinValue) / (mMaxValue - mMinValue) *
+    if (!mDragging) mHandle->setLeft((int)(Ogre::Math::inverseLerp(mMinValue, mMaxValue, mValue) *
                                            (mTrack->getWidth() - mHandle->getWidth())));
 }
 
@@ -896,7 +896,7 @@ void Slider::_cursorReleased(const Ogre::Vector2 &cursorPos)
     if (mDragging)
     {
         mDragging = false;
-        mHandle->setLeft((int)((mValue - mMinValue) / (mMaxValue - mMinValue) *
+        mHandle->setLeft((int)(Ogre::Math::inverseLerp(mMinValue, mMaxValue, mValue) *
                                (mTrack->getWidth() - mHandle->getWidth())));
     }
 }
