@@ -95,7 +95,7 @@ namespace Volume {
             normal.y = normal4.y;
             normal.z = normal4.z;
             normal.normalise();
-            return v0 + mu * (v1 - v0);
+            return Math::lerp(v0, v1, mu);
         }
 
     public:

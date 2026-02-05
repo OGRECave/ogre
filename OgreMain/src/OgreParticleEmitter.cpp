@@ -286,7 +286,7 @@ namespace Ogre
         Real scalar;
         if (mMinSpeed != mMaxSpeed)
         {
-            scalar = mMinSpeed + (Math::UnitRandom() * (mMaxSpeed - mMinSpeed));
+            scalar = Math::RangeRandom(mMinSpeed, mMaxSpeed);
         }
         else
         {
@@ -300,7 +300,7 @@ namespace Ogre
     {
         if (mMaxTTL != mMinTTL)
         {
-            return mMinTTL + (Math::UnitRandom() * (mMaxTTL - mMinTTL));
+            return Math::RangeRandom(mMinTTL, mMaxTTL);
         }
         else
         {
@@ -369,7 +369,7 @@ namespace Ogre
         {
             // Randomise
             ColourValue t(Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom());
-            destColour = (mColourRangeStart + t * (mColourRangeEnd - mColourRangeStart)).getAsBYTE();
+            destColour = Math::lerp(mColourRangeStart, mColourRangeEnd, t).getAsBYTE();
         }
         else
         {
