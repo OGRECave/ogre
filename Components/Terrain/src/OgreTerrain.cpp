@@ -2321,8 +2321,8 @@ namespace Ogre
         Vector3 cur = localRay.getPoint(aabbTest.second);
 
         // now check every quad the ray touches
-        int quadX = std::min(std::max(static_cast<int>(cur.x), 0), (int)mSize-2);
-        int quadZ = std::min(std::max(static_cast<int>(cur.z), 0), (int)mSize-2);
+        int quadX = Math::Clamp<int>(cur.x, 0, (int)mSize-2);
+        int quadZ = Math::Clamp<int>(cur.z, 0, (int)mSize-2);
         int flipX = (rayDirection.x < 0 ? 0 : 1);
         int flipZ = (rayDirection.z < 0 ? 0 : 1);
         int xDir = (rayDirection.x < 0 ? -1 : 1);
