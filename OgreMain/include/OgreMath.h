@@ -392,8 +392,8 @@ namespace Ogre
         }
 
         /// Simulate the shader function saturate that clamps a parameter value between 0 and 1
-        static inline float saturate(float t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
-        static inline double saturate(double t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
+        static inline float saturate(float t) { return Clamp(t, 0.0f, 1.0f); }
+        static inline double saturate(double t) { return Clamp(t, 0.0, 1.0); }
 
         /// saturated cast of size_t to uint16
         static inline uint16 uint16Cast(size_t t) { return t < UINT16_MAX ? uint16(t) : UINT16_MAX; }
