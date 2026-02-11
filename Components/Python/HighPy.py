@@ -273,7 +273,7 @@ def imshow(window_name: str, img_src: Union[str, os.PathLike, memoryview, "np.nd
     """!
     show an image in the window
     @param window_name: name of the window
-    @param img_src: image data (gray or BGR) or path to the image file
+    @param img_src: image data or path to the image file
     """
     assert _ctx is not None, "call window_create first"
     assert window_name in _ctx.windows, f"no window named: {window_name}"
@@ -284,18 +284,22 @@ def imshow(window_name: str, img_src: Union[str, os.PathLike, memoryview, "np.nd
 
     img = Ogre.Image()
 
-    inchannels = 0
     if hasattr(img_src, "shape"):
-        inchannels = img_src.shape[2]
-
-    if inchannels == 3: # assume BGR, matching OpenCV format
-        img.loadDynamicImage(img_src, img_src.shape[1], img_src.shape[0], Ogre.PF_R8G8B8)
-    elif inchannels == 1:
-        img.loadDynamicImage(img_src, img_src.shape[1], img_src.shape[0], Ogre.PF_BYTE_L)
+        img.loadDynamicImage(img_src)
     else: # load from file
         img.load(str(img_src), Ogre.RGN_DEFAULT)
 
     window_data.background.loadImage(img)
+
+def imwrite(filename, imgdata: Union[memoryview, "np.ndarray"]):
+    """!
+    Save an image to a file.
+    @param filename: The name of the file to save the image to.
+    @param imgdata: The pixel data of the image. Should be a memoryview or numpy array
+    """
+    im = Ogre.Image()
+    im.loadDynamicImage(imgdata)
+    im.save(filename)
 
 def camera_intrinsics(window_name: str, K, imsize):
     """!

@@ -394,6 +394,83 @@ CS_VECTOR_OPS(4);
     $1 = true; // actual check in the typemap
 }
 
+// specific typemap for loadDynamicImage, to allow passing a numpy array directly
+%define PYBUFFER_TO_IMAGE_DATA(buffer_var, width_var, height_var, format_var, data_var)
+    int res = PyObject_GetBuffer($input, &buffer_var, PyBUF_CONTIG | PyBUF_FORMAT);
+    if (res < 0) {
+        SWIG_fail;
+    }
+    if (buffer_var.ndim != 3)
+    {
+        PyBuffer_Release(&buffer_var);
+        PyErr_Format(PyExc_ValueError, "ndim must be 3, got: %d", buffer_var.ndim);
+        SWIG_fail;
+    }
+
+    data_var = (Ogre::uchar*)buffer_var.buf;
+    height_var = (Ogre::uint32)buffer_var.shape[0];
+    width_var = (Ogre::uint32)buffer_var.shape[1];
+
+    int channels = buffer_var.shape[2];
+    char type_char = buffer_var.format ? buffer_var.format[0] : 'B';
+
+    switch(channels)
+    {
+    case 4:
+        format_var = Ogre::PF_BYTE_RGBA;
+        break;
+    case 3:
+        format_var = Ogre::PF_BYTE_RGB;
+        break;
+    case 1:
+        {
+            switch(type_char)
+            {
+            case 'B':
+            case 'b':
+                format_var = Ogre::PF_L8;
+                break;
+            case 'H':
+                format_var = Ogre::PF_L16;
+                break;
+            case 'f':
+                format_var = Ogre::PF_FLOAT32_R;
+                break;
+            default:
+                PyBuffer_Release(&buffer_var);
+                PyErr_Format(PyExc_ValueError, "Unsupported data type: %c", type_char);
+                SWIG_fail;
+            }
+        }
+        break;
+    default:
+        PyBuffer_Release(&buffer_var);
+        PyErr_Format(PyExc_ValueError, "Unsupported channel count: %d", channels);
+        SWIG_fail;
+    }
+%enddef
+
+%typecheck(SWIG_TYPECHECK_POINTER) (Ogre::uchar* data, Ogre::uint32 width, Ogre::uint32 height, Ogre::PixelFormat format) {
+    $1 = PyObject_CheckBuffer($input);
+}
+
+%typemap(in) (Ogre::uchar* data, Ogre::uint32 width, Ogre::uint32 height, Ogre::PixelFormat format) {
+    Py_buffer view;
+    PYBUFFER_TO_IMAGE_DATA(view, $2, $3, $4, $1)
+    PyBuffer_Release(&view);
+}
+
+%typecheck(SWIG_TYPECHECK_POINTER) (Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth, Ogre::PixelFormat pixelFormat, void *pixelData) {
+    $1 = PyObject_CheckBuffer($input);
+}
+
+%typemap(in) (Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth, Ogre::PixelFormat pixelFormat, void *pixelData) {
+    Py_buffer view;
+    PYBUFFER_TO_IMAGE_DATA(view, $1, $2, $4, $5)
+    $3 = 1;
+    PyBuffer_Release(&view);
+}
+
 %define TYPEMAP_SEQUENCE_FOR(TYPE, LEN_CHECK)
 %typemap(in) const TYPE& (TYPE temp) {
     void *argp = 0;

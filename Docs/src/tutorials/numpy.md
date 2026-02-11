@@ -79,8 +79,6 @@ Finally, we want read-back rendered image into an array. To avoid superficial co
 
 @snippet Samples/Python/numpy_sample.py ogre_to_np
 
-Note, that the convention of specifying width and height is swapped between %Ogre and numpy.
-
 Now we can store the image to disk using pyplot.
 
 @snippet Samples/Python/numpy_sample.py zero_copy_view
