@@ -264,10 +264,11 @@ def window_pixel_data(window_name: str, compositor_name: str | None = None, text
         raise ValueError(f"unsupported format: {Ogre.PixelUtil.getFormatName(dst_type)}")
 
     buf = bytearray(math.prod(shape) * struct.calcsize(dtype))
-    pb = Ogre.PixelBox(shape[1], shape[0], 1, dst_type, buf)
+    mview = memoryview(buf).cast(dtype, shape)
+    pb = Ogre.PixelBox(mview)
     rtarget.copyContentsToMemory(pb, pb)
 
-    return memoryview(buf).cast(dtype, shape)
+    return mview
 
 def imshow(window_name: str, img_src: Union[str, os.PathLike, memoryview, "np.ndarray"]):
     """!
