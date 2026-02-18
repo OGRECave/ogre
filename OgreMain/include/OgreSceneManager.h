@@ -2230,7 +2230,7 @@ namespace Ogre {
             You can create Animation objects for animating SceneNode obejcts using the
             createAnimation method. However, in order to actually apply those animations
             you have to call methods on Node and Animation in a particular order (namely
-            Node::resetToInitialState and Animation::apply). To make this easier and to
+            @ref NodeAnimationTrack::resetToInitialState and @ref Animation::apply). To make this easier and to
             help track the current time position of animations, the AnimationState object
             is provided.
             So if you don't want to control animation application manually, call this method,
@@ -2242,14 +2242,14 @@ namespace Ogre {
         @par
             Note that any SceneNode affected by this automatic animation will have it's state
             reset to it's initial position before application of the animation. Unless specifically
-            modified using Node::setInitialState the Node assumes it's initial state is at the
+            modified using @ref NodeAnimationTrack::setInitialState the Node assumes it's initial state is at the
             origin. If you want the base state of the SceneNode to be elsewhere, make your changes
             to the node using the standard transform methods, then call setInitialState to 
-            'bake' this reference position into the node.
+            'bake' this reference position into the NodeAnimationTrack.
         @par
             If the target of your animation is to be a generic AnimableValue, you
             should ensure that it has a base value set (unlike nodes this has no
-            default). @see AnimableValue::setAsBaseValue.
+            default). @ref AnimableValue::setCurrentStateAsBaseValue
         @param animName The name of an animation created already with createAnimation.
         */
         AnimationState* createAnimationState(const String& animName);
