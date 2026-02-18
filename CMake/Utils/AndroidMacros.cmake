@@ -76,6 +76,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
         android:label=\"${LABEL}\"
         android:configChanges=\"orientation|screenSize|keyboardHidden\"
         android:exported=\"true\"
+        android:enableOnBackInvokedCallback=\"false\"
         android:theme=\"@android:style/Theme.Black.NoTitleBar.Fullscreen\">
             <meta-data android:name=\"android.app.lib_name\" android:value=\"${ANDROID_MOD_NAME}\" />
             <intent-filter>
