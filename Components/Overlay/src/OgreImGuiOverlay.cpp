@@ -68,6 +68,7 @@ ImGuiOverlay::ImGuiOverlay() : Overlay("ImGuiOverlay")
     ImGuiIO& io = ImGui::GetIO();
 
     io.BackendPlatformName = "OGRE";
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 }
 ImGuiOverlay::~ImGuiOverlay()
 {
@@ -104,7 +105,6 @@ void ImGuiOverlay::ImGUIRenderable::createMaterial()
     mPass->setSeparateSceneBlending(SBF_SOURCE_ALPHA, SBF_ONE_MINUS_SOURCE_ALPHA, SBF_ONE, SBF_ONE_MINUS_SOURCE_ALPHA);
 
     TextureUnitState* mTexUnit = mPass->createTextureUnitState();
-    mTexUnit->setTexture(mFontTex);
     mTexUnit->setTextureFiltering(TFO_NONE);
     mTexUnit->setTextureAddressingMode(TAM_CLAMP);
 
@@ -175,21 +175,6 @@ ImFont* ImGuiOverlay::addFont(const String& name, const String& group)
     return ret;
 }
 
-void ImGuiOverlay::ImGUIRenderable::createFontTexture()
-{
-    // Build texture atlas
-    ImGuiIO& io = ImGui::GetIO();
-    if (io.Fonts->Fonts.empty())
-        io.Fonts->AddFontDefault();
-    unsigned char* pixels;
-    int width, height;
-    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-
-    mFontTex = TextureManager::getSingleton().createManual("ImGui/FontTex", RGN_INTERNAL, TEX_TYPE_2D,
-                                                           width, height, 1, 1, PF_BYTE_RGBA);
-
-    mFontTex->getBuffer()->blitFromMemory(PixelBox(Box(0, 0, width, height), PF_BYTE_RGBA, pixels));
-}
 void ImGuiOverlay::NewFrame()
 {
     static auto lastTime = Root::getSingleton().getTimer()->getMilliseconds();
@@ -216,6 +201,51 @@ void ImGuiOverlay::NewFrame()
     ImGui::NewFrame();
 }
 
+#if IMGUI_VERSION_NUM >= 19200
+static void updateTextureData(ImVector<ImTextureData*>& textures)
+{
+    static int texCounter = 0;
+
+    for (auto tex : textures)
+    {
+        if (tex->Status == ImTextureStatus_OK)
+            continue; // nothing to do
+
+        if (tex->Status == ImTextureStatus_WantCreate)
+        {
+            OgreAssert(tex->Format == ImTextureFormat_RGBA32, "ImGuiOverlay only supports RGBA32 textures");
+            auto otex = TextureManager::getSingleton().createManual(StringUtil::format("ImGui/Tex%d", texCounter++),
+                                                                    RGN_INTERNAL, TEX_TYPE_2D, tex->Width, tex->Height,
+                                                                    1, 0, PF_BYTE_RGBA);
+
+            otex->getBuffer()->blitFromMemory(
+                PixelBox(Box(0, 0, tex->Width, tex->Height), PF_BYTE_RGBA, tex->GetPixels()));
+
+            tex->SetTexID((ImTextureID)otex->getHandle());
+            tex->SetStatus(ImTextureStatus_OK);
+        }
+        else if (tex->Status == ImTextureStatus_WantUpdates)
+        {
+            auto otex =
+                static_pointer_cast<Texture>(TextureManager::getSingleton().getByHandle((ResourceHandle)tex->TexID));
+
+            auto r = tex->UpdateRect;
+            PixelBox pb(r.w, r.h, 1, PF_BYTE_RGBA, tex->GetPixelsAt(r.x, r.y));
+            pb.rowPitch = tex->Width;
+            otex->getBuffer()->blitFromMemory(pb, Box(r.x, r.y, r.x + r.w, r.y + r.h));
+
+            tex->SetStatus(ImTextureStatus_OK);
+        }
+        else if (tex->Status == ImTextureStatus_WantDestroy)
+        {
+            TextureManager::getSingleton().remove((ResourceHandle)tex->TexID);
+            tex->SetTexID(ImTextureID_Invalid);
+            tex->SetStatus(ImTextureStatus_Destroyed);
+        }
+    }
+}
+#endif
+
 void ImGuiOverlay::ImGUIRenderable::_update()
 {
     if (mMaterial->getSupportedTechniques().empty())
@@ -226,6 +256,13 @@ void ImGuiOverlay::ImGUIRenderable::_update()
     ImGui::Render();
     ImDrawData* draw_data = ImGui::GetDrawData();
     updateVertexData(draw_data);
+
+#if IMGUI_VERSION_NUM >= 19200
+    if (draw_data->Textures)
+    {
+        updateTextureData(*draw_data->Textures);
+    }
+#endif
 
     RenderSystem* rSys = Root::getSingleton().getRenderSystem();
 
@@ -285,7 +322,7 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
                 if (tex)
                 {
                     rsys->_setTexture(0, true, tex);
-                    rsys->_setSampler(0, *TextureManager::getSingleton().getDefaultSampler());
+                    rsys->_setSampler(0, *tu->getSampler());
                 }
             }
 
@@ -295,13 +332,6 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
             mRenderOp.indexData->indexCount = drawCmd->ElemCount;
 
             rsys->_render(mRenderOp);
-
-            if (drawCmd->GetTexID())
-            {
-                // reset to pass state
-                rsys->_setTexture(0, true, mFontTex);
-                rsys->_setSampler(0, *tu->getSampler());
-            }
 
             // Update counts
             mRenderOp.indexData->indexStart += drawCmd->ElemCount;
@@ -331,7 +361,10 @@ ImGuiOverlay::ImGUIRenderable::ImGUIRenderable()
 //-----------------------------------------------------------------------------------
 void ImGuiOverlay::ImGUIRenderable::initialise(void)
 {
-    createFontTexture();
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.Fonts->Fonts.empty())
+        io.Fonts->AddFontDefault();
+
     createMaterial();
 
     mRenderOp.vertexData = OGRE_NEW VertexData();
@@ -359,8 +392,6 @@ void ImGuiOverlay::ImGUIRenderable::initialise(void)
 //-----------------------------------------------------------------------------------
 ImGuiOverlay::ImGUIRenderable::~ImGUIRenderable()
 {
-    if(mFontTex)
-        TextureManager::getSingleton().remove(mFontTex);
     if(mMaterial)
         MaterialManager::getSingleton().remove(mMaterial);
     OGRE_DELETE mRenderOp.vertexData;
