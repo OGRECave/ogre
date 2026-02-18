@@ -5,6 +5,8 @@
     android:versionName="@OGRE_VERSION@"
 	android:installLocation="auto">
 
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
     @ANDROID_ADDITIONAL_PERMISSION@
 
     <application android:label="@ANDROID_MOD_NAME@" android:icon="@drawable/ic_launcher" android:hasCode="@HAS_CODE@">
