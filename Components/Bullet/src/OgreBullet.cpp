@@ -96,26 +96,22 @@ btCylinderShape* createCylinderCollider(const MovableObject* mo)
 }
 
 /// create compound shape because we can
-btCompoundShape* createCompoundShape()
-{
-	return new btCompoundShape;
-}
+btCompoundShape* createCompoundShape() { return new btCompoundShape; }
 
 /// create height field collider
-btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain, struct HeightFieldData *data)
+btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain, struct HeightFieldData* data)
 {
 #ifdef OGRE_BUILD_COMPONENT_TERRAIN
     OgreAssert(terrain && terrain->getHeightData() && terrain->isLoaded(), "invalid terrain supplied");
     int i;
     uint16 size = terrain->getSize();
-    float *heightData = terrain->getHeightData();
+    float* heightData = terrain->getHeightData();
     /* need to flip terrain data */
 
     data->terrainHeights = new float[size * size];
-    for (i = 0; i < size; i++) {
-        memcpy(data->terrainHeights + size * i,
-            heightData + size * (size - i - 1),
-            sizeof(float) * size);
+    for (i = 0; i < size; i++)
+    {
+        memcpy(data->terrainHeights + size * i, heightData + size * (size - i - 1), sizeof(float) * size);
     }
     Real minHeight = terrain->getMinHeight();
     Real maxHeight = terrain->getMaxHeight();
@@ -123,9 +119,8 @@ btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain,
     Real worldSize = terrain->getWorldSize();
     float scaled = worldSize / (size - 1);
     btVector3 localScale(scaled, 1.0f, scaled);
-    btHeightfieldTerrainShape *shape = new btHeightfieldTerrainShape((int)size, (int)size,
-                                        data->terrainHeights, 1, minHeight, maxHeight,
-                                        1, PHY_FLOAT, true);
+    btHeightfieldTerrainShape* shape = new btHeightfieldTerrainShape((int)size, (int)size, data->terrainHeights, 1,
+                                                                     minHeight, maxHeight, 1, PHY_FLOAT, true);
     data->bodyPosition.y += (maxHeight + minHeight) / 2.0f;
     shape->setUseDiamondSubdivision(true);
     shape->setLocalScaling(localScale);
@@ -135,7 +130,6 @@ btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain,
     return nullptr;
 #endif
 }
-
 
 struct EntityCollisionListener
 {
@@ -209,16 +203,10 @@ private:
 };
 
 /// create trimesh collider using ogre provided data
-btBvhTriangleMeshShape* createTrimeshCollider(const Entity* ent)
-{
-        return VertexIndexToShape(ent).createTrimesh();
-}
+btBvhTriangleMeshShape* createTrimeshCollider(const Entity* ent) { return VertexIndexToShape(ent).createTrimesh(); }
 
 /// create convex hull collider using ogre provided data
-btConvexHullShape* createConvexHullCollider(const Entity* ent)
-{
-	return VertexIndexToShape(ent).createConvex();
-}
+btConvexHullShape* createConvexHullCollider(const Entity* ent) { return VertexIndexToShape(ent).createConvex(); }
 
 /// wrapper with automatic memory management
 class CollisionObject
@@ -248,7 +236,8 @@ public:
     }
 };
 
-DynamicsWorld::DynamicsWorld(const Vector3& gravity) : CollisionWorld(NULL) // prevent CollisionWorld from creating a world
+DynamicsWorld::DynamicsWorld(const Vector3& gravity)
+    : CollisionWorld(NULL) // prevent CollisionWorld from creating a world
 {
     // Bullet initialisation.
     mCollisionConfig.reset(new btDefaultCollisionConfiguration());
@@ -256,7 +245,8 @@ DynamicsWorld::DynamicsWorld(const Vector3& gravity) : CollisionWorld(NULL) // p
     mSolver.reset(new btSequentialImpulseConstraintSolver());
     mBroadphase.reset(new btDbvtBroadphase());
 
-    auto btworld = new btDiscreteDynamicsWorld(mDispatcher.get(), mBroadphase.get(), mSolver.get(), mCollisionConfig.get());
+    auto btworld =
+        new btDiscreteDynamicsWorld(mDispatcher.get(), mBroadphase.get(), mSolver.get(), mCollisionConfig.get());
     btworld->setGravity(convert(gravity));
     btworld->setInternalTickCallback(onTick);
     mGhostPairCallback = new btGhostPairCallback();
@@ -332,26 +322,25 @@ btRigidBody* DynamicsWorld::addRigidBody(float mass, Entity* ent, ColliderType c
 btRigidBody* DynamicsWorld::addKinematicRigidBody(Entity* ent, ColliderType ct, int group, int mask)
 {
     btRigidBody* rb = addRigidBody(0, ent, ct, nullptr, group, mask);
-    rb->setCollisionFlags(rb->getCollisionFlags()
-                    | btCollisionObject::CF_KINEMATIC_OBJECT
-                    | btCollisionObject::CF_NO_CONTACT_RESPONSE
-                    );
+    rb->setCollisionFlags(rb->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT |
+                          btCollisionObject::CF_NO_CONTACT_RESPONSE);
     rb->setActivationState(DISABLE_DEACTIVATION);
     return rb;
 }
 
-class TerrainRigidBody: public RigidBody
+class TerrainRigidBody : public RigidBody
 {
     HeightFieldData hfdata;
+
 public:
-    TerrainRigidBody(btCollisionObject* btBody, btCollisionWorld* btWorld, const HeightFieldData &data)
-        : RigidBody(btBody, btWorld), hfdata(data) {}
-    ~TerrainRigidBody()
+    TerrainRigidBody(btCollisionObject* btBody, btCollisionWorld* btWorld, const HeightFieldData& data)
+        : RigidBody(btBody, btWorld), hfdata(data)
     {
-        delete hfdata.terrainHeights;
     }
+    ~TerrainRigidBody() { delete hfdata.terrainHeights; }
 };
-btRigidBody* DynamicsWorld::addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group, int mask, bool debugDraw)
+btRigidBody* DynamicsWorld::addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group, int mask,
+                                                bool debugDraw)
 {
     Terrain* terrain = nullptr;
 #ifdef OGRE_BUILD_COMPONENT_TERRAIN
@@ -407,17 +396,18 @@ btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType 
     return co;
 }
 
-void DynamicsWorld::attachRigidBody(btRigidBody *rigidBody, Entity* ent, CollisionListener* listener,
-                                         int group, int mask)
+void DynamicsWorld::attachRigidBody(btRigidBody* rigidBody, Entity* ent, CollisionListener* listener, int group,
+                                    int mask)
 {
     auto node = ent->getParentSceneNode();
     OgreAssert(node, "entity must be attached");
     /* If the body has incorrect btMotionState and is in world
      * we will crash or corrupt some memory. Hope the user
      * will know what he/she is doing */
-    if (!rigidBody->isInWorld()) {
+    if (!rigidBody->isInWorld())
+    {
         RigidBodyState* state = new RigidBodyState(node);
-	rigidBody->setMotionState(state);
+        rigidBody->setMotionState(state);
         getBtWorld()->addRigidBody(rigidBody, group, mask);
     }
     rigidBody->setUserPointer(new EntityCollisionListener{ent, listener});
@@ -752,7 +742,7 @@ VertexIndexToShape::~VertexIndexToShape()
 
     if (mBoneIndex)
     {
-        for (auto & i : *mBoneIndex)
+        for (auto& i : *mBoneIndex)
         {
             delete i.second;
         }
@@ -965,8 +955,6 @@ bool KinematicMotionSimple::recoverFromPenetration(btCollisionWorld* collisionWo
     dispatch->dispatchAllCollisionPairs(mGhostObject->getOverlappingPairCache(), collisionWorld->getDispatchInfo(),
                                         dispatch);
 
-    mCurrentPosition = mGhostObject->getWorldTransform().getOrigin();
-
     mIsOnFloor = false;
     mManifolds = 0;
 
@@ -1070,6 +1058,15 @@ void KinematicMotionSimple::preStep(btCollisionWorld* collisionWorld)
 void KinematicMotionSimple::playerStep(btCollisionWorld* collisionWorld, btScalar dt)
 {
     int numPenetrationLoops = 0;
+    if (!mVelocityMotion)
+    {
+        btVector3 currentPosition = convert(mNode->getPosition());
+        btVector3 motion = currentPosition - mPreviousPosition;
+        float verticalVelocity = motion.y() * dt;
+        stepUp(collisionWorld, verticalVelocity, true);
+        motion.setY(0);
+        stepForwardAndStrafe(false, collisionWorld, motion);
+    }
     while (recoverFromPenetration(collisionWorld))
     {
         numPenetrationLoops++;
@@ -1085,6 +1082,7 @@ void KinematicMotionSimple::updateAction(btCollisionWorld* collisionWorld, btSca
     btTransform xform = mGhostObject->getWorldTransform();
     mNode->setPosition(convert(xform.getOrigin()));
     mNode->setOrientation(convert(xform.getRotation()));
+    mPreviousPosition = xform.getOrigin();
 }
 void KinematicMotionSimple::debugDraw(btIDebugDraw* debugDrawer) {}
 void KinematicMotionSimple::setupCollisionShapes(btCollisionObject* body)
@@ -1136,16 +1134,300 @@ void KinematicMotionSimple::setupCollisionShapes(btCollisionObject* body)
     }
     OgreAssert(mCollisionShapes.size() > 0, "No collision shapes");
 }
+class btKinematicClosestNotMeConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
+{
+public:
+    btKinematicClosestNotMeConvexResultCallback(btCollisionObject* me, const btVector3& up, btScalar minSlopeDot)
+        : btCollisionWorld::ClosestConvexResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0)), mMe(me),
+          mUp(up), mMinSlopeDot(minSlopeDot)
+    {
+    }
+
+    btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace) override
+    {
+        if (convexResult.m_hitCollisionObject == mMe)
+            return btScalar(1.0);
+
+        if (!convexResult.m_hitCollisionObject->hasContactResponse())
+            return btScalar(1.0);
+
+        btVector3 hitNormalWorld;
+        if (normalInWorldSpace)
+        {
+            hitNormalWorld = convexResult.m_hitNormalLocal;
+        }
+        else
+        {
+            /// need to transform normal into worldspace
+            hitNormalWorld =
+                convexResult.m_hitCollisionObject->getWorldTransform().getBasis() * convexResult.m_hitNormalLocal;
+        }
+
+        btScalar dotUp = mUp.dot(hitNormalWorld);
+        if (dotUp < mMinSlopeDot)
+        {
+            return btScalar(1.0);
+        }
+
+        return ClosestConvexResultCallback::addSingleResult(convexResult, normalInWorldSpace);
+    }
+
+protected:
+    btCollisionObject* mMe;
+    const btVector3 mUp;
+    btScalar mMinSlopeDot;
+};
+
+void KinematicMotionSimple::sweepTest(btCollisionWorld* world, const btTransform& start, const btTransform& end,
+                                      btCollisionWorld::ClosestConvexResultCallback& callback, float margin)
+{
+    int i;
+
+    bool updateMargin = false;
+    float originalMargin;
+    if (margin > 0.0f)
+        updateMargin = true;
+    /* loop over shapes */
+    btCollisionShape* shape = mGhostObject->getCollisionShape();
+    if (shape->isCompound())
+    {
+        btCompoundShape* compoundShape = static_cast<btCompoundShape*>(shape);
+        for (i = 0; i < compoundShape->getNumChildShapes(); i++)
+        {
+            btCollisionShape* childShape = compoundShape->getChildShape(i);
+            if (childShape->isConvex())
+            {
+                btConvexShape* convexShape = static_cast<btConvexShape*>(childShape);
+                if (updateMargin)
+                {
+                    originalMargin = convexShape->getMargin();
+                    convexShape->setMargin(margin);
+                }
+                const btTransform& shapeXform = compoundShape->getChildTransform(i);
+                mGhostObject->convexSweepTest(convexShape, start * shapeXform, end * shapeXform, callback,
+                                              world->getDispatchInfo().m_allowedCcdPenetration);
+                if (updateMargin)
+                    convexShape->setMargin(originalMargin);
+            }
+        }
+    }
+}
+btVector3 KinematicMotionSimple::computeReflectionDirection(const btVector3& direction, const btVector3& normal)
+{
+    return direction - (btScalar(2.0) * direction.dot(normal)) * normal;
+}
+btVector3 KinematicMotionSimple::parallelComponent(const btVector3& direction, const btVector3& normal)
+{
+    btScalar magnitude = direction.dot(normal);
+    return normal * magnitude;
+}
+btVector3 KinematicMotionSimple::perpindicularComponent(const btVector3& direction, const btVector3& normal)
+{
+    return direction - parallelComponent(direction, normal);
+}
+void KinematicMotionSimple::updateTargetPositionBasedOnCollision(bool current, btVector3& targetPosition,
+                                                                 const btVector3& hitNormal, btScalar tangentMag,
+                                                                 btScalar normalMag)
+{
+    btVector3 currentPosition = (current ? mCurrentPosition : mPreviousPosition);
+    btVector3 movementDirection = targetPosition - currentPosition;
+    btScalar movementLength = movementDirection.length();
+    if (movementLength > SIMD_EPSILON)
+    {
+        movementDirection.normalize();
+
+        btVector3 reflectDir = computeReflectionDirection(movementDirection, hitNormal);
+        reflectDir.normalize();
+
+        btVector3 parallelDir, perpindicularDir;
+
+        parallelDir = parallelComponent(reflectDir, hitNormal);
+        perpindicularDir = perpindicularComponent(reflectDir, hitNormal);
+
+        targetPosition = currentPosition;
+        if (0)
+        {
+            btVector3 parComponent = parallelDir * btScalar(tangentMag * movementLength);
+            targetPosition += parComponent;
+        }
+
+        if (normalMag != 0.0)
+        {
+            btVector3 perpComponent = perpindicularDir * btScalar(normalMag * movementLength);
+            targetPosition += perpComponent;
+        }
+    }
+    else
+    {
+    }
+}
+
+void KinematicMotionSimple::stepUp(btCollisionWorld* world, btScalar& verticalVelocity, bool interpolateUp)
+{
+    btScalar stepHeight = 0.0f;
+    if (verticalVelocity < 0.0)
+        stepHeight = mStepHeight;
+
+    // phase 1: up
+    btTransform start, end;
+
+    start.setIdentity();
+    end.setIdentity();
+
+    /* FIXME: Handle penetration properly */
+    start.setOrigin(mCurrentPosition);
+
+    btVector3 targetPosition = mCurrentPosition + mUp * stepHeight;
+    mCurrentPosition = targetPosition;
+
+    end.setOrigin(targetPosition);
+
+    start.setRotation(mCurrentOrientation);
+    end.setRotation(mCurrentOrientation);
+
+    btKinematicClosestNotMeConvexResultCallback callback(mGhostObject, -mUp,
+                                                         Ogre::Math::Cos(Ogre::Math::DegreesToRadians(30)));
+    callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
+    callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
+
+    sweepTest(world, start, end, callback);
+
+#if 0
+    if (m_useGhostObjectSweepTest)
+    {
+        m_ghostObject->convexSweepTest(m_convexShape, start, end, callback,
+                                       world->getDispatchInfo().m_allowedCcdPenetration);
+    }
+    else
+    {
+        world->convexSweepTest(m_convexShape, start, end, callback, world->getDispatchInfo().m_allowedCcdPenetration);
+    }
+#endif
+
+    if (callback.hasHit() && mGhostObject->hasContactResponse() &&
+        needsCollision(mGhostObject, callback.m_hitCollisionObject))
+    {
+        // Only modify the position if the hit was a slope and not a wall or ceiling.
+        if (callback.m_hitNormalWorld.dot(mUp) > 0.0)
+        {
+            // we moved up only a fraction of the step height
+            mCurrentStepOffset = stepHeight * callback.m_closestHitFraction;
+            if (interpolateUp == true)
+                mCurrentPosition.setInterpolate3(mCurrentPosition, targetPosition, callback.m_closestHitFraction);
+            else
+                mCurrentPosition = targetPosition;
+        }
+
+        btTransform& xform = mGhostObject->getWorldTransform();
+        xform.setOrigin(mCurrentPosition);
+        mGhostObject->setWorldTransform(xform);
+
+        // fix penetration if we hit a ceiling for example
+        int numPenetrationLoops = 0;
+        /* TODO: bool touchingContact = false; */
+        while (recoverFromPenetration(world))
+        {
+            numPenetrationLoops++;
+            /* TODO: touchingContact = true; */
+            if (numPenetrationLoops > 4)
+            {
+                // printf("character could not recover from penetration = %d\n", numPenetrationLoops);
+                break;
+            }
+        }
+        targetPosition = mGhostObject->getWorldTransform().getOrigin();
+        mCurrentPosition = targetPosition;
+
+        if (mVerticalOffset > 0)
+        {
+            mVerticalOffset = 0.0;
+            verticalVelocity = 0.0;
+            mCurrentStepOffset = mStepHeight;
+        }
+    }
+    else
+    {
+        mCurrentStepOffset = stepHeight;
+        mCurrentPosition = targetPosition;
+    }
+}
+
+void KinematicMotionSimple::stepForwardAndStrafe(bool current, btCollisionWorld* world, const btVector3& motion,
+                                                 float margin, int iterations)
+{
+
+    btTransform start, end;
+
+    btVector3 currentPosition = (current ? mCurrentPosition : mPreviousPosition);
+
+    btVector3 targetPosition = currentPosition + motion;
+    btQuaternion currentOrientation = mGhostObject->getWorldTransform().getRotation();
+    btQuaternion targetOrientation = currentOrientation;
+
+    start.setIdentity();
+    end.setIdentity();
+
+    btScalar fraction = 1.0;
+    btScalar distance2 = (currentPosition - targetPosition).length2();
+
+    int maxIter = iterations;
+
+    while (fraction > btScalar(0.01) && maxIter-- > 0)
+    {
+        start.setOrigin(currentPosition);
+        end.setOrigin(targetPosition);
+        btVector3 sweepDirNegative(currentPosition - targetPosition);
+
+        start.setRotation(currentOrientation);
+        end.setRotation(targetOrientation);
+
+        btKinematicClosestNotMeConvexResultCallback callback(mGhostObject, sweepDirNegative, btScalar(0.0));
+        callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
+        callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
+
+        if (!(start == end))
+            sweepTest(world, start, end, callback, margin);
+
+        fraction -= callback.m_closestHitFraction;
+
+        if (callback.hasHit() && needsCollision(mGhostObject, callback.m_hitCollisionObject))
+        {
+            updateTargetPositionBasedOnCollision(current, targetPosition, callback.m_hitNormalWorld);
+            btVector3 currentDir = targetPosition - currentPosition;
+            distance2 = currentDir.length2();
+            if (distance2 > SIMD_EPSILON)
+            {
+                currentDir.normalize();
+                btVector3 normalizedDirection = motion.normalized();
+                if (currentDir.dot(normalizedDirection) <= btScalar(0.0))
+                {
+                    break;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        else
+        {
+            currentPosition = targetPosition;
+        }
+    }
+    mCurrentPosition = currentPosition;
+}
 KinematicMotionSimple::KinematicMotionSimple(btPairCachingGhostObject* ghostObject, Node* node)
-    : btActionInterface(), mGhostObject(ghostObject), mMaxPenetrationDepth(0.0f),
-      mNode(node), mIsOnFloor(false), mIsPenetrating(false), mManifolds(0),
-      mAllowManualNarrowPhase(false)
+    : btActionInterface(), mGhostObject(ghostObject), mMaxPenetrationDepth(0.0f), mNode(node), mIsOnFloor(false),
+      mIsPenetrating(false), mManifolds(0), mAllowManualNarrowPhase(false), mVelocityMotion(false), mStepHeight(0.0f),
+      mCurrentStepOffset(0.0f), mVerticalOffset(0.0f), mUp(0.0f, 1.0f, 0.0f)
 {
     btTransform nodeXform;
+    nodeXform.setIdentity();
     nodeXform.setRotation(convert(node->getOrientation()));
     nodeXform.setOrigin(convert(node->getPosition()));
     ghostObject->setWorldTransform(nodeXform);
     setupCollisionShapes(ghostObject);
+    mPreviousPosition = convert(node->getPosition());
 }
 KinematicMotionSimple::~KinematicMotionSimple() {}
 
