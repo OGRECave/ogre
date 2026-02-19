@@ -97,6 +97,7 @@
 #endif
 #include "VolumeTex.h"
 #include "Water.h"
+#include "ThreadedResourcePrep.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -176,6 +177,7 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_Terrain);
     addSample(new Sample_EndlessWorld);
 #endif
+    addSample(new Sample_ThreadedResourcePrep);
 }
 
 DefaultSamplesPlugin::~DefaultSamplesPlugin()
