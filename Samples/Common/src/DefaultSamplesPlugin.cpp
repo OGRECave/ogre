@@ -97,6 +97,7 @@
 #endif
 #include "VolumeTex.h"
 #include "Water.h"
+#include "Gizmos.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -163,6 +164,7 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
 #endif
     addSample(new Sample_BSP);
     addSample(new Sample_CelShading);
+    addSample(new Sample_Gizmos);
     addSample(new Sample_Compositor);
     addSample(new Sample_Compute);
     addSample(new Sample_CubeMapping);
