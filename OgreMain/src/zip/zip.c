@@ -655,20 +655,24 @@ static int zip_central_dir_move(mz_zip_internal_state *pState, int begin,
   return 0;
 }
 
+// Fix: parameter type changed from int* to mz_bool* to match the caller
+// (zip_entries_delete_mark passes mz_bool array, not int array)
 static int zip_central_dir_delete(mz_zip_internal_state *pState,
-                                  int *deleted_entry_index_array,
+                                  mz_bool *deleted_entry_index_array,
                                   int entry_num) {
   int i = 0;
   int begin = 0;
   int end = 0;
   int d_num = 0;
   while (i < entry_num) {
-    while ((!deleted_entry_index_array[i]) && (i < entry_num)) {
+    // Fix: bound check MUST come first to prevent out-of-bounds array access
+    while ((i < entry_num) && (!deleted_entry_index_array[i])) {
       i++;
     }
     begin = i;
 
-    while ((deleted_entry_index_array[i]) && (i < entry_num)) {
+    // Fix: bound check MUST come first to prevent out-of-bounds array access
+    while ((i < entry_num) && (deleted_entry_index_array[i])) {
       i++;
     }
     end = i;
@@ -677,14 +681,16 @@ static int zip_central_dir_delete(mz_zip_internal_state *pState,
 
   i = 0;
   while (i < entry_num) {
-    while ((!deleted_entry_index_array[i]) && (i < entry_num)) {
+    // Fix: bound check MUST come first to prevent out-of-bounds array access
+    while ((i < entry_num) && (!deleted_entry_index_array[i])) {
       i++;
     }
     begin = i;
     if (begin == entry_num) {
       break;
     }
-    while ((deleted_entry_index_array[i]) && (i < entry_num)) {
+    // Fix: bound check MUST come first to prevent out-of-bounds array access
+    while ((i < entry_num) && (deleted_entry_index_array[i])) {
       i++;
     }
     end = i;
@@ -724,19 +730,27 @@ static ssize_t zip_entries_delete_mark(struct zip_t *zip,
   mz_zip_internal_state *pState = zip->archive.m_pState;
   zip->archive.m_zip_mode = MZ_ZIP_MODE_WRITING;
 
+  // Guard: m_pFile must be valid before any file I/O in delete operation
+  if (!pState || !pState->m_pFile) {
+    CLEANUP(deleted_entry_flag_array);
+    return ZIP_ENOINIT;
+  }
+
   if (MZ_FSEEK64(pState->m_pFile, 0, SEEK_SET)) {
     CLEANUP(deleted_entry_flag_array);
     return ZIP_ENOENT;
   }
 
   while (i < entry_num) {
-    while ((entry_mark[i].type == MZ_KEEP) && (i < entry_num)) {
+    // Bug fix: bound check MUST come first to avoid out-of-bounds array access
+    while ((i < entry_num) && (entry_mark[i].type == MZ_KEEP)) {
       writen_num += entry_mark[i].lf_length;
       read_num = writen_num;
       i++;
     }
 
-    while ((entry_mark[i].type == MZ_DELETE) && (i < entry_num)) {
+    // Bug fix: bound check MUST come first to avoid out-of-bounds array access
+    while ((i < entry_num) && (entry_mark[i].type == MZ_DELETE)) {
       deleted_entry_flag_array[i] = MZ_TRUE;
       read_num += entry_mark[i].lf_length;
       deleted_length += entry_mark[i].lf_length;
@@ -744,7 +758,12 @@ static ssize_t zip_entries_delete_mark(struct zip_t *zip,
       deleted_entry_num++;
     }
 
-    while ((entry_mark[i].type == MZ_MOVE) && (i < entry_num)) {
+    // Bug fix: reset move_length each outer iteration to avoid accumulating
+    // lengths across multiple delete groups, which would move wrong data ranges
+    move_length = 0;
+
+    // Bug fix: bound check MUST come first to avoid out-of-bounds array access
+    while ((i < entry_num) && (entry_mark[i].type == MZ_MOVE)) {
       move_length += entry_mark[i].lf_length;
       mz_uint8 *p = &MZ_ZIP_ARRAY_ELEMENT(
           &pState->m_central_dir, mz_uint8,
