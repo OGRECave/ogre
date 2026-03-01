@@ -61,7 +61,6 @@ namespace Ogre {
         void decode(const DataStreamPtr& input, const Any& output) const override;
 
         String getType() const  override;
-        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const override;
 
         /// Static method to startup and register the codecs
         _OgreSTBICodecExport static void startup(void);

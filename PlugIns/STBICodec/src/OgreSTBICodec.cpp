@@ -208,11 +208,6 @@ namespace Ogre {
     {
         return mType;
     }
-    //---------------------------------------------------------------------
-    String STBIImageCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const
-    {
-        return BLANKSTRING;
-    }
 
 #ifndef OGRE_STATIC_LIB
     extern "C" void _OgreSTBICodecExport dllStartPlugin();

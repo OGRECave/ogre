@@ -184,9 +184,6 @@ void RsImageCodec::decode(const DataStreamPtr& input, const Any& output) const
 }
 //---------------------------------------------------------------------
 String RsImageCodec::getType() const { return mType; }
-//---------------------------------------------------------------------
-String RsImageCodec::magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return BLANKSTRING; }
-
 #ifndef OGRE_STATIC_LIB
 extern "C" void _OgreRsImageCodecExport dllStartPlugin();
 extern "C" void _OgreRsImageCodecExport dllStopPlugin();
