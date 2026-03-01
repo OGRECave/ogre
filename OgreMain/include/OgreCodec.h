@@ -128,7 +128,7 @@ namespace Ogre {
         @param maxbytes The number of bytes passed
         @return A blank string if the magic number was unknown, or a file extension.
         */
-        virtual String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const = 0;
+        virtual String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const;
 
         virtual bool setParameter(const String& name, const String& value) { return false; }
     };

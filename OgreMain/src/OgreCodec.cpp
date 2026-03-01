@@ -34,6 +34,8 @@ namespace Ogre {
     Codec::~Codec() {
     }
 
+    String Codec::magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const { return BLANKSTRING; }
+
     DataStreamPtr Codec::encode(const Any& input) const
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, getType() + " - encoding to memory not supported");
