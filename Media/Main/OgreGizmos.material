@@ -1,0 +1,32 @@
+material AxisGizmo_Material
+{
+	technique
+	{
+		pass
+		{
+            lighting off
+            emissive vertexcolour
+            polygon_mode solid
+            polygon_mode_overrideable false
+            cull_hardware none
+            depth_check off
+            scene_blend alpha_blend
+		}
+	}
+}
+
+material AxisGizmo_Material_Hl
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+            emissive vertexcolour
+            polygon_mode solid
+            polygon_mode_overrideable false
+            cull_hardware none
+            depth_check off
+        }
+    }
+}
