@@ -589,11 +589,20 @@ namespace Ogre {
             useful for simple transforms that don't require a child node.*/
         Vector3 convertLocalToWorldPosition( const Vector3 &localPos );
 
-        /** Gets the local direction, relative to this node, of the given world-space direction */
+        /** Gets the local direction, relative to this node, of the
+            given world-space direction
+
+        @param useScale determines if this node or it's parents' scale affects
+            the magnitude of the returned worldDir vector.
+        */
         Vector3 convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale );
 
         /** Gets the world direction of a point in the node local space
-            useful for simple transforms that don't require a child node.*/
+            useful for simple transforms that don't require a child node.
+
+        @param useScale determines if this node or it's parents' scale affects
+            the magnitude of the returned localDir vector.
+        */
         Vector3 convertLocalToWorldDirection( const Vector3 &localDir, bool useScale );
 
         /** Gets the local orientation, relative to this node, of the given world-space orientation */
