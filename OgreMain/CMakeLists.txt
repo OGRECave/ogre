@@ -133,6 +133,11 @@ if (OGRE_CONFIG_ENABLE_ZIP)
   list(APPEND HEADER_FILES include/OgreZip.h)
   list(APPEND SOURCE_FILES src/OgreZip.cpp src/zip/zip.c)
 
+  if(UNIX)
+    set_source_files_properties(src/OgreDeflate.cpp
+      PROPERTIES COMPILE_FLAGS -Wno-unused-function)
+  endif()
+
   if(ANDROID)
     list(APPEND PLATFORM_SOURCE_FILES src/Android/OgreAPKZipArchive.cpp)
   endif()
