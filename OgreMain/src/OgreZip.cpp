@@ -160,8 +160,10 @@ namespace {
         OGRE_LOCK_AUTO_MUTEX;
         String lookUpFileName = filename;
 
-        bool open = zip_entry_open(mZipFile, lookUpFileName.c_str(), OGRE_RESOURCEMANAGER_STRICT) == 0;
-#if !OGRE_RESOURCEMANAGER_STRICT
+#if OGRE_RESOURCEMANAGER_STRICT
+        bool open = zip_entry_opencasesensitive(mZipFile, lookUpFileName.c_str()) == 0;
+#else
+        bool open = zip_entry_open(mZipFile, lookUpFileName.c_str()) == 0;
         if (!open) // Try if we find the file
         {
             String basename, path;
