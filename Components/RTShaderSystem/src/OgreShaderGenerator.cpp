@@ -960,6 +960,11 @@ bool ShaderGenerator::cloneShaderBasedTechniques(Material& srcMat, Material& dst
                 {
                     if (t->hasRenderState(pi))
                     {
+                        // copy non-FFP marks
+                        auto any = t->getSourceTechnique()->getPass(pi)->getUserObjectBindings().getUserAny("_RTSS_nonFFP_TUS");
+                        if (auto dstTechnique = findSourceTechnique(dstMat, srcFromTechniqueScheme, false))
+                            dstTechnique->getPass(pi)->getUserObjectBindings().setUserAny("_RTSS_nonFFP_TUS", any);
+
                         //copy the custom render state from the source material to the destination material
                         RenderState* srcRenderState = t->getRenderState(pi);
                         RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMat, pi);
