@@ -1460,7 +1460,7 @@ namespace Ogre {
             readInts(stream, &bufferIndex, 1);
             if(bufferIndex != (unsigned int)-1) {
                 // copy buffer pointer
-                indexData->indexBuffer = s->mLodFaceList[bufferIndex - 1]->indexBuffer;
+                indexData->indexBuffer = s->mLodFaceList.at(bufferIndex - 1)->indexBuffer;
                 assert(indexData->indexBuffer);
             } else {
                 // generate buffers
@@ -1767,7 +1767,7 @@ namespace Ogre {
 #else
                 if (!isManual) {
 #endif
-                    MeshLodUsage& usage = pMesh->mMeshLodUsageList[lodIndex];
+                    MeshLodUsage& usage = pMesh->mMeshLodUsageList.at(lodIndex);
 
                     usage.edgeData = OGRE_NEW EdgeData();
 
@@ -1788,14 +1788,12 @@ namespace Ogre {
                             }
                             else
                             {
-                                edgeGroup.vertexData = pMesh->getSubMesh(
-                                    (unsigned short)edgeGroup.vertexSet-1)->vertexData;
+                                edgeGroup.vertexData = pMesh->getSubMeshes().at(edgeGroup.vertexSet - 1)->vertexData;
                             }
                         }
                         else
                         {
-                            edgeGroup.vertexData = pMesh->getSubMesh(
-                                (unsigned short)edgeGroup.vertexSet)->vertexData;
+                            edgeGroup.vertexData = pMesh->getSubMeshes().at(edgeGroup.vertexSet)->vertexData;
                         }
                     }
                 }
@@ -2452,6 +2450,9 @@ namespace Ogre {
         uint16 target;
         readShorts(stream, &target, 1);
 
+        if (target > pMesh->getNumSubMeshes())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid target for vertex animation track");
+
         VertexAnimationTrack* track = anim->createVertexTrack(target,
             pMesh->getVertexDataByTrackHandle(target), animType);
 
@@ -2564,7 +2565,7 @@ namespace Ogre {
         unsigned short idx;
         readShorts(stream, &idx, 1);
         
-        SubMesh *sm = pMesh->getSubMesh (idx);
+        SubMesh *sm = pMesh->getSubMeshes().at(idx);
         
         int n_floats = (mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE -
                         sizeof (unsigned short)) / sizeof (float);
