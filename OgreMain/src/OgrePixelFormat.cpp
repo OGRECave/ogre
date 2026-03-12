@@ -185,7 +185,7 @@ namespace Ogre {
         }
         else
         {
-            return width*height*depth*getNumElemBytes(format);
+            return size_t(width)*height*depth*getNumElemBytes(format);
         }
     }
     //-----------------------------------------------------------------------
