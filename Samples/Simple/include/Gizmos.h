@@ -53,8 +53,8 @@ protected:
         node2->setPosition(-5, 0, 0);
         node3->setPosition(25, 0, 0);
         mSelectedEnt = ent;
-        mGizmo = new Gizmo(node, G_TRANSLATE, mCamera, mWindow);
-        mCameraGizmo = new CameraGizmo(mCameraNode, mCameraMan.get(), mWindow);
+        mGizmo = new Gizmo(node, GO_TRANSLATE, mViewport);
+        mCameraGizmo = new CameraGizmo(mViewport);
 
         mInputListenerChain =
             TouchAgnosticInputListenerChain(mWindow, {mTrayMgr.get(), mCameraGizmo, mGizmo, this, mCameraMan.get()});
@@ -104,10 +104,10 @@ private:
 
     void selectEntity(Entity* ent)
     {
-        if (ent != nullptr && ent != mSelectedEnt && !mGizmo->isGizmoEntity(ent))
+        if (ent != nullptr && ent != mSelectedEnt)
         {
             mSelectedEnt = ent;
-            mGizmo->attachTo(ent->getParentSceneNode());
+            mGizmo->setTargetNode(ent->getParentSceneNode());
         }
     }
 
@@ -116,15 +116,15 @@ private:
         String name = button->getName();
         if (name == "Translate")
         {
-            mGizmo->setMode(G_TRANSLATE);
+            mGizmo->setOperation(GO_TRANSLATE);
         }
         else if (name == "Rotate")
         {
-            mGizmo->setMode(G_ROTATE);
+            mGizmo->setOperation(GO_ROTATE);
         }
         else if (name == "Scale")
         {
-            mGizmo->setMode(G_SCALE);
+            mGizmo->setOperation(GO_SCALE);
         }
     }
 
