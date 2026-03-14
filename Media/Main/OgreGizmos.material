@@ -1,0 +1,41 @@
+material Ogre/AxisGizmo
+{
+	technique
+	{
+		pass
+		{
+            lighting off
+            emissive vertexcolour
+            cull_hardware none
+            depth_check off
+            scene_blend alpha_blend
+		}
+	}
+}
+
+material Ogre/CameraGizmo
+{
+	technique
+	{
+		pass
+		{
+            lighting off
+            emissive vertexcolour
+            depth_check off
+		}
+	}
+}
+
+material Ogre/AxisGizmo_Highlight
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+            emissive vertexcolour
+            cull_hardware none
+            depth_check off
+        }
+    }
+}
