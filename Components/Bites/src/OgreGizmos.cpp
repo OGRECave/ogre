@@ -1,14 +1,5 @@
 #include "OgreGizmos.h"
-#include "OgreCamera.h"
-#include "OgreManualObject.h"
-#include "OgreMesh.h"
-#include "OgrePass.h"
-#include "OgrePlaneBoundedVolume.h"
-#include "OgreSceneManager.h"
-#include "OgreSceneNode.h"
-#include "OgreSubEntity.h"
-#include "OgreViewport.h"
-#include "OgreEntity.h"
+#include "Ogre.h"
 
 namespace OgreBites
 
@@ -46,15 +37,15 @@ void addQuadVertices(ManualObject* mo, const ColourValue& color)
         mo->position(v);
         mo->colour(color);
     }
+
+    mo->quad(0, 1, 2, 3);
 }
 
 void addFan(int center, int start, int count, ManualObject* mesh)
 {
     for (int i = 0; i < count - 1; ++i)
         mesh->triangle(center, start + i, start + i + 1);
-    mesh->index(center);
-    mesh->index(start + count - 1);
-    mesh->index(start);
+    mesh->triangle(center, start + count - 1, start);
 }
 
 // --- axis gizmo mesh building ---
@@ -90,11 +81,12 @@ constexpr int PLANE_BASE = AXIS_PARTS * 3;
 void addAxisMesh(ManualObject* mesh, const Quaternion& rot, const ColourValue& color, Real arcStart, Real arcEnd,
                  Real division)
 {
-    mesh->begin("Ogre/AxisGizmo", RenderOperation::OT_LINE_LIST);
+    auto mat = MaterialManager::getSingleton().getByName("Ogre/AxisGizmo", RGN_INTERNAL);
+    mesh->begin(mat, RenderOperation::OT_LINE_LIST);
     addLine(Vector3::ZERO, Vector3(3, 0, 0), rot, mesh, color);
     mesh->end();
 
-    mesh->begin("Ogre/AxisGizmo", RenderOperation::OT_LINE_STRIP);
+    mesh->begin(mat, RenderOperation::OT_LINE_STRIP);
     int arcBase = 0;
     for (Real t = arcStart; t < arcEnd; t += division)
     {
@@ -104,7 +96,7 @@ void addAxisMesh(ManualObject* mesh, const Quaternion& rot, const ColourValue& c
     mesh->end();
 
     // Translate
-    mesh->begin("Ogre/AxisGizmo", RenderOperation::OT_TRIANGLE_LIST);
+    mesh->begin(mat, RenderOperation::OT_TRIANGLE_LIST);
     int base = 0;
     addPosition(Vector3(2.85f, 0, 0), rot, mesh, color);
     addCircleVertices(2.95f, rot, mesh, color);
@@ -114,7 +106,7 @@ void addAxisMesh(ManualObject* mesh, const Quaternion& rot, const ColourValue& c
     mesh->end();
 
     // Rotate
-    mesh->begin("Ogre/AxisGizmo", RenderOperation::OT_TRIANGLE_LIST);
+    mesh->begin(mat, RenderOperation::OT_TRIANGLE_LIST);
     Quaternion q1(Degree(-90), Vector3::UNIT_Z);
     Quaternion q2(Degree(90), Vector3::UNIT_Y);
     Vector3 t1(0, 3 * cos(arcEnd), 3 * sin(arcEnd));
@@ -129,7 +121,7 @@ void addAxisMesh(ManualObject* mesh, const Quaternion& rot, const ColourValue& c
     mesh->end();
 
     // Scale
-    mesh->begin("Ogre/AxisGizmo", RenderOperation::OT_TRIANGLE_LIST);
+    mesh->begin(mat, RenderOperation::OT_TRIANGLE_LIST);
     int scaleBase = 0;
     addPosition(Vector3(2.85f, 0, 0), rot, mesh, color);
     addCircleVertices(2.85f, rot, mesh, color);
@@ -145,22 +137,22 @@ void addAxisMesh(ManualObject* mesh, const Quaternion& rot, const ColourValue& c
     addFan(scaleBase, scaleBase + 1, 16, mesh);
     addFan(scaleBase + 17, scaleBase + 1, 16, mesh);
 
-    const int faces[][6] = {{18, 19, 20, 18, 20, 21}, {22, 23, 24, 22, 24, 25}, {18, 22, 25, 18, 25, 21},
-                            {19, 23, 24, 19, 24, 20}, {18, 22, 23, 18, 23, 19}, {21, 20, 24, 21, 24, 25}};
-
-    for (auto& f : faces)
-        for (int i : f)
-            mesh->index(i);
+    mesh->quad(18, 19, 20, 21); // -X face
+    mesh->quad(22, 23, 24, 25); // +X face
+    mesh->quad(18, 22, 25, 21); // +Z face
+    mesh->quad(19, 23, 24, 20); // -Z face
+    mesh->quad(18, 22, 23, 19); // +Y face
+    mesh->quad(21, 20, 24, 25); // -Y face
     mesh->end();
 }
 
 void addPlaneMesh(ManualObject* mesh, const Quaternion& rot, const ColourValue& color)
 {
-    mesh->begin("Ogre/AxisGizmo", RenderOperation::OT_TRIANGLE_LIST);
+    mesh->begin("Ogre/AxisGizmo", RenderOperation::OT_TRIANGLE_LIST, RGN_INTERNAL);
     for (auto& v : {Vector3(0, 0, 0), Vector3(1, 0, 0), Vector3(1, 1, 0), Vector3(0, 1, 0)})
         addPosition(v, rot, mesh, color);
-    for (int i : {0, 1, 2, 0, 2, 3})
-        mesh->index(i);
+
+    mesh->quad(0, 1, 2, 3);
     mesh->end();
 }
 
@@ -203,21 +195,24 @@ void updateCameraQuad(ManualObject* mo, const ColourValue& color)
 {
     mo->beginUpdate(0);
     addQuadVertices(mo, color);
-    mo->quad(0, 1, 2, 3);
     mo->end();
 }
 
-void tryTriangleHit(const Ray& ray, const Vector3& a, const Vector3& b, const Vector3& c,
-                    ManualObject* candidate, Real& closest, ManualObject*& face)
+bool tryQuadHit(const Ray& ray, const Vector3& a, const Vector3& b, const Vector3& c, const Vector3& d, Real& closest)
 {
-    auto hit = Math::intersects(ray, a, b, c, true, true);
+    auto hit = Math::intersects(ray, a, b, c, true, false);
+    if(!hit.first)
+        hit = Math::intersects(ray, a, c, d, true, false);
+
     if (!hit.first || hit.second < 0.0f)
-        return;
+        return false;
+
     if (hit.second < closest)
     {
         closest = hit.second;
-        face = candidate;
+        return true;
     }
+    return false;
 }
 
 SceneNode* createCameraFace(SceneNode* parentNode, SceneManager* manager, const String& n,
@@ -227,10 +222,8 @@ SceneNode* createCameraFace(SceneNode* parentNode, SceneManager* manager, const 
 
     ManualObject* quad = manager->createManualObject(n + "_Face");
     quad->setDynamic(true);
-    quad->begin("Ogre/CameraGizmo", RenderOperation::OT_TRIANGLE_LIST);
+    quad->begin("Ogre/CameraGizmo", RenderOperation::OT_TRIANGLE_LIST, RGN_INTERNAL);
     addQuadVertices(quad, color);
-    quad->triangle(0, 1, 2);
-    quad->triangle(0, 2, 3);
     quad->end();
 
     quad->setQueryFlags(QUERYFLAG_GIZMO);
@@ -240,32 +233,6 @@ SceneNode* createCameraFace(SceneNode* parentNode, SceneManager* manager, const 
     outQuad = quad;
 
     return faceNode;
-}
-
-void createMesh(SceneManager* manager, const String& name, const ColourValue& xColor, const ColourValue& yColor,
-                const ColourValue& zColor, const ColourValue& xyColor, const ColourValue& yzColor,
-                const ColourValue& zxColor)
-{
-    ManualObject* mMesh = manager->createManualObject(name + "ManualObject");
-
-    constexpr Real PI = Math::PI;
-    const float division = (PI / 2.0f) / 16.0f;
-    const Real arcStart = division * 3;
-    const Real arcEnd = division * 14;
-
-    const Quaternion rotY = Quaternion(Degree(90), Vector3::UNIT_Z) * Quaternion(Degree(90), Vector3::UNIT_X);
-    const Quaternion rotZ = Quaternion(Degree(-90), Vector3::UNIT_Y) * Quaternion(Degree(-90), Vector3::UNIT_X);
-
-    addAxisMesh(mMesh, Quaternion::IDENTITY, xColor, arcStart, arcEnd, division);
-    addAxisMesh(mMesh, rotY, yColor, arcStart, arcEnd, division);
-    addAxisMesh(mMesh, rotZ, zColor, arcStart, arcEnd, division);
-
-    addPlaneMesh(mMesh, Quaternion::IDENTITY, xyColor);
-    addPlaneMesh(mMesh, rotY, yzColor);
-    addPlaneMesh(mMesh, rotZ, zxColor);
-
-    mMesh->convertToMesh(name, RGN_INTERNAL);
-    manager->destroyManualObject(mMesh);
 }
 
 Vector3 computePlaneHit(const Ray& ray, const Vector3& mDragAxis, const Vector3& cameraDir, const Vector3& planePoint)
@@ -292,10 +259,36 @@ Gizmo::Gizmo(SceneNode* sceneNode, GizmoOperation mode, Viewport* viewport) : mO
 {
     mViewport = viewport;
 
-    createMesh(sceneNode->getCreator(), "AxisGizmosMesh", ColourValue(1.0f, 0.0f, 0.0f, 0.50f),
-               ColourValue(0.0f, 1.0f, 0.0f, 0.50f), ColourValue(0.0f, 0.0f, 1.0f, 0.50f),
-               ColourValue(1.0f, 1.0f, 0.0f, 0.35f), ColourValue(0.0f, 1.0f, 1.0f, 0.35f),
-               ColourValue(1.0f, 0.0f, 1.0f, 0.35f));
+    auto manager = sceneNode->getCreator();
+    if(!MeshManager::getSingleton().resourceExists("AxisGizmosMesh"))
+    {
+        const float division = Math::HALF_PI / 16.0f;
+        const Real arcStart = division * 3;
+        const Real arcEnd = division * 14;
+
+        const Quaternion rotY = Quaternion(Degree(90), Vector3::UNIT_Z) * Quaternion(Degree(90), Vector3::UNIT_X);
+        const Quaternion rotZ = Quaternion(Degree(-90), Vector3::UNIT_Y) * Quaternion(Degree(-90), Vector3::UNIT_X);
+
+        const ColourValue xColor(1.0f, 0.0f, 0.0f, 0.50f);
+        const ColourValue yColor(0.0f, 1.0f, 0.0f, 0.50f);
+        const ColourValue zColor(0.0f, 0.0f, 1.0f, 0.50f);
+        const ColourValue xyColor(1.0f, 1.0f, 0.0f, 0.50f);
+        const ColourValue yzColor(0.0f, 1.0f, 1.0f, 0.50f);
+        const ColourValue zxColor(1.0f, 0.0f, 1.0f, 0.50f);
+
+        ManualObject* mo = manager->createManualObject("AxisGizmosMesh_ManualObject");
+        mo->setBufferUsage(HBU_CPU_TO_GPU); // allows vulkan to copy buffers in spite of incomplete impl
+        addAxisMesh(mo, Quaternion::IDENTITY, xColor, arcStart, arcEnd, division);
+        addAxisMesh(mo, rotY, yColor, arcStart, arcEnd, division);
+        addAxisMesh(mo, rotZ, zColor, arcStart, arcEnd, division);
+
+        addPlaneMesh(mo, Quaternion::IDENTITY, xyColor);
+        addPlaneMesh(mo, rotY, yzColor);
+        addPlaneMesh(mo, rotZ, zxColor);
+
+        mo->convertToMesh("AxisGizmosMesh", RGN_INTERNAL);
+        manager->destroyManualObject(mo);
+    }
 
     setTargetNode(sceneNode);
 
@@ -303,16 +296,10 @@ Gizmo::Gizmo(SceneNode* sceneNode, GizmoOperation mode, Viewport* viewport) : mO
 
     mGizmoEntity = sceneNode->getCreator()->createEntity("scbw", "AxisGizmosMesh", RGN_INTERNAL);
     mGizmoEntity->setCastShadows(false);
-    mGizmoEntity->setMaterialName("Ogre/AxisGizmo");
-    mGizmoEntity->setRenderQueueGroup(RENDER_QUEUE_SKIES_LATE);
+    mGizmoEntity->setRenderQueueGroup(RENDER_QUEUE_OVERLAY);
     mGizmoEntity->setQueryFlags(QUERYFLAG_GIZMO);
 
     mGizmoNode->attachObject(mGizmoEntity);
-
-    // Call once to derive bounding boxes
-    mGizmoEntity->getWorldBoundingBox(true);
-
-    mGizmoNode->setVisible(true);
     setOperation(mode);
 
     mDragging = false;
@@ -679,48 +666,23 @@ void Gizmo::scaleToParent()
         return;
 
     AxisAlignedBox worldAABB;
-    bool found = false;
 
     // Accumulate bounds of all attached movable objects
-    for (unsigned i = 0; i < mParentNode->numAttachedObjects(); ++i)
+    for (auto* mo : mParentNode->getAttachedObjects())
     {
-        MovableObject* mo = mParentNode->getAttachedObject(i);
-
-        if (!mo)
-            continue;
-
-        AxisAlignedBox box = mo->getWorldBoundingBox(true);
-        if (box.isNull())
-            continue;
-
-        if (!found)
-        {
-            worldAABB = box;
-            found = true;
-        }
-        else
-        {
-            worldAABB.merge(box);
-        }
+        worldAABB.merge(mo->getWorldBoundingBox(true));
     }
-
-    if (!found)
-        return;
 
     // Compute size
     Vector3 size = worldAABB.getSize();
-
     Real maxExtent = std::max({size.x, size.y, size.z});
 
     // Avoid degenerate scale
     if (maxExtent < Real(1e-6))
-        maxExtent = 1.0f;
+        return;
 
-    constexpr Real gizmoScaleFactor = 0.1f;
-
-    Real scale = maxExtent * gizmoScaleFactor;
-
-    mGizmoNode->setScale(Vector3(scale));
+    constexpr Real gizmoSize = 3.5f * 2.0f; // from mesh construction
+    mGizmoNode->setScale(Vector3(maxExtent / gizmoSize));
 }
 
 bool Gizmo::pickAxis(Ray& ray)
@@ -829,33 +791,31 @@ CameraGizmo::CameraGizmo(Viewport* viewport)
 {
     mViewport = viewport;
     mCamera = mViewport->getCamera();
+    OgreAssert(mCamera, "CameraGizmo requires a camera in the viewport");
+
     auto* cameraNode = mCamera->getParentSceneNode();
-    auto* gizmoSm = cameraNode->getCreator();
-    mGizmoNode = cameraNode->createChildSceneNode("GizmoRoot");
+    mGizmoNode = cameraNode->createChildSceneNode();
     // No rotation with camera
     mGizmoNode->setInheritOrientation(false);
     mGizmoNode->setOrientation(Ogre::Quaternion::IDENTITY);
     mGizmoNode->setInheritScale(false);
 
-    createMesh(gizmoSm, "AxisGizmosMesh");
+    createMesh(cameraNode->getCreator(), "AxisGizmosMesh");
 
-    if (mCamera)
-    {
-        const float nx = mOverlayLeft + mOverlayWidth * 0.5f;
-        const float ny = mOverlayTop + mOverlayHeight * 0.5f;
-        const float depth = std::max(mCamera->getNearClipDistance() * 10.0f, 1.0f);
-        const float halfHeight = Math::Tan(mCamera->getFOVy() * 0.5f) * depth;
-        const float halfWidth = halfHeight * mCamera->getAspectRatio();
-        const float ndcX = nx * 2.0f - 1.0f;
-        const float ndcY = 1.0f - ny * 2.0f;
-        const float regionWidth = mOverlayWidth * 2.0f * halfWidth;
-        const float regionHeight = mOverlayHeight * 2.0f * halfHeight;
-        const float size = std::max(std::min(regionWidth, regionHeight) * 0.9f * 0.75f, 0.01f);
+    const float nx = mOverlayLeft + mOverlayWidth * 0.5f;
+    const float ny = mOverlayTop + mOverlayHeight * 0.5f;
+    const float depth = std::max(mCamera->getNearClipDistance() * 10.0f, 1.0f);
+    const float halfHeight = Math::Tan(mCamera->getFOVy() * 0.5f) * depth;
+    const float halfWidth = halfHeight * mCamera->getAspectRatio();
+    const float ndcX = nx * 2.0f - 1.0f;
+    const float ndcY = 1.0f - ny * 2.0f;
+    const float regionWidth = mOverlayWidth * 2.0f * halfWidth;
+    const float regionHeight = mOverlayHeight * 2.0f * halfHeight;
+    const float size = std::max(std::min(regionWidth, regionHeight) * 0.9f * 0.75f, 0.01f);
 
-        // Camera-local placement; parent orientation rotates this into world space.
-        mGizmoNode->setPosition(Vector3(ndcX * halfWidth, ndcY * halfHeight, -depth));
-        mGizmoNode->setScale(Vector3(size));
-    }
+    // Camera-local placement; parent orientation rotates this into world space.
+    mGizmoNode->setPosition(Vector3(ndcX * halfWidth, ndcY * halfHeight, -depth));
+    mGizmoNode->setScale(Vector3(size));
 }
 
 bool CameraGizmo::mouseMoved(const MouseMotionEvent& evt)
@@ -863,7 +823,7 @@ bool CameraGizmo::mouseMoved(const MouseMotionEvent& evt)
     const float nx = static_cast<float>(evt.x) / static_cast<float>(mViewport->getActualWidth());
     const float ny = static_cast<float>(evt.y) / static_cast<float>(mViewport->getActualHeight());
 
-    if (pickFace(nx, ny))
+    if (pickFace(nx, ny) != -1)
     {
         return true;
     }
@@ -879,69 +839,49 @@ bool CameraGizmo::mousePressed(const MouseButtonEvent& evt)
 
         if (snapCamera(pickFace(nx, ny)))
         {
-            pickFace(nx, ny);
+            highlightFace(-1);
             return true;
         }
     }
     return InputListener::mousePressed(evt);
 }
 
-ManualObject* CameraGizmo::pickFace(float nx, float ny)
+int CameraGizmo::pickFace(float nx, float ny)
 {
-    if (!mCamera)
-        return nullptr;
     const Ray worldRay = mCamera->getCameraToViewportRay(nx, ny);
-
-    ManualObject* face = nullptr;
     Real closest = std::numeric_limits<Real>::max();
 
+    int faceIndex = -1;
     for (int i = 0; i < 6; ++i)
     {
-        if (!mFaceNodes[i] || !mGizmoObjects[i])
-            continue;
-
-        const Vector3 worldNormal = mFaceNodes[i]->_getDerivedOrientation() * Vector3::UNIT_Z;
-        if (worldNormal.dotProduct(worldRay.getDirection()) >= 0.0f)
-            continue;
-
         const Matrix4 xf = mFaceNodes[i]->_getFullTransform();
         const Vector3 v0 = xf * Vector3(-0.5f, -0.5f, 0.0f);
         const Vector3 v1 = xf * Vector3(0.5f, -0.5f, 0.0f);
         const Vector3 v2 = xf * Vector3(0.5f, 0.5f, 0.0f);
         const Vector3 v3 = xf * Vector3(-0.5f, 0.5f, 0.0f);
 
-        tryTriangleHit(worldRay, v0, v1, v2, mGizmoObjects[i], closest, face);
-        tryTriangleHit(worldRay, v0, v2, v3, mGizmoObjects[i], closest, face);
+        if(tryQuadHit(worldRay, v0, v1, v2, v3, closest))
+            faceIndex = i;
     }
-    highlightFace(face);
-    return face;
+
+    highlightFace(faceIndex);
+    return faceIndex;
 }
 
-bool CameraGizmo::snapCamera(ManualObject* face) const
+bool CameraGizmo::snapCamera(int faceIndex) const
 {
     using namespace Ogre;
-
-    if (!face || !mCamera)
-        return false;
-
-    int faceIndex = -1;
-    for (int i = 0; i < 6; ++i)
-        if (mGizmoObjects[i] == face)
-        {
-            faceIndex = i;
-            break;
-        }
 
     if (faceIndex == -1)
         return false;
 
-    static const Degree yawPitch[][2] = {
-        {Degree(90), Degree(0)},   // +X
-        {Degree(-90), Degree(0)},  // -X
-        {Degree(0), Degree(90)},   // +Y
-        {Degree(0), Degree(-90)},  // -Y
-        {Degree(0), Degree(0)},    // +Z
-        {Degree(180), Degree(0)},  // -Z
+    static const Vector3 directions[] = {
+        Vector3::NEGATIVE_UNIT_X,
+        Vector3::UNIT_X,
+        Vector3::NEGATIVE_UNIT_Y,
+        Vector3::UNIT_Y,
+        Vector3::NEGATIVE_UNIT_Z,
+        Vector3::UNIT_Z,
     };
 
     auto* cameraNode = mCamera->getParentSceneNode();
@@ -953,33 +893,23 @@ bool CameraGizmo::snapCamera(ManualObject* face) const
     Vector3 target = camPos + camDir * dist;
 
     cameraNode->setPosition(target);
-    cameraNode->setOrientation(Quaternion::IDENTITY);
-    cameraNode->yaw(yawPitch[faceIndex][0]);
-    cameraNode->pitch(-yawPitch[faceIndex][1]);
+    cameraNode->setDirection(directions[faceIndex], Node::TS_WORLD);
     cameraNode->translate(Vector3(0, 0, dist), Node::TS_LOCAL);
     return true;
 }
 
-void CameraGizmo::highlightFace(ManualObject* face)
+void CameraGizmo::highlightFace(int faceIndex)
 {
     static const ColourValue base[] = {
-        ColourValue(0.1f, 0.1f, 0.8f, 1.0f), ColourValue(0.1f, 0.1f, 0.8f, 1.0f), // X pair
-        ColourValue(0.1f, 0.8f, 0.2f, 1.0f), ColourValue(0.1f, 0.8f, 0.2f, 1.0f), // Y pair
-        ColourValue(0.8f, 0.1f, 0.1f, 1.0f), ColourValue(0.8f, 0.1f, 0.1f, 1.0f), // Z pair
+        ColourValue(0.1f, 0.1f, 0.8f),
+        ColourValue(0.1f, 0.8f, 0.2f),
+        ColourValue(0.8f, 0.1f, 0.1f),
     };
     static const ColourValue hl[] = {
-        ColourValue(0.0f, 0.0f, 1.0f, 1.0f), ColourValue(0.0f, 0.0f, 1.0f, 1.0f),
-        ColourValue(0.0f, 1.0f, 0.0f, 1.0f), ColourValue(0.0f, 1.0f, 0.0f, 1.0f),
-        ColourValue(1.0f, 0.0f, 0.0f, 1.0f), ColourValue(1.0f, 0.0f, 0.0f, 1.0f),
+        ColourValue(0.0f, 0.0f, 1.0f),
+        ColourValue(0.0f, 1.0f, 0.0f),
+        ColourValue(1.0f, 0.0f, 0.0f),
     };
-
-    int faceIndex = -1;
-    for (int i = 0; i < 6; ++i)
-        if (mGizmoObjects[i] == face)
-        {
-            faceIndex = i;
-            break;
-        }
 
     if (faceIndex == mOldFaceIndex)
         return;
@@ -987,7 +917,7 @@ void CameraGizmo::highlightFace(ManualObject* face)
 
     for (int i = 0; i < 6; ++i)
     {
-        updateCameraQuad(mGizmoObjects[i], (i == faceIndex) ? hl[i] : base[i]);
+        updateCameraQuad(mGizmoObjects[i], (i == faceIndex) ? hl[i/2] : base[i/2]);
     }
 }
 
