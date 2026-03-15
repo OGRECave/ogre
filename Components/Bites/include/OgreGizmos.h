@@ -79,9 +79,9 @@ public:
     bool mouseMoved(const MouseMotionEvent& evt) override;
     bool mousePressed(const MouseButtonEvent& evt) override;
 private:
-    void highlightFace(Ogre::ManualObject* face);
-    bool snapCamera(Ogre::ManualObject* face) const;
-    Ogre::ManualObject* pickFace(float vx, float vy);
+    void highlightFace(int faceIndex);
+    bool snapCamera(int faceIndex) const;
+    int pickFace(float vx, float vy);
     void createMesh(Ogre::SceneManager* manager, Ogre::String name);
 
     Ogre::SceneNode* mGizmoNode{};
