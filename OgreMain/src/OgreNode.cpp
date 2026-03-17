@@ -554,6 +554,13 @@ namespace Ogre {
         mChildrenToUpdate.clear();
     }
     //-----------------------------------------------------------------------
+    void Node::detachSelf(void)
+    {
+        if (getParent()) {
+            getParent()->removeChild(this);
+        }
+    }
+    //-----------------------------------------------------------------------
     void Node::setScale(const Vector3& inScale)
     {
 #ifndef OGRE_FAST_MATH

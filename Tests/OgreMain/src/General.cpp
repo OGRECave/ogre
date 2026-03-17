@@ -188,6 +188,16 @@ TEST_F(SceneNodeTest, destroyChildAndObjects)
     EXPECT_TRUE(mSceneMgr->hasEntity("sinbad"));
 }
 
+TEST_F(SceneNodeTest, detachSelf) {
+    SceneNode* parent = mSceneMgr->getRootSceneNode()->createChildSceneNode("parent");
+    SceneNode* child = parent->createChildSceneNode("child");
+    EXPECT_EQ(parent->getChild("child"), child);
+    child->detachSelf(); //detach when we have a parent.
+    EXPECT_EQ(child->getParent(), nullptr);
+    child->detachSelf(); //detach when we don't a parent.
+    EXPECT_EQ(child->getParent(), nullptr); //it is a no-op
+}
+
 static void createRandomEntityClones(Entity* ent, size_t cloneCount, const Vector3& min,
                                      const Vector3& max, SceneManager* mgr)
 {
