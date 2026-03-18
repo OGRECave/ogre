@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreDDSCodec.h"
 #include "OgreImage.h"
 
+#include <climits>
+
 namespace Ogre {
     // Internal DDS structure definitions
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
@@ -767,8 +769,7 @@ namespace {
         
         if (FOURCC('D', 'D', 'S', ' ') != fileType)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "This is not a DDS file!", "DDSCodec::decode");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "This is not a DDS file");
         }
         
         // Read header in full
@@ -779,15 +780,18 @@ namespace {
         flipEndian(&header, 4, sizeof(DDSHeader) / 4);
 
         // Check some sizes
-        if (header.size != DDS_HEADER_SIZE)
+        if (header.size != DDS_HEADER_SIZE || header.pixelFormat.size != DDS_PIXELFORMAT_SIZE)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "DDS header size mismatch!", "DDSCodec::decode");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "DDS header size mismatch");
         }
-        if (header.pixelFormat.size != DDS_PIXELFORMAT_SIZE)
+
+        // prevent overflow in size calculations
+        // this allows a single 64GB texture and is much larger than any current hardware support
+        const uint32 MAX_IMAGE_DIMENSION = USHRT_MAX;
+        if (header.width == 0 || header.height == 0 || header.width > MAX_IMAGE_DIMENSION ||
+            header.height > MAX_IMAGE_DIMENSION)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "DDS header size mismatch!", "DDSCodec::decode");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "DDS file has invalid width or height");
         }
 
         uint32 imgDepth = 1; // (deal with volume later)
@@ -795,7 +799,7 @@ namespace {
         uint32 num_mipmaps = 0;
         PixelFormat format = PF_UNKNOWN;
 
-        if (header.caps.caps1 & DDSCAPS_MIPMAP)
+        if ((header.caps.caps1 & DDSCAPS_MIPMAP) && header.mipMapCount > 1)
         {
             num_mipmaps = static_cast<uint8>(header.mipMapCount - 1);
         }
@@ -813,6 +817,10 @@ namespace {
         else if (header.caps.caps2 & DDSCAPS2_VOLUME)
         {
             imgDepth = header.depth;
+            if (imgDepth == 0 || imgDepth > MAX_IMAGE_DIMENSION)
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "DDS volume texture has invalid depth");
+            }
         }
         // Pixel format
         PixelFormat sourceFormat = PF_UNKNOWN;
@@ -826,7 +834,7 @@ namespace {
                 stream->read(&extHeader, sizeof(DDSExtendedHeader));
 
                 // Endian flip if required, all 32-bit values
-                flipEndian(&header, sizeof(DDSExtendedHeader));
+                flipEndian(&extHeader, 4, sizeof(DDSExtendedHeader) / 4);
                 sourceFormat = convertDXToOgreFormat(extHeader.dxgiFormat);
             }
             else

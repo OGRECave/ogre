@@ -82,8 +82,8 @@ namespace Ogre {
             /** Called when a node gets updated.
 
                 Note that this happens when the node's derived update happens,
-                not every time a method altering it's state occurs. There may 
-                be several state-changing calls but only one of these calls, 
+                not every time a method altering it's state occurs. There may
+                be several state-changing calls but only one of these calls,
                 when the node graph is fully updated.
             */
             virtual void nodeUpdated(const Node*) {}
@@ -172,7 +172,7 @@ namespace Ogre {
         /** Class-specific implementation of _updateFromParent.
 
             Splitting the implementation of the update away from the update call
-            itself allows the detail to be overridden without disrupting the 
+            itself allows the detail to be overridden without disrupting the
             general sequence of updateFromParent (e.g. raising events)
         */
         virtual void updateFromParentImpl(void) const;
@@ -202,7 +202,7 @@ namespace Ogre {
         /// Constructor, should only be called by parent, not directly.
         Node(const String& name = "");
 
-        virtual ~Node();  
+        virtual ~Node();
 
         /** Returns the name of the node. */
         const String& getName(void) const { return mName; }
@@ -295,7 +295,7 @@ namespace Ogre {
         */
         void setInheritOrientation(bool inherit);
 
-        /** Returns true if this node is affected by orientation applied to the parent node. 
+        /** Returns true if this node is affected by orientation applied to the parent node.
 
             Orientations, unlike other transforms, are not always inherited by child nodes.
             Whether or not orientations affect the orientation of the child nodes depends on
@@ -324,16 +324,16 @@ namespace Ogre {
         */
         void setInheritScale(bool inherit);
 
-        /** Returns true if this node is affected by scaling factors applied to the parent node. 
+        /** Returns true if this node is affected by scaling factors applied to the parent node.
 
             See setInheritScale for more info.
         */
         bool getInheritScale(void) const { return mInheritScale; }
 
-        /** Scales the node, combining it's current scale with the passed in scaling factor. 
+        /** Scales the node, combining it's current scale with the passed in scaling factor.
 
             This method applies an extra scaling factor to the node's existing scale, (unlike setScale
-            which overwrites it) combining it's current scale with the new one. E.g. calling this 
+            which overwrites it) combining it's current scale with the new one. E.g. calling this
             method twice with Vector3(2,2,2) would have the same effect as setScale(Vector3(4,4,4)) if
             the existing scale was 1.
         @par
@@ -431,12 +431,12 @@ namespace Ogre {
             Initial rotation relative to parent
         */
         virtual Node* createChild(
-            const Vector3& translate = Vector3::ZERO, 
+            const Vector3& translate = Vector3::ZERO,
             const Quaternion& rotate = Quaternion::IDENTITY );
 
         /** Creates a new named Node as a child of this node.
 
-            This creates a child node with a given name, which allows you to look the node up from 
+            This creates a child node with a given name, which allows you to look the node up from
             the parent which holds this collection of nodes.
         @param name Name of the Node to create
         @param translate
@@ -477,10 +477,10 @@ namespace Ogre {
         /// List of sub-nodes of this Node
         const ChildNodeMap& getChildren() const { return mChildren; }
 
-        /** Drops the specified child from this node. 
+        /** Drops the specified child from this node.
 
             Does not delete the node, just detaches it from
-            this parent, potentially to be reattached elsewhere. 
+            this parent, potentially to be reattached elsewhere.
             There is also an alternate version which drops a named
             child from this node.
         */
@@ -488,7 +488,7 @@ namespace Ogre {
         /// @overload
         virtual Node* removeChild(Node* child);
 
-        /** Drops the named child from this node. 
+        /** Drops the named child from this node.
 
             Does not delete the node, just detaches it from
             this parent, potentially to be reattached elsewhere.
@@ -498,7 +498,7 @@ namespace Ogre {
             this parent, potentially to be reattached elsewhere.
         */
         virtual void removeAllChildren(void);
-        
+
         /** Sets the final world position of the node directly.
 
             It's advisable to use the local setPosition if possible
@@ -555,11 +555,11 @@ namespace Ogre {
             allowed.
         */
         void setListener(Listener* listener) { mListener = listener; }
-        
+
         /** Gets the current listener for this Node.
         */
         Listener* getListener(void) const { return mListener; }
-        
+
 
         /** Sets the current transform of this node to be the 'initial state' ie that
             position / orientation / scale to be used as a basis for delta values used
@@ -576,12 +576,12 @@ namespace Ogre {
         /** Resets the position / orientation / scale of this node to it's initial state, see setInitialState for more info. */
         void resetToInitialState(void);
 
-        /** Gets the initial position of this node, see setInitialState for more info. 
+        /** Gets the initial position of this node, see setInitialState for more info.
 
             Also resets the cumulative animation weight used for blending.
         */
         const Vector3& getInitialPosition(void) const { return mInitialPosition; }
-        
+
         /** Gets the local position, relative to this node, of the given world-space position */
         Vector3 convertWorldToLocalPosition( const Vector3 &worldPos );
 
@@ -589,11 +589,22 @@ namespace Ogre {
             useful for simple transforms that don't require a child node.*/
         Vector3 convertLocalToWorldPosition( const Vector3 &localPos );
 
-        /** Gets the local direction, relative to this node, of the given world-space direction */
+        /** Gets the local direction, relative to this node, of the
+            given world-space direction
+
+	@param worldDir world direction (as a vector) to be returned in local space
+        @param useScale determines if this node or it's parents' scale affects
+            the magnitude of the returned worldDir vector.
+        */
         Vector3 convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale );
 
         /** Gets the world direction of a point in the node local space
-            useful for simple transforms that don't require a child node.*/
+            useful for simple transforms that don't require a child node.
+
+	@param localDir local direction (as a vector) to be returned in world space
+        @param useScale determines if this node or it's parents' scale affects
+            the magnitude of the returned localDir vector.
+        */
         Vector3 convertLocalToWorldDirection( const Vector3 &localDir, bool useScale );
 
         /** Gets the local orientation, relative to this node, of the given world-space orientation */
@@ -614,7 +625,7 @@ namespace Ogre {
 
         /** To be called in the event of transform changes to this node that require it's recalculation.
 
-            This not only tags the node state as being 'dirty', it also requests it's parent to 
+            This not only tags the node state as being 'dirty', it also requests it's parent to
             know about it's dirtiness so it will get an update next time.
         @param forceParentUpdate Even if the node thinks it has already told it's
             parent, tell it anyway
@@ -632,8 +643,8 @@ namespace Ogre {
         /** Queue a 'needUpdate' call to a node safely.
 
             You can't call needUpdate() during the scene graph update, e.g. in
-            response to a Node::Listener hook, because the graph is already being 
-            updated, and update flag changes cannot be made reliably in that context. 
+            response to a Node::Listener hook, because the graph is already being
+            updated, and update flag changes cannot be made reliably in that context.
             Call this method if you need to queue a needUpdate call in this case.
         */
         static void queueNeedUpdate(Node* n);

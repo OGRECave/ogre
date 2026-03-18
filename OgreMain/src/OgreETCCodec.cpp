@@ -227,6 +227,11 @@ namespace Ogre {
 
         if (header.endianness == KTX_ENDIAN_REF_REV)
             flipEndian(&header.glType, sizeof(uint32));
+        if (header.numberOfFaces == 0)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "KTX file has zero faces");
+
+        if (header.numberOfMipmapLevels == 0)
+            header.numberOfMipmapLevels = 1; // per KTX spec, 0 means generate mipmaps; treat as 1
 
         PixelFormat format = PF_UNKNOWN;
 
@@ -330,17 +335,20 @@ namespace Ogre {
 
         // Now deal with the data
         uchar* destPtr = image->getData();
-        uint32 mipOffset = 0;
+        size_t mipOffset = 0;
         uint32 numFaces = header.numberOfFaces;
-        size_t size = image->getSize();
+        size_t faceSize = image->getSize() / numFaces;
         for (uint32 level = 0; level < header.numberOfMipmapLevels; ++level)
         {
             uint32 imageSize = 0;
             stream->read(&imageSize, sizeof(uint32));
 
+            if (mipOffset + imageSize > faceSize)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "KTX file contains more data than expected");
+
             for(uint32 face = 0; face < numFaces; ++face)
             {
-                uchar* placePtr = destPtr + ((size)/numFaces)*face + mipOffset; // shuffle mip and face
+                uchar* placePtr = destPtr + faceSize * face + mipOffset; // shuffle mip and face
                 stream->read(placePtr, imageSize);
             }
             mipOffset += imageSize;
