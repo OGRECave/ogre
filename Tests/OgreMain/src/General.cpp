@@ -188,13 +188,13 @@ TEST_F(SceneNodeTest, destroyChildAndObjects)
     EXPECT_TRUE(mSceneMgr->hasEntity("sinbad"));
 }
 
-TEST_F(SceneNodeTest, detachSelf) {
+TEST_F(SceneNodeTest, removeFromParent) {
     SceneNode* parent = mSceneMgr->getRootSceneNode()->createChildSceneNode("parent");
     SceneNode* child = parent->createChildSceneNode("child");
     EXPECT_EQ(parent->getChild("child"), child);
-    child->detachSelf(); //detach when we have a parent.
+    child->removeFromParent(); //detach when we have a parent.
     EXPECT_EQ(child->getParent(), nullptr);
-    child->detachSelf(); //detach when we don't a parent.
+    child->removeFromParent(); //detach when we don't a parent.
     EXPECT_EQ(child->getParent(), nullptr); //it is a no-op
 }
 

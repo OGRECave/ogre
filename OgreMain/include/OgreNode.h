@@ -504,7 +504,7 @@ namespace Ogre {
 
             No-op on nodes without a parent.
 	*/
-        void detachSelf(void);
+        void removeFromParent(void);
 
         /** Sets the final world position of the node directly.
 

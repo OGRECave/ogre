@@ -554,7 +554,7 @@ namespace Ogre {
         mChildrenToUpdate.clear();
     }
     //-----------------------------------------------------------------------
-    void Node::detachSelf(void)
+    void Node::removeFromParent(void)
     {
         if (getParent()) {
             getParent()->removeChild(this);
