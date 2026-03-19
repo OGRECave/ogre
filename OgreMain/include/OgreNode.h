@@ -499,6 +499,13 @@ namespace Ogre {
         */
         virtual void removeAllChildren(void);
 
+        /** if this node has a parent, then detatch this node from the parent,
+            so this node can be reattached elsewhere.
+
+            No-op on nodes without a parent.
+	*/
+        void removeFromParent(void);
+
         /** Sets the final world position of the node directly.
 
             It's advisable to use the local setPosition if possible
