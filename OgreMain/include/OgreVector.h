@@ -46,24 +46,21 @@ namespace Ogre
     template <int dims, typename T> struct VectorBase
     {
         VectorBase() {}
-        constexpr VectorBase(T _x, T _y)
+        constexpr VectorBase(T _x, T _y) : data{_x, _y}
         {
             static_assert(dims > 1, "must have at least 2 dimensions");
-            data[0] = _x; data[1] = _y;
         }
-        constexpr VectorBase(T _x, T _y, T _z)
+        constexpr VectorBase(T _x, T _y, T _z) : data{_x, _y, _z}
         {
             static_assert(dims > 2, "must have at least 3 dimensions");
-            data[0] = _x; data[1] = _y; data[2] = _z;
         }
-        constexpr VectorBase(T _x, T _y, T _z, T _w)
+        constexpr VectorBase(T _x, T _y, T _z, T _w) : data{_x, _y, _z, _w}
         {
             static_assert(dims > 3, "must have at least 4 dimensions");
-            data[0] = _x; data[1] = _y; data[2] = _z; data[3] = _w;
         }
         T data[dims];
         T* ptr() { return data; }
-        const T* ptr() const { return data; }
+        constexpr const T* ptr() const { return data; }
     };
     template <> struct _OgreExport VectorBase<2, Real>
     {
@@ -71,7 +68,7 @@ namespace Ogre
         constexpr VectorBase(Real _x, Real _y) : x(_x), y(_y) {}
         Real x, y;
         Real* ptr() { return &x; }
-        const Real* ptr() const { return &x; }
+        constexpr const Real* ptr() const { return &x; }
 
         /** Returns a vector at a point half way between this and the passed
             in vector.
@@ -131,7 +128,7 @@ namespace Ogre
         constexpr VectorBase(Real _x, Real _y, Real _z) : x(_x), y(_y), z(_z) {}
         Real x, y, z;
         Real* ptr() { return &x; }
-        const Real* ptr() const { return &x; }
+        constexpr const Real* ptr() const { return &x; }
 
         /** Calculates the cross-product of 2 vectors, i.e. the vector that
             lies perpendicular to them both.
@@ -260,7 +257,7 @@ namespace Ogre
         constexpr VectorBase(Real _x, Real _y, Real _z, Real _w) : x(_x), y(_y), z(_z), w(_w) {}
         Real x, y, z, w;
         Real* ptr() { return &x; }
-        const Real* ptr() const { return &x; }
+        constexpr const Real* ptr() const { return &x; }
 
         // special points
         static const Vector4 &ZERO;
@@ -320,7 +317,7 @@ namespace Ogre
             return Vector<2, T>(ptr());
         }
 
-        T operator[](size_t i) const
+        constexpr T operator[](size_t i) const
         {
             assert(i < dims);
             return ptr()[i];

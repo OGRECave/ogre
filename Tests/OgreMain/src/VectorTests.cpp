@@ -228,3 +228,14 @@ TEST(VectorTests, TypeCasts)
 
     EXPECT_EQ(imat.getTrans(), vec);
 }
+
+TEST(VectorTests, Constexpr)
+{
+    constexpr Vector3 v(1, 2, 3);
+    constexpr float x = v[1];
+    EXPECT_EQ(x, 2);
+
+    constexpr Vector3i v2(1, 2, 3);
+    constexpr int x2 = v2[1];
+    EXPECT_EQ(x2, 2);
+}
