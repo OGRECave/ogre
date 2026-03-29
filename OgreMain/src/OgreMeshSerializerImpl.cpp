@@ -589,6 +589,8 @@ namespace Ogre {
 
         unsigned int vertexCount = 0;
         readInts(stream, &vertexCount, 1);
+        if (stream->size() < stream->tell() + vertexCount)
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex count exceeds remaining stream data");
         dest->vertexCount = vertexCount;
         // Find optional geometry streams
         if (!stream->eof())
@@ -731,6 +733,9 @@ namespace Ogre {
         }
 
         // Create / populate vertex buffer
+        size_t vbufBytes = dest->vertexCount * (size_t)vertexSize;
+        if (vbufBytes / vertexSize != dest->vertexCount || stream->size() < stream->tell() + vbufBytes)
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining stream data");
         HardwareVertexBufferSharedPtr vbuf;
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             vertexSize,
@@ -738,7 +743,7 @@ namespace Ogre {
             pMesh->mVertexBufferUsage,
             pMesh->mVertexBufferShadowBuffer);
         HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
-        stream->read(vbufLock.pData, dest->vertexCount * vertexSize);
+        stream->read(vbufLock.pData, vbufBytes);
 
         // endian conversion for OSX
         flipFromLittleEndian(
@@ -924,6 +929,10 @@ namespace Ogre {
         readBools(stream, &idx32bit, 1);
         if (indexCount > 0)
         {
+            size_t indexSize = idx32bit ? sizeof(unsigned int) : sizeof(unsigned short);
+            size_t bufSize = indexCount * indexSize;
+            if (bufSize / indexSize != indexCount || stream->size() < stream->tell() + bufSize)
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Index buffer size exceeds remaining stream data");
             if (idx32bit)
             {
                 ibuf = pMesh->getHardwareBufferManager()->createIndexBuffer(
