@@ -419,7 +419,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     StreamSerialiser::Chunk* StreamSerialiser::readChunkImpl()
     {
-        Chunk *chunk = OGRE_NEW Chunk();
+        auto chunk = std::make_unique<Chunk>();
         chunk->offset = static_cast<uint32>(mStream->tell());
         read(&chunk->id);
         read(&chunk->version);
@@ -428,20 +428,17 @@ namespace Ogre
         uint32 checksum;
         read(&checksum);
         
-        if (checksum != calculateChecksum(chunk))
+        if (checksum != calculateChecksum(chunk.get()))
         {
             // no good, this is an invalid chunk
             uint32 off = chunk->offset;
-            OGRE_DELETE chunk;
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
                 "Corrupt chunk detected in stream " + mStream->getName() + " at byte "
                 + StringConverter::toString(off), 
                 "StreamSerialiser::readChunkImpl");
         }
-        else
-        {
-            return chunk;
-        }
+
+        return chunk.release();
 
 
     }
