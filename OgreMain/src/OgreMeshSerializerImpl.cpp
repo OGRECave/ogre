@@ -1400,6 +1400,8 @@ namespace Ogre {
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
+        // num LOD levels must be at least 1 (base mesh)
+        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
         pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         for (auto *s : pMesh->getSubMeshes())
         {
