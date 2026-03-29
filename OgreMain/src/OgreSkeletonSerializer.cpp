@@ -489,6 +489,10 @@ namespace Ogre {
         // unsigned short parentHandle   : parent bone
         readShorts(stream, &parentHandle, 1);
 
+        auto numBones = pSkel->getBones().size();
+        if (parentHandle >= numBones || childHandle >= numBones)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid bone handle in skeleton file");
+
         // Find bones
         parent = pSkel->getBone(parentHandle);
         child = pSkel->getBone(childHandle);
