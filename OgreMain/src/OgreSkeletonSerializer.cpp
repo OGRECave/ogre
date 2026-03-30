@@ -450,6 +450,9 @@ namespace Ogre {
         unsigned short handle;
         readShorts(stream, &handle, 1);
 
+        if (handle > pSkel->getNumBones())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Bone handles must be contiguous");
+
         // Create new bone
         Bone* pBone = pSkel->createBone(name, handle);
 
