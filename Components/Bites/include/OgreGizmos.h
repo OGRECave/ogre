@@ -3,6 +3,7 @@
 #include "OgreBitesPrerequisites.h"
 #include "OgreInput.h"
 #include "OgreRay.h"
+#include "OgreViewport.h"
 
 namespace OgreBites
 {
@@ -71,7 +72,7 @@ private:
     int mOldGizmoAxis{};
 };
 
-class _OgreBitesExport CameraGizmo : public InputListener
+class _OgreBitesExport CameraGizmo : public InputListener, public Ogre::Viewport::Listener
 {
 public:
     CameraGizmo(Ogre::Viewport* viewport);
@@ -83,6 +84,8 @@ private:
     bool snapCamera(int faceIndex) const;
     int pickFace(float vx, float vy);
     void createMesh(Ogre::SceneManager* manager, Ogre::String name);
+
+    void viewportDimensionsChanged(Ogre::Viewport* viewport) override;
 
     Ogre::SceneNode* mGizmoNode{};
     Ogre::Camera* mCamera{};

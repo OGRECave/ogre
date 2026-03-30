@@ -802,6 +802,12 @@ CameraGizmo::CameraGizmo(Viewport* viewport)
 
     createMesh(cameraNode->getCreator(), "AxisGizmosMesh");
 
+    viewportDimensionsChanged(mViewport);
+    mViewport->addListener(this);
+}
+
+void CameraGizmo::viewportDimensionsChanged(Ogre::Viewport* viewport)
+{
     const float nx = mOverlayLeft + mOverlayWidth * 0.5f;
     const float ny = mOverlayTop + mOverlayHeight * 0.5f;
     const float depth = std::max(mCamera->getNearClipDistance() * 10.0f, 1.0f);
@@ -813,7 +819,6 @@ CameraGizmo::CameraGizmo(Viewport* viewport)
     const float regionHeight = mOverlayHeight * 2.0f * halfHeight;
     const float size = std::max(std::min(regionWidth, regionHeight) * 0.9f * 0.75f, 0.01f);
 
-    // Camera-local placement; parent orientation rotates this into world space.
     mGizmoNode->setPosition(Vector3(ndcX * halfWidth, ndcY * halfHeight, -depth));
     mGizmoNode->setScale(Vector3(size));
 }
