@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreImage.h"
 
 #include "OgrePlatformInformation.h"
+#include "OgreString.h"
 
 #if __OGRE_HAVE_NEON
 #define STBI_NEON
@@ -178,6 +179,13 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
                 "Error decoding image: " + String(stbi_failure_reason()),
                 "STBIImageCodec::decode");
+        }
+
+        if (width <= 0 || height <= 0)
+        {
+            stbi_image_free(pixelData);
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        StringUtil::format("Image has invalid dimensions: %dx%d", width, height));
         }
 
         PixelFormat format = PF_UNKNOWN;
