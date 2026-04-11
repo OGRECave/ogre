@@ -565,7 +565,9 @@ namespace Ogre {
         readShorts(stream, &boneHandle, 1);
 
         // Find bone
-        Bone *targetBone = pSkel->getBone(boneHandle);
+        if (boneHandle >= pSkel->getBones().size())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Animation track boneHandle out of range");
+        Bone* targetBone = pSkel->getBone(boneHandle);
 
         // Create track
         NodeAnimationTrack* pTrack = anim->createNodeTrack(boneHandle, targetBone);
