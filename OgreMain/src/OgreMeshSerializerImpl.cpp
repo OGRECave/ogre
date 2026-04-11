@@ -2974,6 +2974,8 @@ namespace Ogre {
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
+        // num LOD levels must be at least 1 (base mesh)
+        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
         // bool manual;  (true for manual alternate meshes, false for generated)
         readBools(stream, &(pMesh->mHasManualLodLevel), 1);
 
@@ -3362,6 +3364,8 @@ namespace Ogre {
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
+        // num LOD levels must be at least 1 (base mesh)
+        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
         bool manual; // true for manual alternate meshes, false for generated
         readBools(stream, &manual, 1);
 
