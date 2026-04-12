@@ -2979,6 +2979,7 @@ namespace Ogre {
         // bool manual;  (true for manual alternate meshes, false for generated)
         readBools(stream, &(pMesh->mHasManualLodLevel), 1);
 
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         // Preallocate submesh lod face data if not manual
         if (!pMesh->hasManualLodLevel())
         {
@@ -3003,13 +3004,8 @@ namespace Ogre {
                     "MeshSerializerImpl::readMeshLodInfo");
             }
             // Read depth
-            MeshLodUsage usage;
+            MeshLodUsage& usage = pMesh->mMeshLodUsageList[i];
             readFloats(stream, &(usage.userValue), 1);
-
-            // Set default values
-            usage.manualName = "";
-            usage.manualMesh.reset();
-            usage.edgeData = NULL;
 
             if (pMesh->hasManualLodLevel())
             {
@@ -3020,9 +3016,6 @@ namespace Ogre {
                 readMeshLodUsageGenerated(stream, pMesh, i, usage);
             }
             usage.edgeData = NULL;
-
-            // Save usage
-            pMesh->mMeshLodUsageList.push_back(usage);
         }
         popInnerChunk(stream);
 #endif
@@ -3371,6 +3364,7 @@ namespace Ogre {
 
         pMesh->mHasManualLodLevel = manual;
 
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         // Preallocate submesh LOD face data if not manual
         if (!manual)
         {
@@ -3392,14 +3386,9 @@ namespace Ogre {
                     "MeshSerializerImpl::readMeshLodInfo");
             }
             // Read depth
-            MeshLodUsage usage;
+            MeshLodUsage& usage = pMesh->mMeshLodUsageList[i];
             readFloats(stream, &(usage.value), 1);
             usage.userValue = Math::Sqrt(usage.value);
-
-            // Set default values
-            usage.manualName = "";
-            usage.manualMesh.reset();
-            usage.edgeData = NULL;
 
             if (manual)
             {
@@ -3410,9 +3399,6 @@ namespace Ogre {
                 readMeshLodUsageGenerated(stream, pMesh, i, usage);
             }
             usage.edgeData = NULL;
-
-            // Save usage
-            pMesh->mMeshLodUsageList.push_back(usage);
         }
         popInnerChunk(stream);
 #endif
