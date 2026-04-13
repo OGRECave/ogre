@@ -44,6 +44,15 @@ namespace Ogre {
 
     /// stream overhead = ID + size
     const long MSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
+
+    static bool checkStreamRemainingSize(const DataStreamPtr& stream, size_t itemCount,
+        size_t itemSize)
+    {
+        if (itemCount == 0)
+            return true;
+        size_t remaining = stream->size() - stream->tell();
+        return remaining / itemSize >= itemCount;
+    }
     //---------------------------------------------------------------------
     MeshSerializerImpl::MeshSerializerImpl()
     {
@@ -929,10 +938,8 @@ namespace Ogre {
         readBools(stream, &idx32bit, 1);
         if (indexCount > 0)
         {
-            size_t indexSize = idx32bit ? sizeof(unsigned int) : sizeof(unsigned short);
-            size_t bufSize = indexCount * indexSize;
-            if (bufSize / indexSize != indexCount || stream->size() < stream->tell() + bufSize)
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Index buffer size exceeds remaining stream data");
+            if (!checkStreamRemainingSize(stream, indexCount, idx32bit ? sizeof(unsigned int) : sizeof(unsigned short)))
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Index buffer size exceeds stream size");
             if (idx32bit)
             {
                 ibuf = pMesh->getHardwareBufferManager()->createIndexBuffer(
@@ -1341,6 +1348,8 @@ namespace Ogre {
         String strategyName = readString(stream);
         uint16 numLods;
         readShorts(stream, &numLods, 1);
+        if (!checkStreamRemainingSize(stream, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         pushInnerChunk(stream);
         for (int lodID = 1; lodID < numLods; lodID++){
             unsigned short streamID = readChunk(stream);
@@ -1402,6 +1411,8 @@ namespace Ogre {
         readShorts(stream, &(pMesh->mNumLods), 1);
         // num LOD levels must be at least 1 (base mesh)
         pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         for (auto *s : pMesh->getSubMeshes())
         {
@@ -2908,6 +2919,8 @@ namespace Ogre {
         String strategyName = readString(stream);
         uint16 numLods;
         readShorts(stream, &numLods, 1);
+        if (!checkStreamRemainingSize(stream, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         bool manual;
         readBools(stream, &manual, 1); // missing in v1_9
         pushInnerChunk(stream);
@@ -2976,6 +2989,8 @@ namespace Ogre {
         readShorts(stream, &(pMesh->mNumLods), 1);
         // num LOD levels must be at least 1 (base mesh)
         pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         // bool manual;  (true for manual alternate meshes, false for generated)
         readBools(stream, &(pMesh->mHasManualLodLevel), 1);
 
@@ -3294,6 +3309,8 @@ namespace Ogre {
         // String strategyName = readString(stream); // missing in v1_4
         uint16 numLods;
         readShorts(stream, &numLods, 1);
+        if (!checkStreamRemainingSize(stream, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         bool manual;
         readBools(stream, &manual, 1); // missing in v1_9
         pushInnerChunk(stream);
@@ -3359,6 +3376,8 @@ namespace Ogre {
         readShorts(stream, &(pMesh->mNumLods), 1);
         // num LOD levels must be at least 1 (base mesh)
         pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         bool manual; // true for manual alternate meshes, false for generated
         readBools(stream, &manual, 1);
 
