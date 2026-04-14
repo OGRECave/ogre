@@ -90,7 +90,7 @@ void TimeEventDispatcher::removeListener(TimeEventListener * listener)
 
 void TimeEventDispatcher::dispatch(float lastTime, float thisTime, int loops, float length)
 {
-    if ((loops > 0) || (thisTime > lastTime))
+    if ((loops > 0) || ((loops == 0) && (thisTime > lastTime)))
     {
         while (loops--)
         {
@@ -106,7 +106,7 @@ void TimeEventDispatcher::dispatch(float lastTime, float thisTime, int loops, fl
             dispatchForwardExclusive(lastTime, thisTime);
         }
     }
-    else if ((loops < 0) || (thisTime < lastTime))
+    else if ((loops < 0) || ((loops == 0) && (thisTime < lastTime)))
     {
         if (lastTime == 0.0f)
         {

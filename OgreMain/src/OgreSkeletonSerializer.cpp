@@ -450,6 +450,9 @@ namespace Ogre {
         unsigned short handle;
         readShorts(stream, &handle, 1);
 
+        if (handle > pSkel->getNumBones())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Bone handles must be contiguous");
+
         // Create new bone
         Bone* pBone = pSkel->createBone(name, handle);
 
@@ -488,6 +491,10 @@ namespace Ogre {
         readShorts(stream, &childHandle, 1);
         // unsigned short parentHandle   : parent bone
         readShorts(stream, &parentHandle, 1);
+
+        auto numBones = pSkel->getBones().size();
+        if (parentHandle >= numBones || childHandle >= numBones)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid bone handle in skeleton file");
 
         // Find bones
         parent = pSkel->getBone(parentHandle);
@@ -558,7 +565,9 @@ namespace Ogre {
         readShorts(stream, &boneHandle, 1);
 
         // Find bone
-        Bone *targetBone = pSkel->getBone(boneHandle);
+        if (boneHandle >= pSkel->getBones().size())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Animation track boneHandle out of range");
+        Bone* targetBone = pSkel->getBone(boneHandle);
 
         // Create track
         NodeAnimationTrack* pTrack = anim->createNodeTrack(boneHandle, targetBone);

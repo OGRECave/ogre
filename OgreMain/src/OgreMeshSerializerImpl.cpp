@@ -44,6 +44,15 @@ namespace Ogre {
 
     /// stream overhead = ID + size
     const long MSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
+
+    static bool checkStreamRemainingSize(const DataStreamPtr& stream, size_t itemCount,
+        size_t itemSize)
+    {
+        if (itemCount == 0)
+            return true;
+        size_t remaining = stream->size() - stream->tell();
+        return remaining / itemSize >= itemCount;
+    }
     //---------------------------------------------------------------------
     MeshSerializerImpl::MeshSerializerImpl()
     {
@@ -589,6 +598,8 @@ namespace Ogre {
 
         unsigned int vertexCount = 0;
         readInts(stream, &vertexCount, 1);
+        if (stream->size() < stream->tell() + vertexCount)
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex count exceeds remaining stream data");
         dest->vertexCount = vertexCount;
         // Find optional geometry streams
         if (!stream->eof())
@@ -731,6 +742,9 @@ namespace Ogre {
         }
 
         // Create / populate vertex buffer
+        size_t vbufBytes = dest->vertexCount * (size_t)vertexSize;
+        if (vbufBytes / vertexSize != dest->vertexCount || stream->size() < stream->tell() + vbufBytes)
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining stream data");
         HardwareVertexBufferSharedPtr vbuf;
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             vertexSize,
@@ -738,7 +752,7 @@ namespace Ogre {
             pMesh->mVertexBufferUsage,
             pMesh->mVertexBufferShadowBuffer);
         HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
-        stream->read(vbufLock.pData, dest->vertexCount * vertexSize);
+        stream->read(vbufLock.pData, vbufBytes);
 
         // endian conversion for OSX
         flipFromLittleEndian(
@@ -924,6 +938,8 @@ namespace Ogre {
         readBools(stream, &idx32bit, 1);
         if (indexCount > 0)
         {
+            if (!checkStreamRemainingSize(stream, indexCount, idx32bit ? sizeof(unsigned int) : sizeof(unsigned short)))
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Index buffer size exceeds stream size");
             if (idx32bit)
             {
                 ibuf = pMesh->getHardwareBufferManager()->createIndexBuffer(
@@ -1332,6 +1348,8 @@ namespace Ogre {
         String strategyName = readString(stream);
         uint16 numLods;
         readShorts(stream, &numLods, 1);
+        if (!checkStreamRemainingSize(stream, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         pushInnerChunk(stream);
         for (int lodID = 1; lodID < numLods; lodID++){
             unsigned short streamID = readChunk(stream);
@@ -1391,6 +1409,10 @@ namespace Ogre {
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
+        // num LOD levels must be at least 1 (base mesh)
+        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         for (auto *s : pMesh->getSubMeshes())
         {
@@ -2897,6 +2919,8 @@ namespace Ogre {
         String strategyName = readString(stream);
         uint16 numLods;
         readShorts(stream, &numLods, 1);
+        if (!checkStreamRemainingSize(stream, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         bool manual;
         readBools(stream, &manual, 1); // missing in v1_9
         pushInnerChunk(stream);
@@ -2963,9 +2987,14 @@ namespace Ogre {
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
+        // num LOD levels must be at least 1 (base mesh)
+        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         // bool manual;  (true for manual alternate meshes, false for generated)
         readBools(stream, &(pMesh->mHasManualLodLevel), 1);
 
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         // Preallocate submesh lod face data if not manual
         if (!pMesh->hasManualLodLevel())
         {
@@ -2990,13 +3019,8 @@ namespace Ogre {
                     "MeshSerializerImpl::readMeshLodInfo");
             }
             // Read depth
-            MeshLodUsage usage;
+            MeshLodUsage& usage = pMesh->mMeshLodUsageList[i];
             readFloats(stream, &(usage.userValue), 1);
-
-            // Set default values
-            usage.manualName = "";
-            usage.manualMesh.reset();
-            usage.edgeData = NULL;
 
             if (pMesh->hasManualLodLevel())
             {
@@ -3007,9 +3031,6 @@ namespace Ogre {
                 readMeshLodUsageGenerated(stream, pMesh, i, usage);
             }
             usage.edgeData = NULL;
-
-            // Save usage
-            pMesh->mMeshLodUsageList.push_back(usage);
         }
         popInnerChunk(stream);
 #endif
@@ -3288,6 +3309,8 @@ namespace Ogre {
         // String strategyName = readString(stream); // missing in v1_4
         uint16 numLods;
         readShorts(stream, &numLods, 1);
+        if (!checkStreamRemainingSize(stream, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         bool manual;
         readBools(stream, &manual, 1); // missing in v1_9
         pushInnerChunk(stream);
@@ -3351,11 +3374,16 @@ namespace Ogre {
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
+        // num LOD levels must be at least 1 (base mesh)
+        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         bool manual; // true for manual alternate meshes, false for generated
         readBools(stream, &manual, 1);
 
         pMesh->mHasManualLodLevel = manual;
 
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         // Preallocate submesh LOD face data if not manual
         if (!manual)
         {
@@ -3377,14 +3405,9 @@ namespace Ogre {
                     "MeshSerializerImpl::readMeshLodInfo");
             }
             // Read depth
-            MeshLodUsage usage;
+            MeshLodUsage& usage = pMesh->mMeshLodUsageList[i];
             readFloats(stream, &(usage.value), 1);
             usage.userValue = Math::Sqrt(usage.value);
-
-            // Set default values
-            usage.manualName = "";
-            usage.manualMesh.reset();
-            usage.edgeData = NULL;
 
             if (manual)
             {
@@ -3395,9 +3418,6 @@ namespace Ogre {
                 readMeshLodUsageGenerated(stream, pMesh, i, usage);
             }
             usage.edgeData = NULL;
-
-            // Save usage
-            pMesh->mMeshLodUsageList.push_back(usage);
         }
         popInnerChunk(stream);
 #endif
