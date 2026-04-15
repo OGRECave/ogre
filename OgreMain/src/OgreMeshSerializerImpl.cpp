@@ -472,10 +472,7 @@ namespace Ogre {
         size += sizeof(bool);
 
         // Geometry
-        if (pMesh->sharedVertexData)
-        {
-            size += calcGeometrySize(pMesh->sharedVertexData);
-        }
+        size += calcGeometrySize(pMesh->sharedVertexData);
 
         // Submeshes
         for (auto *s : pMesh->getSubMeshes())
@@ -567,6 +564,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcGeometrySize(const VertexData* vertexData)
     {
+        if (!vertexData)
+            return 0;
+
         const VertexDeclaration::VertexElementList& elemList =
             vertexData->vertexDeclaration->getElements();
         const VertexBufferBinding::VertexBufferBindingMap& bindings =
