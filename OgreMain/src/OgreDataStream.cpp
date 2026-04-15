@@ -341,10 +341,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     size_t MemoryDataStream::read(void* buf, size_t count)
     {
-        size_t cnt = count;
         // Read over end of memory?
-        if (mPos + cnt > mEnd)
-            cnt = mEnd - mPos;
+        if (mPos >= mEnd)
+            return 0;
+        size_t cnt = std::min(count, static_cast<size_t>(mEnd - mPos));
         if (cnt == 0)
             return 0;
 
