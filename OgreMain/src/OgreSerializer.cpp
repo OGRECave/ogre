@@ -260,13 +260,19 @@ namespace Ogre {
     //---------------------------------------------------------------------
     unsigned short Serializer::readChunk(const DataStreamPtr& stream)
     {
-#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
         size_t pos = stream->tell();
-#endif
         unsigned short id;
         readShorts(stream, &id, 1);
         
         readInts(stream, &mCurrentstreamLen, 1);
+
+        if (!stream->eof())
+        {
+            // chunk size cant be smaller than the header size, and must fit within the stream
+            if (mCurrentstreamLen < calcChunkHeaderSize() || pos + mCurrentstreamLen > stream->size())
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Corrupt chunk length");
+        }
+
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
         if (!mChunkSizeStack.empty() && !stream->eof()){
             if (pos != static_cast<size_t>(mChunkSizeStack.back()) && mReportChunkErrors){
