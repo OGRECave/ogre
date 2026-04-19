@@ -472,10 +472,7 @@ namespace Ogre {
         size += sizeof(bool);
 
         // Geometry
-        if (pMesh->sharedVertexData)
-        {
-            size += calcGeometrySize(pMesh->sharedVertexData);
-        }
+        size += calcGeometrySize(pMesh->sharedVertexData);
 
         // Submeshes
         for (auto *s : pMesh->getSubMeshes())
@@ -567,6 +564,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcGeometrySize(const VertexData* vertexData)
     {
+        if (!vertexData)
+            return 0;
+
         const VertexDeclaration::VertexElementList& elemList =
             vertexData->vertexDeclaration->getElements();
         const VertexBufferBinding::VertexBufferBindingMap& bindings =
@@ -2588,11 +2588,15 @@ namespace Ogre {
         readShorts(stream, &idx, 1);
         
         SubMesh *sm = pMesh->getSubMeshes().at(idx);
-        
-        int n_floats = (mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE -
-                        sizeof (unsigned short)) / sizeof (float);
-        
-        assert ((n_floats % 3) == 0);
+
+        const size_t minChunkSize = MSTREAM_OVERHEAD_SIZE + sizeof(unsigned short);
+        if (mCurrentstreamLen <= minChunkSize)
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Extremes chunk too small");
+
+        size_t n_floats = (mCurrentstreamLen - minChunkSize) / sizeof(float);
+
+        if (n_floats == 0 || n_floats % 3 != 0)
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid extremes data size");
         
         sm->extremityPoints.resize(n_floats / 3);
 
