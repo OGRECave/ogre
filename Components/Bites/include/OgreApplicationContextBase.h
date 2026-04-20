@@ -303,7 +303,7 @@ namespace OgreBites
 
         Ogre::OverlaySystem* mOverlaySystem;  // Overlay system
 
-        Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
+        std::unique_ptr<Ogre::FileSystemLayer> mFSLayer; // File system abstraction layer
         Ogre::Root* mRoot;              // OGRE root
         StaticPluginLoader mStaticPluginLoader;
         bool mFirstRun;

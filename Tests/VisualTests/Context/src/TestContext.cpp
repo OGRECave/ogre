@@ -129,7 +129,7 @@ void TestContext::setup()
     mWindows.push_back({mWindow});
 
     mWindow->setDeactivateOnFocusChange(false);
-    
+
     locateResources();
     initialiseRTShaderSystem();
 
@@ -208,7 +208,7 @@ OgreBites::Sample* TestContext::loadTests()
         return startSample;
     }
     else
-        return 0;    
+        return 0;
 }
 //-----------------------------------------------------------------------
 
@@ -401,11 +401,11 @@ void TestContext::setupDirectories(Ogre::String batchName)
     if(mOutputDir.empty())
     {
         mOutputDir = mFSLayer->getWritablePath("VisualTests/");
-        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+        mFSLayer->createDirectory(mOutputDir);
 
         // make sure there's a directory for the test set
         mOutputDir += mTestSetName + "/";
-        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+        mFSLayer->createDirectory(mOutputDir);
 
         // add a directory for the render system
         Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
@@ -414,17 +414,16 @@ void TestContext::setupDirectories(Ogre::String batchName)
             if (i != ' ')
                 mOutputDir += i;
         mOutputDir += "/";
-        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+        mFSLayer->createDirectory(mOutputDir);
     }
 
     if(mSummaryOutputDir != "NONE")
     {
-        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mSummaryOutputDir);
+        mFSLayer->createDirectory(mSummaryOutputDir);
     }
 
     // and finally a directory for the test batch itself
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir
-                                                                   + batchName + "/");
+    mFSLayer->createDirectory(mOutputDir + batchName + "/");
 }
 //-----------------------------------------------------------------------
 
@@ -449,7 +448,7 @@ void TestContext::finishedTests()
             // if no luck, just grab the most recent compatible set
             foundReference = false;
             batches = TestBatch::loadTestBatches(mOutputDir);
-            
+
             TestBatchSet::iterator i;
             for (i = batches.begin(); i != batches.end(); ++i)
             {

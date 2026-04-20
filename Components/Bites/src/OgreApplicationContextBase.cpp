@@ -33,7 +33,7 @@ static const char* SHADER_CACHE_FILENAME = "cache.bin";
 ApplicationContextBase::ApplicationContextBase(const Ogre::String& appName)
 {
     mAppName = appName;
-    mFSLayer = new Ogre::FileSystemLayer(mAppName);
+    mFSLayer.reset(new Ogre::FileSystemLayer(mAppName));
 
     if (char* val = getenv("OGRE_CONFIG_DIR"))
     {
@@ -53,7 +53,7 @@ ApplicationContextBase::ApplicationContextBase(const Ogre::String& appName)
 
 ApplicationContextBase::~ApplicationContextBase()
 {
-    delete mFSLayer;
+
 }
 
 void ApplicationContextBase::initApp()
