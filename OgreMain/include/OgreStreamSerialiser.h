@@ -362,29 +362,18 @@ namespace Ogre
         template <typename T, typename U>
         void writeConverted(const T* src, U typeToWrite, size_t count)
         {
-            U* tmp = OGRE_ALLOC_T(U, count, MEMCATEGORY_GENERAL);
-            U* pDst = tmp;
-            const T* pSrc = src;
-            for (size_t i = 0; i < count; ++i)
-                *pDst++ = static_cast<U>(*pSrc++);
-            
-            writeData(tmp, sizeof(U), count);
-
-            OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
+            std::vector<U> tmp(count);
+            for (auto& e : tmp)
+                e = static_cast<U>(*src++);
+            writeData(tmp.data(), sizeof(U), count);
         }
         template <typename T, typename U>
         void readConverted(T* dst, U typeToRead, size_t count)
         {
-            U* tmp = OGRE_ALLOC_T(U, count, MEMCATEGORY_GENERAL);
-            readData(tmp, sizeof(U), count);
-
-            T* pDst = dst;
-            const U* pSrc = tmp;
-            for (size_t i = 0; i < count; ++i)
-                *pDst++ = static_cast<T>(*pSrc++);
-
-
-            OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
+            std::vector<U> tmp(count);
+            readData(tmp.data(), sizeof(U), count);
+            for (auto& e : tmp)
+                *dst++ = static_cast<T>(e);
         }
 
     };
