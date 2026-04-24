@@ -285,10 +285,11 @@ namespace Ogre {
         if (child->mParent)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Node '" + child->getName() + "' already was a child of '" +
-                child->mParent->getName() + "'.",
-                "Node::addChild");
+                        "Node '" + child->getName() + "' already was a child of '" + child->mParent->getName() + "'");
         }
+
+        if (child == this)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot add node as a child of itself");
 
         mChildren.push_back(child);
         child->setParent(this);
