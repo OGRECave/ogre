@@ -1177,6 +1177,8 @@ namespace Ogre {
     void MeshSerializerImpl::writeLodUsageGeneratedSubmesh( const SubMesh* submesh, unsigned short lodNum )
     {
         const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
+        OgreAssert(indexData, "Generated LOD is missing IndexData");
+
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(ibuf);
         unsigned int bufferIndex = -1;
@@ -1276,6 +1278,8 @@ namespace Ogre {
         size_t size = 0;
         
         const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
+        OgreAssert(indexData, "Generated LOD is missing IndexData");
+
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(ibuf);
         unsigned int bufferIndex = -1;
@@ -2707,6 +2711,8 @@ namespace Ogre {
     size_t MeshSerializerImpl_v1_8::calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum)
     {
         const IndexData* indexData = submesh->mLodFaceList[lodNum - 1];
+        OgreAssert(indexData, "Generated LOD is missing IndexData");
+
         const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
 
         size_t size = MSTREAM_OVERHEAD_SIZE; // M_MESH_LOD_GENERATED
@@ -2808,6 +2814,7 @@ namespace Ogre {
     void MeshSerializerImpl_v1_8::writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum)
     {
         const IndexData* indexData = submesh->mLodFaceList[lodNum - 1];
+        OgreAssert(indexData, "Generated LOD is missing IndexData");
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(ibuf);
 
