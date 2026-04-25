@@ -140,6 +140,12 @@ namespace Ogre
         pipelineCi.pStages = shaderStages.data();
         pipelineCi.stageCount = 2; // vertex+fragment
 
+        for(auto& p : mProfiles)
+        {
+            p.layout = VK_NULL_HANDLE;
+            p.pipelineLayout = VK_NULL_HANDLE;
+        }
+
         inputAssemblyCi.primitiveRestartEnable = false;
 
         mssCi.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
@@ -160,36 +166,37 @@ namespace Ogre
         viewportStateCi.scissorCount = 1u;
 
         // use a single descriptor set for all shaders
-        mDescriptorSetBindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
-        mDescriptorSetBindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        auto& legacy = mProfiles[GraphicsLegacy];
+        legacy.bindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        legacy.bindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
         for(uint32 i = 0; i < OGRE_MAX_TEXTURE_COORD_SETS; ++i)
-            mDescriptorSetBindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+            legacy.bindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
 
         // one descriptor will have at most OGRE_MAX_TEXTURE_LAYERS and one UBO per shader type (for now)
-        mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
-        mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, OGRE_MAX_TEXTURE_COORD_SETS});
+        legacy.poolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
+        legacy.poolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, OGRE_MAX_TEXTURE_COORD_SETS});
 
         // silence validation layer, when unused
         mUBOInfo[0].range = 1;
         mUBOInfo[1].range = 1;
 
-        mDescriptorWrites.resize(OGRE_MAX_TEXTURE_COORD_SETS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
-        mDescriptorWrites[0].dstBinding = 0;
-        mDescriptorWrites[0].descriptorCount = 1;
-        mDescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        mDescriptorWrites[0].pBufferInfo = mUBOInfo.data();
+        legacy.writes.resize(OGRE_MAX_TEXTURE_COORD_SETS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
+        legacy.writes[0].dstBinding = 0;
+        legacy.writes[0].descriptorCount = 1;
+        legacy.writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        legacy.writes[0].pBufferInfo = mUBOInfo.data();
 
-        mDescriptorWrites[1].dstBinding = 1;
-        mDescriptorWrites[1].descriptorCount = 1;
-        mDescriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        mDescriptorWrites[1].pBufferInfo = mUBOInfo.data() + 1;
+        legacy.writes[1].dstBinding = 1;
+        legacy.writes[1].descriptorCount = 1;
+        legacy.writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        legacy.writes[1].pBufferInfo = mUBOInfo.data() + 1;
 
         for(int i = 0; i < OGRE_MAX_TEXTURE_COORD_SETS; i++)
         {
-            mDescriptorWrites[i + 2].dstBinding = 2 + i;
-            mDescriptorWrites[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            mDescriptorWrites[i + 2].pImageInfo = mImageInfos.data() + i;
-            mDescriptorWrites[i + 2].descriptorCount = 1;
+            legacy.writes[i + 2].dstBinding = 2 + i;
+            legacy.writes[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            legacy.writes[i + 2].pImageInfo = mImageInfos.data() + i;
+            legacy.writes[i + 2].descriptorCount = 1;
         }
 
         if(volkInitialize() != VK_SUCCESS)
@@ -306,15 +313,19 @@ namespace Ogre
         OGRE_DELETE mSPIRVProgramFactory;
         mSPIRVProgramFactory = 0;
 
-        vkDestroyPipelineLayout(mDevice->mDevice, mLayout, 0);
-        vkDestroyDescriptorSetLayout(mDevice->mDevice, mDescriptorSetLayout, 0);
+        for(auto& p : mProfiles)
+        {
+            if(p.pipelineLayout)
+                vkDestroyPipelineLayout(mDevice->mDevice, p.pipelineLayout, 0);
+            if(p.layout)
+                vkDestroyDescriptorSetLayout(mDevice->mDevice, p.layout, 0);
+            p.pool.reset();
+        }
 
         for(auto it : mRenderPassCache)
         {
             vkDestroyRenderPass(mDevice->mDevice, it.second, 0);
         }
-
-        mDescriptorPool.reset();
 
         clearPipelineCache();
 
@@ -800,15 +811,17 @@ namespace Ogre
             mTextureManager = new VulkanTextureGpuManager(this, mDevice, bCanRestrictImageViewUsage);
             mTextureManager->_getWarningTexture(); // preload warning texture, so does not interrupt render pass
 
+            auto& legacy = mProfiles[GraphicsLegacy];
+            
             VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCi = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
-            descriptorSetLayoutCi.bindingCount = mDescriptorSetBindings.size();
-            descriptorSetLayoutCi.pBindings = mDescriptorSetBindings.data();
+            descriptorSetLayoutCi.bindingCount = legacy.bindings.size();
+            descriptorSetLayoutCi.pBindings = legacy.bindings.data();
             OGRE_VK_CHECK(vkCreateDescriptorSetLayout(mActiveDevice->mDevice, &descriptorSetLayoutCi, nullptr,
-                                                      &mDescriptorSetLayout));
+                                                      &legacy.layout));
 
-            pipelineLayoutCi.pSetLayouts = &mDescriptorSetLayout;
+            pipelineLayoutCi.pSetLayouts = &legacy.layout;
             pipelineLayoutCi.setLayoutCount = 1;
-            OGRE_VK_CHECK(vkCreatePipelineLayout(mActiveDevice->mDevice, &pipelineLayoutCi, 0, &mLayout));
+            OGRE_VK_CHECK(vkCreatePipelineLayout(mActiveDevice->mDevice, &pipelineLayoutCi, 0, &legacy.pipelineLayout));
 
             // allocate 1.5MB buffer. Holds e.g. 1024 batches of 512 bytes for 3 frames-in-flight
             resizeAutoParamsBuffer(1024 * 512 * 3);
@@ -843,9 +856,15 @@ namespace Ogre
         mUBOInfo[1].buffer = mUBOInfo[0].buffer;
 
         // descriptors referring to old buffer are invalidated
-        mDescriptorSetCache.clear();
-        mActiveDevice->mGraphicsQueue.queueForDeletion(mDescriptorPool);
-        mDescriptorPool.reset( new VulkanDescriptorPool(mDescriptorPoolSizes, mDescriptorSetLayout, mDevice));
+        for(auto& p : mProfiles)
+        {
+            if(!p.layout)
+                continue;
+            p.cache.clear();
+            if(p.pool)
+                mActiveDevice->mGraphicsQueue.queueForDeletion(p.pool);
+            p.pool.reset( new VulkanDescriptorPool(p.poolSizes, p.layout, mDevice));
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -896,6 +915,7 @@ namespace Ogre
 
     VkDescriptorSet VulkanRenderSystem::getDescriptorSet()
     {
+        auto& prf = mProfiles[GraphicsLegacy];
         uint32 hash = HashCombine(0, mUBOInfo);
 
         int numTextures = 0;
@@ -906,32 +926,33 @@ namespace Ogre
             hash = HashCombine(hash, mImageInfos[numTextures]);
         }
 
-        VkDescriptorSet retVal = mDescriptorSetCache[hash];
+        VkDescriptorSet retVal = prf.cache[hash];
 
         if(retVal != VK_NULL_HANDLE)
             return retVal;
 
-        retVal = mDescriptorPool->allocate();
+        retVal = prf.pool->allocate();
 
-        mDescriptorWrites[0].dstSet = retVal;
-        mDescriptorWrites[1].dstSet = retVal;
+        prf.writes[0].dstSet = retVal;
+        prf.writes[1].dstSet = retVal;
         for(int i = 0; i < numTextures; i++)
         {
-            mDescriptorWrites[i + 2].dstSet = retVal;
+            prf.writes[i + 2].dstSet = retVal;
         }
 
         int bindCount = numTextures + 2;
-        vkUpdateDescriptorSets(mActiveDevice->mDevice, bindCount, mDescriptorWrites.data(), 0, nullptr);
+        vkUpdateDescriptorSets(mActiveDevice->mDevice, bindCount, prf.writes.data(), 0, nullptr);
 
-        mDescriptorSetCache[hash] = retVal;
+        prf.cache[hash] = retVal;
 
         return retVal;
     }
 
     VkPipeline VulkanRenderSystem::getPipeline()
     {
+        auto& prf = mProfiles[GraphicsLegacy];
         pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
-        pipelineCi.layout = mLayout;
+        pipelineCi.layout = prf.pipelineLayout;
         mssCi.rasterizationSamples = VkSampleCountFlagBits(std::max(mActiveRenderTarget->getFSAA(), 1u));
 
         auto hash = HashCombine(0, pipelineCi.renderPass);
@@ -1042,7 +1063,8 @@ namespace Ogre
 
         auto pipeline = getPipeline();
         auto descriptorSet = getDescriptorSet();
-        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineCi.layout, 0, 1, &descriptorSet, 2,
+        auto& prf = mProfiles[GraphicsLegacy];
+        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prf.pipelineLayout, 0, 1, &descriptorSet, 2,
                                 mUBODynOffsets.data());
 
         vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline );
