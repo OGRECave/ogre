@@ -126,6 +126,7 @@ namespace Ogre
         std::array<VkDescriptorBufferInfo, 2> mUBOInfo;
         std::array<uint32, 2> mUBODynOffsets;
         std::array<VkDescriptorImageInfo, OGRE_MAX_TEXTURE_LAYERS> mImageInfos;
+        VkDescriptorImageInfo mComputeImageInfo;
 
         std::array<VkPipelineColorBlendAttachmentState, OGRE_MAX_MULTIPLE_RENDER_TARGETS> blendStates;
 
@@ -136,6 +137,7 @@ namespace Ogre
 
         std::unordered_map<uint32, VkRenderPass> mRenderPassCache;
         std::unordered_map<uint32, VkPipeline> mPipelineCache;
+        std::unordered_map<uint32, VkPipeline> mComputePipelineCache;
 
         // clears the pipeline cache
         void clearPipelineCache();
@@ -144,8 +146,8 @@ namespace Ogre
         void enumerateDevices();
         uint32 getSelectedDeviceIdx() const;
 
-        VkDescriptorSet getDescriptorSet();
-        VkPipeline getPipeline();
+        VkDescriptorSet getDescriptorSet( DescriptorSetProfileId profile );
+        VkPipeline getPipeline( DescriptorSetProfileId profile );
     public:
         VulkanRenderSystem();
         ~VulkanRenderSystem();
@@ -178,6 +180,7 @@ namespace Ogre
         void _endFrame( void ) override;
 
         void _render( const RenderOperation &op ) override;
+        void _dispatchCompute( const Vector3i &workgroupDim ) override;
 
         void bindGpuProgram(GpuProgram* prg) override;
         void bindGpuProgramParameters( GpuProgramType gptype,

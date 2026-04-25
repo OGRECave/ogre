@@ -123,6 +123,7 @@ namespace Ogre
         mUBOInfo{},
         mUBODynOffsets{},
         mImageInfos{},
+        mComputeImageInfo{},
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
         mScissorRect{},
@@ -198,6 +199,23 @@ namespace Ogre
             legacy.writes[i + 2].pImageInfo = mImageInfos.data() + i;
             legacy.writes[i + 2].descriptorCount = 1;
         }
+
+        // Minimal compute profile for image write + dynamic UBO.
+        auto &compute = mProfiles[ComputeImageWrite];
+        compute.bindings.push_back( {0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT} );
+        compute.bindings.push_back(
+            {1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_COMPUTE_BIT} );
+        compute.poolSizes.push_back( {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u} );
+        compute.poolSizes.push_back( {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1u} );
+        compute.writes.resize( 2u, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET} );
+        compute.writes[0].dstBinding = 0;
+        compute.writes[0].descriptorCount = 1;
+        compute.writes[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        compute.writes[0].pImageInfo = &mComputeImageInfo;
+        compute.writes[1].dstBinding = 1;
+        compute.writes[1].descriptorCount = 1;
+        compute.writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        compute.writes[1].pBufferInfo = mUBOInfo.data() + 1;
 
         if(volkInitialize() != VK_SUCCESS)
         {
@@ -340,6 +358,13 @@ namespace Ogre
         }
 
         mPipelineCache.clear();
+
+        for( auto it : mComputePipelineCache )
+        {
+            vkDestroyPipeline( mDevice->mDevice, it.second, 0 );
+        }
+
+        mComputePipelineCache.clear();
     }
     //-------------------------------------------------------------------------
     const String &VulkanRenderSystem::getName( void ) const
@@ -784,7 +809,8 @@ namespace Ogre
                         deviceExtensions.push_back( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
                         mRealCapabilities->setCapability(RSC_MESH_PROGRAM);
 
-                        mDescriptorSetBindings[0].stageFlags |= VK_SHADER_STAGE_MESH_BIT_NV;
+                        for( auto &binding : mProfiles[GraphicsLegacy].bindings )
+                            binding.stageFlags |= VK_SHADER_STAGE_MESH_BIT_NV;
                     }
 #endif
                 }
@@ -811,17 +837,24 @@ namespace Ogre
             mTextureManager = new VulkanTextureGpuManager(this, mDevice, bCanRestrictImageViewUsage);
             mTextureManager->_getWarningTexture(); // preload warning texture, so does not interrupt render pass
 
-            auto& legacy = mProfiles[GraphicsLegacy];
-            
-            VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCi = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
-            descriptorSetLayoutCi.bindingCount = legacy.bindings.size();
-            descriptorSetLayoutCi.pBindings = legacy.bindings.data();
-            OGRE_VK_CHECK(vkCreateDescriptorSetLayout(mActiveDevice->mDevice, &descriptorSetLayoutCi, nullptr,
-                                                      &legacy.layout));
+            for( auto &profile : mProfiles )
+            {
+                if( profile.bindings.empty() )
+                    continue;
 
-            pipelineLayoutCi.pSetLayouts = &legacy.layout;
-            pipelineLayoutCi.setLayoutCount = 1;
-            OGRE_VK_CHECK(vkCreatePipelineLayout(mActiveDevice->mDevice, &pipelineLayoutCi, 0, &legacy.pipelineLayout));
+                VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCi =
+                    {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
+                descriptorSetLayoutCi.bindingCount = profile.bindings.size();
+                descriptorSetLayoutCi.pBindings = profile.bindings.data();
+                OGRE_VK_CHECK( vkCreateDescriptorSetLayout( mActiveDevice->mDevice, &descriptorSetLayoutCi,
+                                                            nullptr, &profile.layout ) );
+
+                pipelineLayoutCi.pSetLayouts = &profile.layout;
+                pipelineLayoutCi.setLayoutCount = 1;
+                OGRE_VK_CHECK(
+                    vkCreatePipelineLayout( mActiveDevice->mDevice, &pipelineLayoutCi, 0,
+                                            &profile.pipelineLayout ) );
+            }
 
             // allocate 1.5MB buffer. Holds e.g. 1024 batches of 512 bytes for 3 frames-in-flight
             resizeAutoParamsBuffer(1024 * 512 * 3);
@@ -913,85 +946,144 @@ namespace Ogre
         //rootLayout->bind( mDevice, vaoManager, mGlobalTable );
     }
 
-    VkDescriptorSet VulkanRenderSystem::getDescriptorSet()
+    VkDescriptorSet VulkanRenderSystem::getDescriptorSet( DescriptorSetProfileId profile )
     {
-        auto& prf = mProfiles[GraphicsLegacy];
-        uint32 hash = HashCombine(0, mUBOInfo);
+        auto &prf = mProfiles[profile];
 
-        int numTextures = 0;
-        for (; numTextures < OGRE_MAX_TEXTURE_COORD_SETS; numTextures++)
+        if( profile == GraphicsLegacy )
         {
-            if (!mImageInfos[numTextures].imageView)
-                break;
-            hash = HashCombine(hash, mImageInfos[numTextures]);
+            uint32 hash = HashCombine( 0, mUBOInfo );
+
+            int numTextures = 0;
+            for( ; numTextures < OGRE_MAX_TEXTURE_COORD_SETS; numTextures++ )
+            {
+                if( !mImageInfos[numTextures].imageView )
+                    break;
+                hash = HashCombine( hash, mImageInfos[numTextures] );
+            }
+
+            VkDescriptorSet retVal = prf.cache[hash];
+
+            if( retVal != VK_NULL_HANDLE )
+                return retVal;
+
+            retVal = prf.pool->allocate();
+
+            prf.writes[0].dstSet = retVal;
+            prf.writes[1].dstSet = retVal;
+            for( int i = 0; i < numTextures; i++ )
+            {
+                prf.writes[i + 2].dstSet = retVal;
+            }
+
+            int bindCount = numTextures + 2;
+            vkUpdateDescriptorSets( mActiveDevice->mDevice, bindCount, prf.writes.data(), 0, nullptr );
+
+            prf.cache[hash] = retVal;
+
+            return retVal;
         }
 
-        VkDescriptorSet retVal = prf.cache[hash];
+        // For milestone 3, map compute image binding from texture unit 0 until a dedicated
+        // shader-access binding path is introduced in milestone 4.
+        mComputeImageInfo = mImageInfos[0];
+        mComputeImageInfo.sampler = VK_NULL_HANDLE;
+        mComputeImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
-        if(retVal != VK_NULL_HANDLE)
+        if( !mComputeImageInfo.imageView )
+            return VK_NULL_HANDLE;
+
+        uint32 hash = HashCombine( 0u, mUBOInfo[1] );
+        hash = HashCombine( hash, mComputeImageInfo.imageView );
+
+        VkDescriptorSet retVal = prf.cache[hash];
+        if( retVal != VK_NULL_HANDLE )
             return retVal;
 
         retVal = prf.pool->allocate();
-
         prf.writes[0].dstSet = retVal;
         prf.writes[1].dstSet = retVal;
-        for(int i = 0; i < numTextures; i++)
-        {
-            prf.writes[i + 2].dstSet = retVal;
-        }
-
-        int bindCount = numTextures + 2;
-        vkUpdateDescriptorSets(mActiveDevice->mDevice, bindCount, prf.writes.data(), 0, nullptr);
-
+        vkUpdateDescriptorSets( mActiveDevice->mDevice, 2u, prf.writes.data(), 0, nullptr );
         prf.cache[hash] = retVal;
-
         return retVal;
     }
 
-    VkPipeline VulkanRenderSystem::getPipeline()
+    VkPipeline VulkanRenderSystem::getPipeline( DescriptorSetProfileId profile )
     {
-        auto& prf = mProfiles[GraphicsLegacy];
-        pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
-        pipelineCi.layout = prf.pipelineLayout;
-        mssCi.rasterizationSamples = VkSampleCountFlagBits(std::max(mActiveRenderTarget->getFSAA(), 1u));
-
-        auto hash = HashCombine(0, pipelineCi.renderPass);
-        hash = HashCombine(hash, blendStates[0]);
-        hash = HashCombine(hash, rasterState);
-        hash = HashCombine(hash, inputAssemblyCi);
-        hash = HashCombine(hash, mssCi);
-
-        for(uint32 i = 0; i <vertexFormatCi.vertexAttributeDescriptionCount; i++)
+        if( profile == GraphicsLegacy )
         {
-            hash = HashCombine(hash, vertexFormatCi.pVertexAttributeDescriptions[i]);
+            auto &prf = mProfiles[GraphicsLegacy];
+            pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
+            pipelineCi.layout = prf.pipelineLayout;
+            mssCi.rasterizationSamples =
+                VkSampleCountFlagBits( std::max( mActiveRenderTarget->getFSAA(), 1u ) );
+
+            auto hash = HashCombine( 0, pipelineCi.renderPass );
+            hash = HashCombine( hash, blendStates[0] );
+            hash = HashCombine( hash, rasterState );
+            hash = HashCombine( hash, inputAssemblyCi );
+            hash = HashCombine( hash, mssCi );
+
+            for( uint32 i = 0; i < vertexFormatCi.vertexAttributeDescriptionCount; i++ )
+            {
+                hash = HashCombine( hash, vertexFormatCi.pVertexAttributeDescriptions[i] );
+            }
+
+            for( uint32 i = 0; i < vertexFormatCi.vertexBindingDescriptionCount; i++ )
+            {
+                hash = HashCombine( hash, vertexFormatCi.pVertexBindingDescriptions[i] );
+            }
+
+            for( uint32 i = 0; i < pipelineCi.stageCount; i++ )
+            {
+                hash = HashCombine( hash, mBoundGpuPrograms[i] );
+            }
+
+            VkPipeline retVal = mPipelineCache[hash];
+            if( retVal != VK_NULL_HANDLE )
+                return retVal;
+
+            // if we resize the window, we create new FBOs which mean a new renderpass and invalid caches anyway..
+            const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR};
+            VkPipelineDynamicStateCreateInfo dynamicStateCi =
+                {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+            dynamicStateCi.dynamicStateCount = 1;
+            dynamicStateCi.pDynamicStates = dynamicStates;
+            pipelineCi.pDynamicState = &dynamicStateCi;
+
+            OGRE_VK_CHECK(
+                vkCreateGraphicsPipelines( mActiveDevice->mDevice, 0, 1, &pipelineCi, 0, &retVal ) );
+
+            mPipelineCache[hash] = retVal;
+
+            return retVal;
         }
 
-        for(uint32 i = 0; i < vertexFormatCi.vertexBindingDescriptionCount; i++)
-        {
-            hash = HashCombine(hash, vertexFormatCi.pVertexBindingDescriptions[i]);
-        }
+        auto &prf = mProfiles[ComputeImageWrite];
+        auto hash = HashCombine( 0u, uint32( ComputeImageWrite ) );
+        hash = HashCombine( hash, mBoundGpuPrograms[GPT_COMPUTE_PROGRAM] );
 
-        for(uint32 i= 0; i < pipelineCi.stageCount; i++)
-        {
-            hash = HashCombine(hash, mBoundGpuPrograms[i]);
-        }
-
-        VkPipeline retVal = mPipelineCache[hash];
-        if(retVal != VK_NULL_HANDLE)
+        VkPipeline retVal = mComputePipelineCache[hash];
+        if( retVal != VK_NULL_HANDLE )
             return retVal;
 
-        // if we resize the window, we create new FBOs which mean a new renderpass and invalid caches anyway..
-        // VK_DYNAMIC_STATE_VIEWPORT
-        const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR};
-        VkPipelineDynamicStateCreateInfo dynamicStateCi = {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
-        dynamicStateCi.dynamicStateCount = 1;
-        dynamicStateCi.pDynamicStates = dynamicStates;
-        pipelineCi.pDynamicState = &dynamicStateCi;
+        if( !mProgramBound[GPT_COMPUTE_PROGRAM] )
+            return VK_NULL_HANDLE;
 
-        OGRE_VK_CHECK(vkCreateGraphicsPipelines(mActiveDevice->mDevice, 0, 1, &pipelineCi, 0, &retVal));
+        const auto &computeStage = shaderStages[GPT_COMPUTE_PROGRAM % GPT_PIPELINE_COUNT];
+        if( computeStage.stage != VK_SHADER_STAGE_COMPUTE_BIT ||
+            computeStage.module == VK_NULL_HANDLE )
+        {
+            return VK_NULL_HANDLE;
+        }
 
-        mPipelineCache[hash] = retVal;
+        VkComputePipelineCreateInfo computeCi = {VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO};
+        computeCi.layout = prf.pipelineLayout;
+        computeCi.stage = computeStage;
 
+        OGRE_VK_CHECK( vkCreateComputePipelines( mActiveDevice->mDevice, VK_NULL_HANDLE, 1u, &computeCi,
+                                                 nullptr, &retVal ) );
+        mComputePipelineCache[hash] = retVal;
         return retVal;
     }
 
@@ -1061,8 +1153,8 @@ namespace Ogre
             vkCmdBindIndexBuffer(cmdBuffer, b, 0, itype);
         }
 
-        auto pipeline = getPipeline();
-        auto descriptorSet = getDescriptorSet();
+        auto pipeline = getPipeline( GraphicsLegacy );
+        auto descriptorSet = getDescriptorSet( GraphicsLegacy );
         auto& prf = mProfiles[GraphicsLegacy];
         vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prf.pipelineLayout, 0, 1, &descriptorSet, 2,
                                 mUBODynOffsets.data());
@@ -1114,6 +1206,39 @@ namespace Ogre
                 vkCmdDraw(cmdBuffer, (uint32)op.vertexData->vertexCount, op.numberOfInstances, vertexStart, 0u);
             } while( updatePassIterationRenderState() );
         }
+    }
+    //-------------------------------------------------------------------------
+    void VulkanRenderSystem::_dispatchCompute( const Vector3i &workgroupDim )
+    {
+        if( !mActiveDevice )
+            return;
+
+        if( workgroupDim[0] <= 0 || workgroupDim[1] <= 0 || workgroupDim[2] <= 0 )
+            return;
+
+        if( !mProgramBound[GPT_COMPUTE_PROGRAM] )
+        {
+            LogManager::getSingleton().logWarning(
+                "[Vulkan] _dispatchCompute called without a bound compute program" );
+            return;
+        }
+
+        mActiveDevice->mGraphicsQueue.getComputeEncoder();
+        VkCommandBuffer cmdBuffer = mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer;
+
+        auto pipeline = getPipeline( ComputeImageWrite );
+        auto descriptorSet = getDescriptorSet( ComputeImageWrite );
+        if( pipeline == VK_NULL_HANDLE || descriptorSet == VK_NULL_HANDLE )
+            return;
+
+        auto &prf = mProfiles[ComputeImageWrite];
+        const uint32 dynOffset = mUBODynOffsets[1];
+        vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline );
+        vkCmdBindDescriptorSets( cmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, prf.pipelineLayout, 0, 1,
+                                 &descriptorSet, 1, &dynOffset );
+        vkCmdDispatch( cmdBuffer, static_cast<uint32>( workgroupDim[0] ),
+                       static_cast<uint32>( workgroupDim[1] ),
+                       static_cast<uint32>( workgroupDim[2] ) );
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindGpuProgram(GpuProgram* prg)
