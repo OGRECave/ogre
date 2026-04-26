@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 #include "OgreRoot.h"
 #include "OgreVulkanTextureGpuWindow.h"
+#include "OgreVulkanRenderSystem.h"
 
 #define TODO_add_resource_transitions
 
@@ -640,6 +641,21 @@ namespace Ogre
                             "Either the texture wasn't properly loaded or _setToDisplayDummyTexture "
                             "wasn't called when it should have been" );
         return mDefaultDisplaySrv;
+    }
+    //-----------------------------------------------------------------------------------
+    void VulkanTextureGpu::createShaderAccessPoint( uint bindPoint, TextureAccess access,
+                                                    int mipmapLevel, int textureArrayIndex,
+                                                    PixelFormat format )
+    {
+        (void)access;
+        (void)textureArrayIndex;
+        (void)format;
+
+        auto *rs = dynamic_cast<VulkanRenderSystem *>( Root::getSingleton().getRenderSystem() );
+        if( !rs )
+            return;
+
+        rs->setStorageTexture( bindPoint, this, mipmapLevel );
     }
     //-----------------------------------------------------------------------------------
     VkImageMemoryBarrier VulkanTextureGpu::getImageMemoryBarrier( void ) const

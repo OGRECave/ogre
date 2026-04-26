@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreVulkanRenderSystem.h"
 
+#include <algorithm>
 #include <numeric>
 
 #include "OgreGpuProgramManager.h"
@@ -37,7 +38,6 @@ THE SOFTWARE.
 #include "OgreVulkanDevice.h"
 #include "OgreVulkanMappings.h"
 #include "OgreVulkanProgram.h"
-#include "OgreVulkanRenderPassDescriptor.h"
 #include "OgreVulkanTextureGpuManager.h"
 #include "OgreVulkanUtils.h"
 #include "OgreVulkanWindow.h"
@@ -49,7 +49,6 @@ THE SOFTWARE.
 #include "OgreDepthBuffer.h"
 #include "OgreRoot.h"
 
-#include "OgreVulkanWindow.h"
 #include "OgrePixelFormat.h"
 
 namespace Ogre
@@ -124,6 +123,9 @@ namespace Ogre
         mUBODynOffsets{},
         mImageInfos{},
         mComputeImageInfo{},
+        mStorageImageInfos{},
+        mStorageTextures{},
+        mStorageImageViews{},
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
         mScissorRect{},
@@ -330,6 +332,8 @@ namespace Ogre
 
         OGRE_DELETE mSPIRVProgramFactory;
         mSPIRVProgramFactory = 0;
+
+        clearStorageTextureBindings();
 
         for(auto& p : mProfiles)
         {
@@ -682,7 +686,59 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::resetAllBindings( void )
     {
+        for( auto &imgInfo : mImageInfos )
+            imgInfo = {};
 
+        for( auto &imgInfo : mStorageImageInfos )
+            imgInfo = {};
+
+        mStorageTextures.fill( nullptr );
+        mStorageImageViews.fill( VK_NULL_HANDLE );
+        mComputeImageInfo = {};
+        mUBODynOffsets = {0u, 0u};
+    }
+
+    void VulkanRenderSystem::setStorageTexture( size_t texUnit, VulkanTextureGpu *texture, int mipmapLevel )
+    {
+        if( texUnit >= OGRE_MAX_TEXTURE_LAYERS )
+            return;
+
+        if( mStorageImageViews[texUnit] != VK_NULL_HANDLE && mDevice )
+            vkDestroyImageView( mDevice->mDevice, mStorageImageViews[texUnit], nullptr );
+
+        mStorageImageViews[texUnit] = VK_NULL_HANDLE;
+        mStorageTextures[texUnit] = texture;
+        mStorageImageInfos[texUnit] = {};
+
+        if( !texture )
+            return;
+
+        VkImageView imageView = texture->getDefaultDisplaySrv();
+        const int maxMipLevel = static_cast<int>( texture->getNumMipmaps() );
+        const int clampedMip = std::max( 0, std::min( mipmapLevel, maxMipLevel ) );
+        if( clampedMip > 0 && mDevice )
+        {
+            imageView = texture->_createView( static_cast<uint8>( clampedMip ), 1u, 0u,
+                                              texture->getNumLayers() );
+            mStorageImageViews[texUnit] = imageView;
+        }
+
+        mStorageImageInfos[texUnit].sampler = VK_NULL_HANDLE;
+        mStorageImageInfos[texUnit].imageView = imageView;
+        mStorageImageInfos[texUnit].imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+    }
+
+    void VulkanRenderSystem::clearStorageTextureBindings()
+    {
+        for( size_t i = 0u; i < mStorageImageViews.size(); ++i )
+        {
+            if( mStorageImageViews[i] != VK_NULL_HANDLE && mDevice )
+                vkDestroyImageView( mDevice->mDevice, mStorageImageViews[i], nullptr );
+
+            mStorageImageViews[i] = VK_NULL_HANDLE;
+            mStorageTextures[i] = nullptr;
+            mStorageImageInfos[i] = {};
+        }
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::initializeVkInstance( void )
@@ -911,6 +967,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::_setTexture( size_t unit, bool enabled, const TexturePtr& texPtr )
     {
+        setStorageTexture( unit, nullptr, 0 );
+
         if( texPtr && enabled)
         {
             VulkanTextureGpu *tex = static_cast<VulkanTextureGpu *>( texPtr.get() );
@@ -949,6 +1007,8 @@ namespace Ogre
     VkDescriptorSet VulkanRenderSystem::getDescriptorSet( DescriptorSetProfileId profile )
     {
         auto &prf = mProfiles[profile];
+        if( !prf.pool )
+            return VK_NULL_HANDLE;
 
         if( profile == GraphicsLegacy )
         {
@@ -984,11 +1044,7 @@ namespace Ogre
             return retVal;
         }
 
-        // For milestone 3, map compute image binding from texture unit 0 until a dedicated
-        // shader-access binding path is introduced in milestone 4.
-        mComputeImageInfo = mImageInfos[0];
-        mComputeImageInfo.sampler = VK_NULL_HANDLE;
-        mComputeImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        mComputeImageInfo = mStorageImageInfos[0];
 
         if( !mComputeImageInfo.imageView )
             return VK_NULL_HANDLE;
@@ -1229,16 +1285,57 @@ namespace Ogre
         auto pipeline = getPipeline( ComputeImageWrite );
         auto descriptorSet = getDescriptorSet( ComputeImageWrite );
         if( pipeline == VK_NULL_HANDLE || descriptorSet == VK_NULL_HANDLE )
+        {
+            LogManager::getSingleton().logWarning(
+                "[Vulkan] Compute dispatch skipped: missing compute pipeline or descriptor set "
+                "(ensure unordered_access_mip texture unit is bound)" );
             return;
+        }
 
         auto &prf = mProfiles[ComputeImageWrite];
         const uint32 dynOffset = mUBODynOffsets[1];
+
+        VulkanTextureGpu *computeTexture = mStorageTextures[0];
+        if( computeTexture && computeTexture->mCurrLayout != VK_IMAGE_LAYOUT_GENERAL )
+        {
+            VkImageMemoryBarrier barrier = computeTexture->getImageMemoryBarrier();
+            barrier.srcAccessMask = VulkanMappings::get( computeTexture ) & static_cast<VkAccessFlags>( ~VK_ACCESS_SHADER_READ_BIT );
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+            barrier.oldLayout = computeTexture->mCurrLayout;
+            barrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+            if( barrier.srcAccessMask == 0u )
+                barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            vkCmdPipelineBarrier( cmdBuffer,
+                                  VK_PIPELINE_STAGE_ALL_COMMANDS_BIT & mActiveDevice->mSupportedStages,
+                                  VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0, 0u, nullptr, 0u, nullptr,
+                                  1u, &barrier );
+            computeTexture->mCurrLayout = VK_IMAGE_LAYOUT_GENERAL;
+            computeTexture->mNextLayout = VK_IMAGE_LAYOUT_GENERAL;
+        }
+
         vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline );
         vkCmdBindDescriptorSets( cmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, prf.pipelineLayout, 0, 1,
                                  &descriptorSet, 1, &dynOffset );
         vkCmdDispatch( cmdBuffer, static_cast<uint32>( workgroupDim[0] ),
                        static_cast<uint32>( workgroupDim[1] ),
                        static_cast<uint32>( workgroupDim[2] ) );
+
+        if( computeTexture )
+        {
+            VkImageMemoryBarrier barrier = computeTexture->getImageMemoryBarrier();
+            barrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+            vkCmdPipelineBarrier( cmdBuffer, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                                  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT |
+                                      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                                  0, 0u, nullptr, 0u, nullptr, 1u, &barrier );
+            computeTexture->mCurrLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            computeTexture->mNextLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        }
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindGpuProgram(GpuProgram* prg)

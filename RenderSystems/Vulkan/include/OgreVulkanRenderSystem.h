@@ -53,6 +53,7 @@ namespace Ogre
     class _OgreVulkanExport VulkanRenderSystem : public RenderSystem
     {
         friend class VulkanSampler;
+        friend class VulkanTextureGpu;
     public:
         enum DescriptorSetProfileId {
             GraphicsLegacy,
@@ -127,6 +128,9 @@ namespace Ogre
         std::array<uint32, 2> mUBODynOffsets;
         std::array<VkDescriptorImageInfo, OGRE_MAX_TEXTURE_LAYERS> mImageInfos;
         VkDescriptorImageInfo mComputeImageInfo;
+        std::array<VkDescriptorImageInfo, OGRE_MAX_TEXTURE_LAYERS> mStorageImageInfos;
+        std::array<VulkanTextureGpu *, OGRE_MAX_TEXTURE_LAYERS> mStorageTextures;
+        std::array<VkImageView, OGRE_MAX_TEXTURE_LAYERS> mStorageImageViews;
 
         std::array<VkPipelineColorBlendAttachmentState, OGRE_MAX_MULTIPLE_RENDER_TARGETS> blendStates;
 
@@ -145,6 +149,8 @@ namespace Ogre
         void initializeVkInstance( void );
         void enumerateDevices();
         uint32 getSelectedDeviceIdx() const;
+        void setStorageTexture( size_t texUnit, VulkanTextureGpu *texture, int mipmapLevel );
+        void clearStorageTextureBindings();
 
         VkDescriptorSet getDescriptorSet( DescriptorSetProfileId profile );
         VkPipeline getPipeline( DescriptorSetProfileId profile );

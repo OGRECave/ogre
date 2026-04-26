@@ -160,6 +160,9 @@ namespace Ogre
 
         VkImageView createView( void ) const;
         VkImageView getDefaultDisplaySrv( void ) const { return mDefaultDisplaySrv; }
+        void createShaderAccessPoint( uint bindPoint, TextureAccess access = TA_READ_WRITE,
+                                      int mipmapLevel = 0, int textureArrayIndex = 0,
+                                      PixelFormat format = PF_UNKNOWN ) override;
 
         void destroyView( VkImageView imageView );
 
