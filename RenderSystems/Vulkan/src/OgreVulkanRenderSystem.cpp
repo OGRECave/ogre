@@ -620,8 +620,8 @@ namespace Ogre
         }
         rsc->setCapability( RSC_TEXTURE_2D_ARRAY );
         rsc->setCapability( RSC_ALPHA_TO_COVERAGE );
-        rsc->setCapability( RSC_COMPUTE_PROGRAM );
         rsc->setCapability( RSC_HW_GAMMA );
+        rsc->setCapability( RSC_COMPUTE_PROGRAM );
         rsc->setCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA );
         rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
         rsc->setCapability(RSC_VERTEX_FORMAT_16X3);
@@ -1349,7 +1349,21 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindGpuProgram(GpuProgram* prg)
     {
-        auto shader = static_cast<VulkanProgram*>(prg);
+        if(!prg)
+        {
+            LogManager::getSingleton().logError("[Vulkan] bindGpuProgram got null program");
+            return;
+        }
+
+        auto shader = dynamic_cast<VulkanProgram*>(prg);
+        if(!shader)
+        {
+            LogManager::getSingleton().logError(
+                "[Vulkan] bindGpuProgram got non-Vulkan program: name='" + prg->getName() +
+                "' syntax='" + prg->getSyntaxCode() + "'");
+            return;
+        }
+
         shaderStages[prg->getType() % GPT_PIPELINE_COUNT] = shader->getPipelineShaderStageCi();
         mBoundGpuPrograms[prg->getType()] = prg->_getHash();
 

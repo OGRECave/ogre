@@ -202,6 +202,10 @@ namespace Ogre {
                 GpuProgramType programType = GpuProgramType(t);
                 if (currPass->hasGpuProgram(programType))
                 {
+                    if (programType == GPT_COMPUTE_PROGRAM)
+                    {
+                        LogManager::getSingleton().logError("COMPUTE");
+                    }
                     GpuProgramPtr program = currPass->getGpuProgram(programType);
                     if (!program->isSupported())
                     {
