@@ -126,6 +126,7 @@ namespace Ogre
         mStorageImageInfos{},
         mStorageTextures{},
         mStorageImageViews{},
+        mBoundComputeProfile( ComputeImageWrite ),
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
         mScissorRect{},
@@ -619,6 +620,7 @@ namespace Ogre
         }
         rsc->setCapability( RSC_TEXTURE_2D_ARRAY );
         rsc->setCapability( RSC_ALPHA_TO_COVERAGE );
+        rsc->setCapability( RSC_COMPUTE_PROGRAM );
         rsc->setCapability( RSC_HW_GAMMA );
         rsc->setCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA );
         rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
@@ -695,6 +697,7 @@ namespace Ogre
         mStorageTextures.fill( nullptr );
         mStorageImageViews.fill( VK_NULL_HANDLE );
         mComputeImageInfo = {};
+        mBoundComputeProfile = ComputeImageWrite;
         mUBODynOffsets = {0u, 0u};
     }
 
@@ -1044,6 +1047,9 @@ namespace Ogre
             return retVal;
         }
 
+        if( profile != ComputeImageWrite )
+            return VK_NULL_HANDLE;
+
         mComputeImageInfo = mStorageImageInfos[0];
 
         if( !mComputeImageInfo.imageView )
@@ -1115,8 +1121,11 @@ namespace Ogre
             return retVal;
         }
 
-        auto &prf = mProfiles[ComputeImageWrite];
-        auto hash = HashCombine( 0u, uint32( ComputeImageWrite ) );
+        auto &prf = mProfiles[profile];
+        if( prf.pipelineLayout == VK_NULL_HANDLE )
+            return VK_NULL_HANDLE;
+
+        auto hash = HashCombine( 0u, uint32( profile ) );
         hash = HashCombine( hash, mBoundGpuPrograms[GPT_COMPUTE_PROGRAM] );
 
         VkPipeline retVal = mComputePipelineCache[hash];
@@ -1282,8 +1291,8 @@ namespace Ogre
         mActiveDevice->mGraphicsQueue.getComputeEncoder();
         VkCommandBuffer cmdBuffer = mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer;
 
-        auto pipeline = getPipeline( ComputeImageWrite );
-        auto descriptorSet = getDescriptorSet( ComputeImageWrite );
+        auto pipeline = getPipeline( mBoundComputeProfile );
+        auto descriptorSet = getDescriptorSet( mBoundComputeProfile );
         if( pipeline == VK_NULL_HANDLE || descriptorSet == VK_NULL_HANDLE )
         {
             LogManager::getSingleton().logWarning(
@@ -1292,7 +1301,7 @@ namespace Ogre
             return;
         }
 
-        auto &prf = mProfiles[ComputeImageWrite];
+        auto &prf = mProfiles[mBoundComputeProfile];
         const uint32 dynOffset = mUBODynOffsets[1];
 
         VulkanTextureGpu *computeTexture = mStorageTextures[0];
@@ -1343,6 +1352,25 @@ namespace Ogre
         auto shader = static_cast<VulkanProgram*>(prg);
         shaderStages[prg->getType() % GPT_PIPELINE_COUNT] = shader->getPipelineShaderStageCi();
         mBoundGpuPrograms[prg->getType()] = prg->_getHash();
+
+        if( prg->getType() == GPT_COMPUTE_PROGRAM )
+        {
+            switch( shader->getDescriptorSetProfileHint() )
+            {
+            case VulkanProgram::DescriptorSetProfileGraphicsLegacy:
+                LogManager::getSingleton().logWarning(
+                    "[Vulkan] descriptor_set_profile GraphicsLegacy is not supported for compute "
+                    "dispatch yet. Falling back to ComputeImageWrite" );
+                mBoundComputeProfile = ComputeImageWrite;
+                break;
+            case VulkanProgram::DescriptorSetProfileComputeImageWrite:
+                mBoundComputeProfile = ComputeImageWrite;
+                break;
+            default:
+                mBoundComputeProfile = ComputeImageWrite;
+                break;
+            }
+        }
 
         RenderSystem::bindGpuProgram(prg);
     }

@@ -42,6 +42,13 @@ namespace Ogre
     class VulkanProgram : public GpuProgram
     {
     public:
+        enum DescriptorSetProfileHint
+        {
+            DescriptorSetProfileAuto,
+            DescriptorSetProfileGraphicsLegacy,
+            DescriptorSetProfileComputeImageWrite
+        };
+
         VulkanProgram( ResourceManager *creator, const String &name, ResourceHandle handle,
                        const String &group, bool isManual, ManualResourceLoader *loader,
                        VulkanDevice *device );
@@ -53,6 +60,11 @@ namespace Ogre
         VkPipelineShaderStageCreateInfo getPipelineShaderStageCi() const;
 
         uint32 getDrawIdLocation() const { return mDrawIdLocation; }
+        DescriptorSetProfileHint getDescriptorSetProfileHint() const { return mDescriptorSetProfileHint; }
+        void setDescriptorSetProfileHint( DescriptorSetProfileHint hint )
+        {
+            mDescriptorSetProfileHint = hint;
+        }
 
     private:
         void loadFromSource() override;
@@ -61,6 +73,7 @@ namespace Ogre
         VulkanDevice *mDevice;
         VkShaderModule mShaderModule;
         uint32 mDrawIdLocation;
+        DescriptorSetProfileHint mDescriptorSetProfileHint;
     };
 
     /** Factory class for Vulkan programs. */

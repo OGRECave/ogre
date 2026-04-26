@@ -439,7 +439,7 @@ namespace Ogre
         /** Adds a capability flag
         */
         void setCapability(const Capabilities c) 
-        { 
+        {
             int index = (CAPS_CATEGORY_MASK & c) >> OGRE_CAPS_BITSHIFT;
             // zero out the index from the stored capability
             mCapabilities[index] |= (c & ~CAPS_CATEGORY_MASK);

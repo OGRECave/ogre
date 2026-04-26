@@ -131,6 +131,7 @@ namespace Ogre
         std::array<VkDescriptorImageInfo, OGRE_MAX_TEXTURE_LAYERS> mStorageImageInfos;
         std::array<VulkanTextureGpu *, OGRE_MAX_TEXTURE_LAYERS> mStorageTextures;
         std::array<VkImageView, OGRE_MAX_TEXTURE_LAYERS> mStorageImageViews;
+        DescriptorSetProfileId mBoundComputeProfile;
 
         std::array<VkPipelineColorBlendAttachmentState, OGRE_MAX_MULTIPLE_RENDER_TARGETS> blendStates;
 
