@@ -1415,14 +1415,15 @@ namespace Ogre {
         readShorts(stream, &(pMesh->mNumLods), 1);
         // num LOD levels must be at least 1 (base mesh)
         pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
-        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         for (auto *s : pMesh->getSubMeshes())
         {
             assert(s->mLodFaceList.empty());
             s->mLodFaceList.resize(pMesh->mNumLods-1);
         }
+
+        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         pushInnerChunk(stream);
         // lodID=0 is the original mesh. We need to skip it.
         for(int lodID = 1; lodID < pMesh->mNumLods; lodID++){
@@ -3000,12 +3001,12 @@ namespace Ogre {
         readShorts(stream, &(pMesh->mNumLods), 1);
         // num LOD levels must be at least 1 (base mesh)
         pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         // bool manual;  (true for manual alternate meshes, false for generated)
         readBools(stream, &(pMesh->mHasManualLodLevel), 1);
 
-        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         // Preallocate submesh lod face data if not manual
         if (!pMesh->hasManualLodLevel())
         {
@@ -3387,6 +3388,7 @@ namespace Ogre {
         readShorts(stream, &(pMesh->mNumLods), 1);
         // num LOD levels must be at least 1 (base mesh)
         pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         bool manual; // true for manual alternate meshes, false for generated
@@ -3394,7 +3396,6 @@ namespace Ogre {
 
         pMesh->mHasManualLodLevel = manual;
 
-        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         // Preallocate submesh LOD face data if not manual
         if (!manual)
         {
