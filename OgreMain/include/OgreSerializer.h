@@ -49,7 +49,7 @@ namespace Ogre {
     {
     public:
         Serializer();
-        ~Serializer();
+        virtual ~Serializer();
 
         /// The endianness of written files
         enum Endian
