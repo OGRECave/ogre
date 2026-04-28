@@ -734,11 +734,15 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Can't find vertex buffer data area",
                 "MeshSerializerImpl::readGeometryVertexBuffer");
         }
-        // Check that vertex size agrees
-        if (dest->vertexDeclaration->getVertexSize(bindIndex) != vertexSize)
+        size_t declaredVertexSize = dest->vertexDeclaration->getVertexSize(bindIndex);
+        if (declaredVertexSize == 0)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer vertex size does not agree with vertex declaration",
-                "MeshSerializerImpl::readGeometryVertexBuffer");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Missing vertex declaration for buffer bind index");
+        }
+        // Check that vertex size agrees
+        if (declaredVertexSize != vertexSize)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer vertex size does not agree with vertex declaration");
         }
 
         // Create / populate vertex buffer
