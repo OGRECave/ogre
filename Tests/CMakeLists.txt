@@ -157,3 +157,21 @@ if (OGRE_BUILD_TESTS)
     
     add_subdirectory(VisualTests)
 endif (OGRE_BUILD_TESTS)
+
+if(OGRE_BUILD_FUZZERS)
+  set(LIB_FUZZING_ENGINE "-fsanitize=fuzzer")
+  if(DEFINED ENV{LIB_FUZZING_ENGINE})
+    set(LIB_FUZZING_ENGINE "$ENV{LIB_FUZZING_ENGINE}")
+  endif()
+  add_executable(image_fuzz fuzz/image_fuzz.cpp)
+  target_link_libraries(image_fuzz OgreBites Codec_STBI ${DEPENDENCIES} ${LIB_FUZZING_ENGINE})
+
+  add_executable(stream_fuzz fuzz/stream_fuzz.cpp)
+  target_link_libraries(stream_fuzz OgreMain ${LIB_FUZZING_ENGINE})
+
+  add_executable(zip_fuzz fuzz/zip_fuzz.cpp)
+  target_link_libraries(zip_fuzz OgreMain ${LIB_FUZZING_ENGINE})
+
+  add_executable(ogre_deep_fuzz fuzz/ogre_deep_fuzz.cpp)
+  target_link_libraries(ogre_deep_fuzz OgreMain ${LIB_FUZZING_ENGINE})
+endif ()

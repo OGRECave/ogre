@@ -330,6 +330,7 @@ cmake_dependent_option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE "pug
 cmake_dependent_option(OGRE_BUILD_XSIEXPORTER "Build the Softimage exporter" FALSE "Softimage_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_LIBS_AS_FRAMEWORKS "Build frameworks for libraries on OS X." TRUE "APPLE;NOT OGRE_BUILD_PLATFORM_APPLE_IOS" FALSE)
 cmake_dependent_option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE "OGRE_BUILD_COMPONENT_BITES" FALSE)
+option(OGRE_BUILD_FUZZERS "Build fuzzers for testing" FALSE)
 option(OGRE_CONFIG_DOUBLE "Use doubles instead of floats in Ogre" FALSE)
 option(OGRE_CONFIG_NODE_INHERIT_TRANSFORM "Tells the node whether it should inherit full transform from it's parent node or derived position, orientation and scale" FALSE)
 set(OGRE_CONFIG_THREADS "3" CACHE STRING 
