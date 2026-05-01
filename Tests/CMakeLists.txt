@@ -164,7 +164,7 @@ if(OGRE_BUILD_FUZZERS)
     set(LIB_FUZZING_ENGINE "$ENV{LIB_FUZZING_ENGINE}")
   endif()
   add_executable(image_fuzz fuzz/image_fuzz.cpp)
-  target_link_libraries(image_fuzz OgreBites Codec_STBI ${DEPENDENCIES} ${LIB_FUZZING_ENGINE})
+  target_link_libraries(image_fuzz OgreBites Codec_STBI ${LIB_FUZZING_ENGINE})
 
   add_executable(stream_fuzz fuzz/stream_fuzz.cpp)
   target_link_libraries(stream_fuzz OgreMain ${LIB_FUZZING_ENGINE})
