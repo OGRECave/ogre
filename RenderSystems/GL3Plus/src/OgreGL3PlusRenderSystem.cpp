@@ -1274,34 +1274,8 @@ namespace Ogre {
     void GL3PlusRenderSystem::_unregisterContext(GL3PlusContext *context)
     {
         static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
-
-        for(auto & rt : mRenderTargets)
-        {
-            if(auto target = dynamic_cast<GLRenderTarget*>(rt.second))
-            {
-                if(auto fbo = target->getFBO())
-                    fbo->notifyContextDestroyed(context);
-            }
-        }
         
-        if (mCurrentContext == context)
-        {
-            // Change the context to something else so that a valid context
-            // remains active. When this is the main context being unregistered,
-            // we set the main context to 0.
-            if (mCurrentContext != mMainContext)
-            {
-                _switchContext(mMainContext);
-            }
-            else
-            {
-                /// No contexts remain
-                mCurrentContext->endCurrent();
-                mCurrentContext = 0;
-                mMainContext = 0;
-                mStateCacheManager = 0;
-            }
-        }
+        GLRenderSystemCommon::_unregisterContext(context);
     }
 
     uint32 GL3PlusRenderSystem::_createVao()

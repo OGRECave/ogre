@@ -192,9 +192,7 @@ namespace Ogre {
              GLContext.
              */
             void _unregisterContext(GLContext *context) override;
-            /** Switch GL context, dealing with involved internal cached states too
-             */
-            void _switchContext(GLContext *context);
+            void _switchContext(GLContext *context) override;
             void _oneTimeContextInitialization() override;
             void initialiseContext(RenderWindow* primary);
             /**
