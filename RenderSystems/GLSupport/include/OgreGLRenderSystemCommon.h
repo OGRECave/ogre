@@ -117,7 +117,11 @@ namespace Ogre {
             @note This is automatically called by the destructor of
             GLContext.
         */
-        virtual void _unregisterContext(GLContext *context) = 0;
+        virtual void _unregisterContext(GLContext *context);
+
+        /** Switch GL context, dealing with involved internal cached states too
+         */
+        virtual void _switchContext(GLContext *context) = 0;
 
         virtual void bindVertexElementToGpu(const VertexElement& elem,
                                             const HardwareVertexBufferSharedPtr& vertexBuffer,

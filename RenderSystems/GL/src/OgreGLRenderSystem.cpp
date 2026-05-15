@@ -2681,25 +2681,6 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void GLRenderSystem::_unregisterContext(GLContext *context)
-    {
-        if(mCurrentContext == context) {
-            // Change the context to something else so that a valid context
-            // remains active. When this is the main context being unregistered,
-            // we set the main context to 0.
-            if(mCurrentContext != mMainContext) {
-                _switchContext(mMainContext);
-            } else {
-                /// No contexts remain
-                mCurrentContext->endCurrent();
-                mCurrentContext = 0;
-                mMainContext = 0;
-                mStateCacheManager = 0;
-            }
-        }
-    }
-
-    //---------------------------------------------------------------------
     void GLRenderSystem::beginProfileEvent( const String &eventName )
     {
         markProfileEvent("Begin Event: " + eventName);

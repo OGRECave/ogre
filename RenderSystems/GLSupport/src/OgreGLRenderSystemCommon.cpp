@@ -47,6 +47,37 @@ namespace Ogre {
         return StringUtil::format("%4d x %4d", width, height);
     }
 
+    void GLRenderSystemCommon::_unregisterContext(GLContext *context)
+    {
+        for(auto & rt : mRenderTargets)
+        {
+            if(auto target = dynamic_cast<GLRenderTarget*>(rt.second))
+            {
+                if(auto fbo = target->getFBO())
+                    fbo->notifyContextDestroyed(context);
+            }
+        }
+
+        if (mCurrentContext == context)
+        {
+            // Change the context to something else so that a valid context
+            // remains active. When this is the main context being unregistered,
+            // we set the main context to 0.
+            if (mCurrentContext != mMainContext)
+            {
+                _switchContext(mMainContext);
+            }
+            else
+            {
+                /// No contexts remain
+                mCurrentContext->endCurrent();
+                mCurrentContext = 0;
+                mMainContext = 0;
+                //mStateCacheManager = 0;
+            }
+        }
+    }
+
     void GLRenderSystemCommon::initConfigOptions()
     {
         mOptions = mGLSupport->getConfigOptions();
