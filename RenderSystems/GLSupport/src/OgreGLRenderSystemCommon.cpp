@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreGLContext.h"
 #include "OgreGLNativeSupport.h"
 #include "OgreGLRenderTexture.h"
+#include "OgreGLDepthBufferCommon.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #include "OgreEGLWindow.h"
@@ -55,6 +56,26 @@ namespace Ogre {
             {
                 if(auto fbo = target->getFBO())
                     fbo->notifyContextDestroyed(context);
+            }
+        }
+
+        // Remove depth buffers associated with the context
+        // NB: Should not be needed, as they are shared between contexts
+        // However, we got reported issues and this is not a big deal, so let's be safe
+        for (auto& p : mDepthBufferPool)
+        {
+            for (auto it = p.second.begin(); it != p.second.end(); )
+            {
+                if (auto glDepthBuffer = dynamic_cast<GLDepthBufferCommon*>(*it))
+                {
+                    if (glDepthBuffer->getGLContext() == context)
+                    {
+                        delete *it;
+                        it = p.second.erase(it);
+                        continue;
+                    }
+                }
+                ++it;
             }
         }
 
