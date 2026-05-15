@@ -9,6 +9,9 @@
 
 # Configure Tests build
 if (OGRE_BUILD_TESTS)
+  # enable CTest
+  ENABLE_TESTING()
+  INCLUDE(CTest)
 
   if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-1.16.0)
     message(STATUS "Building gtest")
