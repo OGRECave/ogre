@@ -23,7 +23,6 @@ limitations under the License.
 #include <string>
 
 #include "OgreRoot.h"
-#include "OgreStaticPluginLoader.h"
 
 #include "OgreConfigFile.h"
 #include "OgreException.h"
@@ -39,8 +38,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     initialized = 1;
 
     Ogre::Root root("");
-    OgreBites::StaticPluginLoader mStaticPluginLoader;
-    mStaticPluginLoader.load();
+    Ogre::STBIImageCodec::startup();
   }
 
   char filename[256];

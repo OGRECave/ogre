@@ -9,6 +9,9 @@
 
 # Configure Tests build
 if (OGRE_BUILD_TESTS)
+  # enable CTest
+  ENABLE_TESTING()
+  INCLUDE(CTest)
 
   if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-1.16.0)
     message(STATUS "Building gtest")
@@ -164,14 +167,18 @@ if(OGRE_BUILD_FUZZERS)
     set(LIB_FUZZING_ENGINE "$ENV{LIB_FUZZING_ENGINE}")
   endif()
   add_executable(image_fuzz fuzz/image_fuzz.cpp)
-  target_link_libraries(image_fuzz OgreBites Codec_STBI ${LIB_FUZZING_ENGINE})
+  target_link_libraries(image_fuzz OgreMain Codec_STBI ${LIB_FUZZING_ENGINE})
+  target_compile_features(image_fuzz PRIVATE cxx_std_17)
 
   add_executable(stream_fuzz fuzz/stream_fuzz.cpp)
   target_link_libraries(stream_fuzz OgreMain ${LIB_FUZZING_ENGINE})
+  target_compile_features(stream_fuzz PRIVATE cxx_std_17)
 
   add_executable(zip_fuzz fuzz/zip_fuzz.cpp)
   target_link_libraries(zip_fuzz OgreMain ${LIB_FUZZING_ENGINE})
+  target_compile_features(zip_fuzz PRIVATE cxx_std_17)
 
   add_executable(ogre_deep_fuzz fuzz/ogre_deep_fuzz.cpp)
   target_link_libraries(ogre_deep_fuzz OgreMain ${LIB_FUZZING_ENGINE})
+  target_compile_features(ogre_deep_fuzz PRIVATE cxx_std_17)
 endif ()

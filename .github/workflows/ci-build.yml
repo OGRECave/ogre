@@ -129,8 +129,8 @@ jobs:
         python-version: '3.10'
     - name: Install Dependencies
       run: |
-        curl -LO https://sdk.lunarg.com/sdk/download/1.3.275.0/windows/VulkanSDK-1.3.275.0-Installer.exe
-        .\VulkanSDK-1.3.275.0-Installer.exe --accept-licenses --default-answer --confirm-command install
+        curl -LO https://sdk.lunarg.com/sdk/download/1.3.296.0/windows/VulkanSDK-1.3.296.0-Installer.exe
+        .\VulkanSDK-1.3.296.0-Installer.exe --accept-licenses --default-answer --confirm-command install
         curl -sSf -o rustup-init.exe https://win.rustup.rs/
         .\rustup-init.exe -y
         pip install swig aqtinstall
@@ -151,7 +151,7 @@ jobs:
         cmake -P ci-build.cmake
         cmake --build build --config RelWithDebInfo --target INSTALL
       env:
-        VULKAN_SDK: C:\VulkanSDK\1.3.275.0
+        VULKAN_SDK: C:\VulkanSDK\1.3.296.0
         APPVEYOR: true
         DXSDK_DIR: C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)
         Cg_HOME: C:\Program Files (x86)\NVIDIA Corporation\Cg
