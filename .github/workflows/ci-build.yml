@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v6
-    - uses: actions/cache@v6
+    - uses: actions/cache@v5
       with:
         path: android-ndk-r21e
         key: ${{ runner.os }}-android-ndk
@@ -142,7 +142,7 @@ jobs:
         Start-Process -Wait -FilePath .\DXSDK_Jun10.exe -ArgumentList "/U"
     - name: Cache Built Dependencies
       id: cache-folder
-      uses: actions/cache@v6
+      uses: actions/cache@v5
       with:
         path: ogredeps
         key: cache-${{ hashFiles('CMake/Dependencies.cmake') }}
