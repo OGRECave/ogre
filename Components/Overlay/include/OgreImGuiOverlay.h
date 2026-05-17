@@ -70,7 +70,6 @@ private:
         const LightList& getLights(void) const override;
 
         void createMaterial();
-        void createFontTexture();
 
         const MaterialPtr& getMaterial() const override { return mMaterial; }
 
@@ -80,7 +79,6 @@ private:
 
         Matrix4 mXform;
         RenderOperation mRenderOp;
-        TexturePtr mFontTex;
         MaterialPtr mMaterial;
     };
 
