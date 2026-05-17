@@ -19,7 +19,7 @@ jobs:
           mono-mcs python3-dev \
           python3-lxml texlive-binaries texlive-base graphviz doxygen
         sudo pip3 install swig
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 2
     - name: Build
@@ -54,8 +54,8 @@ jobs:
   android:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/cache@v4
+    - uses: actions/checkout@v6
+    - uses: actions/cache@v5
       with:
         path: android-ndk-r21e
         key: ${{ runner.os }}-android-ndk
@@ -85,7 +85,7 @@ jobs:
     steps:
     - name: Install Dependencies
       run: brew update && brew install sdl2 pugixml
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Build
       run: |
         cmake -P ci-build.cmake
@@ -97,7 +97,7 @@ jobs:
   ios:
     runs-on: macos-14
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Build
       run: |
         cmake -P ci-build.cmake
@@ -112,7 +112,7 @@ jobs:
         sudo apt update
         sudo apt install -y libwayland-dev libwayland-egl1 pkg-config libegl-dev \
           qtwayland5 qtbase5-private-dev
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Build
       run: |
         cmake -Bbuild -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none -DOGRE_CONFIG_DOUBLE=ON -DOGRE_ASSERT_MODE=1 -DOGRE_PROFILING=ON -DOGRE_USE_WAYLAND=ON .
@@ -120,7 +120,7 @@ jobs:
   windows:
     runs-on: windows-2022
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         toolset: 14.2
@@ -129,8 +129,8 @@ jobs:
         python-version: '3.10'
     - name: Install Dependencies
       run: |
-        curl -LO https://sdk.lunarg.com/sdk/download/1.3.296.0/windows/VulkanSDK-1.3.296.0-Installer.exe
-        .\VulkanSDK-1.3.296.0-Installer.exe --accept-licenses --default-answer --confirm-command install
+        curl -LO https://sdk.lunarg.com/sdk/download/1.4.350.0/windows/VulkanRT-X64-1.4.350.0-Installer.exe
+        .\VulkanRT-X64-1.4.350.0-Installer.exe --accept-licenses --default-answer --confirm-command install
         curl -sSf -o rustup-init.exe https://win.rustup.rs/
         .\rustup-init.exe -y
         pip install swig aqtinstall
@@ -142,7 +142,7 @@ jobs:
         Start-Process -Wait -FilePath .\DXSDK_Jun10.exe -ArgumentList "/U"
     - name: Cache Built Dependencies
       id: cache-folder
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ogredeps
         key: cache-${{ hashFiles('CMake/Dependencies.cmake') }}
@@ -151,7 +151,7 @@ jobs:
         cmake -P ci-build.cmake
         cmake --build build --config RelWithDebInfo --target INSTALL
       env:
-        VULKAN_SDK: C:\VulkanSDK\1.3.296.0
+        VULKAN_SDK: C:\VulkanSDK\1.4.350.0
         APPVEYOR: true
         DXSDK_DIR: C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)
         Cg_HOME: C:\Program Files (x86)\NVIDIA Corporation\Cg
