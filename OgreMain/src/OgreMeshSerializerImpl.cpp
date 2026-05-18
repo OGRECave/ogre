@@ -1503,6 +1503,9 @@ namespace Ogre {
                 unsigned int buffIndexCount;
                 readInts(stream, &buffIndexCount, 1);
 
+                if (!checkStreamRemainingSize(stream, buffIndexCount, idx32Bit ? 4 : 2))
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD index data exceeds stream size");
+
                 indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
                     idx32Bit ? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT,
                     buffIndexCount, pMesh->mIndexBufferUsage, pMesh->mIndexBufferShadowBuffer);
