@@ -134,7 +134,7 @@ namespace Ogre
         virtual void destroyMsaaSurface( void );
     public:
         bool hasMsaaExplicitResolves() const { return false; }
-        bool isUav() const { return false; }
+        bool isUav() const { return (getUsage() & TU_UNORDERED_ACCESS) != 0; }
         bool isMultisample() const { return mFSAA > 1; }
         virtual bool isRenderWindowSpecific() const { return false; }
 

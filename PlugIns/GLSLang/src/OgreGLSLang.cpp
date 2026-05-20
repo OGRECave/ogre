@@ -327,6 +327,20 @@ static EShLanguage getShLanguage(GpuProgramType type)
     return EShLangFragment;
 }
 
+class CmdDescriptorSetProfile : public ParamCommand
+{
+public:
+    String doGet(const void* target) const override
+    {
+        return static_cast<const GLSLangProgram*>(target)->getDescriptorSetProfile();
+    }
+    void doSet(void* target, const String& val) override
+    {
+        static_cast<GLSLangProgram*>(target)->setDescriptorSetProfile(val);
+    }
+};
+static CmdDescriptorSetProfile msCmdDescriptorSetProfile;
+
 GLSLangProgram::GLSLangProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
                                const String& group, bool isManual, ManualResourceLoader* loader)
     : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
@@ -334,6 +348,10 @@ GLSLangProgram::GLSLangProgram(ResourceManager* creator, const String& name, Res
     if (createParamDictionary("glslangProgram"))
     {
         setupBaseParamDictionary();
+        ParamDictionary* dict = getParamDictionary();
+        dict->addParameter(ParameterDef("descriptor_set_profile", "Descriptor set profile override. Values: Auto, "
+                                          "GraphicsLegacy, ComputeImageWrite", PT_STRING), &msCmdDescriptorSetProfile);
+
         memset(&DefaultTBuiltInResource.limits, 1, sizeof(TLimits));
 
         if(sizeof(TBuiltInResource) == 420) // replace with build_info.h, when it is universally available
@@ -369,6 +387,8 @@ void GLSLangProgram::createLowLevelImpl()
 
     mAssemblerProgram =
         GpuProgramManager::getSingleton().createProgram(mName + "/Delegate", mGroup, mSyntaxCode, mType);
+    if (!mDescriptorSetProfile.empty())
+        mAssemblerProgram->setParameter("descriptor_set_profile", mDescriptorSetProfile);
     String assemblyStr((char*)mAssembly.data(), mAssembly.size() * sizeof(uint32));
     mAssemblerProgram->setSource(assemblyStr);
     mAssembly.clear(); // delegate stores the data now

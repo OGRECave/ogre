@@ -1,11 +1,9 @@
 //////////
 // GLSL //
 //////////
-compute_program Compute/CS_GLSL glsl
+compute_program Compute/CS_GLSL glslang
 {
         source ComputeCS.glsl
-        syntax glsl430
-        has_sampler_binding true
         descriptor_set_profile ComputeImageWrite
 
         //TODO how to handle glMemoryBarrier?

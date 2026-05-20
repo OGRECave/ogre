@@ -578,6 +578,7 @@ namespace Ogre
             if( props.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT )
                 rsc->setCapability( RSC_TEXTURE_COMPRESSION_ASTC );
         }
+        rsc->setCapability( RSC_COMPUTE_PROGRAM );
 
         const VkPhysicalDeviceLimits &deviceLimits = mDevice->mDeviceProperties.limits;
         //rsc->setMaximumResolutions( deviceLimits.maxImageDimension2D, deviceLimits.maxImageDimension3D,
@@ -621,7 +622,6 @@ namespace Ogre
         rsc->setCapability( RSC_TEXTURE_2D_ARRAY );
         rsc->setCapability( RSC_ALPHA_TO_COVERAGE );
         rsc->setCapability( RSC_HW_GAMMA );
-        rsc->setCapability( RSC_COMPUTE_PROGRAM );
         rsc->setCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA );
         rsc->setCapability(RSC_VERTEX_FORMAT_INT_10_10_10_2);
         rsc->setCapability(RSC_VERTEX_FORMAT_16X3);

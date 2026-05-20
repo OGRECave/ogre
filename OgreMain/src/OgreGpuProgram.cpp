@@ -231,10 +231,6 @@ namespace Ogre
 
         // Basic support check
         auto blah = getType();
-        if (blah == GPT_COMPUTE_PROGRAM)
-        {
-            auto derp = caps->hasCapability(RSC_COMPUTE_PROGRAM);
-        }
 
         if ((getType() == GPT_GEOMETRY_PROGRAM && !caps->hasCapability(RSC_GEOMETRY_PROGRAM)) ||
             ((getType() == GPT_DOMAIN_PROGRAM || getType() == GPT_HULL_PROGRAM) &&
