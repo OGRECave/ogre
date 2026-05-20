@@ -734,11 +734,15 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Can't find vertex buffer data area",
                 "MeshSerializerImpl::readGeometryVertexBuffer");
         }
-        // Check that vertex size agrees
-        if (dest->vertexDeclaration->getVertexSize(bindIndex) != vertexSize)
+        size_t declaredVertexSize = dest->vertexDeclaration->getVertexSize(bindIndex);
+        if (declaredVertexSize == 0)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer vertex size does not agree with vertex declaration",
-                "MeshSerializerImpl::readGeometryVertexBuffer");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Missing vertex declaration for buffer bind index");
+        }
+        // Check that vertex size agrees
+        if (declaredVertexSize != vertexSize)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer vertex size does not agree with vertex declaration");
         }
 
         // Create / populate vertex buffer
@@ -1177,6 +1181,8 @@ namespace Ogre {
     void MeshSerializerImpl::writeLodUsageGeneratedSubmesh( const SubMesh* submesh, unsigned short lodNum )
     {
         const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
+        OgreAssert(indexData, "Generated LOD is missing IndexData");
+
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(ibuf);
         unsigned int bufferIndex = -1;
@@ -1276,6 +1282,8 @@ namespace Ogre {
         size_t size = 0;
         
         const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
+        OgreAssert(indexData, "Generated LOD is missing IndexData");
+
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(ibuf);
         unsigned int bufferIndex = -1;
@@ -1411,14 +1419,15 @@ namespace Ogre {
         readShorts(stream, &(pMesh->mNumLods), 1);
         // num LOD levels must be at least 1 (base mesh)
         pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
-        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         for (auto *s : pMesh->getSubMeshes())
         {
             assert(s->mLodFaceList.empty());
             s->mLodFaceList.resize(pMesh->mNumLods-1);
         }
+
+        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         pushInnerChunk(stream);
         // lodID=0 is the original mesh. We need to skip it.
         for(int lodID = 1; lodID < pMesh->mNumLods; lodID++){
@@ -1493,6 +1502,9 @@ namespace Ogre {
                 
                 unsigned int buffIndexCount;
                 readInts(stream, &buffIndexCount, 1);
+
+                if (!checkStreamRemainingSize(stream, buffIndexCount, idx32Bit ? 4 : 2))
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD index data exceeds stream size");
 
                 indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
                     idx32Bit ? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT,
@@ -2707,6 +2719,8 @@ namespace Ogre {
     size_t MeshSerializerImpl_v1_8::calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum)
     {
         const IndexData* indexData = submesh->mLodFaceList[lodNum - 1];
+        OgreAssert(indexData, "Generated LOD is missing IndexData");
+
         const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
 
         size_t size = MSTREAM_OVERHEAD_SIZE; // M_MESH_LOD_GENERATED
@@ -2808,6 +2822,7 @@ namespace Ogre {
     void MeshSerializerImpl_v1_8::writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum)
     {
         const IndexData* indexData = submesh->mLodFaceList[lodNum - 1];
+        OgreAssert(indexData, "Generated LOD is missing IndexData");
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(ibuf);
 
@@ -2993,12 +3008,12 @@ namespace Ogre {
         readShorts(stream, &(pMesh->mNumLods), 1);
         // num LOD levels must be at least 1 (base mesh)
         pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         // bool manual;  (true for manual alternate meshes, false for generated)
         readBools(stream, &(pMesh->mHasManualLodLevel), 1);
 
-        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         // Preallocate submesh lod face data if not manual
         if (!pMesh->hasManualLodLevel())
         {
@@ -3380,6 +3395,7 @@ namespace Ogre {
         readShorts(stream, &(pMesh->mNumLods), 1);
         // num LOD levels must be at least 1 (base mesh)
         pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
         bool manual; // true for manual alternate meshes, false for generated
@@ -3387,7 +3403,6 @@ namespace Ogre {
 
         pMesh->mHasManualLodLevel = manual;
 
-        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         // Preallocate submesh LOD face data if not manual
         if (!manual)
         {

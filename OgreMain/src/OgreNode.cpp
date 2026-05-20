@@ -285,9 +285,7 @@ namespace Ogre {
         if (child->mParent)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Node '" + child->getName() + "' already was a child of '" +
-                child->mParent->getName() + "'.",
-                "Node::addChild");
+                        "Node '" + child->getName() + "' already is a child of '" + child->mParent->getName() + "'");
         }
 
         mChildren.push_back(child);

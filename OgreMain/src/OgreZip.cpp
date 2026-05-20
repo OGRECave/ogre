@@ -187,7 +187,10 @@ namespace {
         auto ret = std::make_shared<MemoryDataStream>(lookUpFileName, zip_entry_size(mZipFile), true, true);
 
         if(zip_entry_noallocread(mZipFile, ret->getPtr(), ret->size()) < 0)
+        {
+            zip_entry_close(mZipFile);
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "could not read "+lookUpFileName);
+        }
         zip_entry_close(mZipFile);
 
         return ret;

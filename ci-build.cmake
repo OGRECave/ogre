@@ -77,6 +77,7 @@ if(DEFINED ENV{ANDROID})
 
     set(OTHER
         ${CROSS}
+        -DOGRE_BUILD_FUZZERS=TRUE # need clang for this
         -DCMAKE_CXX_FLAGS="-Werror"
         -DOGRE_BUILD_ANDROID_JNI_SAMPLE=TRUE
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)

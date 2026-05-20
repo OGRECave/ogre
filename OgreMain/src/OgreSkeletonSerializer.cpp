@@ -494,7 +494,10 @@ namespace Ogre {
 
         auto numBones = pSkel->getBones().size();
         if (parentHandle >= numBones || childHandle >= numBones)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid bone handle in skeleton file");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Bone handle out of range");
+
+        if (childHandle == parentHandle)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "A bone cannot be parent of itself");
 
         // Find bones
         parent = pSkel->getBone(parentHandle);

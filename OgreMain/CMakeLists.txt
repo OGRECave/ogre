@@ -222,6 +222,10 @@ if (APPLE)
 endif ()
 target_link_libraries(OgreMain PUBLIC ${PLATFORM_LIBS} PRIVATE ${LIBRARIES} ${CMAKE_DL_LIBS})
 
+if(ANDROID)
+  target_link_libraries(OgreMain PRIVATE cpufeatures log z)
+endif()
+
 # specify a precompiled header to use
 add_native_precompiled_header(OgreMain "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h>")
 

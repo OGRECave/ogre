@@ -198,6 +198,41 @@ TEST_F(SceneNodeTest, removeFromParent) {
     EXPECT_EQ(child->getParent(), nullptr); //it is a no-op
 }
 
+static testing::AssertionResult AssertDirectionEquals(const char* m_expr,
+                                               const char* n_expr,
+                                               const Vector3& m,
+                                               const Vector3& n) {
+    if (m.directionEquals(n, Degree(0.01f)))
+        return testing::AssertionSuccess();
+
+    return testing::AssertionFailure()
+        << m_expr << " and " << n_expr << " do not have the same direction\n"
+        << "  Actual: " << m << "\n"
+        << "Expected: " << n;
+}
+#define EXPECT_DIR_EQ(val1, val2) EXPECT_PRED_FORMAT2(AssertDirectionEquals, val1, val2)
+
+TEST_F(SceneNodeTest, setDirection) {
+    SceneNode* parent = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    parent->setOrientation(Quaternion(Degree(90), Vector3::UNIT_Y));
+
+    SceneNode* child = parent->createChildSceneNode();
+
+    child->setDirection(Vector3::UNIT_X, Node::TS_PARENT);
+    EXPECT_DIR_EQ(child->getOrientation() * Vector3::NEGATIVE_UNIT_Z, Vector3::UNIT_X);
+
+    child->setDirection(Vector3::UNIT_Z, Node::TS_WORLD);
+    EXPECT_DIR_EQ(child->_getDerivedOrientation() * Vector3::NEGATIVE_UNIT_Z, Vector3::UNIT_Z);
+
+    child->setOrientation(Quaternion::IDENTITY);
+    child->setDirection(Vector3::UNIT_X, Node::TS_LOCAL);
+    EXPECT_DIR_EQ(child->getOrientation() * Vector3::NEGATIVE_UNIT_Z, Vector3::UNIT_X);
+
+    child->setFixedYawAxis(true, Vector3::UNIT_Z);
+    child->setDirection(Vector3::UNIT_X, Node::TS_PARENT);
+    EXPECT_DIR_EQ(child->getOrientation() * Vector3::NEGATIVE_UNIT_Z, Vector3::UNIT_X);
+}
+
 static void createRandomEntityClones(Entity* ent, size_t cloneCount, const Vector3& min,
                                      const Vector3& max, SceneManager* mgr)
 {

@@ -23,6 +23,8 @@ if(ANDROID)
   set(NATIVE_INCLUDES 
       ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL 
       ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL/Android)
+
+  set(PLATFORM_LIBS android EGL GLESv2)
 elseif (EMSCRIPTEN)
   file(GLOB PLATFORM_HEADERS "include/EGL/Emscripten/*.h" "include/EGL/*.h")
   file(GLOB PLATFORM_SOURCES "src/EGL/Emscripten/*.cpp" "src/EGL/*.cpp")

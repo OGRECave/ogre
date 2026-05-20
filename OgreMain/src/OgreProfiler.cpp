@@ -158,13 +158,12 @@ namespace Ogre {
 
             mInitialized = true;
         }
-        else if (mInitialized)
+        else if (mInitialized && !enabled)
         {
             for(auto & l : mListeners)
                 l->finializeSession();
 
             mInitialized = false;
-            mEnabled = false;
         }
         // We store this enable/disable request until the frame ends
         // (don't want to screw up any open profiles!)

@@ -131,7 +131,7 @@ endif()
 target_link_libraries(SampleBrowser OgreMain ${OGRE_PLUGIN_LIBRARIES} ${SAMPLE_LIBRARIES} OgreBites)
 
 if(ANDROID)
-    target_link_libraries(SampleBrowser native_app_glue cpufeatures android c m dl z log EGL GLESv2 "-u ANativeActivity_onCreate")
+    target_link_libraries(SampleBrowser native_app_glue c m "-u ANativeActivity_onCreate")
     set_target_properties(SampleBrowser PROPERTIES LINK_FLAGS -s) # strip symbols
 endif()
 
