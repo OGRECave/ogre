@@ -1416,11 +1416,14 @@ namespace Ogre {
         pMesh->setLodStrategy(strategy);
 
         // unsigned short numLevels;
-        readShorts(stream, &(pMesh->mNumLods), 1);
-        // num LOD levels must be at least 1 (base mesh)
-        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
-        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+        uint16 numLods;
+        readShorts(stream, &numLods, 1);
+        numLods = std::max<ushort>(numLods, 1);
+
+        if (!checkStreamRemainingSize(stream, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
+
+        pMesh->mNumLods = numLods;
         pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         for (auto *s : pMesh->getSubMeshes())
         {
@@ -3004,13 +3007,19 @@ namespace Ogre {
             pMesh->setLodStrategy(strategy);
 
         // unsigned short numLevels;
-        readShorts(stream, &(pMesh->mNumLods), 1);
-        // num LOD levels must be at least 1 (base mesh)
-        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
-        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+        uint16 numLods;
+        readShorts(stream, &numLods, 1);
+        numLods = std::max<ushort>(numLods, 1);
+
+        if (!checkStreamRemainingSize(stream, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
-        // bool manual;  (true for manual alternate meshes, false for generated)
-        readBools(stream, &(pMesh->mHasManualLodLevel), 1);
+
+        pMesh->mNumLods = numLods;
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
+
+        bool manual; // true for manual alternate meshes, false for generated
+        readBools(stream, &manual, 1);
+        pMesh->mHasManualLodLevel = manual;
 
         pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         // Preallocate submesh lod face data if not manual
@@ -3391,11 +3400,15 @@ namespace Ogre {
         pMesh->setLodStrategy(strategy);
 
         // unsigned short numLevels;
-        readShorts(stream, &(pMesh->mNumLods), 1);
-        // num LOD levels must be at least 1 (base mesh)
-        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
-        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+        uint16 numLods;
+        readShorts(stream, &numLods, 1);
+        numLods = std::max<ushort>(numLods, 1);
+
+        if (!checkStreamRemainingSize(stream, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
+
+        pMesh->mNumLods = numLods;
+        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
         bool manual; // true for manual alternate meshes, false for generated
         readBools(stream, &manual, 1);
 
