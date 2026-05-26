@@ -1492,9 +1492,12 @@ namespace Ogre {
             unsigned int bufferIndex;
             readInts(stream, &bufferIndex, 1);
             if(bufferIndex != (unsigned int)-1) {
+                if (bufferIndex - 1 >= (unsigned int)lodNum - 1)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid LOD buffer index in mesh LOD data");
                 // copy buffer pointer
                 indexData->indexBuffer = s->mLodFaceList.at(bufferIndex - 1)->indexBuffer;
-                assert(indexData->indexBuffer);
+                if (!indexData->indexBuffer)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Referenced LOD index buffer is null");
             } else {
                 // generate buffers
 
