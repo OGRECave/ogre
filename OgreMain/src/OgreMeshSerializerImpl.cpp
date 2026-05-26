@@ -2879,9 +2879,13 @@ namespace Ogre {
                 sm->mLodFaceList[lodNum - 1] = indexData;
                 unsigned int numIndexes;
                 readInts(stream, &numIndexes, 1);
-                indexData->indexCount = static_cast<size_t>(numIndexes);
                 bool idx32Bit;
                 readBools(stream, &idx32Bit, 1);
+
+                if (!checkStreamRemainingSize(stream, numIndexes, idx32Bit ? 4 : 2))
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD index data exceeds stream size");
+
+                indexData->indexCount = numIndexes;
 
                 if (idx32Bit)
                 {
