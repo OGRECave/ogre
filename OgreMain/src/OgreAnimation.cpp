@@ -221,6 +221,7 @@ namespace Ogre {
     VertexAnimationTrack* Animation::createVertexTrack(unsigned short handle,
         VertexData* data, VertexAnimationType animType)
     {
+        OgreAssert(data, "VertexData must not be null");
         VertexAnimationTrack* ret = createVertexTrack(handle, animType);
 
         ret->setAssociatedVertexData(data);
