@@ -55,7 +55,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     Ogre::Vector3 dest;
     serialiser.read(&dest, 1);
-  } catch (Ogre::InvalidStateException) {
+  } catch (Ogre::Exception&) {
   }
   factory.destroyInstance(arch);
   unlink(filename);
