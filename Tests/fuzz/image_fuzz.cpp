@@ -72,7 +72,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         Ogre::DataStreamPtr(OGRE_NEW Ogre::FileStreamDataStream(&file1, false));
     Ogre::Image img;
     img.load(data1, "png");
-    img.save(file_to_save);
+    // Limit re-encoding to reasonably-sized images to avoid fuzzer timeouts
+    // during PNG compression of very large bitmaps.
+    if (img.getWidth() <= 1024 && img.getHeight() <= 1024)
+      img.save(file_to_save);
   } catch (Ogre::ItemIdentityException) {
   } catch (Ogre::InternalErrorException) {
   }
