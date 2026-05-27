@@ -50,6 +50,10 @@ namespace Ogre {
     {
         if (itemCount == 0)
             return true;
+
+        if(stream->tell() >= stream->size())
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid stream position");
+
         size_t remaining = stream->size() - stream->tell();
         return remaining / itemSize >= itemCount;
     }
