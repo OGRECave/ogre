@@ -2496,8 +2496,10 @@ namespace Ogre {
         if (target > pMesh->getNumSubMeshes())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid target for vertex animation track");
 
-        VertexAnimationTrack* track = anim->createVertexTrack(target,
-            pMesh->getVertexDataByTrackHandle(target), animType);
+        VertexData* vdata = pMesh->getVertexDataByTrackHandle(target);
+        if (!vdata)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Animation track references target with no vertex data");
+        VertexAnimationTrack* track = anim->createVertexTrack(target, vdata, animType);
 
         // keyframes
         if (!stream->eof())
