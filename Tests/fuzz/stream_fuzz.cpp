@@ -24,10 +24,14 @@ limitations under the License.
 
 #include "OgreException.h"
 #include "OgreFileSystem.h"
+#include "OgreLogManager.h"
 #include "OgreStreamSerialiser.h"
 #include "OgreVector.h"
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+  Ogre::LogManager logManager;
+  logManager.createLog("Temporary log", true, true, true);
+
   char filename[256];
   sprintf(filename, "/tmp/libfuzzer.%d", getpid());
 
