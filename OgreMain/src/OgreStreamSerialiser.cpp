@@ -675,6 +675,12 @@ namespace Ogre
         // String is stored as a uint32 character count, then string
         uint32 len;
         read(&len);
+
+        // Guard against OOM from corrupt/malicious input: cap len to remaining chunk bytes
+        OgreAssertDbg(mChunkStack.size(), "Not currently in a chunk, cannot read string length");
+        if (len > mChunkStack.back()->length)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "String length field exceeds remaining chunk data");
+
         string->resize(len);
         if (len)
             read(&(*string->begin()), len);
