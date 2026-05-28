@@ -441,7 +441,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MemoryDataStream::seek( size_t pos )
     {
-        assert( mData + pos <= mEnd );
+        if (mData + pos > mEnd)
+            pos = static_cast<size_t>(mEnd - mData);
         mPos = mData + pos;
     }
     //-----------------------------------------------------------------------
