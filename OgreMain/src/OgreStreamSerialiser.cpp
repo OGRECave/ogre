@@ -424,7 +424,10 @@ namespace Ogre
         read(&chunk->id);
         read(&chunk->version);
         read(&chunk->length);
-        
+
+        if (chunk->length > mStream->size() - mStream->tell())
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Chunk length field exceeds remaining stream data");
+
         uint32 checksum;
         read(&checksum);
         
