@@ -1150,7 +1150,7 @@ namespace Ogre {
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
 
         // Basic prerequisites
-        assert(numLevels > 0 && "Must be at least one level (full detail level must exist)");
+        OgreAssert(numLevels > 0,  "Must be at least one level (full detail level must exist)");
 
         mNumLods = numLevels;
         mMeshLodUsageList.resize(numLevels);
