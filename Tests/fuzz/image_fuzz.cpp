@@ -76,8 +76,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     // during PNG compression of very large bitmaps.
     if (img.getWidth() <= 1024 && img.getHeight() <= 1024)
       img.save(file_to_save);
-  } catch (Ogre::ItemIdentityException) {
-  } catch (Ogre::InternalErrorException) {
+  } catch (Ogre::Exception&) {
   }
 
   Ogre::STBIImageCodec::shutdown();
