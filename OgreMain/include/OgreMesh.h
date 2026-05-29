@@ -158,16 +158,12 @@ namespace Ogre {
             IndexMap& blendIndexToBoneIndexMap,
             VertexData* targetVertexData);
 #if !OGRE_NO_MESHLOD
-        const LodStrategy *mLodStrategy;
         bool mHasManualLodLevel;
-        ushort mNumLods;
-        MeshLodUsageList mMeshLodUsageList;
 #else
-        const LodStrategy *mLodStrategy;
         const bool mHasManualLodLevel;
-        const ushort mNumLods;
-        MeshLodUsageList mMeshLodUsageList;
 #endif
+        const LodStrategy *mLodStrategy;
+        MeshLodUsageList mMeshLodUsageList;
         HardwareBufferManagerBase* mBufferManager;
         HardwareBufferUsage mVertexBufferUsage;
         HardwareBufferUsage mIndexBufferUsage;
@@ -496,7 +492,7 @@ namespace Ogre {
 
             This number includes the original model.
         */
-        ushort getNumLodLevels(void) const { return mNumLods; }
+        ushort getNumLodLevels(void) const { return mMeshLodUsageList.size(); }
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
 
