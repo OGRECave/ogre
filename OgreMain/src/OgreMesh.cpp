@@ -46,9 +46,8 @@ namespace Ogre {
         mBoundRadius(0.0f),
         mBoneBoundingRadius(0.0f),
         mBoneAssignmentsOutOfDate(false),
-        mLodStrategy(LodStrategyManager::getSingleton().getDefaultStrategy()),
         mHasManualLodLevel(false),
-        mNumLods(1),
+        mLodStrategy(LodStrategyManager::getSingleton().getDefaultStrategy()),
         mBufferManager(0),
         mVertexBufferUsage(HBU_GPU_ONLY),
         mIndexBufferUsage(HBU_GPU_ONLY),
@@ -67,8 +66,6 @@ namespace Ogre {
         MeshLodUsage lod;
         lod.userValue = 0; // User value not used for base LOD level
         lod.value = getLodStrategy()->getBaseValue();
-        lod.edgeData = NULL;
-        lod.manualMesh.reset();
         mMeshLodUsageList.push_back(lod);
     }
     //-----------------------------------------------------------------------
@@ -339,7 +336,6 @@ namespace Ogre {
 #if !OGRE_NO_MESHLOD
         newMesh->mHasManualLodLevel = mHasManualLodLevel;
         newMesh->mLodStrategy = mLodStrategy;
-        newMesh->mNumLods = mNumLods;
         newMesh->mMeshLodUsageList = mMeshLodUsageList;
 #endif
         // Unreference edge lists, otherwise we'll delete the same lot twice, build on demand
@@ -1152,7 +1148,6 @@ namespace Ogre {
         // Basic prerequisites
         OgreAssert(numLevels > 0,  "Must be at least one level (full detail level must exist)");
 
-        mNumLods = numLevels;
         mMeshLodUsageList.resize(numLevels);
         // Resize submesh face data lists too
         for (auto & i : mSubMeshList)
@@ -1224,7 +1219,6 @@ namespace Ogre {
         freeEdgeList();
 
         // Reinitialise
-        mNumLods = 1;
         mMeshLodUsageList.resize(1);
         mMeshLodUsageList[0].edgeData = NULL;
 
