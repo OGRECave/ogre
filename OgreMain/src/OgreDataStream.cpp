@@ -433,16 +433,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MemoryDataStream::skip(long count)
     {
+        // will underflow to size_t max if we skip below 0
         size_t newpos = (size_t)( ( mPos - mData ) + count );
-        assert( mData + newpos <= mEnd );        
 
+        if (mData + newpos > mEnd)
+            newpos = static_cast<size_t>(mEnd - mData); // will trigger eof
         mPos = mData + newpos;
     }
     //-----------------------------------------------------------------------
     void MemoryDataStream::seek( size_t pos )
     {
         if (mData + pos > mEnd)
-            pos = static_cast<size_t>(mEnd - mData);
+            pos = static_cast<size_t>(mEnd - mData); // will trigger eof
         mPos = mData + pos;
     }
     //-----------------------------------------------------------------------
