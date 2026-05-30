@@ -288,6 +288,14 @@ namespace Ogre {
     {
         static_assert(sizeof(bool) == 1, "add conversion to char for your platform");
         stream->read(pDest, sizeof(bool) * count);
+        // Normalize raw bytes to canonical bool values (0 or 1).
+        // A non-zero byte that is not exactly 1 can cause miscompile bugs later
+        for (size_t i = 0; i < count; ++i)
+        {
+            uint8_t raw;
+            memcpy(&raw, &pDest[i], 1);
+            pDest[i] = (raw != 0);
+        }
     }
     //---------------------------------------------------------------------
     void Serializer::readFloats(const DataStreamPtr& stream, float* pDest, size_t count)
