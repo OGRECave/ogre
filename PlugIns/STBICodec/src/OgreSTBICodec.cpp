@@ -178,9 +178,9 @@ namespace Ogre {
 
         if (!pixelData)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                "Error decoding image: " + String(stbi_failure_reason()),
-                "STBIImageCodec::decode");
+            const char* reason = stbi_failure_reason();
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Error decoding image: " + String(reason ? reason : "no reason"));
         }
 
         if (width <= 0 || height <= 0)
