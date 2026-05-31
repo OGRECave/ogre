@@ -1143,7 +1143,7 @@ void DotScenePlugin::install()
     Codec::registerCodec(mCodec);
 }
 
-void DotScenePlugin::shutdown() {
+void DotScenePlugin::uninstall() {
     Codec::unregisterCodec(mCodec);
     delete mCodec;
 }
