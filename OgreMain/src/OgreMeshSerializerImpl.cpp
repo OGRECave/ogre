@@ -750,6 +750,13 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer vertex size does not agree with vertex declaration");
         }
 
+        for (const auto& elem : dest->vertexDeclaration->findElementsBySource(bindIndex))
+        {
+            if (elem.getOffset() + elem.getSize() > (size_t)vertexSize)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                                "Vertex element offset + size exceeds vertex buffer stride");
+        }
+
         // Create / populate vertex buffer
         size_t vbufBytes = dest->vertexCount * (size_t)vertexSize;
         if (vbufBytes / vertexSize != dest->vertexCount || stream->size() < stream->tell() + vbufBytes)
