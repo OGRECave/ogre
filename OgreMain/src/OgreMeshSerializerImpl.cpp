@@ -3918,6 +3918,8 @@ namespace Ogre {
 
         unsigned int vertexCount = 0;
         readInts(stream, &vertexCount, 1);
+        if (!checkStreamRemainingSize(stream, vertexCount, sizeof(float) * 3)) // At least positions
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex count exceeds remaining stream data");
         dest->vertexCount = vertexCount;
 
         // Vertex buffers
@@ -3985,6 +3987,8 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf;
         // float* pNormals (x, y, z order x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_FLOAT3, VES_NORMAL);
+        if (!checkStreamRemainingSize(stream, dest->vertexCount, sizeof(float) * 3))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining stream data");
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
@@ -4001,6 +4005,8 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf;
         // unsigned long* pColours (RGBA 8888 format x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_COLOUR, VES_DIFFUSE);
+        if (!checkStreamRemainingSize(stream, dest->vertexCount, 4))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining stream data");
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
@@ -4025,6 +4031,8 @@ namespace Ogre {
             VertexElement::multiplyTypeCount(VET_FLOAT1, dim),
             VES_TEXTURE_COORDINATES,
             texCoordSet);
+        if (!checkStreamRemainingSize(stream, dest->vertexCount, dest->vertexDeclaration->getVertexSize(bindIdx)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining stream data");
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
