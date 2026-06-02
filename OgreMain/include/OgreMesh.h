@@ -68,7 +68,6 @@ namespace Ogre {
             Transformed from user-supplied values with LodStrategy::transformUserValue.
         */
         Real value;
-        
 
         /// Only relevant if mIsLodManual is true, the name of the alternative mesh to use.
         String manualName;
