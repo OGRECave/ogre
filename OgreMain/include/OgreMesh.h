@@ -30,8 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include <vector>
-
 #include "OgreResource.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreVertexBoneAssignment.h"
@@ -961,11 +959,6 @@ namespace Ogre {
         /// @overload
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
     };
-
-
-    /** @} */
-    /** @} */
-
 
 } // namespace Ogre
 
