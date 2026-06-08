@@ -48,7 +48,7 @@ namespace Ogre
     *  @{
     */
 
-    #define USE_VALIDATION_LAYERS 0
+    #define USE_VALIDATION_LAYERS 1
 
     class _OgreVulkanExport VulkanRenderSystem : public RenderSystem
     {
@@ -100,9 +100,9 @@ namespace Ogre
 
         bool mHasValidationLayers;
 
-        PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback;
-        PFN_vkDestroyDebugReportCallbackEXT DestroyDebugReportCallback;
-        VkDebugReportCallbackEXT mDebugReportCallback;
+        PFN_vkCreateDebugUtilsMessengerEXT CreateDebugUtilsMessenger;
+        PFN_vkDestroyDebugUtilsMessengerEXT DestroyDebugUtilsMessenger;
+        VkDebugUtilsMessengerEXT mDebugMessenger;
 
         /// Declared here to avoid constant reallocations
         FastArray<VkImageMemoryBarrier> mImageBarriers;
@@ -120,6 +120,7 @@ namespace Ogre
         VkPipelineRasterizationStateCreateInfo rasterState;
         VkPipelineColorBlendStateCreateInfo blendStateCi;
         std::array<VkPipelineShaderStageCreateInfo, GPT_COUNT> shaderStages;
+        VkPipelineShaderStageCreateInfo mComputeShaderStage;
         std::array<uint32, GPT_COUNT> mBoundGpuPrograms;
 
         std::array<DescriptorSetProfile, NUM_DESCRIPTOR_SET_PROFILES> mProfiles;

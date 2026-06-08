@@ -82,6 +82,8 @@ namespace Ogre
                                              FastArray<const char *> &layers,
                                              PFN_vkDebugReportCallbackEXT debugCallback)
     {
+
+
         VkInstanceCreateInfo createInfo = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
         VkApplicationInfo appInfo = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
 

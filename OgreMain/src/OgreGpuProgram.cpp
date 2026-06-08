@@ -229,9 +229,6 @@ namespace Ogre
         const RenderSystemCapabilities* caps =
             Root::getSingleton().getRenderSystem()->getCapabilities();
 
-        // Basic support check
-        auto blah = getType();
-
         if ((getType() == GPT_GEOMETRY_PROGRAM && !caps->hasCapability(RSC_GEOMETRY_PROGRAM)) ||
             ((getType() == GPT_DOMAIN_PROGRAM || getType() == GPT_HULL_PROGRAM) &&
              !caps->hasCapability(RSC_TESSELLATION_PROGRAM)) ||

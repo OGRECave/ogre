@@ -69,33 +69,37 @@ namespace Ogre
         14,  // VES_TANGENT - 1
     };
 
-    static VKAPI_ATTR VkBool32 dbgFunc( VkFlags msgFlags, VkDebugReportObjectTypeEXT objType,
-                                            uint64_t srcObject, size_t location, int32_t msgCode,
-                                            const char *pLayerPrefix, const char *pMsg, void *pUserData )
-    {
-        const char* messageType = "INFORMATION";
+static VKAPI_ATTR VkBool32 VKAPI_CALL dbgUtilsCallback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+    void *pUserData )
+{
+    const char *severity = "INFO";
+    if( messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT )
+        severity = "ERROR";
+    else if( messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT )
+        severity = "WARNING";
+    else if( messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT )
+        severity = "VERBOSE";
 
-        if (msgFlags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
-            messageType = "WARNING";
-        else if (msgFlags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
-            messageType = "PERFORMANCE WARNING";
-        else if (msgFlags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
-            messageType = "ERROR";
-        else if (msgFlags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)
-            messageType = "DEBUG";
+    const char *type = "";
+    if( messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT )
+        type = "VALIDATION";
+    else if( messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT )
+        type = "PERFORMANCE";
+    else if( messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT )
+        type = "GENERAL";
 
-        LogManager::getSingleton().logMessage(
-            StringUtil::format("%s: [%s] Code %d : %s", messageType, pLayerPrefix, msgCode, pMsg));
+    LogManager::getSingleton().logMessage(
+        StringUtil::format( "[Vulkan][%s][%s] %s (ID: %s #%d)",
+                            severity, type,
+                            pCallbackData->pMessage,
+                            pCallbackData->pMessageIdName ? pCallbackData->pMessageIdName : "",
+                            pCallbackData->messageIdNumber ) );
 
-        /*
-         * false indicates that layer should not bail-out of an
-         * API call that had validation failures. This may mean that the
-         * app dies inside the driver due to invalid parameter(s).
-         * That's what would happen without validation layers, so we'll
-         * keep that behavior here.
-         */
-        return false;
-    }
+    return VK_FALSE;
+}
 
     //-------------------------------------------------------------------------
     VulkanRenderSystem::VulkanRenderSystem() :
@@ -109,9 +113,9 @@ namespace Ogre
         mDevice( 0 ),
         mCurrentRenderPassDescriptor( 0 ),
         mHasValidationLayers( false ),
-        CreateDebugReportCallback( 0 ),
-        DestroyDebugReportCallback( 0 ),
-        mDebugReportCallback( 0 ),
+        CreateDebugUtilsMessenger( 0 ),
+        DestroyDebugUtilsMessenger( 0 ),
+        mDebugMessenger( 0 ),
         pipelineCi{VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO},
         pipelineLayoutCi{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO},
         vertexFormatCi{VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO},
@@ -280,10 +284,10 @@ namespace Ogre
     {
         shutdown();
 
-        if( mDebugReportCallback )
+        if( mDebugMessenger )
         {
-            DestroyDebugReportCallback( mVkInstance, mDebugReportCallback, 0 );
-            mDebugReportCallback = 0;
+            DestroyDebugUtilsMessenger( mVkInstance, mDebugMessenger, nullptr );
+            mDebugMessenger = 0;
         }
 
         if( mVkInstance )
@@ -428,45 +432,33 @@ namespace Ogre
             mIsReverseDepthBufferEnabled = StringConverter::parseBool(value);
     }
     //-------------------------------------------------------------------------
-    void VulkanRenderSystem::addInstanceDebugCallback( void )
-    {
-        CreateDebugReportCallback = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(
-            mVkInstance, "vkCreateDebugReportCallbackEXT" );
-        DestroyDebugReportCallback = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(
-            mVkInstance, "vkDestroyDebugReportCallbackEXT" );
-        if( !CreateDebugReportCallback )
-        {
-            LogManager::getSingleton().logMessage(
-                "[Vulkan] GetProcAddr: Unable to find vkCreateDebugReportCallbackEXT. "
-                "Debug reporting won't be available" );
-            return;
-        }
-        if( !DestroyDebugReportCallback )
-        {
-            LogManager::getSingleton().logMessage(
-                "[Vulkan] GetProcAddr: Unable to find vkDestroyDebugReportCallbackEXT. "
-                "Debug reporting won't be available" );
-            return;
-        }
-        // DebugReportMessage =
-        //    (PFN_vkDebugReportMessageEXT)vkGetInstanceProcAddr( mVkInstance, "vkDebugReportMessageEXT"
-        //    );
-        // if( !DebugReportMessage )
-        //{
-        //    LogManager::getSingleton().logMessage(
-        //        "[Vulkan] GetProcAddr: Unable to find DebugReportMessage. "
-        //        "Debug reporting won't be available" );
-        //}
+void VulkanRenderSystem::addInstanceDebugCallback( void )
+{
+    CreateDebugUtilsMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+        mVkInstance, "vkCreateDebugUtilsMessengerEXT" );
+    DestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+        mVkInstance, "vkDestroyDebugUtilsMessengerEXT" );
 
-        VkDebugReportCallbackCreateInfoEXT dbgCreateInfo = {VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT};
-        PFN_vkDebugReportCallbackEXT callback;
-        callback = dbgFunc;
-        dbgCreateInfo.pfnCallback = callback;
-        dbgCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
-                              VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-        OGRE_VK_CHECK(
-            CreateDebugReportCallback( mVkInstance, &dbgCreateInfo, 0, &mDebugReportCallback ));
+    if( !CreateDebugUtilsMessenger || !DestroyDebugUtilsMessenger )
+    {
+        LogManager::getSingleton().logMessage(
+            "[Vulkan] Unable to find vkCreateDebugUtilsMessengerEXT. "
+            "Debug reporting won't be available" );
+        return;
     }
+
+    VkDebugUtilsMessengerCreateInfoEXT messengerCi = {VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
+    messengerCi.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
+                                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
+    messengerCi.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                              VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                              VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    messengerCi.pfnUserCallback = dbgUtilsCallback;
+    messengerCi.pUserData = nullptr;
+
+    OGRE_VK_CHECK( CreateDebugUtilsMessenger( mVkInstance, &messengerCi, nullptr, &mDebugMessenger ) );
+}
     //-------------------------------------------------------------------------
     HardwareOcclusionQuery *VulkanRenderSystem::createHardwareOcclusionQuery( void )
     {
@@ -772,8 +764,8 @@ namespace Ogre
                 reqInstanceExtensions.push_back(VulkanWindow::getRequiredExtensionName());
             }
 
-            if (debugEnabled && extensionName == "VK_EXT_debug_report")
-                reqInstanceExtensions.push_back("VK_EXT_debug_report");
+            if (debugEnabled && extensionName == "VK_EXT_debug_utils")
+                reqInstanceExtensions.push_back("VK_EXT_debug_utils");
         }
 
         reqInstanceExtensions.push_back("VK_KHR_surface"); // required for window surface
@@ -1085,6 +1077,7 @@ namespace Ogre
             hash = HashCombine( hash, rasterState );
             hash = HashCombine( hash, inputAssemblyCi );
             hash = HashCombine( hash, mssCi );
+            hash = HashCombine( hash, depthStencilStateCi );
 
             for( uint32 i = 0; i < vertexFormatCi.vertexAttributeDescriptionCount; i++ )
             {
@@ -1135,7 +1128,7 @@ namespace Ogre
         if( !mProgramBound[GPT_COMPUTE_PROGRAM] )
             return VK_NULL_HANDLE;
 
-        const auto &computeStage = shaderStages[GPT_COMPUTE_PROGRAM % GPT_PIPELINE_COUNT];
+        const auto &computeStage = mComputeShaderStage;
         if( computeStage.stage != VK_SHADER_STAGE_COMPUTE_BIT ||
             computeStage.module == VK_NULL_HANDLE )
         {
@@ -1291,6 +1284,13 @@ namespace Ogre
         mActiveDevice->mGraphicsQueue.getComputeEncoder();
         VkCommandBuffer cmdBuffer = mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer;
 
+        // DIAGNOSTIC: verify the command buffer is actually recording
+        if( cmdBuffer == VK_NULL_HANDLE )
+        {
+            LogManager::getSingleton().logError("[Vulkan][Compute] cmdBuffer is NULL after getComputeEncoder");
+            return;
+        }
+
         auto pipeline = getPipeline( mBoundComputeProfile );
         auto descriptorSet = getDescriptorSet( mBoundComputeProfile );
         if( pipeline == VK_NULL_HANDLE || descriptorSet == VK_NULL_HANDLE )
@@ -1364,37 +1364,29 @@ namespace Ogre
             return;
         }
 
-        shaderStages[prg->getType() % GPT_PIPELINE_COUNT] = shader->getPipelineShaderStageCi();
         mBoundGpuPrograms[prg->getType()] = prg->_getHash();
 
-        if( prg->getType() == GPT_COMPUTE_PROGRAM )
-        {
-            switch( shader->getDescriptorSetProfileHint() )
-            {
-            case VulkanProgram::DescriptorSetProfileGraphicsLegacy:
-                LogManager::getSingleton().logWarning(
-                    "[Vulkan] descriptor_set_profile GraphicsLegacy is not supported for compute "
-                    "dispatch yet. Falling back to ComputeImageWrite" );
-                mBoundComputeProfile = ComputeImageWrite;
-                break;
-            case VulkanProgram::DescriptorSetProfileComputeImageWrite:
-                mBoundComputeProfile = ComputeImageWrite;
-                break;
-            default:
-                mBoundComputeProfile = ComputeImageWrite;
-                break;
-            }
-        }
+        if (prg->getType() == GPT_COMPUTE_PROGRAM)
+            mComputeShaderStage = shader->getPipelineShaderStageCi();
+        else
+            shaderStages[prg->getType() % GPT_PIPELINE_COUNT] = shader->getPipelineShaderStageCi();
 
         RenderSystem::bindGpuProgram(prg);
     }
+    //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindGpuProgramParameters( GpuProgramType gptype,
-                                                       const GpuProgramParametersPtr& params,
-                                                       uint16 variabilityMask )
+                                                   const GpuProgramParametersPtr& params,
+                                                   uint16 variabilityMask )
     {
         mActiveParameters[gptype] = params;
 
-        int dstUBO = gptype % GPT_PIPELINE_COUNT;
+        // Graphics: vertex → slot 0, fragment → slot 1
+        // Compute:  always → slot 1  (matches ComputeImageWrite descriptor layout)
+        int dstUBO;
+        if( gptype == GPT_COMPUTE_PROGRAM )
+            dstUBO = 1;
+        else
+            dstUBO = gptype % GPT_PIPELINE_COUNT;
 
         auto sizeBytes = params->getConstantList().size();
         if(sizeBytes && dstUBO < 2)
@@ -1406,7 +1398,6 @@ namespace Ogre
             if (std::accumulate(mAutoParamsBufferUsage.begin(), mAutoParamsBufferUsage.end(), 0) + step >=
                 mAutoParamsBuffer->getSizeInBytes())
             {
-                // ran out of UBO memory, allocate a bigger buffer
                 resizeAutoParamsBuffer(mAutoParamsBuffer->getSizeInBytes() * 2);
             }
 
