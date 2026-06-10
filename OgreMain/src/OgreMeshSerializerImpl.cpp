@@ -638,6 +638,17 @@ namespace Ogre {
             popInnerChunk(stream);
         }
 
+        // validate vertex declarations
+        for (auto& binding : dest->vertexBufferBinding->getBindings())
+        {
+            for (auto& elem : dest->vertexDeclaration->findElementsBySource(binding.first))
+            {
+                if (elem.getOffset() + elem.getSize() > binding.second->getVertexSize())
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                                "Vertex element offset + size exceeds vertex buffer stride");
+            }
+        }
+
         // Perform any necessary colour conversions from ARGB to ABGR (UBYTE4)
         dest->convertPackedColour(_DETAIL_SWAP_RB, VET_UBYTE4_NORM);
 
@@ -750,16 +761,9 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Buffer vertex size does not agree with vertex declaration");
         }
 
-        for (const auto& elem : dest->vertexDeclaration->findElementsBySource(bindIndex))
-        {
-            if (elem.getOffset() + elem.getSize() > (size_t)vertexSize)
-                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                                "Vertex element offset + size exceeds vertex buffer stride");
-        }
-
         // Create / populate vertex buffer
         size_t vbufBytes = dest->vertexCount * (size_t)vertexSize;
-        if (vbufBytes / vertexSize != dest->vertexCount || !checkChunkRemainingSize(mCurrentstreamLen, vbufBytes, 1))
+        if (!checkChunkRemainingSize(mCurrentstreamLen, vbufBytes, 1))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining chunk data");
         HardwareVertexBufferSharedPtr vbuf;
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
