@@ -12,7 +12,7 @@ jobs:
       matrix:
         pyver: [cp314-cp314, cp312-cp312]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Docker Image
       run: docker build SDK -t pypi
     - name: Build
@@ -27,12 +27,15 @@ jobs:
     strategy:
       matrix:
         pyver: ['3.14', '3.12']
+    env:
+      # TODO: Remove once ilammy/msvc-dev-cmd is updated to support Node.js 24
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         toolset: 14.2
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.pyver }}
     # see https://github.com/actions/runner-images/issues/6627#issuecomment-1328214957
@@ -58,8 +61,8 @@ jobs:
       matrix:
         pyver: ['3.14', '3.12']
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.pyver }}
     - name: Build
