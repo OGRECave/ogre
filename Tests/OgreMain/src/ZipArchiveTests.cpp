@@ -152,6 +152,14 @@ TEST_F(ZipArchiveTests,FindNonRecursive)
     EXPECT_EQ(String("rootfile2.txt"), vec->at(1));
 }
 //--------------------------------------------------------------------------
+TEST_F(ZipArchiveTests,FindExactNonRecursive)
+{
+    StringVectorPtr vec = arch->find("rootfile.txt", false);
+
+    EXPECT_EQ((size_t)1, vec->size());
+    EXPECT_EQ(String("rootfile.txt"), vec->at(0));
+}
+//--------------------------------------------------------------------------
 TEST_F(ZipArchiveTests,FindRecursive)
 {
     StringVectorPtr vec = arch->find("*.material", true);
