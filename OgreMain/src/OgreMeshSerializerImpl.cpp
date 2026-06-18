@@ -643,6 +643,8 @@ namespace Ogre {
         {
             for (auto& elem : dest->vertexDeclaration->findElementsBySource(binding.first))
             {
+                if(elem.getSize() == 0)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid vertex element type");
                 if (elem.getOffset() + elem.getSize() > binding.second->getVertexSize())
                     OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                                 "Vertex element offset + size exceeds vertex buffer stride");
@@ -740,6 +742,8 @@ namespace Ogre {
         readShorts(stream, &bindIndex, 1);
         // unsigned short vertexSize;   // Per-vertex size, must agree with declaration at this index
         readShorts(stream, &vertexSize, 1);
+        if (dest->vertexBufferBinding->isBufferBound(bindIndex))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Duplicate vertex buffer binding");
         pushInnerChunk(stream);
         {
         // Check for vertex data header
