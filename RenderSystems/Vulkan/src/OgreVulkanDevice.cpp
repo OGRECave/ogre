@@ -80,10 +80,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     VkInstance VulkanDevice::createInstance( FastArray<const char *> &extensions,
                                              FastArray<const char *> &layers,
-                                             PFN_vkDebugReportCallbackEXT debugCallback)
+                                             void* pNext)
     {
-
-
         VkInstanceCreateInfo createInfo = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
         VkApplicationInfo appInfo = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
 
@@ -97,13 +95,7 @@ namespace Ogre
 
         createInfo.enabledExtensionCount = extensions.size();
         createInfo.ppEnabledExtensionNames = extensions.data();
-
-#if 1 //OGRE_DEBUG_MODE
-        VkDebugReportCallbackCreateInfoEXT debugCb = {VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT};
-        debugCb.pfnCallback = debugCallback;
-        debugCb.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
-        createInfo.pNext = &debugCb;
-#endif
+        createInfo.pNext = pNext;
 
         VkInstance instance;
         OGRE_VK_CHECK(vkCreateInstance(&createInfo, 0, &instance));

@@ -698,8 +698,12 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
         if( texUnit >= OGRE_MAX_TEXTURE_LAYERS )
             return;
 
-        if( mStorageImageViews[texUnit] != VK_NULL_HANDLE && mDevice )
-            vkDestroyImageView( mDevice->mDevice, mStorageImageViews[texUnit], nullptr );
+        if( texture == mStorageTextures[texUnit] && mStorageImageViews[texUnit] != VK_NULL_HANDLE )
+            return;
+
+        // NEVER destroy here — just orphan the old view for later cleanup
+        if( mStorageImageViews[texUnit] != VK_NULL_HANDLE )
+            mDeferredViewDeletions[mDevice->mGraphicsQueue.mCurrentFrameIdx].push_back( mStorageImageViews[texUnit] );
 
         mStorageImageViews[texUnit] = VK_NULL_HANDLE;
         mStorageTextures[texUnit] = texture;
@@ -708,27 +712,42 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
         if( !texture )
             return;
 
-        VkImageView imageView = texture->getDefaultDisplaySrv();
         const int maxMipLevel = static_cast<int>( texture->getNumMipmaps() );
         const int clampedMip = std::max( 0, std::min( mipmapLevel, maxMipLevel ) );
-        if( clampedMip > 0 && mDevice )
-        {
-            imageView = texture->_createView( static_cast<uint8>( clampedMip ), 1u, 0u,
-                                              texture->getNumLayers() );
-            mStorageImageViews[texUnit] = imageView;
-        }
+
+        VkImageViewUsageCreateInfo viewUsageCi = {VK_STRUCTURE_TYPE_IMAGE_VIEW_USAGE_CREATE_INFO};
+        viewUsageCi.usage = VK_IMAGE_USAGE_STORAGE_BIT;
+
+        VkImageViewCreateInfo viewCi = {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
+        viewCi.pNext = &viewUsageCi;
+        viewCi.image = texture->getFinalTextureName();
+        viewCi.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        viewCi.format = VulkanMappings::get( texture->getFormat() );
+        viewCi.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        viewCi.subresourceRange.baseMipLevel = static_cast<uint32>( clampedMip );
+        viewCi.subresourceRange.levelCount = 1;
+        viewCi.subresourceRange.baseArrayLayer = 0;
+        viewCi.subresourceRange.layerCount = 1;
+
+        VkImageView imageView;
+        OGRE_VK_CHECK( vkCreateImageView( mDevice->mDevice, &viewCi, nullptr, &imageView ) );
+
+        mStorageImageViews[texUnit] = imageView;
 
         mStorageImageInfos[texUnit].sampler = VK_NULL_HANDLE;
         mStorageImageInfos[texUnit].imageView = imageView;
         mStorageImageInfos[texUnit].imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    }
 
+        // After creating the new view, clear stale cache entries
+        mProfiles[ComputeImageWrite].cache.clear();
+    }
+    //-------------------------------------------------------------------------
     void VulkanRenderSystem::clearStorageTextureBindings()
     {
         for( size_t i = 0u; i < mStorageImageViews.size(); ++i )
         {
-            if( mStorageImageViews[i] != VK_NULL_HANDLE && mDevice )
-                vkDestroyImageView( mDevice->mDevice, mStorageImageViews[i], nullptr );
+            if( mStorageImageViews[i] != VK_NULL_HANDLE )
+                mDeferredViewDeletions[mDevice->mGraphicsQueue.mCurrentFrameIdx].push_back( mStorageImageViews[i] );
 
             mStorageImageViews[i] = VK_NULL_HANDLE;
             mStorageTextures[i] = nullptr;
@@ -795,11 +814,33 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
                 "Debug Layer requested, but VK_LAYER_KHRONOS_validation layer not present");
         }
 
-        mVkInstance = VulkanDevice::createInstance(reqInstanceExtensions, instanceLayers, dbgFunc);
+        VkDebugUtilsMessengerCreateInfoEXT debugCi = {VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
+        void *pNext = nullptr;
+
+        if( mHasValidationLayers )
+        {
+            debugCi.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
+                                      VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
+            debugCi.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                                  VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                                  VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+            debugCi.pfnUserCallback = dbgUtilsCallback;
+            debugCi.pUserData = nullptr;
+            pNext = &debugCi;
+        }
+
+        mVkInstance = VulkanDevice::createInstance(reqInstanceExtensions, instanceLayers, pNext);
         volkLoadInstanceOnly(mVkInstance);
 
         if(mHasValidationLayers)
+        {
+            LogManager::getSingleton().logMessage("[Vulkan] Setting up debug utils messenger...");
             addInstanceDebugCallback();
+        }
+        else
+        {
+            LogManager::getSingleton().logMessage("[Vulkan] No validation layers active");
+        }
     }
     //-------------------------------------------------------------------------
     RenderWindow *VulkanRenderSystem::_createRenderWindow( const String &name, uint32 width, uint32 height,
@@ -976,7 +1017,13 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
         }
     }
     //-------------------------------------------------------------------------
-    void VulkanRenderSystem::_beginFrame( void ) {}
+    void VulkanRenderSystem::_beginFrame( void )
+    {
+        uint32 frameIdx = mDevice->mGraphicsQueue.mCurrentFrameIdx;
+        for( VkImageView view : mDeferredViewDeletions[frameIdx] )
+            vkDestroyImageView( mDevice->mDevice, view, nullptr );
+        mDeferredViewDeletions[frameIdx].clear();
+    }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::_notifyActiveEncoderEnded()
     {
@@ -1056,6 +1103,7 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
 
         retVal = prf.pool->allocate();
         prf.writes[0].dstSet = retVal;
+        prf.writes[0].pImageInfo = &mComputeImageInfo;  // ← ADD THIS
         prf.writes[1].dstSet = retVal;
         vkUpdateDescriptorSets( mActiveDevice->mDevice, 2u, prf.writes.data(), 0, nullptr );
         prf.cache[hash] = retVal;
@@ -1296,10 +1344,10 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
         if( pipeline == VK_NULL_HANDLE || descriptorSet == VK_NULL_HANDLE )
         {
             LogManager::getSingleton().logWarning(
-                "[Vulkan] Compute dispatch skipped: missing compute pipeline or descriptor set "
-                "(ensure unordered_access_mip texture unit is bound)" );
+                StringUtil::format("[Vulkan] Compute dispatch skipped: pipeline=%p descriptorSet=%p",
+                                  (void*)pipeline, (void*)descriptorSet));
             return;
-        }
+    }
 
         auto &prf = mProfiles[mBoundComputeProfile];
         const uint32 dynOffset = mUBODynOffsets[1];
