@@ -338,6 +338,14 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL dbgUtilsCallback(
         OGRE_DELETE mSPIRVProgramFactory;
         mSPIRVProgramFactory = 0;
 
+        // Flush deferred image view deletions
+        for( uint32 i = 0; i < FRAMES_IN_FLIGHT; ++i )
+        {
+            for( VkImageView view : mDeferredViewDeletions[i] )
+                vkDestroyImageView( mDevice->mDevice, view, nullptr );
+            mDeferredViewDeletions[i].clear();
+        }
+
         clearStorageTextureBindings();
 
         for(auto& p : mProfiles)
