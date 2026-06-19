@@ -45,18 +45,16 @@ namespace Ogre {
         // Keep looping while not hitting delimiter
         while ((readCount = read(tmpBuf, OGRE_STREAM_TEMP_SIZE-1)) != 0)
         {
-            // Terminate string
-            tmpBuf[readCount] = '\0';
-
-            char* p = strchr(tmpBuf, '\n');
+            const char* p = static_cast<const char*>(memchr(tmpBuf, '\n', readCount));
+            size_t appendCount = readCount;
             if (p != 0)
             {
+                appendCount = static_cast<size_t>(p - tmpBuf);
                 // Reposition backwards
-                skip((long)(p + 1 - tmpBuf - readCount));
-                *p = '\0';
+                skip(static_cast<long>(appendCount + 1 - readCount));
             }
 
-            retString += tmpBuf;
+            retString.append(tmpBuf, appendCount);
 
             if (p != 0)
             {
