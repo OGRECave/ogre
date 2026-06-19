@@ -67,6 +67,7 @@ namespace Ogre
         ///
         /// Thus we generate VkRenderPass and FBOs together
         VkRenderPass mRenderPass;
+        VkRenderPass mRenderPassLoad;
 
         VulkanFrameBufferDescValue();
     };
@@ -80,6 +81,7 @@ namespace Ogre
         VulkanTextureGpu* mDepth;
         uint8             mNumColourEntries = 0;
         uint8             mSlice = 0;
+        bool              mResuming = false;
     private:
         // 1 per MRT
         // 1 per MRT MSAA resolve

@@ -1019,6 +1019,9 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::_beginFrame( void )
     {
+        if( mCurrentRenderPassDescriptor )
+            mCurrentRenderPassDescriptor->mResuming = false;
+
         uint32 frameIdx = mDevice->mGraphicsQueue.mCurrentFrameIdx;
         for( VkImageView view : mDeferredViewDeletions[frameIdx] )
             vkDestroyImageView( mDevice->mDevice, view, nullptr );
