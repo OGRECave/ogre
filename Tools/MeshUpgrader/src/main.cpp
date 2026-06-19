@@ -438,6 +438,8 @@ struct MeshResourceCreator : public MeshSerializerListener
 
 int main(int numargs, char** args)
 {
+    MeshSerializer::enablePre1_8Formats(true);
+
     int retCode = 0;
 
     LogManager logMgr;

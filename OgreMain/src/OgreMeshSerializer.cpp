@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreMeshSerializerImpl.h"
 
 namespace Ogre {
-
+    bool MeshSerializer::mSupportLegacyFormats = false;
     class _OgrePrivate MeshVersionData : public SerializerAlloc
     {
     public:
@@ -60,6 +60,9 @@ namespace Ogre {
         mVersionData.push_back(OGRE_NEW MeshVersionData(
             MESH_VERSION_1_8, "[MeshSerializer_v1.8]", 
             OGRE_NEW MeshSerializerImpl_v1_8()));
+
+        if(!mSupportLegacyFormats)
+            return;
 
         mVersionData.push_back(OGRE_NEW MeshVersionData(
             MESH_VERSION_1_7, "[MeshSerializer_v1.41]", 
