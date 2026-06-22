@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreGLContext.h"
 #include "OgreGLNativeSupport.h"
 #include "OgreGLRenderTexture.h"
+#include "OgreGLDepthBufferCommon.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #include "OgreEGLWindow.h"
@@ -45,6 +46,49 @@ namespace Ogre {
     String VideoMode::getDescription() const
     {
         return StringUtil::format("%4d x %4d", width, height);
+    }
+
+    void GLRenderSystemCommon::_unregisterContext(GLContext *context)
+    {
+        for(auto & rt : mRenderTargets)
+        {
+            if(auto target = dynamic_cast<GLRenderTarget*>(rt.second))
+            {
+                if(auto fbo = target->getFBO())
+                {
+                    // Check before notifyContextDestroyed clears it
+                    bool fboWasReset = (fbo->getContext() == context);
+                    fbo->notifyContextDestroyed(context);
+                    if(fboWasReset)
+                    {
+                        // The FBO will be recreated in a new context; the depth buffer won't be
+                        // re-attached automatically unless we clear the pointer here, because the
+                        // validity check in _setRenderTarget only looks at the depth buffer's context,
+                        // not whether the FBO itself was just recreated.
+                        rt.second->detachDepthBuffer();
+                    }
+                }
+            }
+        }
+
+        if (mCurrentContext == context)
+        {
+            // Change the context to something else so that a valid context
+            // remains active. When this is the main context being unregistered,
+            // we set the main context to 0.
+            if (mCurrentContext != mMainContext)
+            {
+                _switchContext(mMainContext);
+            }
+            else
+            {
+                /// No contexts remain
+                mCurrentContext->endCurrent();
+                mCurrentContext = 0;
+                mMainContext = 0;
+                //mStateCacheManager = 0;
+            }
+        }
     }
 
     void GLRenderSystemCommon::initConfigOptions()

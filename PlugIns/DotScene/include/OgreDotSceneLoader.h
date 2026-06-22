@@ -87,8 +87,8 @@ class _OgreDotScenePluginExport DotScenePlugin : public Plugin
 
     void install() override;
     void initialise() override {}
-    void shutdown() override;
-    void uninstall() override {}
+    void uninstall() override;
+    void shutdown() override {}
 private:
     Codec* mCodec;
 };

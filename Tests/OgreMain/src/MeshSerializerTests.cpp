@@ -68,6 +68,7 @@ THE SOFTWARE.
 //--------------------------------------------------------------------------
 void MeshSerializerTests::SetUp()
 {
+    MeshSerializer::enablePre1_8Formats(true);
     mErrorFactor = 0.05;
 
     new DefaultHardwareBufferManager();
@@ -148,6 +149,7 @@ void MeshSerializerTests::TearDown()
     
     delete Root::getSingletonPtr();
     delete DefaultHardwareBufferManager::getSingletonPtr();
+    MeshSerializer::enablePre1_8Formats(false);
 }
 //--------------------------------------------------------------------------
 TEST_F(MeshSerializerTests,Mesh_clone)

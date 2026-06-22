@@ -51,7 +51,32 @@ namespace Ogre {
     *  @{
     */
 
-    struct MeshLodUsage;
+    /** A way of recording the way each LODs is recorded this Mesh. */
+    struct MeshLodUsage
+    {
+        /** User-supplied values used to determine on which distance the lod is applies.
+
+            This is required in case the LOD strategy changes.
+        */
+        Real userValue;
+
+        /** Value used by to determine when this LOD applies.
+
+            May be interpreted differently by different strategies.
+            Transformed from user-supplied values with LodStrategy::transformUserValue.
+        */
+        Real value;
+
+        /// Only relevant if mIsLodManual is true, the name of the alternative mesh to use.
+        String manualName;
+        /// Hard link to mesh to avoid looking up each time.
+        mutable MeshPtr manualMesh;
+        /// Edge list for this LOD level (may be derived from manual mesh).
+        mutable EdgeData* edgeData;
+
+        MeshLodUsage() : userValue(0.0), value(0.0), edgeData(0) {}
+    };
+
     class LodStrategy;
 
     /** Resource holding data about 3D mesh.
@@ -158,16 +183,12 @@ namespace Ogre {
             IndexMap& blendIndexToBoneIndexMap,
             VertexData* targetVertexData);
 #if !OGRE_NO_MESHLOD
-        const LodStrategy *mLodStrategy;
         bool mHasManualLodLevel;
-        ushort mNumLods;
-        MeshLodUsageList mMeshLodUsageList;
 #else
-        const LodStrategy *mLodStrategy;
         const bool mHasManualLodLevel;
-        const ushort mNumLods;
-        MeshLodUsageList mMeshLodUsageList;
 #endif
+        const LodStrategy *mLodStrategy;
+        MeshLodUsageList mMeshLodUsageList;
         HardwareBufferManagerBase* mBufferManager;
         HardwareBufferUsage mVertexBufferUsage;
         HardwareBufferUsage mIndexBufferUsage;
@@ -496,7 +517,7 @@ namespace Ogre {
 
             This number includes the original model.
         */
-        ushort getNumLodLevels(void) const { return mNumLods; }
+        ushort getNumLodLevels(void) const { return mMeshLodUsageList.size(); }
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
 
@@ -937,33 +958,6 @@ namespace Ogre {
         UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
         /// @overload
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
-    };
-
-    /** A way of recording the way each LODs is recorded this Mesh. */
-    struct MeshLodUsage
-    {
-        /** User-supplied values used to determine on which distance the lod is applies.
-
-            This is required in case the LOD strategy changes.
-        */
-        Real userValue;
-
-        /** Value used by to determine when this LOD applies.
-
-            May be interpreted differently by different strategies.
-            Transformed from user-supplied values with LodStrategy::transformUserValue.
-        */
-        Real value;
-        
-
-        /// Only relevant if mIsLodManual is true, the name of the alternative mesh to use.
-        String manualName;
-        /// Hard link to mesh to avoid looking up each time.
-        mutable MeshPtr manualMesh;
-        /// Edge list for this LOD level (may be derived from manual mesh).
-        mutable EdgeData* edgeData;
-
-        MeshLodUsage() : userValue(0.0), value(0.0), edgeData(0) {}
     };
 
     /** @} */

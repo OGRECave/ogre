@@ -52,6 +52,13 @@ enum FuzzTarget {
   FUZZ_TARGET_COUNT
 };
 
+class FuzzSkeleton final : public Ogre::Skeleton {
+public:
+    FuzzSkeleton() : Ogre::Skeleton(Ogre::SkeletonManager::getSingletonPtr(), "fuzz.skeleton", 0, "General") {}
+
+    void handleException() { mLoadingState.store(LOADSTATE_PREPARED); }
+};
+
 static bool g_initialized = false;
 
 static void global_init() {
@@ -93,8 +100,7 @@ static void fuzz_mesh(const uint8_t *data, size_t size) {
 }
 
 static void fuzz_skeleton(const uint8_t *data, size_t size) {
-  Ogre::SkeletonPtr skeleton =
-      Ogre::SkeletonManager::getSingleton().create("fuzz.skeleton", "General");
+  auto skeleton = std::make_shared<FuzzSkeleton>();
 
   Ogre::DataStreamPtr stream(
       new Ogre::MemoryDataStream(const_cast<uint8_t *>(data), size, false, true));
@@ -103,10 +109,9 @@ static void fuzz_skeleton(const uint8_t *data, size_t size) {
   try {
     serializer.importSkeleton(stream, skeleton.get());
   } catch (Ogre::Exception &) {
+    skeleton->handleException();
   } catch (std::exception &) {
   }
-
-  Ogre::SkeletonManager::getSingleton().remove(skeleton);
 }
 
 static void fuzz_config(const uint8_t *data, size_t size) {

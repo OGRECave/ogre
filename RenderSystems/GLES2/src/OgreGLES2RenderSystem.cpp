@@ -1288,33 +1288,7 @@ namespace Ogre {
         if(HardwareBufferManager::getSingletonPtr())
             static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->notifyContextDestroyed(context);
 
-        for(const auto& t : mRenderTargets)
-        {
-            if(auto target = dynamic_cast<GLRenderTarget*>(t.second))
-            {
-                if(auto fbo = target->getFBO())
-                    fbo->notifyContextDestroyed(context);
-            }
-        }
-
-        if (mCurrentContext == context)
-        {
-            // Change the context to something else so that a valid context
-            // remains active. When this is the main context being unregistered,
-            // we set the main context to 0.
-            if (mCurrentContext != mMainContext)
-            {
-                _switchContext(mMainContext);
-            }
-            else
-            {
-                // No contexts remain
-                mCurrentContext->endCurrent();
-                mCurrentContext = 0;
-                mMainContext = 0;
-                mStateCacheManager = 0;
-            }
-        }
+        GLRenderSystemCommon::_unregisterContext(context);
     }
 
     uint32 GLES2RenderSystem::_createVao()

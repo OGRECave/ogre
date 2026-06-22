@@ -184,7 +184,17 @@ namespace {
         }
 
         // Construct & return stream
-        auto ret = std::make_shared<MemoryDataStream>(lookUpFileName, zip_entry_size(mZipFile), true, true);
+        size_t entrySize = zip_entry_size(mZipFile);
+        size_t compSize  = zip_entry_comp_size(mZipFile);
+        // repetitive log files have a typical ratio of ~50:1, XML 30:1, images 5:1
+        const size_t MAX_RATIO = 100;
+        if (entrySize > 0 && (compSize == 0 || entrySize / compSize > MAX_RATIO))
+        {
+            zip_entry_close(mZipFile);
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "zip entry has suspicious compression ratio (possible decompression bomb): " + lookUpFileName);
+        }
+        auto ret = std::make_shared<MemoryDataStream>(lookUpFileName, entrySize, true, true);
 
         if(zip_entry_noallocread(mZipFile, ret->getPtr(), ret->size()) < 0)
         {
@@ -238,13 +248,14 @@ namespace {
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
+        // this "flattens" the zip, so "*txt" will find all txt files, even in subdirs
         bool wildCard = pattern.find('*') != String::npos;
             
         for (auto& f : mFileList)
             if ((dirs == (f.compressedSize == size_t (-1))) &&
-                (recursive || full_match || wildCard))
-                // Check basename matches pattern (zip is case insensitive)
-                if (StringUtil::match(full_match ? f.filename : f.basename, pattern, false))
+                (recursive || full_match || wildCard || f.path.empty()))
+                // Check basename matches pattern
+                if (StringUtil::match(full_match ? f.filename : f.basename, pattern, isCaseSensitive()))
                     ret->push_back(f.filename);
 
         return ret;
@@ -258,13 +269,14 @@ namespace {
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
+        // this "flattens" the zip, so "*txt" will find all txt files, even in subdirs
         bool wildCard = pattern.find('*') != String::npos;
 
         for (auto& f : mFileList)
             if ((dirs == (f.compressedSize == size_t (-1))) &&
-                (recursive || full_match || wildCard))
-                // Check name matches pattern (zip is case insensitive)
-                if (StringUtil::match(full_match ? f.filename : f.basename, pattern, false))
+                (recursive || full_match || wildCard || f.path.empty()))
+                // Check name matches pattern
+                if (StringUtil::match(full_match ? f.filename : f.basename, pattern, isCaseSensitive()))
                     ret->push_back(f);
 
         return ret;

@@ -94,6 +94,12 @@ namespace Ogre {
         MeshSerializer();
         virtual ~MeshSerializer();
 
+        /** Support for v1.7 [MeshSerializer_v1.41] and earlier legacy formats.
+         * @attention Legacy formats are not fuzzer tested and contain security vulnerabilities
+         * @param enable True to enable legacy formats, false to disable.
+         */
+        static void enablePre1_8Formats(bool enable) { mSupportLegacyFormats = enable; }
+
         /** Exports a mesh to the file specified, in a specific version format. 
 
          This method takes an externally created Mesh object, and exports it
@@ -149,7 +155,7 @@ namespace Ogre {
         MeshVersionDataList mVersionData;
 
         MeshSerializerListener *mListener;
-
+        static bool mSupportLegacyFormats;
     };
 
     /** 

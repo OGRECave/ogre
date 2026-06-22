@@ -41,6 +41,8 @@ THE SOFTWARE.
 #define STBI_NO_STDIO
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
+// guard against wrong image headers, limits to 16K x 16K
+#define STBI_MAX_DIMENSIONS 16384
 #include "stbi/stb_image.h"
 
 #ifdef HAVE_ZLIB
@@ -176,9 +178,9 @@ namespace Ogre {
 
         if (!pixelData)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                "Error decoding image: " + String(stbi_failure_reason()),
-                "STBIImageCodec::decode");
+            const char* reason = stbi_failure_reason();
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Error decoding image: " + String(reason ? reason : "no reason"));
         }
 
         if (width <= 0 || height <= 0)

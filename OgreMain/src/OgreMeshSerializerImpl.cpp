@@ -45,12 +45,16 @@ namespace Ogre {
     /// stream overhead = ID + size
     const long MSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
 
-    static bool checkStreamRemainingSize(const DataStreamPtr& stream, size_t itemCount,
+    static bool checkChunkRemainingSize(size_t chunkSize, size_t itemCount,
         size_t itemSize)
     {
         if (itemCount == 0)
             return true;
-        size_t remaining = stream->size() - stream->tell();
+
+        if (chunkSize <= MSTREAM_OVERHEAD_SIZE || itemSize == 0)
+            return false;
+
+        size_t remaining = chunkSize - MSTREAM_OVERHEAD_SIZE;
         return remaining / itemSize >= itemCount;
     }
     //---------------------------------------------------------------------
@@ -58,6 +62,7 @@ namespace Ogre {
     {
         // Version number
         mVersion = "[MeshSerializer_v1.100]";
+        exportedLodCount = 0;
     }
     //---------------------------------------------------------------------
     MeshSerializerImpl::~MeshSerializerImpl()
@@ -598,8 +603,8 @@ namespace Ogre {
 
         unsigned int vertexCount = 0;
         readInts(stream, &vertexCount, 1);
-        if (stream->size() < stream->tell() + vertexCount)
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex count exceeds remaining stream data");
+        if (!checkChunkRemainingSize(mCurrentstreamLen, vertexCount, 1))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex count exceeds remaining chunk data");
         dest->vertexCount = vertexCount;
         // Find optional geometry streams
         if (!stream->eof())
@@ -631,6 +636,19 @@ namespace Ogre {
                 backpedalChunkHeader(stream);
             }
             popInnerChunk(stream);
+        }
+
+        // validate vertex declarations
+        for (auto& binding : dest->vertexBufferBinding->getBindings())
+        {
+            for (auto& elem : dest->vertexDeclaration->findElementsBySource(binding.first))
+            {
+                if(elem.getSize() == 0)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid vertex element type");
+                if (elem.getOffset() + elem.getSize() > binding.second->getVertexSize())
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                                "Vertex element offset + size exceeds vertex buffer stride");
+            }
         }
 
         // Perform any necessary colour conversions from ARGB to ABGR (UBYTE4)
@@ -724,6 +742,8 @@ namespace Ogre {
         readShorts(stream, &bindIndex, 1);
         // unsigned short vertexSize;   // Per-vertex size, must agree with declaration at this index
         readShorts(stream, &vertexSize, 1);
+        if (dest->vertexBufferBinding->isBufferBound(bindIndex))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Duplicate vertex buffer binding");
         pushInnerChunk(stream);
         {
         // Check for vertex data header
@@ -747,8 +767,8 @@ namespace Ogre {
 
         // Create / populate vertex buffer
         size_t vbufBytes = dest->vertexCount * (size_t)vertexSize;
-        if (vbufBytes / vertexSize != dest->vertexCount || stream->size() < stream->tell() + vbufBytes)
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining stream data");
+        if (!checkChunkRemainingSize(mCurrentstreamLen, vbufBytes, 1))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining chunk data");
         HardwareVertexBufferSharedPtr vbuf;
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             vertexSize,
@@ -942,8 +962,8 @@ namespace Ogre {
         readBools(stream, &idx32bit, 1);
         if (indexCount > 0)
         {
-            if (!checkStreamRemainingSize(stream, indexCount, idx32bit ? sizeof(unsigned int) : sizeof(unsigned short)))
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Index buffer size exceeds stream size");
+            if (!checkChunkRemainingSize(mCurrentstreamLen, indexCount, idx32bit ? sizeof(unsigned int) : sizeof(unsigned short)))
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Index buffer size exceeds chunk size");
             if (idx32bit)
             {
                 ibuf = pMesh->getHardwareBufferManager()->createIndexBuffer(
@@ -1356,8 +1376,8 @@ namespace Ogre {
         String strategyName = readString(stream);
         uint16 numLods;
         readShorts(stream, &numLods, 1);
-        if (!checkStreamRemainingSize(stream, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
+        if (!checkChunkRemainingSize(mCurrentstreamLen, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
         pushInnerChunk(stream);
         for (int lodID = 1; lodID < numLods; lodID++){
             unsigned short streamID = readChunk(stream);
@@ -1416,21 +1436,17 @@ namespace Ogre {
         pMesh->setLodStrategy(strategy);
 
         // unsigned short numLevels;
-        readShorts(stream, &(pMesh->mNumLods), 1);
-        // num LOD levels must be at least 1 (base mesh)
-        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
-        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
-        for (auto *s : pMesh->getSubMeshes())
-        {
-            assert(s->mLodFaceList.empty());
-            s->mLodFaceList.resize(pMesh->mNumLods-1);
-        }
+        uint16 numLods;
+        readShorts(stream, &numLods, 1);
+        numLods = std::max<ushort>(numLods, 1);
 
-        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
+        if (!checkChunkRemainingSize(mCurrentstreamLen, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
+
+        pMesh->_setLodInfo(numLods);
         pushInnerChunk(stream);
         // lodID=0 is the original mesh. We need to skip it.
-        for(int lodID = 1; lodID < pMesh->mNumLods; lodID++){
+        for(int lodID = 1; lodID < pMesh->getNumLodLevels(); lodID++){
             // Read depth
             MeshLodUsage& usage = pMesh->mMeshLodUsageList[lodID];
             unsigned short streamID = readChunk(stream);
@@ -1490,9 +1506,12 @@ namespace Ogre {
             unsigned int bufferIndex;
             readInts(stream, &bufferIndex, 1);
             if(bufferIndex != (unsigned int)-1) {
+                if (bufferIndex - 1 >= (unsigned int)lodNum - 1)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid LOD buffer index in mesh LOD data");
                 // copy buffer pointer
                 indexData->indexBuffer = s->mLodFaceList.at(bufferIndex - 1)->indexBuffer;
-                assert(indexData->indexBuffer);
+                if (!indexData->indexBuffer)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Referenced LOD index buffer is null");
             } else {
                 // generate buffers
 
@@ -1503,8 +1522,8 @@ namespace Ogre {
                 unsigned int buffIndexCount;
                 readInts(stream, &buffIndexCount, 1);
 
-                if (!checkStreamRemainingSize(stream, buffIndexCount, idx32Bit ? 4 : 2))
-                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD index data exceeds stream size");
+                if (!checkChunkRemainingSize(mCurrentstreamLen, buffIndexCount, idx32Bit ? 4 : 2))
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD index data exceeds chunk size");
 
                 indexData->indexBuffer = pMesh->getHardwareBufferManager()->createIndexBuffer(
                     idx32Bit ? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT,
@@ -2487,8 +2506,10 @@ namespace Ogre {
         if (target > pMesh->getNumSubMeshes())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid target for vertex animation track");
 
-        VertexAnimationTrack* track = anim->createVertexTrack(target,
-            pMesh->getVertexDataByTrackHandle(target), animType);
+        VertexData* vdata = pMesh->getVertexDataByTrackHandle(target);
+        if (!vdata)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Animation track references target with no vertex data");
+        VertexAnimationTrack* track = anim->createVertexTrack(target, vdata, animType);
 
         // keyframes
         if (!stream->eof())
@@ -2877,9 +2898,13 @@ namespace Ogre {
                 sm->mLodFaceList[lodNum - 1] = indexData;
                 unsigned int numIndexes;
                 readInts(stream, &numIndexes, 1);
-                indexData->indexCount = static_cast<size_t>(numIndexes);
                 bool idx32Bit;
                 readBools(stream, &idx32Bit, 1);
+
+                if (!checkChunkRemainingSize(mCurrentstreamLen, numIndexes, idx32Bit ? 4 : 2))
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD index data exceeds chunk size");
+
+                indexData->indexCount = numIndexes;
 
                 if (idx32Bit)
                 {
@@ -2938,8 +2963,8 @@ namespace Ogre {
         String strategyName = readString(stream);
         uint16 numLods;
         readShorts(stream, &numLods, 1);
-        if (!checkStreamRemainingSize(stream, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
+        if (!checkChunkRemainingSize(mCurrentstreamLen, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
         bool manual;
         readBools(stream, &manual, 1); // missing in v1_9
         pushInnerChunk(stream);
@@ -3005,14 +3030,18 @@ namespace Ogre {
             pMesh->setLodStrategy(strategy);
 
         // unsigned short numLevels;
-        readShorts(stream, &(pMesh->mNumLods), 1);
-        // num LOD levels must be at least 1 (base mesh)
-        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
-        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
-        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
-        // bool manual;  (true for manual alternate meshes, false for generated)
-        readBools(stream, &(pMesh->mHasManualLodLevel), 1);
+        uint16 numLods;
+        readShorts(stream, &numLods, 1);
+        numLods = std::max<ushort>(numLods, 1);
+
+        if (!checkChunkRemainingSize(mCurrentstreamLen, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
+
+        pMesh->mMeshLodUsageList.resize(numLods);
+
+        bool manual; // true for manual alternate meshes, false for generated
+        readBools(stream, &manual, 1);
+        pMesh->mHasManualLodLevel = manual;
 
         // Preallocate submesh lod face data if not manual
         if (!pMesh->hasManualLodLevel())
@@ -3022,13 +3051,13 @@ namespace Ogre {
             {
                 SubMesh* sm = pMesh->getSubMesh(i);
                 assert(sm->mLodFaceList.empty());
-                sm->mLodFaceList.resize(pMesh->mNumLods - 1);
+                sm->mLodFaceList.resize(numLods - 1);
             }
         }
 
         pushInnerChunk(stream);
         // Loop from 1 rather than 0 (full detail index is not in file)
-        for (i = 1; i < pMesh->mNumLods; ++i)
+        for (i = 1; i < numLods; ++i)
         {
             streamID = readChunk(stream);
             if (streamID != M_MESH_LOD_USAGE)
@@ -3328,8 +3357,8 @@ namespace Ogre {
         // String strategyName = readString(stream); // missing in v1_4
         uint16 numLods;
         readShorts(stream, &numLods, 1);
-        if (!checkStreamRemainingSize(stream, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
+        if (!checkChunkRemainingSize(mCurrentstreamLen, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
         bool manual;
         readBools(stream, &manual, 1); // missing in v1_9
         pushInnerChunk(stream);
@@ -3392,12 +3421,14 @@ namespace Ogre {
         pMesh->setLodStrategy(strategy);
 
         // unsigned short numLevels;
-        readShorts(stream, &(pMesh->mNumLods), 1);
-        // num LOD levels must be at least 1 (base mesh)
-        pMesh->mNumLods = std::max<ushort>(pMesh->mNumLods, 1);
-        pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
-        if (!checkStreamRemainingSize(stream, pMesh->mNumLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds stream size");
+        uint16 numLods;
+        readShorts(stream, &numLods, 1);
+        numLods = std::max<ushort>(numLods, 1);
+
+        if (!checkChunkRemainingSize(mCurrentstreamLen, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
+
+        pMesh->mMeshLodUsageList.resize(numLods);
         bool manual; // true for manual alternate meshes, false for generated
         readBools(stream, &manual, 1);
 
@@ -3409,12 +3440,12 @@ namespace Ogre {
             for (auto *s : pMesh->getSubMeshes())
             {
                 assert(s->mLodFaceList.empty());
-                s->mLodFaceList.resize(pMesh->mNumLods - 1);
+                s->mLodFaceList.resize(numLods - 1);
             }
         }
         pushInnerChunk(stream);
         // Loop from 1 rather than 0 (full detail index is not in file)
-        for (i = 1; i < pMesh->mNumLods; ++i)
+        for (i = 1; i < numLods; ++i)
         {
             streamID = readChunk(stream);
             if (streamID != M_MESH_LOD_USAGE)
@@ -3895,6 +3926,8 @@ namespace Ogre {
 
         unsigned int vertexCount = 0;
         readInts(stream, &vertexCount, 1);
+        if (!checkChunkRemainingSize(mCurrentstreamLen, vertexCount, sizeof(float) * 3)) // At least positions
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex count exceeds remaining chunk data");
         dest->vertexCount = vertexCount;
 
         // Vertex buffers
@@ -3962,6 +3995,8 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf;
         // float* pNormals (x, y, z order x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_FLOAT3, VES_NORMAL);
+        if (!checkChunkRemainingSize(mCurrentstreamLen, dest->vertexCount, sizeof(float) * 3))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining chunk data");
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
@@ -3978,6 +4013,8 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf;
         // unsigned long* pColours (RGBA 8888 format x numVertices)
         dest->vertexDeclaration->addElement(bindIdx, 0, VET_COLOUR, VES_DIFFUSE);
+        if (!checkChunkRemainingSize(mCurrentstreamLen, dest->vertexCount, 4))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining chunk data");
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,
@@ -4002,6 +4039,8 @@ namespace Ogre {
             VertexElement::multiplyTypeCount(VET_FLOAT1, dim),
             VES_TEXTURE_COORDINATES,
             texCoordSet);
+        if (!checkChunkRemainingSize(mCurrentstreamLen, dest->vertexCount, dest->vertexDeclaration->getVertexSize(bindIdx)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Vertex buffer size exceeds remaining chunk data");
         vbuf = pMesh->getHardwareBufferManager()->createVertexBuffer(
             dest->vertexDeclaration->getVertexSize(bindIdx),
             dest->vertexCount,

@@ -424,7 +424,10 @@ namespace Ogre
         read(&chunk->id);
         read(&chunk->version);
         read(&chunk->length);
-        
+
+        if (chunk->length > mStream->size() - mStream->tell())
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Chunk length field exceeds remaining stream data");
+
         uint32 checksum;
         read(&checksum);
         
@@ -675,6 +678,12 @@ namespace Ogre
         // String is stored as a uint32 character count, then string
         uint32 len;
         read(&len);
+
+        // Guard against OOM from corrupt/malicious input: cap len to remaining chunk bytes
+        OgreAssertDbg(mChunkStack.size(), "Not currently in a chunk, cannot read string length");
+        if (len > mChunkStack.back()->length)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "String length field exceeds remaining chunk data");
+
         string->resize(len);
         if (len)
             read(&(*string->begin()), len);
