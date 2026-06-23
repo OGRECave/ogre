@@ -638,19 +638,6 @@ namespace Ogre {
             popInnerChunk(stream);
         }
 
-        // validate vertex declarations
-        for (auto& binding : dest->vertexBufferBinding->getBindings())
-        {
-            for (auto& elem : dest->vertexDeclaration->findElementsBySource(binding.first))
-            {
-                if(elem.getSize() == 0)
-                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid vertex element type");
-                if (elem.getOffset() + elem.getSize() > binding.second->getVertexSize())
-                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                                "Vertex element offset + size exceeds vertex buffer stride");
-            }
-        }
-
         // Perform any necessary colour conversions from ARGB to ABGR (UBYTE4)
         dest->convertPackedColour(_DETAIL_SWAP_RB, VET_UBYTE4_NORM);
 
@@ -778,12 +765,19 @@ namespace Ogre {
         HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
         stream->read(vbufLock.pData, vbufBytes);
 
+        auto elems = dest->vertexDeclaration->findElementsBySource(bindIndex);
+        // validate vertex element declarations
+        for (auto& elem : elems)
+        {
+            if (elem.getSize() == 0)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid vertex element type");
+            if (elem.getOffset() + elem.getSize() > vertexSize)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                                "Vertex element offset + size exceeds vertex buffer stride");
+        }
+
         // endian conversion for OSX
-        flipFromLittleEndian(
-            vbufLock.pData,
-            dest->vertexCount,
-            vertexSize,
-            dest->vertexDeclaration->findElementsBySource(bindIndex));
+        flipFromLittleEndian(vbufLock.pData, dest->vertexCount, vertexSize, elems);
 
         // Set binding
         dest->vertexBufferBinding->setBinding(bindIndex, vbuf);
@@ -873,7 +867,7 @@ namespace Ogre {
                     try {
                         readGeometry(stream, pMesh, pMesh->sharedVertexData);
                     }
-                    catch (ItemIdentityException&)
+                    catch (Exception&)
                     {
                         // duff geometry data entry with 0 vertices
                         pMesh->resetVertexData();
