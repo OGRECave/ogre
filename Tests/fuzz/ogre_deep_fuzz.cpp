@@ -56,7 +56,7 @@ class FuzzSkeleton final : public Ogre::Skeleton {
 public:
     FuzzSkeleton() : Ogre::Skeleton(Ogre::SkeletonManager::getSingletonPtr(), "fuzz.skeleton", 0, "General") {}
 
-    void handleException() { mLoadingState.store(LOADSTATE_PREPARED); }
+    void setPrepared() { mLoadingState.store(LOADSTATE_PREPARED); }
 };
 
 static bool g_initialized = false;
@@ -108,10 +108,10 @@ static void fuzz_skeleton(const uint8_t *data, size_t size) {
   Ogre::SkeletonSerializer serializer;
   try {
     serializer.importSkeleton(stream, skeleton.get());
-  } catch (Ogre::Exception &) {
-    skeleton->handleException();
   } catch (std::exception &) {
   }
+
+  skeleton->setPrepared(); // force cleanup of any partially loaded data
 }
 
 static void fuzz_config(const uint8_t *data, size_t size) {
