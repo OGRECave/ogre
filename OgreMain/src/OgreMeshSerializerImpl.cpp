@@ -710,6 +710,9 @@ namespace Ogre {
         // unsigned short index;    // index of the semantic
         readShorts(stream, &index, 1);
 
+        if (dest->vertexBufferBinding->isBufferBound(source))
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Cannot add vertex element after reading buffer");
+
         dest->vertexDeclaration->addElement(source, offset, vType, vSemantic, index);
 
         if (vType == _DETAIL_SWAP_RB)
