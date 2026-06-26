@@ -92,8 +92,8 @@ static void fuzz_mesh(const uint8_t *data, size_t size) {
   Ogre::MeshSerializer serializer;
   try {
     serializer.importMesh(stream, mesh.get());
-  } catch (Ogre::Exception &) {
   } catch (std::exception &) {
+    mesh->resetVertexData(); // cleanup of any partially loaded data
   }
 
   Ogre::MeshManager::getSingleton().remove(mesh);
