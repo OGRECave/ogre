@@ -17,7 +17,7 @@ const String SRS_COOK_TORRANCE_LIGHTING = "CookTorranceLighting";
 
 //-----------------------------------------------------------------------
 CookTorranceLighting::CookTorranceLighting()
-    : mLightCount(0), mTexCoordSet(0), mMRMapSamplerIndex(0), mLtcLUT1SamplerIndex(-1)
+    : mLightCount(0), mTexCoordSet(0), mMRMapSamplerIndex(0), mLtcLUT1SamplerIndex(-1), mTextureOcclusion(false)
 {
 }
 
@@ -96,21 +96,26 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     }
 
     // add the lighting computation
-    auto mrparams = psMain->resolveLocalParameter(GCT_FLOAT2, "metalRoughness");
+    auto ormParams = psMain->resolveLocalParameter(GCT_FLOAT3, "ormParams");
+    fstage.assign(1.0f, Out(ormParams).x());
     if(!mMetalRoughnessMapName.empty())
     {
-        auto metalRoughnessSampler =
-            psProgram->resolveParameter(GCT_SAMPLER2D, "metalRoughnessSampler", mMRMapSamplerIndex);
-        auto mrSample = psMain->resolveLocalParameter(GCT_FLOAT4, "mrSample");
+        auto ormSampler =
+            psProgram->resolveParameter(GCT_SAMPLER2D, "ormSampler", mMRMapSamplerIndex);
+        auto ormSample = psMain->resolveLocalParameter(GCT_FLOAT4, "ormSample");
         // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
         // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
-        fstage.sampleTexture(metalRoughnessSampler, psInTexcoord, mrSample);
-        fstage.assign(In(mrSample).mask(Operand::OPM_YZ), mrparams);
+        fstage.sampleTexture(ormSampler, psInTexcoord, ormSample);
+        fstage.assign(In(ormSample).mask(Operand::OPM_YZ), Out(ormParams).mask(Operand::OPM_YZ));
+        if(mTextureOcclusion)
+        {
+            fstage.assign(In(ormSample).x(), Out(ormParams).x());
+        }
     }
     else
     {
         auto specular = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR);
-        fstage.assign(In(specular).xy(), mrparams);
+        fstage.assign(In(specular).xy(), Out(ormParams).mask(Operand::OPM_YZ));
     }
 
     auto sceneCol = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
@@ -124,7 +129,7 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
     fstage.assign(Vector3(0), Out(outDiffuse).xyz());
     fstage.mul(In(diffuse).w(), In(outDiffuse).w(), Out(outDiffuse).w()); // forward alpha
 
-    fstage.callFunction("PBR_MakeParams", {In(baseColor), In(mrparams), InOut(pixelParams)});
+    fstage.callFunction("PBR_MakeParams", {In(baseColor), In(ormParams), InOut(pixelParams)});
 
     fstage = psMain->getStage(FFP_PS_PBR_LIGHTING_END);
     if(mLightCount > 0)
@@ -166,6 +171,7 @@ void CookTorranceLighting::copyFrom(const SubRenderState& rhs)
     mSampler = rhsLighting.mSampler;
     mLightCount = rhsLighting.mLightCount;
     mTexCoordSet = rhsLighting.mTexCoordSet;
+    mTextureOcclusion = rhsLighting.mTextureOcclusion;
 }
 
 //-----------------------------------------------------------------------
@@ -197,6 +203,10 @@ bool CookTorranceLighting::setParameter(const String& name, const String& value)
     {
         mMetalRoughnessMapName = value;
         return true;
+    }
+    else if (name == "texture_occlusion")
+    {
+        return StringConverter::parse(value, mTextureOcclusion);
     }
     else if (name == "tex_coord_set")
     {
@@ -244,23 +254,34 @@ SubRenderState* CookTorranceLightingFactory::createInstance(const ScriptProperty
         if(!subRenderState->setParameter("texture", prop.values[2]))
             translator->emitError();
 
-        if(prop.values.size() < 4)
-            return subRenderState;
-
-        if (auto sampler = TextureManager::getSingleton().getSampler(prop.values[3]))
+        // Parse the remaining (optional) arguments. "occlusion" may appear
+        // anywhere after the texture name; the others are positional.
+        size_t pos = 3;
+        for (size_t i = 3; i < prop.values.size(); ++i)
         {
-            subRenderState->setParameter("sampler", sampler);
-        }
-        else
-        {
-            translator->emitError();
-        }
+            if (prop.values[i] == "occlusion")
+            {
+                subRenderState->setParameter("texture_occlusion", "true");
+                continue;
+            }
 
-        if(prop.values.size() < 5)
-            return subRenderState;
-
-        if(!subRenderState->setParameter("tex_coord_set", prop.values[4]))
-            translator->emitError();
+            switch (pos++)
+            {
+            case 3:
+                if (auto sampler = TextureManager::getSingleton().getSampler(prop.values[i]))
+                    subRenderState->setParameter("sampler", sampler);
+                else
+                    translator->emitError();
+                break;
+            case 4:
+                if(!subRenderState->setParameter("tex_coord_set", prop.values[i]))
+                    translator->emitError();
+                break;
+            default:
+                translator->emitError(prop.values[i]);
+                break;
+            }
+        }
 
         return subRenderState;
     }
@@ -280,6 +301,8 @@ void CookTorranceLightingFactory::writeInstance(MaterialSerializer* ser, SubRend
         return;
     ser->writeValue("texture");
     ser->writeValue(ctSubRenderState->getMetalRoughnessMapName());
+    if(ctSubRenderState->getTextureOcclusion())
+        ser->writeValue("occlusion");
 }
 
 //-----------------------------------------------------------------------
