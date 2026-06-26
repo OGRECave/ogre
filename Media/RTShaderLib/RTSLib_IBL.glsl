@@ -72,8 +72,8 @@ void evaluateIBL(inout PixelParams pixel,
     vec3 diffuseIrradiance = Irradiance_RoughnessOne(iblEnvTex, shading_normal, iblRoughnessOneLevel);
     vec3 Fd = pixel.diffuseColor * diffuseIrradiance * (1.0 - E);
 
-    Fr *= iblLuminance;
-    Fd *= iblLuminance;
+    Fr *= iblLuminance * pixel.ambientOcclusion;
+    Fd *= iblLuminance * pixel.ambientOcclusion;
 
     // Combine all terms
     // Note: iblLuminance is already premultiplied by the exposure

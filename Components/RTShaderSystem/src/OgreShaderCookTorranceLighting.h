@@ -43,6 +43,8 @@ public:
     */
     const String& getMetalRoughnessMapName() const { return mMetalRoughnessMapName; }
 
+    bool getTextureOcclusion() const { return mTextureOcclusion; }
+
     bool setParameter(const String& name, const String& value) override;
 
     void setParameter(const String& name, const Any& value) override;
@@ -56,6 +58,7 @@ private:
     uint32 mTexCoordSet;
     uint8 mMRMapSamplerIndex;
     int8 mLtcLUT1SamplerIndex;
+    bool mTextureOcclusion;
 };
 
 class CookTorranceLightingFactory : public SubRenderStateFactory

@@ -29,6 +29,7 @@ struct PixelParams
     vec3  f0;
     vec3  dfg;
     vec3  energyCompensation;
+    float ambientOcclusion;
 };
 
 float clampNoV(float NoV) {
@@ -167,17 +168,18 @@ vec3 evaluateLight(
     return color;
 }
 
-void PBR_MakeParams(in vec3 baseColor, in vec2 mrParam, inout PixelParams pixel)
+void PBR_MakeParams(in vec3 baseColor, in vec3 ormParam, inout PixelParams pixel)
 {
     pixel.baseColor = baseColor;
 
-    float perceptualRoughness = mrParam.x;
+    pixel.ambientOcclusion = saturate(ormParam.x);
+    float perceptualRoughness = ormParam.y;
     // Clamp the roughness to a minimum value to avoid divisions by 0 during lighting
     pixel.perceptualRoughness = clamp(perceptualRoughness, MIN_PERCEPTUAL_ROUGHNESS, 1.0);
     // Remaps the roughness to a perceptually linear roughness (roughness^2)
     pixel.roughness = perceptualRoughnessToRoughness(pixel.perceptualRoughness);
 
-    float metallic = saturate(mrParam.y);
+    float metallic = saturate(ormParam.z);
     pixel.f0 = computeF0(baseColor, metallic, 0.04); // using fixed IOR of 1.5 as per glTF spec
     pixel.diffuseColor = computeDiffuseColor(baseColor, metallic);
 
@@ -232,7 +234,7 @@ void PBR_Lights(
 #endif
         vOutColour += lightVal;
     }
-
-    vOutColour += pixel.baseColor * ambient.rgb;
+    // apply ambient occlusion to the indirect (ambient) term only
+    vOutColour += pixel.baseColor * ambient.rgb * pixel.ambientOcclusion;
 }
 #endif
