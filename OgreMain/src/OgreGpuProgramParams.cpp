@@ -185,6 +185,8 @@ namespace Ogre
         AutoConstantDefinition(ACT_LIGHT_CUSTOM,        "light_custom", 4, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_POINT_PARAMS,                    "point_params",                   4, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_MATERIAL_LOD_INDEX,       "material_lod_index",             1, ET_INT, ACDT_NONE),
+        AutoConstantDefinition(ACT_FROXEL_TILE_PARAMS,   "froxel_tile_params",   4, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_FROXEL_DEPTH_PARAMS, "froxel_depth_params", 4, ET_REAL, ACDT_NONE),
 
         // NOTE: new auto constants must be added before this line, as the following are merely aliases
         // to allow legacy world_ names in scripts
@@ -661,7 +663,7 @@ namespace Ogre
         , mActivePassIterationIndex(std::numeric_limits<size_t>::max())
         , mUseLinearColours(false)
     {
-        static_assert((sizeof(AutoConstantDictionary) / sizeof(AutoConstantDefinition) - 5) == ACT_MATERIAL_LOD_INDEX,
+        static_assert((sizeof(AutoConstantDictionary) / sizeof(AutoConstantDefinition) - 5) == ACT_FROXEL_DEPTH_PARAMS,
                       "AutoConstantDictionary out of sync");
     }
     GpuProgramParameters::~GpuProgramParameters() {}
@@ -1094,6 +1096,8 @@ namespace Ogre
         case ACT_SPOTLIGHT_VIEWPROJ_MATRIX:
         case ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY:
         case ACT_LIGHT_CUSTOM:
+        case ACT_FROXEL_TILE_PARAMS:
+        case ACT_FROXEL_DEPTH_PARAMS:
 
             return (uint16)GPV_LIGHTS;
 
@@ -2091,7 +2095,12 @@ namespace Ogre
                                           source->getSpotlightViewProjMatrix(l),ac.elementCount);
                     }
                     break;
-
+                case ACT_FROXEL_TILE_PARAMS:
+                    _writeRawConstant(ac.physicalIndex, source->getFroxelTileParams(), ac.elementCount);
+                    break;
+                case ACT_FROXEL_DEPTH_PARAMS:
+                    _writeRawConstant(ac.physicalIndex, source->getFroxelDepthParams(), ac.elementCount);
+                    break;
                 default:
                     break;
                 };
