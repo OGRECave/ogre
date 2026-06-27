@@ -1906,6 +1906,9 @@ namespace Ogre {
         // unsigned long numTriangles
         uint32 numTriangles;
         readInts(stream, &numTriangles, 1);
+        if(!checkChunkRemainingSize(mCurrentstreamLen, numTriangles, sizeof(EdgeData::Triangle) + sizeof(Vector4f)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Edge list triangle data exceeds chunk size");
+
         // Allocate correct amount of memory
         edgeData->triangles.resize(numTriangles);
         edgeData->triangleFaceNormals.resize(numTriangles);
@@ -1913,6 +1916,9 @@ namespace Ogre {
         // unsigned long numEdgeGroups
         uint32 numEdgeGroups;
         readInts(stream, &numEdgeGroups, 1);
+        if(!checkChunkRemainingSize(mCurrentstreamLen, numEdgeGroups, sizeof(uint32) * 4))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Edge list group data exceeds chunk size");
+
         // Allocate correct amount of memory
         edgeData->edgeGroups.resize(numEdgeGroups);
         // Triangle* triangleList
