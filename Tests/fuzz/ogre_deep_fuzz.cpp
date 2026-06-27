@@ -52,13 +52,6 @@ enum FuzzTarget {
   FUZZ_TARGET_COUNT
 };
 
-class FuzzSkeleton final : public Ogre::Skeleton {
-public:
-    FuzzSkeleton() : Ogre::Skeleton(Ogre::SkeletonManager::getSingletonPtr(), "fuzz.skeleton", 0, "General") {}
-
-    void setPrepared() { mLoadingState.store(LOADSTATE_PREPARED); }
-};
-
 static bool g_initialized = false;
 
 static void global_init() {
@@ -83,8 +76,9 @@ static void global_init() {
 }
 
 static void fuzz_mesh(const uint8_t *data, size_t size) {
-  Ogre::MeshPtr mesh =
-      Ogre::MeshManager::getSingleton().create("fuzz.mesh", "General");
+  // manual, so we can load it from memory without a file
+  auto mesh = Ogre::MeshManager::getSingleton().create("fuzz.mesh", "General", true);
+  mesh->load(); // ensure cleanup runs
 
   Ogre::DataStreamPtr stream(
       new Ogre::MemoryDataStream(const_cast<uint8_t *>(data), size, false, true));
@@ -93,14 +87,15 @@ static void fuzz_mesh(const uint8_t *data, size_t size) {
   try {
     serializer.importMesh(stream, mesh.get());
   } catch (std::exception &) {
-    mesh->resetVertexData(); // cleanup of any partially loaded data
   }
 
   Ogre::MeshManager::getSingleton().remove(mesh);
 }
 
 static void fuzz_skeleton(const uint8_t *data, size_t size) {
-  auto skeleton = std::make_shared<FuzzSkeleton>();
+  // manual, so we can load it from memory without a file
+  auto skeleton = Ogre::SkeletonManager::getSingleton().create("fuzz.skeleton", "General", true);
+  skeleton->prepare();   // ensure cleanup runs
 
   Ogre::DataStreamPtr stream(
       new Ogre::MemoryDataStream(const_cast<uint8_t *>(data), size, false, true));
@@ -111,7 +106,7 @@ static void fuzz_skeleton(const uint8_t *data, size_t size) {
   } catch (std::exception &) {
   }
 
-  skeleton->setPrepared(); // force cleanup of any partially loaded data
+  Ogre::SkeletonManager::getSingleton().remove(skeleton);
 }
 
 static void fuzz_config(const uint8_t *data, size_t size) {
