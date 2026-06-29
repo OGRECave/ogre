@@ -1818,6 +1818,8 @@ namespace Ogre {
                 if (!isManual) {
 #endif
                     MeshLodUsage& usage = pMesh->mMeshLodUsageList.at(lodIndex);
+                    if (usage.edgeData)
+                        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Duplicate edge data for LOD");
 
                     usage.edgeData = OGRE_NEW EdgeData();
 
