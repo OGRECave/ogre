@@ -31,11 +31,40 @@ class ImageBasedLighting : public SubRenderState
     int mDfgLUTSamplerIndex = 0;
     int mEnvMapSamplerIndex = 0;
     int mEnvMapSamplerIndexSpecular = 0;
+    int mLocalProbeShAtlasSamplerIndex = 0;
     float mLuminance = 1.0f;
+    float mLocalBlendWeight = 0.5f;
     String mEnvMapName;
     String mEnvMapNameSpecular;
+    String mLocalProbeShAtlas;
+
     UniformParameterPtr mLuminanceParam;
+    UniformParameterPtr mBlendWeightParam;
+
+    UniformParameterPtr mLocalProbeShAtlasSampler;      //Stores all probe SH coefficients. Row = probe ID. Colums = SH coefficients.
+    UniformParameterPtr mShAtlasSizeParam;
+
+    UniformParameterPtr mLocalProbeParams1_1;           //Stores probe position (x, y, z), plus probe ID for SH atlas reference (w).
+    UniformParameterPtr mLocalProbeParams1_2;           //Stores probe box extents (x, y, z), plus probe blend distance (w).
+    UniformParameterPtr mLocalProbeParams1_3;           //Quaternoin for orientation of probe
+
+    UniformParameterPtr mLocalProbeParams2_1;
+    UniformParameterPtr mLocalProbeParams2_2;
+    UniformParameterPtr mLocalProbeParams2_3;
+
+    UniformParameterPtr mLocalProbeParams3_1;
+    UniformParameterPtr mLocalProbeParams3_2;
+    UniformParameterPtr mLocalProbeParams3_3;
+
+    UniformParameterPtr mLocalProbeParams4_1;
+    UniformParameterPtr mLocalProbeParams4_2;
+    UniformParameterPtr mLocalProbeParams4_3;
+
+    UniformParameterPtr mProbeMaskParam;
+
     bool mIsLuminanceParamDirty = true;
+    bool mUseVertexColourProbeMask = false;
+    bool mIsLocalProbesEnabled = false;
 
 public:
     const String& getType() const override;

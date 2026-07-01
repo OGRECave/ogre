@@ -162,12 +162,13 @@ vec3 evaluateLight(
     vec3 Fr = (D * V) * F;
     vec3 Fd = pixel.diffuseColor * Fd_Lambert();
 
-    //Compute AO
-    float visibility = 1.0;
-    visibility *= computeMicroShadowing(NoL, pixel.ao);
+    //AO / micro shadowing
+    float microShadow = computeMicroShadowing(NoL, pixel.ao);
+    vec3 diffuseTerm  = Fd * microShadow;
 
-    // https://google.github.io/filament/Filament.md.html#materialsystem/improvingthebrdfs/energylossinspecularreflectance
-    vec3 color = visibility * NoL * lightColor * (Fr * pixel.energyCompensation + Fd);
+    vec3 specularTerm = Fr * pixel.energyCompensation;
+
+    vec3 color = NoL * lightColor * (specularTerm + diffuseTerm);
 
     color *= getDistanceAttenuation(pointParams.yzw, fLightD);
 
