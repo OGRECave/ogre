@@ -1821,13 +1821,13 @@ namespace Ogre {
                     if (usage.edgeData)
                         OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Duplicate edge data for LOD");
 
-                    usage.edgeData = OGRE_NEW EdgeData();
+                    auto edgeData = std::make_unique<EdgeData>(); // in case of exception, will be deleted automatically
 
                     // Read detail information of the edge list
-                    readEdgeListLodInfo(stream, usage.edgeData);
+                    readEdgeListLodInfo(stream, edgeData.get());
 
                     // Postprocessing edge groups
-                    for (auto& edgeGroup : usage.edgeData->edgeGroups)
+                    for (auto& edgeGroup : edgeData->edgeGroups)
                     {
                         // Populate edgeGroup.vertexData pointers
                         // If there is shared vertex data, vertexSet 0 is that,
@@ -1848,6 +1848,8 @@ namespace Ogre {
                             edgeGroup.vertexData = pMesh->getSubMeshes().at(edgeGroup.vertexSet)->vertexData;
                         }
                     }
+
+                    usage.edgeData = edgeData.release();
                 }
 
                 if (!stream->eof())
