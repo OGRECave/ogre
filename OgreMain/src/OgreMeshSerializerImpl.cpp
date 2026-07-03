@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgrePlatform.h"
 #include "OgreStableHeaders.h"
 
 #include "OgreMeshSerializerImpl.h"
@@ -1978,6 +1979,9 @@ namespace Ogre {
             // unsigned long numEdges
             uint32 numEdges;
             readInts(stream, &numEdges, 1);
+            if(!checkChunkRemainingSize(mCurrentstreamLen, numEdges, sizeof(uint32) * 6 + sizeof(bool)))
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Edge list edge data exceeds chunk size");
+
             edgeGroup.edges.resize(numEdges);
             // Edge* edgeList
             for (uint32 e = 0; e < numEdges; ++e)
