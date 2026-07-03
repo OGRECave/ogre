@@ -10,6 +10,7 @@
 add_executable(OgreAssimpConverter main.cpp)
 target_link_libraries(OgreAssimpConverter OgreMain OgreRTShaderSystem)
 target_include_directories(OgreAssimpConverter PRIVATE $<TARGET_PROPERTY:fix::assimp,INTERFACE_INCLUDE_DIRECTORIES>)
+target_compile_features(OgreAssimpConverter PRIVATE cxx_std_17)
 if (OGRE_PROJECT_FOLDERS)
 	set_property(TARGET OgreAssimpConverter PROPERTY FOLDER Tools)
 endif ()
