@@ -271,29 +271,12 @@ namespace Ogre
             return;
 
         mDevice->stall();
-#if 0
-        {
-            // Remove all windows.
-            // (destroy primary window last since others may depend on it)
-            RenderWindow *primary = 0;
-            WindowSet::const_iterator itor = mWindows.begin();
-            WindowSet::const_iterator endt = mWindows.end();
 
-            while( itor != endt )
-            {
-                if( !primary && ( *itor )->isPrimary() )
-                    primary = *itor;
-                else
-                    OGRE_DELETE *itor;
-
-                ++itor;
-            }
-
-            OGRE_DELETE primary;
-            mWindows.clear();
-        }
-#endif
-        _cleanupDepthBuffers();
+        // destroys the depth buffers and render targets (incl. windows) like
+        // the other render systems do - their Vulkan resources (e.g. the
+        // VMA-backed window depth texture) must be released while the device
+        // and its allocator are still alive
+        RenderSystem::shutdown();
 
         mAutoParamsBuffer.reset();
 
