@@ -12,6 +12,9 @@
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 list(APPEND HEADER_FILES ${PROJECT_BINARY_DIR}/include/OgreVulkanExports.h)
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/volk.c")
+if(APPLE)
+    list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreVulkanWindowApple.mm")
+endif()
 
 set( HEADER_FILES ${HEADER_FILES})
 set( SOURCE_FILES ${SOURCE_FILES})
@@ -27,6 +30,17 @@ if(WIN32)
     target_compile_definitions(RenderSystem_Vulkan PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 elseif(ANDROID)
     target_compile_definitions(RenderSystem_Vulkan PRIVATE VK_USE_PLATFORM_ANDROID_KHR)
+elseif(APPLE)
+    # VK_EXT_metal_surface: the surface is created from a CAMetalLayer, which
+    # OgreVulkanWindowApple.mm resolves from the supplied window handle.
+    # Vulkan itself is provided by MoltenVK (found by the Khronos loader
+    # through its ICD manifest, or dlopened directly by volk).
+    target_compile_definitions(RenderSystem_Vulkan PRIVATE VK_USE_PLATFORM_METAL_EXT)
+    set_source_files_properties(src/OgreVulkanWindowApple.mm PROPERTIES COMPILE_OPTIONS "-fobjc-arc")
+    target_link_libraries(RenderSystem_Vulkan PRIVATE "-framework QuartzCore")
+    if(NOT APPLE_IOS)
+        target_link_libraries(RenderSystem_Vulkan PRIVATE "-framework AppKit")
+    endif()
 elseif(OGRE_USE_WAYLAND)
     target_compile_definitions(RenderSystem_Vulkan PRIVATE VK_USE_PLATFORM_WAYLAND_KHR)
 else()

@@ -96,6 +96,14 @@ namespace Ogre
         createInfo.enabledExtensionCount = extensions.size();
         createInfo.ppEnabledExtensionNames = extensions.data();
 
+#ifdef VK_KHR_portability_enumeration
+        for( const char *extension : extensions )
+        {
+            if( String( extension ) == VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME )
+                createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+        }
+#endif
+
 #if 1 //OGRE_DEBUG_MODE
         VkDebugReportCallbackCreateInfoEXT debugCb = {VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT};
         debugCb.pfnCallback = debugCallback;
