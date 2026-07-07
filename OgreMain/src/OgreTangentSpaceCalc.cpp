@@ -204,6 +204,9 @@ namespace Ogre
         // Normalise the tangents & binormals
         for (auto & v : mVertexArray)
         {
+            if (v.parity == 0)
+                v.parity = -1;   // never leave it unset (orphan / degenerate-only verts)
+
             v.tangent.normalise();
             v.binormal.normalise();
 
