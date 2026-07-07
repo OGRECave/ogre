@@ -560,6 +560,7 @@ int main(int numargs, char** args)
             if (existing) {
                 // safe
                 opts.generateTangents = false;
+                logMgr.logWarning("Mesh already has tangents, skipping generation");
             }
             if (opts.generateTangents) {
                 logMgr.logMessage("Generating tangent vectors...");
