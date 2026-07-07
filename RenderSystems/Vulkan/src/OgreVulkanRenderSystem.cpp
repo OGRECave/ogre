@@ -679,6 +679,13 @@ namespace Ogre
 
             if (debugEnabled && extensionName == "VK_EXT_debug_report")
                 reqInstanceExtensions.push_back("VK_EXT_debug_report");
+
+#ifdef VK_KHR_portability_enumeration
+            // portability (non fully conformant) implementations like MoltenVK are
+            // only enumerated when VK_KHR_portability_enumeration is enabled
+            if (extensionName == VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME)
+                reqInstanceExtensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+#endif
         }
 
         reqInstanceExtensions.push_back("VK_KHR_surface"); // required for window surface
@@ -761,6 +768,10 @@ namespace Ogre
                     }
                     else if( extensionName == VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME )
                         deviceExtensions.push_back( VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME );
+                    else if( extensionName == "VK_KHR_portability_subset" )
+                        // required by the spec whenever the implementation
+                        // advertises it (e.g. MoltenVK)
+                        deviceExtensions.push_back( "VK_KHR_portability_subset" );
                     else if( extensionName == VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME )
                     {
                         deviceExtensions.push_back( VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME );

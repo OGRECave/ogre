@@ -49,6 +49,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+#if defined( VK_USE_PLATFORM_METAL_EXT )
+    // OgreVulkanWindowApple.mm - resolves an NSWindow*/NSView*/CAMetalLayer*
+    // handle to the CAMetalLayer required by VK_EXT_metal_surface
+    void *getCAMetalLayer( size_t windowHandle );
+#endif
+
     VulkanWindow::VulkanWindow( const String &title, uint32 width, uint32 height, bool fullscreenMode ) :
         mLowestLatencyVSync( false ),
         mHdrDisplay( false ),
@@ -128,10 +134,22 @@ namespace Ogre
         VkSurfaceCapabilitiesKHR surfaceCaps;
         OGRE_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mDevice->mPhysicalDevice, mSurfaceKHR, &surfaceCaps));
 
-        // Swapchain may be smaller/bigger than requested
-        mWidth = Math::Clamp(mWidth, surfaceCaps.minImageExtent.width, surfaceCaps.maxImageExtent.width);
-        mHeight =
-            Math::Clamp(mHeight, surfaceCaps.minImageExtent.height, surfaceCaps.maxImageExtent.height);
+        if (surfaceCaps.currentExtent.width != 0xFFFFFFFFu)
+        {
+            // surface size is defined by the window system - the swapchain must
+            // match it. Notably on MoltenVK, where min/maxImageExtent leave room,
+            // any other size makes vkAcquireNextImageKHR return
+            // VK_ERROR_OUT_OF_DATE_KHR forever (-> swapchain recreation loop)
+            mWidth = surfaceCaps.currentExtent.width;
+            mHeight = surfaceCaps.currentExtent.height;
+        }
+        else
+        {
+            // Swapchain may be smaller/bigger than requested
+            mWidth = Math::Clamp(mWidth, surfaceCaps.minImageExtent.width, surfaceCaps.maxImageExtent.width);
+            mHeight =
+                Math::Clamp(mHeight, surfaceCaps.minImageExtent.height, surfaceCaps.maxImageExtent.height);
+        }
 
         mTexture->setWidth(mWidth);
         mTexture->setHeight(mHeight);
@@ -407,6 +425,18 @@ namespace Ogre
         surfCreateInfo.window = (ANativeWindow*)windowHandle;
 
         OGRE_VK_CHECK(vkCreateAndroidSurfaceKHR(mDevice->mInstance, &surfCreateInfo, 0, &mSurfaceKHR));
+#elif defined(VK_USE_PLATFORM_METAL_EXT)
+        CAMetalLayer* layer = (CAMetalLayer*)getCAMetalLayer(windowHandle);
+        if (!layer)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "windowHandle does not resolve to a CAMetalLayer");
+        }
+
+        VkMetalSurfaceCreateInfoEXT surfCreateInfo = {VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT};
+        surfCreateInfo.pLayer = layer;
+
+        OGRE_VK_CHECK(vkCreateMetalSurfaceEXT(mDevice->mInstance, &surfCreateInfo, 0, &mSurfaceKHR));
 #else
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unsupported Vulkan platform");
 #endif
@@ -435,6 +465,8 @@ namespace Ogre
         return VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
         return VK_KHR_ANDROID_SURFACE_EXTENSION_NAME;
+#elif defined(VK_USE_PLATFORM_METAL_EXT)
+        return VK_EXT_METAL_SURFACE_EXTENSION_NAME;
 #endif
         return "";
     }
