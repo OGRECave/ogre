@@ -26,6 +26,10 @@ include_directories(
 
 add_definitions(${OGRE_VISIBILITY_FLAGS})
 add_library(RenderSystem_Metal ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+target_include_directories(RenderSystem_Metal PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/Windowing/${OS}>"
+    $<INSTALL_INTERFACE:include/OGRE/RenderSystems/Metal>)
 if (APPLE_IOS)
 target_link_libraries(RenderSystem_Metal OgreMain "-framework Metal" "-framework QuartzCore")
 else()
