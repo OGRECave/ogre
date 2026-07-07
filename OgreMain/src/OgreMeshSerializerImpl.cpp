@@ -1822,6 +1822,9 @@ namespace Ogre {
                 if (!isManual) {
 #endif
                     MeshLodUsage& usage = pMesh->mMeshLodUsageList.at(lodIndex);
+                    if(!usage.manualName.empty())
+                        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD is marked as non-manual, but has a manual mesh name");
+
                     if (usage.edgeData)
                         OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Duplicate edge data for LOD");
 
