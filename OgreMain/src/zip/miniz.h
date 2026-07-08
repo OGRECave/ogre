@@ -1,7 +1,7 @@
 #ifndef MINIZ_EXPORT
 #define MINIZ_EXPORT
 #endif
-/* miniz.c 3.1.0 - public domain deflate/inflate, zlib-subset, ZIP
+/* miniz.c 3.1.2 - public domain deflate/inflate, zlib-subset, ZIP
    reading/writing/appending, PNG writing See "unlicense" statement at the end
    of this file. Rich Geldreich <richgel99@gmail.com>, last updated Oct. 13,
    2013 Implements RFC 1950: http://www.ietf.org/rfc/rfc1950.txt and RFC 1951:
@@ -335,11 +335,11 @@ enum {
   MZ_DEFAULT_COMPRESSION = -1
 };
 
-#define MZ_VERSION "11.3.1"
-#define MZ_VERNUM 0xB301
+#define MZ_VERSION "11.3.2"
+#define MZ_VERNUM 0xB302
 #define MZ_VER_MAJOR 11
 #define MZ_VER_MINOR 3
-#define MZ_VER_REVISION 1
+#define MZ_VER_REVISION 2
 #define MZ_VER_SUBREVISION 0
 
 #ifndef MINIZ_NO_ZLIB_APIS
@@ -4106,6 +4106,11 @@ void *tdefl_write_image_to_png_file_in_memory_ex(const void *pImage, int w,
   *pLen_out = 0;
   if (!pComp)
     return NULL;
+  if (w <= 0 || h <= 0 || w > 0xFFFF || h > 0xFFFF || num_chans < 1 ||
+      num_chans > 4) {
+    MZ_FREE(pComp);
+    return NULL;
+  }
   MZ_CLEAR_OBJ(out_buf);
   out_buf.m_expandable = MZ_TRUE;
   out_buf.m_capacity = 57 + MZ_MAX(64, (1 + bpl) * h);
@@ -4662,6 +4667,9 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r,
             counter = sym2;
             bit_buf >>= code_len;
             num_bits -= code_len;
+            if (code_len == 0) {
+              TINFL_CR_RETURN_FOREVER(40, TINFL_STATUS_FAILED);
+            }
             if (counter & 256)
               break;
 
@@ -4685,6 +4693,9 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r,
             }
             bit_buf >>= code_len;
             num_bits -= code_len;
+            if (code_len == 0) {
+              TINFL_CR_RETURN_FOREVER(54, TINFL_STATUS_FAILED);
+            }
 
             pOut_buf_cur[0] = (mz_uint8)counter;
             if (sym2 & 256) {
@@ -5854,7 +5865,8 @@ static mz_bool mz_zip_reader_read_central_dir(mz_zip_archive *pZip,
       (mz_uint64)pZip->m_total_files * MZ_ZIP_CENTRAL_DIR_HEADER_SIZE)
     return mz_zip_set_error(pZip, MZ_ZIP_INVALID_HEADER_OR_CORRUPTED);
 
-  if ((cdir_ofs + (mz_uint64)cdir_size) > pZip->m_archive_size)
+  if (cdir_size > pZip->m_archive_size ||
+      cdir_ofs > pZip->m_archive_size - cdir_size)
     return mz_zip_set_error(pZip, MZ_ZIP_INVALID_HEADER_OR_CORRUPTED);
 
   if (eocd_ofs < cdir_ofs + cdir_size)
