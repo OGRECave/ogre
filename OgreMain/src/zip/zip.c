@@ -76,6 +76,7 @@
     }                                                                          \
   } while (0)
 
+#define UNX_IFMT 0170000   /* Unix file-type mask */
 #define UNX_IFDIR 0040000  /* Unix directory */
 #define UNX_IFREG 0100000  /* Unix regular file */
 #define UNX_IFSOCK 0140000 /* Unix socket (BSD, not SysV or Amiga) */
@@ -111,8 +112,20 @@ static size_t zip_stream_delete_write_func(void *pOpaque, mz_uint64 file_ofs,
     size_t new_capacity = MZ_MAX(64, pState->m_mem_capacity);
     while (new_capacity < new_size)
       new_capacity *= 2;
-    if (NULL == (pNew_block = pZip->m_pRealloc(
-                     pZip->m_pAlloc_opaque, pState->m_pMem, 1, new_capacity))) {
+    if (pState->m_mem_capacity == 0) {
+      // m_pMem still aliases the caller-owned buffer passed to zip_stream_open
+      // (mz_zip_reader_init_mem stores it verbatim, leaving m_mem_capacity 0).
+      // Reallocating it would move and free a buffer the caller still owns and
+      // frees; copy into a library-owned block and leave the caller's intact.
+      pNew_block = pZip->m_pAlloc(pZip->m_pAlloc_opaque, 1, new_capacity);
+      if (pNew_block) {
+        memcpy(pNew_block, pState->m_pMem, (size_t)pState->m_mem_size);
+      }
+    } else {
+      pNew_block = pZip->m_pRealloc(pZip->m_pAlloc_opaque, pState->m_pMem, 1,
+                                    new_capacity);
+    }
+    if (NULL == pNew_block) {
       mz_zip_set_error(pZip, MZ_ZIP_ALLOC_FAILED);
       return 0;
     }
@@ -540,8 +553,9 @@ static mz_bool zip_stat_is_symlink(mz_uint16 version_made_by,
   mz_bool is_unix_or_macos =
       ((version_made_by >> 8) == 3) || ((version_made_by >> 8) == 19);
 
-  // and has sym link attribute (0x80 is file, 0x40 is directory)
-  return is_unix_or_macos && (external_attr & (0x20 << 24));
+  // and the Unix file-type field marks it a symbolic link; test the whole
+  // type field, not a single bit that block/char device modes also set
+  return is_unix_or_macos && (((external_attr >> 16) & UNX_IFMT) == UNX_IFLNK);
 }
 
 #if ZIP_ENABLE_INFLATE
@@ -557,7 +571,13 @@ static mz_bool zip_symlink_target_escapes(const char *link_name,
   long depth = 0;
   const char *p;
 
-  if (ISSLASH(target[0])) {
+  // symlink() stores the target verbatim and POSIX resolves it with '/' as the
+  // only separator; a backslash is an ordinary byte. Splitting the target on
+  // '\' would count "a\b" as two levels and let "a\b/../../escape" cancel its
+  // own ".." and climb out of the root. The link name keeps ISSLASH because
+  // zip_mkpath rewrites its '\' to '/' before the link is created, so each
+  // separator there is a real directory level.
+  if (target[0] == '/') {
     return MZ_TRUE;
   }
 
@@ -571,7 +591,7 @@ static mz_bool zip_symlink_target_escapes(const char *link_name,
   for (p = target; *p;) {
     const char *seg = p;
     size_t len = 0;
-    while (*p && !ISSLASH(*p)) {
+    while (*p && *p != '/') {
       ++p;
       ++len;
     }
@@ -582,7 +602,7 @@ static mz_bool zip_symlink_target_escapes(const char *link_name,
     } else if (!(len == 0 || (len == 1 && seg[0] == '.'))) {
       ++depth;
     }
-    while (ISSLASH(*p)) {
+    while (*p == '/') {
       ++p;
     }
   }
@@ -645,6 +665,25 @@ static int zip_archive_extract(mz_zip_archive *zip_archive, const char *dir,
     if (!zip_name_normalize(info.m_filename, info.m_filename,
                             strlen(info.m_filename))) {
       // Cannot normalize file name;
+      err = ZIP_EINVENTNAME;
+      goto out;
+    }
+
+    // a name built only from separators and "."/".." components (e.g. "..",
+    // "/", "./") normalizes to an empty string, so the path below collapses to
+    // the destination directory itself: a directory-flagged entry would then
+    // CHMOD the destination to the archive's mode and a regular entry would try
+    // to write over it
+    if (info.m_filename[0] == '\0') {
+      err = ZIP_EINVENTNAME;
+      goto out;
+    }
+
+    // a name that does not fit gets silently truncated by the copy below; the
+    // symlink branch then measures escape depth from the full name while the
+    // link is created at the shortened path, so a long name plus a climbing
+    // target resolves outside the destination
+    if (strlen(info.m_filename) >= filename_size) {
       err = ZIP_EINVENTNAME;
       goto out;
     }
@@ -1158,7 +1197,6 @@ static int zip_central_dir_delete(mz_zip_internal_state *pState,
   int i = 0;
   int begin = 0;
   int end = 0;
-  int d_num = 0;
   while (i < entry_num) {
     while ((i < entry_num) && (!deleted_entry_index_array[i])) {
       i++;
@@ -1172,32 +1210,26 @@ static int zip_central_dir_delete(mz_zip_internal_state *pState,
     zip_central_dir_move(pState, begin, end, entry_num);
   }
 
-  i = 0;
-  while (i < entry_num) {
-    while ((i < entry_num) && (!deleted_entry_index_array[i])) {
-      i++;
+  // every surviving entry already holds its rebased offset at its original
+  // index after the moves above, so pack the offsets down in one stable pass.
+  // the old per-run compaction copied the whole tail (including deleted slots
+  // not yet processed) into the survivor slots, so with two or more separated
+  // delete runs a survivor's offset was overwritten by a stale deleted-entry
+  // offset that points past the realloc-shrunk central directory; the next
+  // index lookup (zip_entry_openbyindex) then read out of bounds.
+  // m_central_dir_offsets holds one mz_uint32 element per file and m_size is an
+  // element count, not a byte count.
+  {
+    int w = 0;
+    for (i = 0; i < entry_num; i++) {
+      if (!deleted_entry_index_array[i]) {
+        MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32, w) =
+            MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32, i);
+        w++;
+      }
     }
-    begin = i;
-    if (begin == entry_num) {
-      break;
-    }
-    while ((i < entry_num) && (deleted_entry_index_array[i])) {
-      i++;
-    }
-    end = i;
-    int k = 0, j;
-    for (j = end; j < entry_num; j++) {
-      MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32,
-                           begin + k) =
-          (mz_uint32)MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets,
-                                          mz_uint32, j);
-      k++;
-    }
-    d_num += end - begin;
+    pState->m_central_dir_offsets.m_size = (size_t)w;
   }
-
-  pState->m_central_dir_offsets.m_size =
-      sizeof(mz_uint32) * (entry_num - d_num);
   return 0;
 }
 
@@ -1233,27 +1265,51 @@ static ssize_t zip_entries_delete_mark(struct zip_t *zip,
 #endif /* MINIZ_NO_STDIO */
   }
 
+  // file regions sit on disk in local-header-offset order, which need not match
+  // central-directory order. zip_entry_finalize already ranked every entry by
+  // offset in file_index; walk the entries in that physical order so writen_num
+  // and read_num track real file positions and a MOVE entry's offset is rebased
+  // by exactly the bytes deleted before it. Iterating in central-dir order
+  // corrupts surviving entries when an archive's two orders differ.
+  int *offset_order = (int *)calloc(entry_num, sizeof(int));
+  if (offset_order == NULL) {
+    CLEANUP(deleted_entry_flag_array);
+    return ZIP_EOOMEM;
+  }
+  for (i = 0; i < entry_num; i++) {
+    ssize_t rank = entry_mark[i].file_index;
+    if (rank < 0 || rank >= entry_num) {
+      CLEANUP(offset_order);
+      CLEANUP(deleted_entry_flag_array);
+      return ZIP_EINVIDX;
+    }
+    offset_order[rank] = i;
+  }
+
+  i = 0;
   while (i < entry_num) {
-    while ((i < entry_num) && (entry_mark[i].type == MZ_KEEP)) {
-      writen_num += entry_mark[i].lf_length;
+    while ((i < entry_num) && (entry_mark[offset_order[i]].type == MZ_KEEP)) {
+      writen_num += entry_mark[offset_order[i]].lf_length;
       read_num = writen_num;
       i++;
     }
 
-    while ((i < entry_num) && (entry_mark[i].type == MZ_DELETE)) {
-      deleted_entry_flag_array[i] = MZ_TRUE;
-      read_num += entry_mark[i].lf_length;
-      deleted_length += entry_mark[i].lf_length;
+    while ((i < entry_num) && (entry_mark[offset_order[i]].type == MZ_DELETE)) {
+      deleted_entry_flag_array[offset_order[i]] = MZ_TRUE;
+      read_num += entry_mark[offset_order[i]].lf_length;
+      deleted_length += entry_mark[offset_order[i]].lf_length;
       i++;
       deleted_entry_num++;
     }
 
-    while ((i < entry_num) && (entry_mark[i].type == MZ_MOVE)) {
-      move_length += entry_mark[i].lf_length;
+    while ((i < entry_num) && (entry_mark[offset_order[i]].type == MZ_MOVE)) {
+      move_length += entry_mark[offset_order[i]].lf_length;
       mz_uint8 *p = &MZ_ZIP_ARRAY_ELEMENT(
           &pState->m_central_dir, mz_uint8,
-          MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32, i));
+          MZ_ZIP_ARRAY_ELEMENT(&pState->m_central_dir_offsets, mz_uint32,
+                               offset_order[i]));
       if (!p) {
+        CLEANUP(offset_order);
         CLEANUP(deleted_entry_flag_array);
         return ZIP_ENOENT;
       }
@@ -1265,6 +1321,7 @@ static ssize_t zip_entries_delete_mark(struct zip_t *zip,
 
     n = zip_files_move(zip, writen_num, read_num, move_length);
     if (n != (ssize_t)move_length) {
+      CLEANUP(offset_order);
       CLEANUP(deleted_entry_flag_array);
       return n;
     }
@@ -1272,6 +1329,7 @@ static ssize_t zip_entries_delete_mark(struct zip_t *zip,
     read_num += move_length;
     move_length = 0;
   }
+  CLEANUP(offset_order);
 
   // the per-entry lengths sum to at most the archive size, so a deleted_length
   // larger than the archive can only come from corrupted/overlapping offsets;
@@ -2909,6 +2967,12 @@ struct zip_t *zip_stream_openwitherror(const char *stream, size_t size,
         goto cleanup;
       }
       zip->archive.m_pWrite = zip_stream_delete_write_func;
+      // init_from_reader sets m_mem_capacity to the size of the caller-owned
+      // stream buffer and assumes it is heap-resizable. It is not ours to
+      // resize, so clear the capacity: the first write then copies it into a
+      // library-owned block (see zip_stream_delete_write_func) and a non-zero
+      // capacity afterwards reliably marks that owned block.
+      zip->archive.m_pState->m_mem_capacity = 0;
     } else {
       *errnum = ZIP_EINVMODE;
       goto cleanup;
@@ -2976,6 +3040,17 @@ ssize_t zip_stream_copy(struct zip_t *zip, void **buf, size_t *bufsize) {
 void zip_stream_close(struct zip_t *zip) {
   if (zip) {
 #if ZIP_ENABLE_DEFLATE
+    // in-memory delete mode grows a library-owned working copy of the archive
+    // in zip_stream_delete_write_func (m_mem_capacity becomes non-zero);
+    // release it here. writer_end leaves m_pMem alone for this write func,
+    // which is what keeps the caller's original stream buffer untouched.
+    if (zip->archive.m_pWrite == zip_stream_delete_write_func &&
+        zip->archive.m_pState && zip->archive.m_pState->m_pMem &&
+        zip->archive.m_pState->m_mem_capacity != 0) {
+      zip->archive.m_pFree(zip->archive.m_pAlloc_opaque,
+                           zip->archive.m_pState->m_pMem);
+      zip->archive.m_pState->m_pMem = NULL;
+    }
     mz_zip_writer_end(&(zip->archive));
 #endif
 #if ZIP_ENABLE_INFLATE
