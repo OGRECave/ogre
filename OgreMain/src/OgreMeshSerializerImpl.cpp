@@ -1795,6 +1795,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readEdgeList(const DataStreamPtr& stream, Mesh* pMesh)
     {
+        pMesh->mEdgeListsBuilt = true; // set this early, so any partial data is freed
+
         if (!stream->eof())
         {
             pushInnerChunk(stream);
@@ -1872,8 +1874,6 @@ namespace Ogre {
             }
             popInnerChunk(stream);
         }
-
-        pMesh->mEdgeListsBuilt = true;
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readEdgeListLodInfo(const DataStreamPtr& stream,
