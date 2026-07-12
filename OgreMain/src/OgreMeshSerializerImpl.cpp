@@ -3054,6 +3054,9 @@ namespace Ogre {
         if (!checkChunkRemainingSize(mCurrentstreamLen, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
 
+        if(pMesh->getNumLodLevels() > 1)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "LOD levels already exist in mesh");
+
         pMesh->mMeshLodUsageList.resize(numLods);
 
         bool manual; // true for manual alternate meshes, false for generated
