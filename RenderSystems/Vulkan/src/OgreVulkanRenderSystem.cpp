@@ -130,7 +130,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL dbgUtilsCallback(
         mStorageImageInfos{},
         mStorageTextures{},
         mStorageImageViews{},
-        mBoundComputeProfile( ComputeImageWrite ),
+        mBoundComputeProfile( Compute ),
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
         mScissorRect{},
@@ -174,41 +174,41 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL dbgUtilsCallback(
         viewportStateCi.scissorCount = 1u;
 
         // use a single descriptor set for all shaders
-        auto& legacy = mProfiles[GraphicsLegacy];
-        legacy.bindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
-        legacy.bindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        auto& graphics = mProfiles[Graphics];
+        graphics.bindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        graphics.bindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
         for(uint32 i = 0; i < OGRE_MAX_TEXTURE_COORD_SETS; ++i)
-            legacy.bindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+            graphics.bindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
 
         // one descriptor will have at most OGRE_MAX_TEXTURE_LAYERS and one UBO per shader type (for now)
-        legacy.poolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
-        legacy.poolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, OGRE_MAX_TEXTURE_COORD_SETS});
+        graphics.poolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
+        graphics.poolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, OGRE_MAX_TEXTURE_COORD_SETS});
 
         // silence validation layer, when unused
         mUBOInfo[0].range = 1;
         mUBOInfo[1].range = 1;
 
-        legacy.writes.resize(OGRE_MAX_TEXTURE_COORD_SETS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
-        legacy.writes[0].dstBinding = 0;
-        legacy.writes[0].descriptorCount = 1;
-        legacy.writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        legacy.writes[0].pBufferInfo = mUBOInfo.data();
+        graphics.writes.resize(OGRE_MAX_TEXTURE_COORD_SETS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
+        graphics.writes[0].dstBinding = 0;
+        graphics.writes[0].descriptorCount = 1;
+        graphics.writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        graphics.writes[0].pBufferInfo = mUBOInfo.data();
 
-        legacy.writes[1].dstBinding = 1;
-        legacy.writes[1].descriptorCount = 1;
-        legacy.writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        legacy.writes[1].pBufferInfo = mUBOInfo.data() + 1;
+        graphics.writes[1].dstBinding = 1;
+        graphics.writes[1].descriptorCount = 1;
+        graphics.writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        graphics.writes[1].pBufferInfo = mUBOInfo.data() + 1;
 
         for(int i = 0; i < OGRE_MAX_TEXTURE_COORD_SETS; i++)
         {
-            legacy.writes[i + 2].dstBinding = 2 + i;
-            legacy.writes[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            legacy.writes[i + 2].pImageInfo = mImageInfos.data() + i;
-            legacy.writes[i + 2].descriptorCount = 1;
+            graphics.writes[i + 2].dstBinding = 2 + i;
+            graphics.writes[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            graphics.writes[i + 2].pImageInfo = mImageInfos.data() + i;
+            graphics.writes[i + 2].descriptorCount = 1;
         }
 
         // Minimal compute profile for image write + dynamic UBO.
-        auto &compute = mProfiles[ComputeImageWrite];
+        auto &compute = mProfiles[Compute];
         compute.bindings.push_back( {0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT} );
         compute.bindings.push_back(
             {1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_COMPUTE_BIT} );
@@ -223,6 +223,18 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL dbgUtilsCallback(
         compute.writes[1].descriptorCount = 1;
         compute.writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
         compute.writes[1].pBufferInfo = mUBOInfo.data() + 1;
+
+        auto &allUnits = mProfiles[AllUnits];
+        allUnits.bindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        allUnits.bindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        for(uint32 i = 0; i < OGRE_MAX_TEXTURE_LAYERS; ++i)
+            allUnits.bindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+
+        allUnits.poolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
+        allUnits.poolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, OGRE_MAX_TEXTURE_LAYERS});
+
+        allUnits.writes.resize(OGRE_MAX_TEXTURE_LAYERS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
+        // same dstBinding/descriptorType/pBufferInfo/pImageInfo wiring as legacy's loop, just OGRE_MAX_TEXTURE_LAYERS iterations
 
         if(volkInitialize() != VK_SUCCESS)
         {
@@ -697,7 +709,7 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
         mStorageTextures.fill( nullptr );
         mStorageImageViews.fill( VK_NULL_HANDLE );
         mComputeImageInfo = {};
-        mBoundComputeProfile = ComputeImageWrite;
+        mBoundComputeProfile = Compute;
         mUBODynOffsets = {0u, 0u};
     }
 
@@ -747,7 +759,7 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
         mStorageImageInfos[texUnit].imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
         // After creating the new view, clear stale cache entries
-        mProfiles[ComputeImageWrite].cache.clear();
+        mProfiles[Compute].cache.clear();
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::clearStorageTextureBindings()
@@ -909,7 +921,7 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
                         deviceExtensions.push_back( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
                         mRealCapabilities->setCapability(RSC_MESH_PROGRAM);
 
-                        for( auto &binding : mProfiles[GraphicsLegacy].bindings )
+                        for( auto &binding : mProfiles[Graphics].bindings )
                             binding.stageFlags |= VK_SHADER_STAGE_MESH_BIT_NV;
                     }
 #endif
@@ -1050,82 +1062,73 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
         endRenderPassDescriptor();
         //mActiveDevice->commitAndNextCommandBuffer( SubmissionType::EndFrameAndSwap );
     }
-    //-------------------------------------------------------------------------
-    void VulkanRenderSystem::flushRootLayout( void )
-    {
-        //VulkanRootLayout *rootLayout = reinterpret_cast<VulkanHlmsPso *>( mPso->rsData )->rootLayout;
-        //rootLayout->bind( mDevice, vaoManager, mGlobalTable );
-    }
 
-    VkDescriptorSet VulkanRenderSystem::getDescriptorSet( DescriptorSetProfileId profile )
-    {
-        auto &prf = mProfiles[profile];
-        if( !prf.pool )
-            return VK_NULL_HANDLE;
+VkDescriptorSet VulkanRenderSystem::getDescriptorSet( DescriptorSetProfileId profile )
+{
+    auto &prf = mProfiles[profile];
+    if( !prf.pool )
+        return VK_NULL_HANDLE;
 
-        if( profile == GraphicsLegacy )
+    if( profile == Graphics || profile == AllUnits )
+    {
+        const uint32 maxTextures = prf.numTextureUnits; // see note below
+        uint32 hash = HashCombine( 0, mUBOInfo );
+
+        int numTextures = 0;
+        for( ; numTextures < static_cast<int>( maxTextures ); numTextures++ )
         {
-            uint32 hash = HashCombine( 0, mUBOInfo );
-
-            int numTextures = 0;
-            for( ; numTextures < OGRE_MAX_TEXTURE_COORD_SETS; numTextures++ )
-            {
-                if( !mImageInfos[numTextures].imageView )
-                    break;
-                hash = HashCombine( hash, mImageInfos[numTextures] );
-            }
-
-            VkDescriptorSet retVal = prf.cache[hash];
-
-            if( retVal != VK_NULL_HANDLE )
-                return retVal;
-
-            retVal = prf.pool->allocate();
-
-            prf.writes[0].dstSet = retVal;
-            prf.writes[1].dstSet = retVal;
-            for( int i = 0; i < numTextures; i++ )
-            {
-                prf.writes[i + 2].dstSet = retVal;
-            }
-
-            int bindCount = numTextures + 2;
-            vkUpdateDescriptorSets( mActiveDevice->mDevice, bindCount, prf.writes.data(), 0, nullptr );
-
-            prf.cache[hash] = retVal;
-
-            return retVal;
+            if( !mImageInfos[numTextures].imageView )
+                break;
+            hash = HashCombine( hash, mImageInfos[numTextures] );
         }
-
-        if( profile != ComputeImageWrite )
-            return VK_NULL_HANDLE;
-
-        mComputeImageInfo = mStorageImageInfos[0];
-
-        if( !mComputeImageInfo.imageView )
-            return VK_NULL_HANDLE;
-
-        uint32 hash = HashCombine( 0u, mUBOInfo[1] );
-        hash = HashCombine( hash, mComputeImageInfo.imageView );
 
         VkDescriptorSet retVal = prf.cache[hash];
         if( retVal != VK_NULL_HANDLE )
             return retVal;
 
         retVal = prf.pool->allocate();
+
         prf.writes[0].dstSet = retVal;
-        prf.writes[0].pImageInfo = &mComputeImageInfo;  // ← ADD THIS
         prf.writes[1].dstSet = retVal;
-        vkUpdateDescriptorSets( mActiveDevice->mDevice, 2u, prf.writes.data(), 0, nullptr );
+        for( int i = 0; i < numTextures; i++ )
+            prf.writes[i + 2].dstSet = retVal;
+
+        int bindCount = numTextures + 2;
+        vkUpdateDescriptorSets( mActiveDevice->mDevice, bindCount, prf.writes.data(), 0, nullptr );
+
         prf.cache[hash] = retVal;
         return retVal;
     }
 
+    if( profile != Compute )
+        return VK_NULL_HANDLE;
+
+    mComputeImageInfo = mStorageImageInfos[0];
+
+    if( !mComputeImageInfo.imageView )
+        return VK_NULL_HANDLE;
+
+    uint32 hash = HashCombine( 0u, mUBOInfo[1] );
+    hash = HashCombine( hash, mComputeImageInfo.imageView );
+
+    VkDescriptorSet retVal = prf.cache[hash];
+    if( retVal != VK_NULL_HANDLE )
+        return retVal;
+
+    retVal = prf.pool->allocate();
+    prf.writes[0].dstSet = retVal;
+    prf.writes[0].pImageInfo = &mComputeImageInfo;
+    prf.writes[1].dstSet = retVal;
+    vkUpdateDescriptorSets( mActiveDevice->mDevice, 2u, prf.writes.data(), 0, nullptr );
+    prf.cache[hash] = retVal;
+    return retVal;
+}
+
     VkPipeline VulkanRenderSystem::getPipeline( DescriptorSetProfileId profile )
     {
-        if( profile == GraphicsLegacy )
+        if( profile == Graphics )
         {
-            auto &prf = mProfiles[GraphicsLegacy];
+            auto &prf = mProfiles[Graphics];
             pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
             pipelineCi.layout = prf.pipelineLayout;
             mssCi.rasterizationSamples =
@@ -1270,9 +1273,9 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
             vkCmdBindIndexBuffer(cmdBuffer, b, 0, itype);
         }
 
-        auto pipeline = getPipeline( GraphicsLegacy );
-        auto descriptorSet = getDescriptorSet( GraphicsLegacy );
-        auto& prf = mProfiles[GraphicsLegacy];
+        auto pipeline = getPipeline( Graphics );
+        auto descriptorSet = getDescriptorSet( Graphics );
+        auto& prf = mProfiles[Graphics];
         vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prf.pipelineLayout, 0, 1, &descriptorSet, 2,
                                 mUBODynOffsets.data());
 
@@ -1440,7 +1443,7 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
         mActiveParameters[gptype] = params;
 
         // Graphics: vertex → slot 0, fragment → slot 1
-        // Compute:  always → slot 1  (matches ComputeImageWrite descriptor layout)
+        // Compute:  always → slot 1  (matches Compute descriptor layout)
         int dstUBO;
         if( gptype == GPT_COMPUTE_PROGRAM )
             dstUBO = 1;

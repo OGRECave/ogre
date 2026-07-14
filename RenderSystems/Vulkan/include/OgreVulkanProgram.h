@@ -45,8 +45,9 @@ namespace Ogre
         enum DescriptorSetProfileHint
         {
             DescriptorSetProfileAuto,
-            DescriptorSetProfileGraphicsLegacy,
-            DescriptorSetProfileComputeImageWrite
+            DescriptorSetProfileGraphics,
+            DescriptorSetProfileCompute,
+            DescriptorSetProfileAllUnits
         };
 
         VulkanProgram( ResourceManager *creator, const String &name, ResourceHandle handle,

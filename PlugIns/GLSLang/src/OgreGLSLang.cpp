@@ -350,7 +350,7 @@ GLSLangProgram::GLSLangProgram(ResourceManager* creator, const String& name, Res
         setupBaseParamDictionary();
         ParamDictionary* dict = getParamDictionary();
         dict->addParameter(ParameterDef("descriptor_set_profile", "Descriptor set profile override. Values: Auto, "
-                                          "GraphicsLegacy, ComputeImageWrite", PT_STRING), &msCmdDescriptorSetProfile);
+                                          "Graphics, Compute, AllUnits", PT_STRING), &msCmdDescriptorSetProfile);
 
         memset(&DefaultTBuiltInResource.limits, 1, sizeof(TLimits));
 

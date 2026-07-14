@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreVulkanPrerequisites.h"
 
 #include "OgreRenderSystem.h"
-#include "OgreVulkanProgram.h"
 
 #include "OgreVulkanRenderPassDescriptor.h"
 
@@ -48,7 +47,7 @@ namespace Ogre
     *  @{
     */
 
-    #define USE_VALIDATION_LAYERS 1
+    #define USE_VALIDATION_LAYERS 0
 
     class _OgreVulkanExport VulkanRenderSystem : public RenderSystem
     {
@@ -56,8 +55,9 @@ namespace Ogre
         friend class VulkanTextureGpu;
     public:
         enum DescriptorSetProfileId {
-            GraphicsLegacy,
-            ComputeImageWrite,
+            Graphics,
+            Compute,
+            AllUnits,
             NUM_DESCRIPTOR_SET_PROFILES
         };
 
@@ -111,8 +111,6 @@ namespace Ogre
         FastArray<VkImageMemoryBarrier> mImageBarriers;
 
         void addInstanceDebugCallback( void );
-
-        void flushRootLayout( void );
 
         // Pipeline State Infos
         VkGraphicsPipelineCreateInfo pipelineCi;

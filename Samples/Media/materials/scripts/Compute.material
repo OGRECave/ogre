@@ -4,7 +4,7 @@
 compute_program Compute/CS_GLSL glslang
 {
         source ComputeCS.glsl
-        descriptor_set_profile ComputeImageWrite
+        descriptor_set_profile Compute
 
         //TODO how to handle glMemoryBarrier?
         // do other programs need to support this?

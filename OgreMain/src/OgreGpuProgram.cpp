@@ -229,13 +229,13 @@ namespace Ogre
         const RenderSystemCapabilities* caps =
             Root::getSingleton().getRenderSystem()->getCapabilities();
 
+        // Basic support check
         if ((getType() == GPT_GEOMETRY_PROGRAM && !caps->hasCapability(RSC_GEOMETRY_PROGRAM)) ||
             ((getType() == GPT_DOMAIN_PROGRAM || getType() == GPT_HULL_PROGRAM) &&
              !caps->hasCapability(RSC_TESSELLATION_PROGRAM)) ||
             (getType() == GPT_COMPUTE_PROGRAM && !caps->hasCapability(RSC_COMPUTE_PROGRAM)) ||
             ((getType() == GPT_MESH_PROGRAM || getType() == GPT_TASK_PROGRAM) && !caps->hasCapability(RSC_MESH_PROGRAM)))
         {
-            LogManager::getSingleton().logError(mName + " is not a valid program.");
             return false;
         }
 

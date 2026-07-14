@@ -52,10 +52,12 @@ namespace Ogre
                 const auto *program = static_cast<const VulkanProgram *>( target );
                 switch( program->getDescriptorSetProfileHint() )
                 {
-                case VulkanProgram::DescriptorSetProfileGraphicsLegacy:
-                    return "GraphicsLegacy";
-                case VulkanProgram::DescriptorSetProfileComputeImageWrite:
-                    return "ComputeImageWrite";
+                case VulkanProgram::DescriptorSetProfileGraphics:
+                    return "Graphics";
+                case VulkanProgram::DescriptorSetProfileCompute:
+                    return "Compute";
+                case VulkanProgram::DescriptorSetProfileAllUnits:
+                    return "AllUnits";
                 default:
                     return "Auto";
                 }
@@ -71,17 +73,21 @@ namespace Ogre
                 {
                     program->setDescriptorSetProfileHint( VulkanProgram::DescriptorSetProfileAuto );
                 }
-                else if( lowered == "graphicslegacy" || lowered == "graphics_legacy" )
+                else if( lowered == "graphics" )
                 {
                     program->setDescriptorSetProfileHint(
-                        VulkanProgram::DescriptorSetProfileGraphicsLegacy );
+                        VulkanProgram::DescriptorSetProfileGraphics );
                 }
-                else if( lowered == "computeimagewrite" || lowered == "compute_image_write" )
+                else if( lowered == "compute" )
                 {
                     program->setDescriptorSetProfileHint(
-                        VulkanProgram::DescriptorSetProfileComputeImageWrite );
+                        VulkanProgram::DescriptorSetProfileCompute );
                 }
-                else
+                else if( lowered == "allunits" )
+                {
+                    program->setDescriptorSetProfileHint(
+                        VulkanProgram::DescriptorSetProfileAllUnits );
+                }
                 {
                     LogManager::getSingleton().logWarning(
                         "[Vulkan] Unknown descriptor_set_profile '" + val +
@@ -109,7 +115,7 @@ namespace Ogre
             ParamDictionary *dict = getParamDictionary();
             dict->addParameter( ParameterDef( "descriptor_set_profile",
                                               "Descriptor set profile override. Values: Auto, "
-                                              "GraphicsLegacy, ComputeImageWrite",
+                                              "Graphics, Compute, AllUnits",
                                               PT_STRING ),
                                 &msDescriptorSetProfileCmd );
         }
