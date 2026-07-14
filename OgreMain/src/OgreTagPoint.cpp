@@ -32,9 +32,8 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------------
-    TagPoint::TagPoint(unsigned short handle, Skeleton* creator)
-        : Bone(handle, creator)
-        , mInheritParentEntityOrientation(true)
+    TagPoint::TagPoint()
+        : mInheritParentEntityOrientation(true)
         , mInheritParentEntityScale(true)
         , mParentEntity(0)
         , mChildObject(0)
@@ -96,7 +95,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void TagPoint::needUpdate(bool forceParentUpdate)
     {
-        Bone::needUpdate(forceParentUpdate);
+        Node::needUpdate(forceParentUpdate);
 
         // We need to tell parent entities node
         if (mParentEntity)
@@ -114,7 +113,7 @@ namespace Ogre {
     void TagPoint::updateFromParentImpl(void) const
     {
         // Call superclass
-        Bone::updateFromParentImpl();
+        Node::updateFromParentImpl();
 
         // Save transform for local skeleton
         mFullLocalTransform.makeTransform(
