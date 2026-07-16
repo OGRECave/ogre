@@ -173,7 +173,7 @@ namespace {
             {
                 Ogre::FileInfo info = fileNfo->at(0);
                 lookUpFileName = info.path + info.basename;
-                open = zip_entry_open(mZipFile, lookUpFileName.c_str(), OGRE_RESOURCEMANAGER_STRICT) == 0;
+                open = zip_entry_open(mZipFile, lookUpFileName.c_str()) == 0;
             }
         }
 #endif
