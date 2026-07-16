@@ -298,6 +298,9 @@ namespace Ogre {
     {
         GLenum ret = _pixelFormats[pf].internalFormat;
 
+        if(OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN && (ret == GL_BGRA_EXT || ret == GL_BGRA8_EXT))
+            return GL_NONE; // not supported on WebGL
+
         if(!hwGamma)
             return ret;
 
