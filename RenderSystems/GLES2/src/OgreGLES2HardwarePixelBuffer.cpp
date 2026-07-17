@@ -49,16 +49,9 @@ THE SOFTWARE.
 namespace Ogre {
     void GLES2TextureBuffer::_blitFromMemory(const PixelBox &src, const Box &dst)
     {
-        if (!mBuffer.contains(dst))
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Destination box out of range",
-                        "GLES2HardwarePixelBuffer::blitFromMemory");
-        }
-
         PixelBox converted;
 
-        if (src.format != mFormat)
+        if (src.format != mFormat) // must match for GLES2
         {
             // Extents match, but format is not accepted as valid source format for GL
             // do conversion in temporary buffer
@@ -430,6 +423,9 @@ namespace Ogre {
     // blitFromMemory doing hardware trilinear scaling
     void GLES2TextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
     {
+        if(!mBuffer.contains(dstBox))
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Destination box out of range");
+
         // Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
         // the source dimensions match the destination ones, in which case no scaling is needed
         // FIXME: always uses software path, as blitFromTexture is not implemented
@@ -439,9 +435,6 @@ namespace Ogre {
             _blitFromMemory(src, dstBox);
             return;
         }
-        if(!mBuffer.contains(dstBox))
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Destination box out of range",
-                        "GLES2TextureBuffer::blitFromMemory");
 
         TextureType type = (src.getDepth() != 1) ? TEX_TYPE_3D : TEX_TYPE_2D;
 

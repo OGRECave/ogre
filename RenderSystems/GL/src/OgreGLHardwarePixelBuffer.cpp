@@ -44,9 +44,6 @@ namespace Ogre {
 //-----------------------------------------------------------------------------  
 void GLTextureBuffer::_blitFromMemory(const PixelBox &src, const Box &dst)
 {
-    if(!mBuffer.contains(src))
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "destination box out of range",
-         "GLHardwarePixelBuffer::blitFromMemory");
     PixelBox converted;
     
     if(GLPixelUtil::getGLInternalFormat(src.format) == 0)
@@ -605,6 +602,9 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, c
 /// blitFromMemory doing hardware trilinear scaling
 void GLTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
 {
+    if(!mBuffer.contains(dstBox))
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "destination box out of range");
+
     /// Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
     /// - FBO is not supported
     /// - the source dimensions match the destination ones, in which case no scaling is needed
@@ -614,9 +614,6 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
         _blitFromMemory(src, dstBox);
         return;
     }
-    if(!mBuffer.contains(dstBox))
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "destination box out of range",
-                    "GLTextureBuffer::blitFromMemory");
 
     TextureType type = (src.getDepth() != 1) ? TEX_TYPE_3D : TEX_TYPE_2D;
 
