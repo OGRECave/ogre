@@ -226,7 +226,7 @@ endif ()
 target_link_libraries(OgreMain PUBLIC ${PLATFORM_LIBS} PRIVATE ${LIBRARIES} ${CMAKE_DL_LIBS})
 
 if(ANDROID)
-  target_link_libraries(OgreMain PRIVATE cpufeatures log z)
+  target_link_libraries(OgreMain PRIVATE $<BUILD_INTERFACE:cpufeatures> log z)
 endif()
 
 # specify a precompiled header to use
