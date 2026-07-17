@@ -71,9 +71,6 @@ namespace Ogre {
         //            << "(internal 0x" << std::hex << value << ")";
         //        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
-        // Set up a pixel box
-        mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
-
         if (mWidth==0 || mHeight==0 || mDepth==0)
             // We are invalid, do not allocate a buffer
             return;

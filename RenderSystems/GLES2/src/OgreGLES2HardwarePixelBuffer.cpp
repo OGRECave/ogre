@@ -121,9 +121,6 @@ namespace Ogre {
 
         mGLInternalFormat =
             GLES2PixelUtil::getGLInternalFormat(mFormat, parent->isHardwareGammaEnabled());
-
-        // Set up a pixel box
-        mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
         
         if (mWidth==0 || mHeight==0 || mDepth==0)
             // We are invalid, do not allocate a buffer
