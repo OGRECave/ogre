@@ -47,28 +47,6 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 
 namespace Ogre {
-    void GLES2TextureBuffer::_blitFromMemory(const PixelBox &src, const Box &dst)
-    {
-        PixelBox converted;
-
-        if (src.format != mFormat) // must match for GLES2
-        {
-            // Extents match, but format is not accepted as valid source format for GL
-            // do conversion in temporary buffer
-            allocateBuffer();
-            converted = mBuffer.getSubVolume(src);
-            PixelUtil::bulkPixelConversion(src, converted);
-        }
-        else
-        {
-            // No conversion needed
-            converted = src;
-        }
-
-        upload(converted, dst);
-        freeBuffer();
-    }
-
     void GLES2TextureBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
     {
         if (!mBuffer.contains(srcBox))

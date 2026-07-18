@@ -84,6 +84,28 @@ void GLHardwarePixelBufferCommon::unlockImpl(void)
     freeBuffer();
 }
 
+void GLHardwarePixelBufferCommon::_blitFromMemory(const PixelBox &src, const Box& dst)
+{
+    PixelBox converted;
+
+    if (needsConversion(src.format))
+    {
+        // Extents match, but format is not accepted as valid
+        // source format for GL. Do conversion in temporary buffer.
+        allocateBuffer();
+        converted = mBuffer.getSubVolume(src);
+        PixelUtil::bulkPixelConversion(src, converted);
+    }
+    else
+    {
+        // No conversion needed.
+        converted = src;
+    }
+
+    upload(converted, dst);
+    freeBuffer();
+}
+
 void GLHardwarePixelBufferCommon::upload(const PixelBox &data, const Box &dest)
 {
     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

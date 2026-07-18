@@ -42,26 +42,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 //-----------------------------------------------------------------------------  
-void GLTextureBuffer::_blitFromMemory(const PixelBox &src, const Box &dst)
+bool GLTextureBuffer::needsConversion(PixelFormat format)
 {
-    PixelBox converted;
-    
-    if(GLPixelUtil::getGLInternalFormat(src.format) == 0)
-    {
-        // Extents match, but format is not accepted as valid source format for GL
-        // do conversion in temporary buffer
-        allocateBuffer();
-        converted = mBuffer.getSubVolume(src);
-        PixelUtil::bulkPixelConversion(src, converted);
-    }
-    else
-    {
-        // No scaling or conversion needed
-        converted = src;
-    }
-    
-    upload(converted, dst);
-    freeBuffer();
+    return GLPixelUtil::getGLInternalFormat(format) == 0;
 }
 //-----------------------------------------------------------------------------  
 void GLTextureBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
@@ -72,7 +55,7 @@ void GLTextureBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
     if(srcBox.getOrigin() == Vector3i(0, 0 ,0) &&
        srcBox.getSize() == getSize() &&
        dst.getSize() == getSize() &&
-       GLPixelUtil::getGLInternalFormat(dst.format) != 0)
+       !needsConversion(dst.format))
     {
         // The direct case: the user wants the entire texture in a format supported by GL
         // so we don't need an intermediate buffer

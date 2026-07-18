@@ -60,6 +60,11 @@ protected:
 
     // Download a box of pixels from the card
     virtual void download(const PixelBox &data);
+
+    virtual bool needsConversion(PixelFormat format) { return format != mFormat; }
+
+    void _blitFromMemory(const PixelBox &src, const Box& dst);
+
 public:
     /// Should be called by HardwareBufferManager
     GLHardwarePixelBufferCommon(uint32 mWidth, uint32 mHeight, uint32 mDepth,
