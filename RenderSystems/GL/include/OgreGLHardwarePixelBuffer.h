@@ -59,7 +59,7 @@ namespace Ogre {
     protected:
         /// Blitting implementation
         void blitFromTexture(GLTextureBuffer *src, const Box &srcBox, const Box &dstBox);
-        void _blitFromMemory(const PixelBox &src, const Box &dst);
+        bool needsConversion(PixelFormat format) override;
 
         // In case this is a texture level
         GLenum mTarget;

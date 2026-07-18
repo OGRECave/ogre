@@ -66,7 +66,7 @@ namespace Ogre {
     protected:
         // Blitting implementation
         void blitFromTexture(GL3PlusTextureBuffer* src, const Box& srcBox, const Box& dstBox);
-        void _blitFromMemory(const PixelBox& src, const Box& dst);
+        bool needsConversion(PixelFormat format) override;
         // In case this is a texture level.
         GLenum mTarget;
         // Same as mTarget in case of GL_TEXTURE_xD, but cubemap face
