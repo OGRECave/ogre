@@ -51,38 +51,30 @@ namespace Ogre {
     {
         if (!mBuffer.contains(srcBox))
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "source box out of range",
-                        "GLES2HardwarePixelBuffer::blitToMemory");
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "source box out of range");
         }
 
-        if (srcBox.getOrigin() == Vector3i(0, 0 ,0) &&
-            srcBox.getSize() == getSize() &&
-            dst.getSize() == getSize() &&
-            GLES2PixelUtil::getGLInternalFormat(dst.format) != 0)
+        // Construct a temp PixelBox that is RGBA because GL_RGBA/GL_UNSIGNED_BYTE is the only combination that is
+        // guaranteed to work on all platforms.
+        size_t sizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, PF_A8B8G8R8);
+        PixelBox tempBox = PixelBox(mWidth, mHeight, mDepth, PF_A8B8G8R8);
+        tempBox.data = new uint8[sizeInBytes];
+
+        // Download entire buffer
+        download(tempBox);
+
+        if(srcBox.getSize() != dst.getSize())
         {
-            // The direct case: the user wants the entire texture in a format supported by GL
-            // so we don't need an intermediate buffer
-            download(dst);
+            // We need scaling
+            Image::scale(tempBox.getSubVolume(srcBox), dst, Image::FILTER_BILINEAR);
         }
         else
         {
-            // Use buffer for intermediate copy
-            allocateBuffer();
-            // Download entire buffer
-            download(mBuffer);
-            if(srcBox.getSize() != dst.getSize())
-            {
-                // We need scaling
-                Image::scale(mBuffer.getSubVolume(srcBox), dst, Image::FILTER_BILINEAR);
-            }
-            else
-            {
-                // Just copy the bit that we need
-                PixelUtil::bulkPixelConversion(mBuffer.getSubVolume(srcBox), dst);
-            }
-            freeBuffer();
+            // Just copy the bit that we need
+            PixelUtil::bulkPixelConversion(tempBox.getSubVolume(srcBox), dst);
         }
+
+        delete[] tempBox.data;
     }
     
     // TextureBuffer
@@ -266,9 +258,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void GLES2TextureBuffer::download(const PixelBox &data)
     {
-        if(data.getSize() != getSize())
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL ES",
-                        "GLES2TextureBuffer::download");
+        OgreAssert(data.getSize() == getSize(), "only download of entire buffer is supported by GL ES");
+        OgreAssert(data.format == PF_A8B8G8R8, "only download of PF_A8B8G8R8 is supported by GL ES");
 
         if(PixelUtil::isCompressed(data.format))
         {
@@ -288,29 +279,18 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &tempFBO));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, tempFBO));
 
-        // Construct a temp PixelBox that is RGBA because GL_RGBA/GL_UNSIGNED_BYTE is the only combination that is
-        // guaranteed to work on all platforms.
-        size_t sizeInBytes = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
-        PixelBox tempBox = PixelBox(data.getWidth(), data.getHeight(), data.getDepth(), PF_A8B8G8R8);
-        tempBox.data = new uint8[sizeInBytes];
-
         switch (mTarget)
         {
             case GL_TEXTURE_2D:
             case GL_TEXTURE_CUBE_MAP:
-                OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTextureID, 0));
+                OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, mFaceTarget, mTextureID, mLevel));
                 OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_FRAMEBUFFER));
                 OGRE_CHECK_GL_ERROR(glReadPixels(0, 0, data.getWidth(), data.getHeight(),
                                                  GL_RGBA,
                                                  GL_UNSIGNED_BYTE,
-                                                 tempBox.data));
+                                                 data.data));
                 break;
         }
-
-        PixelUtil::bulkPixelConversion(tempBox, data);
-
-        delete[] tempBox.data;
-        tempBox.data = 0;
 
         // Restore defaults
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
