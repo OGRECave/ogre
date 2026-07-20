@@ -23,6 +23,8 @@ Since 14.5, multi-sample textures are supported via the `TEX_TYPE_2D_MULTISAMPLE
 
 Since 14.5, `GpuProgramParameters::setUseLinearColours` can be used to specify that automatic sRGB to linear conversion should be applied to colour parameters when setting them.
 
+Since 14.6, loading of mesh formats older than v1.8 is disabled by default. Use `MeshSerializer::enablePre1_8Formats(true)` to re-enable it.
+
 ### OgreUnifiedShader.h
 
 Sampler definitions now implicitly include the `uniform` keyword to support Vulkan; i.e. this will generate an error:
@@ -167,6 +169,8 @@ pass
 Additionally `parallax_occlusion` mapping is now supported by using the respective keyword. It is also available with the Terrain Component.
 
 Since 14.5, the lighting can be done in linear space by setting `ShaderGenerator::setTargetLinearColours`. This is enabled automatically by the `ApplicationContext` when the sRGB gamma correction is enabled and by the CookTorrance sub-renderstate.
+
+Since 14.6, the `metal_roughness` sub-renderstate supports an additional `occlusion` parameter to sample ambient occlusion from the R channel of the texture.
 
 ## Terrain
 

@@ -315,29 +315,12 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL dbgUtilsCallback(
             return;
 
         mDevice->stall();
-#if 0
-        {
-            // Remove all windows.
-            // (destroy primary window last since others may depend on it)
-            RenderWindow *primary = 0;
-            WindowSet::const_iterator itor = mWindows.begin();
-            WindowSet::const_iterator endt = mWindows.end();
 
-            while( itor != endt )
-            {
-                if( !primary && ( *itor )->isPrimary() )
-                    primary = *itor;
-                else
-                    OGRE_DELETE *itor;
-
-                ++itor;
-            }
-
-            OGRE_DELETE primary;
-            mWindows.clear();
-        }
-#endif
-        _cleanupDepthBuffers();
+        // destroys the depth buffers and render targets (incl. windows) like
+        // the other render systems do - their Vulkan resources (e.g. the
+        // VMA-backed window depth texture) must be released while the device
+        // and its allocator are still alive
+        RenderSystem::shutdown();
 
         mAutoParamsBuffer.reset();
 
@@ -805,6 +788,14 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
 
             if (debugEnabled && extensionName == "VK_EXT_debug_utils")
                 reqInstanceExtensions.push_back("VK_EXT_debug_utils");
+
+#ifdef VK_KHR_portability_enumeration
+            // portability (non fully conformant) implementations like MoltenVK are
+            // only enumerated when VK_KHR_portability_enumeration is enabled
+            if (extensionName == VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME)
+                reqInstanceExtensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+#endif
+
         }
 
         reqInstanceExtensions.push_back("VK_KHR_surface"); // required for window surface
@@ -909,6 +900,10 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
                     }
                     else if( extensionName == VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME )
                         deviceExtensions.push_back( VK_EXT_SHADER_SUBGROUP_VOTE_EXTENSION_NAME );
+                    else if( extensionName == "VK_KHR_portability_subset" )
+                        // required by the spec whenever the implementation
+                        // advertises it (e.g. MoltenVK)
+                        deviceExtensions.push_back( "VK_KHR_portability_subset" );
                     else if( extensionName == VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME )
                     {
                         deviceExtensions.push_back( VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME );

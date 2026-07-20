@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgrePlatform.h"
 #include "OgreStableHeaders.h"
 
 #include "OgreMeshSerializerImpl.h"
@@ -638,19 +639,6 @@ namespace Ogre {
             popInnerChunk(stream);
         }
 
-        // validate vertex declarations
-        for (auto& binding : dest->vertexBufferBinding->getBindings())
-        {
-            for (auto& elem : dest->vertexDeclaration->findElementsBySource(binding.first))
-            {
-                if(elem.getSize() == 0)
-                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid vertex element type");
-                if (elem.getOffset() + elem.getSize() > binding.second->getVertexSize())
-                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                                "Vertex element offset + size exceeds vertex buffer stride");
-            }
-        }
-
         // Perform any necessary colour conversions from ARGB to ABGR (UBYTE4)
         dest->convertPackedColour(_DETAIL_SWAP_RB, VET_UBYTE4_NORM);
 
@@ -723,6 +711,9 @@ namespace Ogre {
         // unsigned short index;    // index of the semantic
         readShorts(stream, &index, 1);
 
+        if (dest->vertexBufferBinding->isBufferBound(source))
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Cannot add vertex element after reading buffer");
+
         dest->vertexDeclaration->addElement(source, offset, vType, vSemantic, index);
 
         if (vType == _DETAIL_SWAP_RB)
@@ -778,12 +769,19 @@ namespace Ogre {
         HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_DISCARD);
         stream->read(vbufLock.pData, vbufBytes);
 
+        auto elems = dest->vertexDeclaration->findElementsBySource(bindIndex);
+        // validate vertex element declarations
+        for (auto& elem : elems)
+        {
+            if (elem.getSize() == 0)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid vertex element type");
+            if (elem.getOffset() + elem.getSize() > vertexSize)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                                "Vertex element offset + size exceeds vertex buffer stride");
+        }
+
         // endian conversion for OSX
-        flipFromLittleEndian(
-            vbufLock.pData,
-            dest->vertexCount,
-            vertexSize,
-            dest->vertexDeclaration->findElementsBySource(bindIndex));
+        flipFromLittleEndian(vbufLock.pData, dest->vertexCount, vertexSize, elems);
 
         // Set binding
         dest->vertexBufferBinding->setBinding(bindIndex, vbuf);
@@ -873,7 +871,7 @@ namespace Ogre {
                     try {
                         readGeometry(stream, pMesh, pMesh->sharedVertexData);
                     }
-                    catch (ItemIdentityException&)
+                    catch (Exception&)
                     {
                         // duff geometry data entry with 0 vertices
                         pMesh->resetVertexData();
@@ -1443,6 +1441,9 @@ namespace Ogre {
         if (!checkChunkRemainingSize(mCurrentstreamLen, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
 
+        if(pMesh->getNumLodLevels() > 1)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "LOD levels already exist in mesh");
+
         pMesh->_setLodInfo(numLods);
         pushInnerChunk(stream);
         // lodID=0 is the original mesh. We need to skip it.
@@ -1794,6 +1795,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readEdgeList(const DataStreamPtr& stream, Mesh* pMesh)
     {
+        pMesh->mEdgeListsBuilt = true; // set this early, so any partial data is freed
+
         if (!stream->eof())
         {
             pushInnerChunk(stream);
@@ -1821,14 +1824,19 @@ namespace Ogre {
                 if (!isManual) {
 #endif
                     MeshLodUsage& usage = pMesh->mMeshLodUsageList.at(lodIndex);
+                    if(!usage.manualName.empty())
+                        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD is marked as non-manual, but has a manual mesh name");
 
-                    usage.edgeData = OGRE_NEW EdgeData();
+                    if (usage.edgeData)
+                        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Duplicate edge data for LOD");
+
+                    auto edgeData = std::make_unique<EdgeData>(); // in case of exception, will be deleted automatically
 
                     // Read detail information of the edge list
-                    readEdgeListLodInfo(stream, usage.edgeData);
+                    readEdgeListLodInfo(stream, edgeData.get());
 
                     // Postprocessing edge groups
-                    for (auto& edgeGroup : usage.edgeData->edgeGroups)
+                    for (auto& edgeGroup : edgeData->edgeGroups)
                     {
                         // Populate edgeGroup.vertexData pointers
                         // If there is shared vertex data, vertexSet 0 is that,
@@ -1849,6 +1857,8 @@ namespace Ogre {
                             edgeGroup.vertexData = pMesh->getSubMeshes().at(edgeGroup.vertexSet)->vertexData;
                         }
                     }
+
+                    usage.edgeData = edgeData.release();
                 }
 
                 if (!stream->eof())
@@ -1864,8 +1874,6 @@ namespace Ogre {
             }
             popInnerChunk(stream);
         }
-
-        pMesh->mEdgeListsBuilt = true;
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readEdgeListLodInfo(const DataStreamPtr& stream,
@@ -1909,6 +1917,9 @@ namespace Ogre {
         // unsigned long numTriangles
         uint32 numTriangles;
         readInts(stream, &numTriangles, 1);
+        if(!checkChunkRemainingSize(mCurrentstreamLen, numTriangles, sizeof(EdgeData::Triangle) + sizeof(Vector4f)))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Edge list triangle data exceeds chunk size");
+
         // Allocate correct amount of memory
         edgeData->triangles.resize(numTriangles);
         edgeData->triangleFaceNormals.resize(numTriangles);
@@ -1916,6 +1927,9 @@ namespace Ogre {
         // unsigned long numEdgeGroups
         uint32 numEdgeGroups;
         readInts(stream, &numEdgeGroups, 1);
+        if(!checkChunkRemainingSize(mCurrentstreamLen, numEdgeGroups, sizeof(uint32) * 4))
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Edge list group data exceeds chunk size");
+
         // Allocate correct amount of memory
         edgeData->edgeGroups.resize(numEdgeGroups);
         // Triangle* triangleList
@@ -1968,6 +1982,9 @@ namespace Ogre {
             // unsigned long numEdges
             uint32 numEdges;
             readInts(stream, &numEdges, 1);
+            if(!checkChunkRemainingSize(mCurrentstreamLen, numEdges, sizeof(uint32) * 6 + sizeof(bool)))
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Edge list edge data exceeds chunk size");
+
             edgeGroup.edges.resize(numEdges);
             // Edge* edgeList
             for (uint32 e = 0; e < numEdges; ++e)
@@ -3036,6 +3053,9 @@ namespace Ogre {
 
         if (!checkChunkRemainingSize(mCurrentstreamLen, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
+
+        if(pMesh->getNumLodLevels() > 1)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "LOD levels already exist in mesh");
 
         pMesh->mMeshLodUsageList.resize(numLods);
 

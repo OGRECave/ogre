@@ -107,10 +107,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void AutoParamDataSource::setCurrentRenderable(const Renderable* rend)
     {
-        OgreAssertDbg(rend, "Cannot set a null renderable");
         mGpuParamsDirty |= GPV_PER_OBJECT;
 
-        bool useIdentityView = rend->getUseIdentityView();
+        bool useIdentityView = rend && rend->getUseIdentityView();
         if (mCurrentUseIdentityView != useIdentityView)
         {
             mCurrentUseIdentityView = useIdentityView;
@@ -120,7 +119,7 @@ namespace Ogre {
             mGpuParamsDirty |= GPV_GLOBAL;
         }
 
-        bool useIdentityProj = rend->getUseIdentityProjection();
+        bool useIdentityProj = rend && rend->getUseIdentityProjection();
         if (mCurrentUseIdentityProj != useIdentityProj)
         {
             mCurrentUseIdentityProj = useIdentityProj;

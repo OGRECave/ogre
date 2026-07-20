@@ -67,7 +67,7 @@ R"HELP(Usage: OgreMeshUpgrader [opts] sourcefile [destfile]
 -f lodnumtris  = Fixed vertex reduction per LOD
 -el            = generate edge lists (for stencil shadows)
 -t             = Generate tangents (for normal mapping)
--ts [3|4]      = Tangent size (4 includes parity, default: 3)
+-ts [3|4]      = Tangent size (4 includes parity, default: 4)
 -tm            = Split tangent vertices at UV mirror points
 -tr            = Split tangent vertices where basis is rotated > 90 degrees
 -r             = DON'T reorganise buffers to recommended format
@@ -110,7 +110,7 @@ UpgradeOptions parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     // Defaults
     opts.generateEdgeLists = false;
     opts.generateTangents = false;
-    opts.tangentUseParity = false;
+    opts.tangentUseParity = true;
     opts.tangentSplitMirrored = false;
     opts.tangentSplitRotated = false;
     opts.dontReorganise = false;
@@ -182,9 +182,7 @@ UpgradeOptions parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
 
     bi = binOpts.find("-ts");
     if (!bi->second.empty()) {
-        if (bi->second == "4") {
-            opts.tangentUseParity = true;
-		}
+        opts.tangentUseParity = bi->second == "4";
     }
 
     bi = binOpts.find("-V");
@@ -562,6 +560,7 @@ int main(int numargs, char** args)
             if (existing) {
                 // safe
                 opts.generateTangents = false;
+                logMgr.logWarning("Mesh already has tangents, skipping generation");
             }
             if (opts.generateTangents) {
                 logMgr.logMessage("Generating tangent vectors...");

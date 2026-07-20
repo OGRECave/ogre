@@ -70,7 +70,6 @@ namespace Ogre {
         protected:
             // Blitting implementation
             void blitFromTexture(GLES2TextureBuffer *src, const Box &srcBox, const Box &dstBox);
-            void _blitFromMemory(const PixelBox &src, const Box &dst);
 
             // In case this is a texture level
             GLenum mTarget;

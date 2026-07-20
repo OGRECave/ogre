@@ -42,29 +42,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 //-----------------------------------------------------------------------------  
-void GLTextureBuffer::_blitFromMemory(const PixelBox &src, const Box &dst)
+bool GLTextureBuffer::needsConversion(PixelFormat format)
 {
-    if(!mBuffer.contains(src))
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "destination box out of range",
-         "GLHardwarePixelBuffer::blitFromMemory");
-    PixelBox converted;
-    
-    if(GLPixelUtil::getGLInternalFormat(src.format) == 0)
-    {
-        // Extents match, but format is not accepted as valid source format for GL
-        // do conversion in temporary buffer
-        allocateBuffer();
-        converted = mBuffer.getSubVolume(src);
-        PixelUtil::bulkPixelConversion(src, converted);
-    }
-    else
-    {
-        // No scaling or conversion needed
-        converted = src;
-    }
-    
-    upload(converted, dst);
-    freeBuffer();
+    return GLPixelUtil::getGLInternalFormat(format) == 0;
 }
 //-----------------------------------------------------------------------------  
 void GLTextureBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
@@ -75,7 +55,7 @@ void GLTextureBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
     if(srcBox.getOrigin() == Vector3i(0, 0 ,0) &&
        srcBox.getSize() == getSize() &&
        dst.getSize() == getSize() &&
-       GLPixelUtil::getGLInternalFormat(dst.format) != 0)
+       !needsConversion(dst.format))
     {
         // The direct case: the user wants the entire texture in a format supported by GL
         // so we don't need an intermediate buffer
@@ -127,8 +107,6 @@ GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent
     LogManager::getSingleton().logMessage( 
                 LML_NORMAL, str.str());
     */
-    // Set up pixel box
-    mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
     
     if(mWidth==0 || mHeight==0 || mDepth==0)
         /// We are invalid, do not allocate a buffer
@@ -605,6 +583,9 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, c
 /// blitFromMemory doing hardware trilinear scaling
 void GLTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
 {
+    if(!mBuffer.contains(dstBox))
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "destination box out of range");
+
     /// Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
     /// - FBO is not supported
     /// - the source dimensions match the destination ones, in which case no scaling is needed
@@ -614,9 +595,6 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src, const Box &dstBox)
         _blitFromMemory(src, dstBox);
         return;
     }
-    if(!mBuffer.contains(dstBox))
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "destination box out of range",
-                    "GLTextureBuffer::blitFromMemory");
 
     TextureType type = (src.getDepth() != 1) ? TEX_TYPE_3D : TEX_TYPE_2D;
 

@@ -71,9 +71,6 @@ namespace Ogre {
         //            << "(internal 0x" << std::hex << value << ")";
         //        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
-        // Set up a pixel box
-        mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
-
         if (mWidth==0 || mHeight==0 || mDepth==0)
             // We are invalid, do not allocate a buffer
             return;
@@ -524,28 +521,10 @@ namespace Ogre {
         // Delete temp texture
         TextureManager::getSingleton().remove(tex);
     }
-    void GL3PlusTextureBuffer::_blitFromMemory(const PixelBox &src, const Box& dst)
+    bool GL3PlusTextureBuffer::needsConversion(PixelFormat format)
     {
-        PixelBox converted;
-
-        if (GL3PlusPixelUtil::getGLInternalFormat(src.format) == 0)
-        {
-            // Extents match, but format is not accepted as valid
-            // source format for GL. Do conversion in temporary buffer.
-            allocateBuffer();
-            converted = mBuffer.getSubVolume(src);
-            PixelUtil::bulkPixelConversion(src, converted);
-        }
-        else
-        {
-            // No conversion needed.
-            converted = src;
-        }
-
-        upload(converted, dst);
-        freeBuffer();
+        return GL3PlusPixelUtil::getGLInternalFormat(format) == 0;
     }
-
     void GL3PlusTextureBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
     {
         if (!mBuffer.contains(srcBox))
@@ -558,7 +537,7 @@ namespace Ogre {
         if (srcBox.getOrigin() == Vector3i(0, 0 ,0) &&
             srcBox.getSize() == getSize() &&
             dst.getSize() == getSize() &&
-            GL3PlusPixelUtil::getGLInternalFormat(dst.format) != 0)
+            !needsConversion(dst.format))
         {
             // The direct case: the user wants the entire texture in a format supported by GL
             // so we don't need an intermediate buffer

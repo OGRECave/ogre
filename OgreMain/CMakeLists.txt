@@ -133,6 +133,9 @@ if (OGRE_CONFIG_ENABLE_ZIP)
   list(APPEND HEADER_FILES include/OgreZip.h)
   list(APPEND SOURCE_FILES src/OgreZip.cpp src/zip/zip.c)
 
+  set_source_files_properties(src/zip/zip.c
+    PROPERTIES COMPILE_DEFINITIONS MINIZ_NO_STDIO)
+
   if(UNIX)
     set_source_files_properties(src/OgreDeflate.cpp
       PROPERTIES COMPILE_FLAGS -Wno-unused-function)
@@ -223,7 +226,7 @@ endif ()
 target_link_libraries(OgreMain PUBLIC ${PLATFORM_LIBS} PRIVATE ${LIBRARIES} ${CMAKE_DL_LIBS})
 
 if(ANDROID)
-  target_link_libraries(OgreMain PRIVATE cpufeatures log z)
+  target_link_libraries(OgreMain PRIVATE $<BUILD_INTERFACE:cpufeatures> log z)
 endif()
 
 # specify a precompiled header to use

@@ -97,6 +97,14 @@ namespace Ogre
         createInfo.ppEnabledExtensionNames = extensions.data();
         createInfo.pNext = pNext;
 
+#ifdef VK_KHR_portability_enumeration
+        for( const char *extension : extensions )
+        {
+            if( String( extension ) == VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME )
+                createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+        }
+#endif
+
         VkInstance instance;
         OGRE_VK_CHECK(vkCreateInstance(&createInfo, 0, &instance));
         return instance;

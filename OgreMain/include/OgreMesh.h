@@ -663,7 +663,7 @@ namespace Ogre {
         */
         void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
 
-        /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
+        /** This method builds a set of tangent vectors for a given mesh.
 
             Tangent vectors are vectors representing the local 'X' axis for a given vertex based
             on the orientation of the 2D texture on the geometry. They are built from a combination

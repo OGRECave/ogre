@@ -173,7 +173,7 @@ namespace {
             {
                 Ogre::FileInfo info = fileNfo->at(0);
                 lookUpFileName = info.path + info.basename;
-                open = zip_entry_open(mZipFile, lookUpFileName.c_str(), OGRE_RESOURCEMANAGER_STRICT) == 0;
+                open = zip_entry_open(mZipFile, lookUpFileName.c_str()) == 0;
             }
         }
 #endif
@@ -188,7 +188,7 @@ namespace {
         size_t compSize  = zip_entry_comp_size(mZipFile);
         // repetitive log files have a typical ratio of ~50:1, XML 30:1, images 5:1
         const size_t MAX_RATIO = 100;
-        if (entrySize > 0 && (compSize == 0 || entrySize / compSize > MAX_RATIO))
+        if ((entrySize > 0 && (compSize == 0 || entrySize / compSize > MAX_RATIO)) || compSize > mBuffer->size())
         {
             zip_entry_close(mZipFile);
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
