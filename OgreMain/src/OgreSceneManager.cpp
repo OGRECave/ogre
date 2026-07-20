@@ -787,6 +787,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool shadowDerivation)
     size_t startLightIndex = pass->getStartLight();
     size_t shadowTexUnitIndex = 0;
     size_t shadowTexIndex = mTextureShadowRenderer.getShadowTexIndex(startLightIndex);
+    mDestRenderSystem->_setPassHints( pass );
     for(auto *pTex : pass->getTextureUnitStates())
     {
         if (!pass->getIteratePerLight() && isShadowTechniqueTextureBased() &&

@@ -69,6 +69,7 @@ namespace Ogre
             std::vector<VkDescriptorPoolSize> poolSizes;
             std::vector<VkWriteDescriptorSet> writes;
             std::unordered_map<uint32, VkDescriptorSet> cache;
+            uint32 numTextureUnits = 0u;
         };
 
     private:
@@ -134,6 +135,7 @@ namespace Ogre
         std::array<VulkanTextureGpu *, OGRE_MAX_TEXTURE_LAYERS> mStorageTextures;
         std::array<VkImageView, OGRE_MAX_TEXTURE_LAYERS> mStorageImageViews;
         DescriptorSetProfileId mBoundComputeProfile;
+        DescriptorSetProfileId mBoundGraphicsProfile;
 
         std::array<VkPipelineColorBlendAttachmentState, OGRE_MAX_MULTIPLE_RENDER_TARGETS> blendStates;
 
@@ -201,6 +203,8 @@ namespace Ogre
         Real getMinimumDepthInputValue( void ) override;
         Real getMaximumDepthInputValue( void ) override;
 
+        ushort _getCurrentPassNumTextureUnits() const override;
+
         void beginProfileEvent( const String &eventName ) override;
         void endProfileEvent( void ) override;
         void markProfileEvent( const String &event ) override;
@@ -230,6 +234,7 @@ namespace Ogre
         void setScissorTest(bool enabled, const Rect& rect = Rect()) override;
         void setStencilState(const StencilState& state) override;
         void _setPolygonMode(PolygonMode level) override;
+        void _setPassHints(const Pass* pass) override;
         void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool) override;
         void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) override;
         void _setDepthBufferParams(bool depthTest, bool depthWrite, CompareFunction depthFunction) override;

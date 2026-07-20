@@ -266,7 +266,7 @@ namespace Ogre
         typedef std::set<String> ShaderProfiles;
     private:
         /// This is used to build a database of RSC's
-        /// if a RSC with same name, but newer version is introduced, the older one 
+        /// if a RSC with same name, but newer version is introduced, the older one
         /// will be removed
         DriverVersion mDriverVersion;
         /// GPU Vendor
@@ -277,6 +277,8 @@ namespace Ogre
 
         /// The number of texture units available
         ushort mNumTextureUnits;
+        /// The number of texture units available under an alternate profile, with fallback to the regular number
+        ushort mNumTextureUnitsWide;
         /// The stencil buffer bit depth
         ushort mStencilBufferBitDepth;
         /// Stores the capabilities flags.
@@ -308,7 +310,7 @@ namespace Ogre
 
         /// The number of vertex attributes available
         ushort mNumVertexAttributes;
-    public: 
+    public:
         RenderSystemCapabilities ();
 
         /** Set the driver version. */
@@ -355,17 +357,17 @@ namespace Ogre
         {
             if (mDriverVersion.major < v.major)
                 return true;
-            else if (mDriverVersion.major == v.major && 
-                mDriverVersion.minor < v.minor)
+            else if (mDriverVersion.major == v.major &&
+                     mDriverVersion.minor < v.minor)
                 return true;
-            else if (mDriverVersion.major == v.major && 
-                mDriverVersion.minor == v.minor && 
-                mDriverVersion.release < v.release)
+            else if (mDriverVersion.major == v.major &&
+                     mDriverVersion.minor == v.minor &&
+                     mDriverVersion.release < v.release)
                 return true;
-            else if (mDriverVersion.major == v.major && 
-                mDriverVersion.minor == v.minor && 
-                mDriverVersion.release == v.release &&
-                mDriverVersion.build < v.build)
+            else if (mDriverVersion.major == v.major &&
+                     mDriverVersion.minor == v.minor &&
+                     mDriverVersion.release == v.release &&
+                     mDriverVersion.build < v.build)
                 return true;
             return false;
         }
@@ -373,6 +375,13 @@ namespace Ogre
         void setNumTextureUnits(ushort num)
         {
             mNumTextureUnits = num;
+            if (mNumTextureUnitsWide == 0)
+                mNumTextureUnitsWide = num;
+        }
+
+        void setNumTextureUnitsWide(ushort num)
+        {
+            mNumTextureUnitsWide = num;
         }
 
         /// @deprecated do not use
@@ -401,17 +410,28 @@ namespace Ogre
         supports.
 
         For use in rendering, this determines how many texture units the
-        are available for multitexturing (i.e. rendering multiple 
-        textures in a single pass). Where a Material has multiple 
-        texture layers, it will try to use multitexturing where 
+        are available for multitexturing (i.e. rendering multiple
+        textures in a single pass). Where a Material has multiple
+        texture layers, it will try to use multitexturing where
         available, and where it is not available, will perform multipass
         rendering to achieve the same effect. This property only applies
-        to the fixed-function pipeline, the number available to the 
+        to the fixed-function pipeline, the number available to the
         programmable pipeline depends on the shader model in use.
         */
         ushort getNumTextureUnits(void) const
         {
             return mNumTextureUnits;
+        }
+
+        /** Returns the greater than or equal number of texture units an
+        alternate profile provides.
+
+        Presently specific to Vulkan. For use with the AllUnits descriptor
+        set profile.
+        */
+        ushort getNumTextureUnitsWide(void) const
+        {
+            return mNumTextureUnitsWide;
         }
 
         /// @deprecated assume 8-bit stencil buffer
@@ -438,7 +458,7 @@ namespace Ogre
 
         /** Adds a capability flag
         */
-        void setCapability(const Capabilities c) 
+        void setCapability(const Capabilities c)
         {
             int index = (CAPS_CATEGORY_MASK & c) >> OGRE_CAPS_BITSHIFT;
             // zero out the index from the stored capability
@@ -447,8 +467,8 @@ namespace Ogre
 
         /** Remove a capability flag
         */
-        void unsetCapability(const Capabilities c) 
-        { 
+        void unsetCapability(const Capabilities c)
+        {
             int index = (CAPS_CATEGORY_MASK & c) >> OGRE_CAPS_BITSHIFT;
             // zero out the index from the stored capability
             mCapabilities[index] &= (~c | CAPS_CATEGORY_MASK);
@@ -630,8 +650,8 @@ namespace Ogre
 
     };
 
-    inline String to_string(GPUVendor v) { return RenderSystemCapabilities::vendorToString(v); }
     inline String to_string(const DriverVersion& v) { return v.toString(); }
+    inline String to_string(GPUVendor v) { return RenderSystemCapabilities::vendorToString(v); }
 
     /** @} */
     /** @} */

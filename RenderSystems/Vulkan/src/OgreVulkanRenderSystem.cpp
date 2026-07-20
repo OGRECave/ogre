@@ -131,6 +131,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL dbgUtilsCallback(
         mStorageTextures{},
         mStorageImageViews{},
         mBoundComputeProfile( Compute ),
+        mBoundGraphicsProfile( Graphics ),
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
         mScissorRect{},
@@ -173,12 +174,13 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL dbgUtilsCallback(
         viewportStateCi.viewportCount = 1u;
         viewportStateCi.scissorCount = 1u;
 
-        // use a single descriptor set for all shaders
+        // single descriptor set for most shaders
         auto& graphics = mProfiles[Graphics];
         graphics.bindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
         graphics.bindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
         for(uint32 i = 0; i < OGRE_MAX_TEXTURE_COORD_SETS; ++i)
             graphics.bindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        graphics.numTextureUnits = OGRE_MAX_TEXTURE_COORD_SETS;
 
         // one descriptor will have at most OGRE_MAX_TEXTURE_LAYERS and one UBO per shader type (for now)
         graphics.poolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
@@ -229,12 +231,30 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL dbgUtilsCallback(
         allUnits.bindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
         for(uint32 i = 0; i < OGRE_MAX_TEXTURE_LAYERS; ++i)
             allUnits.bindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        allUnits.numTextureUnits = OGRE_MAX_TEXTURE_LAYERS;
 
         allUnits.poolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
         allUnits.poolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, OGRE_MAX_TEXTURE_LAYERS});
 
         allUnits.writes.resize(OGRE_MAX_TEXTURE_LAYERS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
-        // same dstBinding/descriptorType/pBufferInfo/pImageInfo wiring as legacy's loop, just OGRE_MAX_TEXTURE_LAYERS iterations
+
+        allUnits.writes[0].dstBinding = 0;
+        allUnits.writes[0].descriptorCount = 1;
+        allUnits.writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        allUnits.writes[0].pBufferInfo = mUBOInfo.data();
+
+        allUnits.writes[1].dstBinding = 1;
+        allUnits.writes[1].descriptorCount = 1;
+        allUnits.writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        allUnits.writes[1].pBufferInfo = mUBOInfo.data() + 1;
+
+        for(int i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
+        {
+            allUnits.writes[i + 2].dstBinding = 2 + i;
+            allUnits.writes[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            allUnits.writes[i + 2].pImageInfo = mImageInfos.data() + i;
+            allUnits.writes[i + 2].descriptorCount = 1;
+        }
 
         if(volkInitialize() != VK_SUCCESS)
         {
@@ -598,6 +618,7 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
 
         //rsc->setCapability( RSC_HWSTENCIL );
         rsc->setNumTextureUnits( OGRE_MAX_TEXTURE_COORD_SETS );
+        rsc->setNumTextureUnitsWide( OGRE_MAX_TEXTURE_LAYERS );
         rsc->setCapability( RSC_TEXTURE_COMPRESSION );
         rsc->setCapability( RSC_32BIT_INDEX );
         rsc->setCapability( RSC_TWO_SIDED_STENCIL );
@@ -693,6 +714,7 @@ void VulkanRenderSystem::addInstanceDebugCallback( void )
         mStorageImageViews.fill( VK_NULL_HANDLE );
         mComputeImageInfo = {};
         mBoundComputeProfile = Compute;
+        mBoundGraphicsProfile = Graphics;
         mUBODynOffsets = {0u, 0u};
     }
 
@@ -1119,57 +1141,50 @@ VkDescriptorSet VulkanRenderSystem::getDescriptorSet( DescriptorSetProfileId pro
     return retVal;
 }
 
-    VkPipeline VulkanRenderSystem::getPipeline( DescriptorSetProfileId profile )
+VkPipeline VulkanRenderSystem::getPipeline( DescriptorSetProfileId profile )
+{
+    if( profile == Graphics || profile == AllUnits )
     {
-        if( profile == Graphics )
-        {
-            auto &prf = mProfiles[Graphics];
-            pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
-            pipelineCi.layout = prf.pipelineLayout;
-            mssCi.rasterizationSamples =
-                VkSampleCountFlagBits( std::max( mActiveRenderTarget->getFSAA(), 1u ) );
+        auto &prf = mProfiles[profile];
+        pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
+        pipelineCi.layout = prf.pipelineLayout;
+        mssCi.rasterizationSamples =
+            VkSampleCountFlagBits( std::max( mActiveRenderTarget->getFSAA(), 1u ) );
 
-            auto hash = HashCombine( 0, pipelineCi.renderPass );
-            hash = HashCombine( hash, blendStates[0] );
-            hash = HashCombine( hash, rasterState );
-            hash = HashCombine( hash, inputAssemblyCi );
-            hash = HashCombine( hash, mssCi );
-            hash = HashCombine( hash, depthStencilStateCi );
+        auto hash = HashCombine( 0, uint32( profile ) );   // ← the fix from two messages ago, folded in here
+        hash = HashCombine( hash, pipelineCi.renderPass );
+        hash = HashCombine( hash, blendStates[0] );
+        hash = HashCombine( hash, rasterState );
+        hash = HashCombine( hash, inputAssemblyCi );
+        hash = HashCombine( hash, mssCi );
+        hash = HashCombine( hash, depthStencilStateCi );
 
-            for( uint32 i = 0; i < vertexFormatCi.vertexAttributeDescriptionCount; i++ )
-            {
-                hash = HashCombine( hash, vertexFormatCi.pVertexAttributeDescriptions[i] );
-            }
+        for( uint32 i = 0; i < vertexFormatCi.vertexAttributeDescriptionCount; i++ )
+            hash = HashCombine( hash, vertexFormatCi.pVertexAttributeDescriptions[i] );
 
-            for( uint32 i = 0; i < vertexFormatCi.vertexBindingDescriptionCount; i++ )
-            {
-                hash = HashCombine( hash, vertexFormatCi.pVertexBindingDescriptions[i] );
-            }
+        for( uint32 i = 0; i < vertexFormatCi.vertexBindingDescriptionCount; i++ )
+            hash = HashCombine( hash, vertexFormatCi.pVertexBindingDescriptions[i] );
 
-            for( uint32 i = 0; i < pipelineCi.stageCount; i++ )
-            {
-                hash = HashCombine( hash, mBoundGpuPrograms[i] );
-            }
+        for( uint32 i = 0; i < pipelineCi.stageCount; i++ )
+            hash = HashCombine( hash, mBoundGpuPrograms[i] );
 
-            VkPipeline retVal = mPipelineCache[hash];
-            if( retVal != VK_NULL_HANDLE )
-                return retVal;
-
-            // if we resize the window, we create new FBOs which mean a new renderpass and invalid caches anyway..
-            const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR};
-            VkPipelineDynamicStateCreateInfo dynamicStateCi =
-                {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
-            dynamicStateCi.dynamicStateCount = 1;
-            dynamicStateCi.pDynamicStates = dynamicStates;
-            pipelineCi.pDynamicState = &dynamicStateCi;
-
-            OGRE_VK_CHECK(
-                vkCreateGraphicsPipelines( mActiveDevice->mDevice, 0, 1, &pipelineCi, 0, &retVal ) );
-
-            mPipelineCache[hash] = retVal;
-
+        VkPipeline retVal = mPipelineCache[hash];
+        if( retVal != VK_NULL_HANDLE )
             return retVal;
-        }
+
+        const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR};
+        VkPipelineDynamicStateCreateInfo dynamicStateCi =
+        {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+        dynamicStateCi.dynamicStateCount = 1;
+        dynamicStateCi.pDynamicStates = dynamicStates;
+        pipelineCi.pDynamicState = &dynamicStateCi;
+
+        OGRE_VK_CHECK(
+            vkCreateGraphicsPipelines( mActiveDevice->mDevice, 0, 1, &pipelineCi, 0, &retVal ) );
+
+        mPipelineCache[hash] = retVal;
+        return retVal;
+    }
 
         auto &prf = mProfiles[profile];
         if( prf.pipelineLayout == VK_NULL_HANDLE )
@@ -1268,9 +1283,9 @@ VkDescriptorSet VulkanRenderSystem::getDescriptorSet( DescriptorSetProfileId pro
             vkCmdBindIndexBuffer(cmdBuffer, b, 0, itype);
         }
 
-        auto pipeline = getPipeline( Graphics );
-        auto descriptorSet = getDescriptorSet( Graphics );
-        auto& prf = mProfiles[Graphics];
+        auto pipeline = getPipeline( mBoundGraphicsProfile );
+        auto descriptorSet = getDescriptorSet( mBoundGraphicsProfile );
+        auto& prf = mProfiles[mBoundGraphicsProfile];
         vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prf.pipelineLayout, 0, 1, &descriptorSet, 2,
                                 mUBODynOffsets.data());
 
@@ -1557,6 +1572,19 @@ VkDescriptorSet VulkanRenderSystem::getDescriptorSet( DescriptorSetProfileId pro
     void VulkanRenderSystem::_setPolygonMode(PolygonMode level)
     {
         rasterState.polygonMode = VulkanMappings::get(level);
+    }
+
+    void VulkanRenderSystem::_setPassHints( const Pass* pass )
+    {
+        mBoundGraphicsProfile =
+            ( pass->getDescriptorProfileHint() == DescriptorProfileHint::AllUnits ) ? AllUnits : Graphics;
+    }
+
+    ushort VulkanRenderSystem::_getCurrentPassNumTextureUnits() const
+    {
+        return ( mBoundGraphicsProfile == AllUnits )
+            ? mRealCapabilities->getNumTextureUnitsWide()
+            : mRealCapabilities->getNumTextureUnits();
     }
 
     void VulkanRenderSystem::_convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool)
