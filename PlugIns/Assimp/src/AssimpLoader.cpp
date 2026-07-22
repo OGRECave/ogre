@@ -665,7 +665,11 @@ void AssimpLoader::parseAnimation(const aiScene* mScene, int index, aiAnimation*
                 }
                 else
                 {
-                    keyframes[(Real)node_anim->mRotationKeys[j].mTime / mTicksPerSecond] =
+                    // A scale key with no coincident pos/rot keyframe must key
+                    // the merged map by its OWN scaling time; keying it by the
+                    // rotation time inserts garbage times and reads out of
+                    // bounds when the channel has fewer rotation than scale keys.
+                    keyframes[(Real)node_anim->mScalingKeys[j].mTime / mTicksPerSecond] =
                         KeyframeData(NULL, NULL, &(node_anim->mScalingKeys[j]));
                 }
             }
@@ -685,6 +689,20 @@ void AssimpLoader::parseAnimation(const aiScene* mScene, int index, aiAnimation*
 
                     aiVector3D aiScale = getScale(node_anim, keyframes, it, mTicksPerSecond);
                     Vector3 scale(aiScale.x, aiScale.y, aiScale.z);
+
+                    // Each keyframe is composed into a full local transform and
+                    // premultiplied by the inverse bind pose, so a component
+                    // whose channel carries NO keys at all must fall back to the
+                    // bone's BIND-pose value, not the getX helpers' neutral
+                    // (0,0,0)/identity/(1,1,1): a neutral placeholder bakes the
+                    // inverse bind in as drift (missing tracks would collapse the
+                    // bone to the origin and sink its descendants).
+                    if (node_anim->mNumPositionKeys == 0)
+                        trans = bone->getPosition();
+                    if (node_anim->mNumRotationKeys == 0)
+                        rot = bone->getOrientation();
+                    if (node_anim->mNumScalingKeys == 0)
+                        scale = bone->getScale();
 
                     Vector3 transCopy = trans;
 
