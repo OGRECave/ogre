@@ -77,6 +77,10 @@ void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pG
 {
     GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
 
+    // Forward shared parameter sets to the concrete GpuProgramParameters,
+    for (const auto& sharedParams : pCpuProgram->getSharedParameters())
+        pGpuParams->addSharedParameters(sharedParams);
+
     pGpuParams->setUseLinearColours(pCpuProgram->getUseLinearColours());
     for (const auto& p : pCpuProgram->getParameters())
     {

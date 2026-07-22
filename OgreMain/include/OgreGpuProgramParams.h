@@ -489,6 +489,9 @@ namespace Ogre {
          */
         const GpuNamedConstants& getConstantDefinitions() const;
 
+        /// Get the constant definitions ordered by their physical index.
+        std::vector<std::pair<String, GpuConstantDefinition>> getConstantDefinitionsSorted() const;
+
         /** @copydoc GpuProgramParameters::setNamedConstant(const String&, Real) */
         template <typename T> void setNamedConstant(const String& name, T val)
         {
