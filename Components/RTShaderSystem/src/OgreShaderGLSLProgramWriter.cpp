@@ -151,6 +151,33 @@ void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, 
     os << "};\n";
 }
 
+void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, int binding,
+                                          const GpuSharedParametersPtr& params)
+{
+    // Explicit binding needs GLSL 420 / SPIR-V; otherwise the RS assigns it by block name.
+    bool explicitBinding = mIsVulkan || mGLSLVersion >= 420;
+
+    os << "layout(";
+    if (explicitBinding)
+        os << "binding = " << binding << ", ";
+    os << "std140, row_major) uniform " << name << " {\n";
+
+    for (const auto& e : params->getConstantDefinitionsSorted())
+    {
+        const GpuConstantDefinition& def = e.second;
+
+        if (def.constType == GCT_MATRIX_3X4 || def.constType == GCT_MATRIX_2X4)
+            os << "layout(column_major) ";
+
+        os << "\t" << mGpuConstTypeMap[def.constType] << " " << e.first;
+        if (def.arraySize > 1)
+            os << "[" << def.arraySize << "]";
+        os << ";\n";
+    }
+
+    os << "};\n";
+}
+
 void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 {
     GpuProgramType gpuType = program->getType();
@@ -187,6 +214,10 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
         writeUniformBlock(os, "OgreUniforms", gpuType, uniforms);
         uniforms.clear();
     }
+
+    int sharedBinding = GPT_FRAGMENT_PROGRAM + 1;
+    for (const auto& shared : program->getSharedParameters())
+        writeUniformBlock(os, shared->getName(), sharedBinding++, shared);
 
     int uniformLoc = 0;
     for (const auto& uparam : uniforms)

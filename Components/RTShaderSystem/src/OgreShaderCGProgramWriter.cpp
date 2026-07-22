@@ -86,6 +86,30 @@ void CGProgramWriter::initializeStringMaps()
     mParamSemanticMap[Parameter::SPS_LAYER] = "SV_RenderTargetArrayIndex";
 }
 
+void CGProgramWriter::writeSharedParams(std::ostream& os, const String& name, int registerIdx, const GpuSharedParametersPtr& params)
+{
+    // In HLSL/D3D11 constant buffers are bound to register(bN).
+    // Only SM4+ (ps_4_0 and up) understands cbuffer/register(b#).
+    bool useRegister = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
+
+    os << "cbuffer " << name;
+    if (useRegister)
+        os << " : register(b" << registerIdx << ")";
+    os << " {\n";
+
+    for (const auto& e : params->getConstantDefinitionsSorted())
+    {
+        const GpuConstantDefinition& def = e.second;
+
+        os << "\t" << mGpuConstTypeMap[def.constType] << " " << e.first;
+        if (def.arraySize > 1)
+            os << "[" << def.arraySize << "]";
+        os << ";\n";
+    }
+
+    os << "};\n";
+}
+
 //-----------------------------------------------------------------------
 void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
@@ -108,6 +132,9 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     }
     os << std::endl;
 
+    int sharedRegister = 1;
+    for (const auto& shared : program->getSharedParameters())
+        writeSharedParams(os, shared->getName(), sharedRegister++, shared);
 
     Function* curFunction = program->getMain();
 

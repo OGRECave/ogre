@@ -77,6 +77,7 @@ public:
 
 // Protected methods.
 protected:
+    void writeSharedParams(std::ostream& os, const String& name, int registerIdx, const GpuSharedParametersPtr& params);
 
     /** Initialize string maps. */
     void initializeStringMaps();
