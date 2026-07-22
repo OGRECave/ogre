@@ -128,6 +128,10 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
         os << "#extension GL_ARB_shader_viewport_layer_array : require\n";
     }
 
+    int sharedBinding = GPT_FRAGMENT_PROGRAM + 1;
+    for (const auto& shared : program->getSharedParameters())
+        writeUniformBlock(os, shared->getName(), sharedBinding++, shared);
+
     // Generate dependencies.
     writeProgramDependencies(os, program);
     os << std::endl;
@@ -145,6 +149,33 @@ void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, 
         if(uparam->getType() == GCT_MATRIX_3X4 || uparam->getType() == GCT_MATRIX_2X4)
             os << "layout(column_major) ";
         writeParameter(os, uparam);
+        os << ";\n";
+    }
+
+    os << "};\n";
+}
+
+void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, int binding,
+                                          const GpuSharedParametersPtr& params)
+{
+    // Explicit binding needs GLSL 420 / SPIR-V; otherwise the RS assigns it by block name.
+    bool explicitBinding = mIsVulkan || mGLSLVersion >= 420;
+
+    os << "layout(";
+    if (explicitBinding)
+        os << "binding = " << binding << ", ";
+    os << "std140, row_major) uniform " << name << " {\n";
+
+    for (const auto& e : params->getConstantDefinitionsSorted())
+    {
+        const GpuConstantDefinition& def = e.second;
+
+        if (def.constType == GCT_MATRIX_3X4 || def.constType == GCT_MATRIX_2X4)
+            os << "layout(column_major) ";
+
+        os << "\t" << mGpuConstTypeMap[def.constType] << " " << e.first;
+        if (def.arraySize > 1)
+            os << "[" << def.arraySize << "]";
         os << ";\n";
     }
 

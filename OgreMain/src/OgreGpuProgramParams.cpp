@@ -486,6 +486,15 @@ namespace Ogre
     {
         return mNamedConstants;
     }
+    std::vector<std::pair<String, GpuConstantDefinition>> GpuSharedParameters::getConstantDefinitionsSorted() const
+    {
+        std::vector<std::pair<String, GpuConstantDefinition>> ordered(mNamedConstants.map.begin(),
+                                                                      mNamedConstants.map.end());
+        std::sort(ordered.begin(), ordered.end(),
+                  [](const auto& a, const auto& b) { return a.second.physicalIndex < b.second.physicalIndex; });
+
+        return ordered;
+    }
     //---------------------------------------------------------------------
     void GpuSharedParameters::setNamedConstant(const String& name, const Matrix4& m)
     {
