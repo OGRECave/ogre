@@ -489,6 +489,9 @@ namespace Ogre {
          */
         const GpuNamedConstants& getConstantDefinitions() const;
 
+        /// Get the constant definitions ordered by their physical index.
+        std::vector<std::pair<String, GpuConstantDefinition>> getConstantDefinitionsSorted() const;
+
         /** @copydoc GpuProgramParameters::setNamedConstant(const String&, Real) */
         template <typename T> void setNamedConstant(const String& name, T val)
         {
@@ -1143,6 +1146,12 @@ namespace Ogre {
             ACT_POINT_PARAMS,
             /// the LOD index as selected by the active LodStrategy
             ACT_MATERIAL_LOD_INDEX,
+            /// Clustered (froxel) lighting grid size parameters
+            /// packed as `(countX, countY, yFix, tileSizePx)`
+            ACT_FROXEL_TILE_PARAMS,
+            /// Clustered (froxel) lighting depth parameters
+            /// packed as `(scaleZ, biasZ, linZ, sliceCount)`
+            ACT_FROXEL_DEPTH_PARAMS,
         };
 
         /** Defines the type of the extra data item used by the auto constant.

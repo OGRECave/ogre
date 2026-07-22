@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 #include "OgreControllerManager.h"
 #include "OgreViewport.h"
+#include "OgreFroxelizer.h"
+
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------------
@@ -56,6 +59,7 @@ namespace Ogre {
          mSceneDepthRangeDirty(true),
          mLodCameraPositionDirty(true),
          mLodCameraPositionObjectSpaceDirty(true),
+         mFroxelStructureDirty(true),
          mCurrentRenderable(0),
          mCurrentCamera(0),
          mCameraRelativeRendering(false),
@@ -75,6 +79,8 @@ namespace Ogre {
         mBlankLight.setSpecularColour(ColourValue::Black);
         mBlankLight.setAttenuation(0,1,0,0);
         mDummyNode.attachObject(&mBlankLight);
+        mFroxelizer = std::make_unique<Froxelizer>();
+
         for(size_t i = 0; i < OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i)
         {
             mTextureViewProjMatrixDirty[i] = true;
@@ -86,6 +92,7 @@ namespace Ogre {
         }
 
     }
+    AutoParamDataSource::~AutoParamDataSource() = default;
     //-----------------------------------------------------------------------------
 	const Camera* AutoParamDataSource::getCurrentCamera() const
 	{
@@ -163,6 +170,7 @@ namespace Ogre {
         mCameraPositionDirty = true;
         mLodCameraPositionObjectSpaceDirty = true;
         mLodCameraPositionDirty = true;
+        mFroxelStructureDirty = true;
     }
     void AutoParamDataSource::setCameraArray(const std::vector<const Camera*> cameras)
     {
@@ -194,6 +202,7 @@ namespace Ogre {
             mSpotlightWorldViewProjMatrixDirty[i] = true;
         }
 
+        mFroxelStructureDirty = true;
     }
     //---------------------------------------------------------------------
     float AutoParamDataSource::getLightNumber(size_t index) const
@@ -1290,5 +1299,69 @@ namespace Ogre {
         }
     }
 
+    const Vector4f& AutoParamDataSource::getFroxelTileParams() const
+    {
+        if(mFroxelStructureDirty)
+        {
+            mFroxelizer->update(mCurrentCamera, mCurrentViewport, *mCurrentLightList);
+            mFroxelStructureDirty = false;
+        }
+
+        return mFroxelizer->getTileParams();
+    }
+
+    const Vector4f& AutoParamDataSource::getFroxelDepthParams() const
+    {
+        if(mFroxelStructureDirty)
+        {
+            mFroxelizer->update(mCurrentCamera, mCurrentViewport, *mCurrentLightList);
+            mFroxelStructureDirty = false;
+        }
+
+        return mFroxelizer->getDepthParams();
+    }
+
+    void AutoParamDataSource::updateFroxelData()
+    {
+        if (mFroxelStructureDirty)
+        {
+            mFroxelizer->update(mCurrentCamera, mCurrentViewport, *mCurrentLightList);
+            mFroxelStructureDirty = false;
+        }
+
+        const auto& grid = mFroxelizer->getGrid();
+        const auto& records = mFroxelizer->getRecords();
+
+        OgreAssert(grid.size() == Froxelizer::MAX_FROXELS, "Assuming a 16x16x16 froxel grid for now");
+        OgreAssert(records.size() <= Froxelizer::MAX_FROXEL_RECORDS, "max of 16384 froxel records for now");
+
+        auto& mgr = GpuProgramManager::getSingleton();
+        if(!mFroxelParams)
+        {
+            if(mgr.getAvailableSharedParameters().count("OgreFroxels") == 0)
+            {
+                mFroxelParams = mgr.createSharedParameters("OgreFroxels");
+                // packed as uvec4
+                mFroxelParams->addConstantDefinition("froxelGrid", GCT_UINT4, Froxelizer::MAX_FROXELS/4);
+                // 4 light bytes per uint, 16 per uvec4
+                mFroxelParams->addConstantDefinition("froxelRecords", GCT_UINT4, Froxelizer::MAX_FROXEL_RECORDS/16);
+            }
+            else
+            {
+                mFroxelParams = mgr.getSharedParameters("OgreFroxels");
+            }
+        }
+
+        // Packs 16 light indices into one uvec4
+        const uint32 recordWords = (std::max<uint32>(records.size(), 1u) + 3) / 4;
+
+        std::vector<uint32> recordData(recordWords, 0);
+        for (uint32 i = 0; i < records.size(); ++i)
+            recordData[i >> 2] |= uint32(records[i]) << ((i & 3u) * 8u);
+
+        // Upload grid (packed offset << 8 | count)
+        mFroxelParams->setNamedConstant("froxelGrid", grid.data(), grid.size());
+        mFroxelParams->setNamedConstant("froxelRecords", recordData.data(), recordData.size());
+    }
 }
 

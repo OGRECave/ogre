@@ -88,6 +88,8 @@ protected:
 
     void writeUniformBlock(std::ostream& os, const String& name, int binding, const UniformParameterList& uniforms);
 
+    void writeUniformBlock(std::ostream& os, const String& name, int binding, const GpuSharedParametersPtr& params);
+
 protected:
     typedef std::map<Parameter::Semantic, const char*>  ParamSemanticToStringMap;
 

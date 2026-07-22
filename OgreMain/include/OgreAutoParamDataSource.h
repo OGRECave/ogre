@@ -37,6 +37,7 @@ namespace Ogre {
 
     // forward decls
     struct VisibleObjectsBoundsInfo;
+    struct Froxelizer;
 
     /** \addtogroup Core
     *  @{
@@ -120,7 +121,10 @@ namespace Ogre {
         mutable bool mSceneDepthRangeDirty;
         mutable bool mLodCameraPositionDirty;
         mutable bool mLodCameraPositionObjectSpaceDirty;
+        mutable bool mFroxelStructureDirty;
 
+        std::unique_ptr<Froxelizer> mFroxelizer;
+        GpuSharedParametersPtr mFroxelParams;
         const Renderable* mCurrentRenderable;
         const Camera* mCurrentCamera;
         std::vector<const Camera*> mCameraArray;
@@ -144,6 +148,7 @@ namespace Ogre {
         bool mCurrentUseIdentityProj;
     public:
         AutoParamDataSource();
+        ~AutoParamDataSource();
         /** Updates the current renderable */
         void setCurrentRenderable(const Renderable* rend);
         /** Sets the world matrices, avoid query from renderable again */
@@ -298,6 +303,11 @@ namespace Ogre {
         uint16 getGpuParamsDirty() const { return mGpuParamsDirty; }
         void resetGpuParamsDirty() { mGpuParamsDirty = 0; }
         void updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const;
+
+        const Vector4f& getFroxelTileParams() const;
+        const Vector4f& getFroxelDepthParams() const;
+        // Updates the froxel data in the shared parameters
+        void updateFroxelData();
     };
     /** @} */
     /** @} */

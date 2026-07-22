@@ -184,6 +184,9 @@ public:
     void setUseLinearColours(bool useLinear) { mUseLinearColours = useLinear; }
     bool getUseLinearColours() const { return mUseLinearColours; }
 
+    void addSharedParameters(GpuSharedParametersPtr sharedParams) { mSharedParameters.push_back(sharedParams); }
+    const std::vector<GpuSharedParametersPtr>& getSharedParameters() const { return mSharedParameters; }
+
     /** Class destructor */
     ~Program();
 // Protected methods.
@@ -213,6 +216,8 @@ private:
     StringVector mDependencies;
     /// preprocessor definitions
     String mPreprocessorDefines;
+    /// Shared parameter sets referenced by this program
+    std::vector<GpuSharedParametersPtr> mSharedParameters;
     // Skeletal animation calculation
     bool mSkeletalAnimation;
     // Whether to pass matrices as column-major.

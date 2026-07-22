@@ -274,6 +274,7 @@ bool IntegratedPSSM3::resolveDependencies(ProgramSet* programSet)
 {
     Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     psProgram->addDependency(SGX_LIB_INTEGRATEDPSSM);
+    psProgram->addDependency("RTSLib_Froxels");
 
     psProgram->addPreprocessorDefines(StringUtil::format("PSSM_NUM_SPLITS=%zu,PCF_XSAMPLES=%.1f,SHADOWLIGHT_COUNT=%d",
                                                          mShadowTextureParamsList.size(), mPCFxSamples, mMultiLightCount));
@@ -376,6 +377,11 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder)
         // Compute shadow factor.
         stage.callFunction("SGX_ComputeShadowFactor_PSSM3", params);
     }
+
+    auto sceneCol = psProgram->resolveParameter(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR);
+    auto froxelTP = psProgram->resolveParameter(GpuProgramParameters::ACT_FROXEL_TILE_PARAMS);
+    auto froxelDP = psProgram->resolveParameter(GpuProgramParameters::ACT_FROXEL_DEPTH_PARAMS);
+    stage.callFunction("getFroxelIndex", {In(mPSInDepth).xyz(), In(froxelTP), In(froxelDP), InOut(sceneCol)});
 
     // shadow factor is applied by lighting stages
     return true;
