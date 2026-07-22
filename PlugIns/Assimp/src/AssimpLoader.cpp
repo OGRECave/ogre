@@ -154,9 +154,12 @@ template <int _i>
 void GetInterpolationIterators(KeyframesMap& keyframes, KeyframesMap::iterator it,
                                KeyframesMap::reverse_iterator& front, KeyframesMap::iterator& back)
 {
+    // reverse_iterator(it) already refers to the element BEFORE it, so the
+    // search starts there: advancing first would skip the immediate
+    // predecessor, and a channel with a single leading key (a constant
+    // glTF track) would then find no key at all - the caller falls back
+    // to zero, which reads as the inverse bind pose leaking into the track
     front = KeyframesMap::reverse_iterator(it);
-
-    front++;
     for (; front != keyframes.rend(); front++)
     {
         if (std::get<_i>(front->second) != NULL)
@@ -206,8 +209,11 @@ aiVector3D getTranslate(aiNodeAnim* node_anim, KeyframesMap& keyframes, Keyframe
         // got 2 keys can interpolate
         if (frontKey && backKey)
         {
-            float prop = (float)(Math::inverseLerp<double>(frontKey->mTime, backKey->mTime, it->first));
-            prop /= ticksPerSecond;
+            // key times are in TICKS while the merged map's times are in
+            // SECONDS: convert the lookup time to ticks for the lerp factor
+            // (the old form also divided the finished factor by ticksPerSecond
+            // again, shrinking it to ~0 - interpolated keys held the front key)
+            float prop = (float)(Math::inverseLerp<double>(frontKey->mTime, backKey->mTime, it->first * ticksPerSecond));
             vect = Math::lerp(frontKey->mValue, backKey->mValue, prop);
         }
 
@@ -254,8 +260,11 @@ aiQuaternion getRotate(aiNodeAnim* node_anim, KeyframesMap& keyframes, Keyframes
         // got 2 keys can interpolate
         if (frontKey && backKey)
         {
-            float prop = (float)(Math::inverseLerp<double>(frontKey->mTime, backKey->mTime, it->first));
-            prop /= ticksPerSecond;
+            // key times are in TICKS while the merged map's times are in
+            // SECONDS: convert the lookup time to ticks for the lerp factor
+            // (the old form also divided the finished factor by ticksPerSecond
+            // again, shrinking it to ~0 - interpolated keys held the front key)
+            float prop = (float)(Math::inverseLerp<double>(frontKey->mTime, backKey->mTime, it->first * ticksPerSecond));
             aiQuaternion::Interpolate(rot, frontKey->mValue, backKey->mValue, prop);
         }
 
@@ -302,8 +311,11 @@ aiVector3D getScale(aiNodeAnim* node_anim, KeyframesMap& keyframes, KeyframesMap
         // got 2 keys can interpolate
         if (frontKey && backKey)
         {
-            float prop = (float)(Math::inverseLerp<double>(frontKey->mTime, backKey->mTime, it->first));
-            prop /= ticksPerSecond;
+            // key times are in TICKS while the merged map's times are in
+            // SECONDS: convert the lookup time to ticks for the lerp factor
+            // (the old form also divided the finished factor by ticksPerSecond
+            // again, shrinking it to ~0 - interpolated keys held the front key)
+            float prop = (float)(Math::inverseLerp<double>(frontKey->mTime, backKey->mTime, it->first * ticksPerSecond));
             vect = Math::lerp(frontKey->mValue, backKey->mValue, prop);
         }
 
