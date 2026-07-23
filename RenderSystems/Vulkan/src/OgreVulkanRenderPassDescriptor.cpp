@@ -557,7 +557,7 @@ void VulkanRenderPassDescriptor::performLoadActions()
         }
 
         VkRenderPassBeginInfo passBeginInfo = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
-        passBeginInfo.renderPass = mResuming ? fboDesc.mRenderPassLoad : fboDesc.mRenderPass; // Pick LOAD if resuming
+        passBeginInfo.renderPass = mResuming ? fboDesc.mRenderPassLoad : fboDesc.mRenderPass;
         passBeginInfo.framebuffer = fboDesc.mFramebuffers[fboIdx];
         passBeginInfo.renderArea.offset.x = 0;
         passBeginInfo.renderArea.offset.y = 0;
@@ -580,7 +580,7 @@ void VulkanRenderPassDescriptor::performLoadActions()
         // Another encoder will have to be created, and don't let ours linger
         // since mCurrentRenderPassDescriptor probably doesn't even point to 'this'
         mQueue->endAllEncoders( false );
-        mResuming = true;  // ADD THIS — next time we start, use LOAD
+        mResuming = true;
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
