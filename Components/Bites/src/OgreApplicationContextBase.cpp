@@ -309,7 +309,7 @@ void ApplicationContextBase::runRenderingSettingsDialog()
     float vpScale = getDisplayDPI()/96;
     Ogre::OverlayManager::getSingleton().setPixelRatio(vpScale);
     auto overlay = initialiseImGui();
-    // ImGui::GetStyle().FontScaleMain = vpScale;
+    ImGui::GetStyle().FontScaleMain = vpScale;
     overlay->show();
 
     addInputListener(getImGuiInputListener());
