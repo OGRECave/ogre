@@ -778,7 +778,7 @@ namespace Ogre
         virtual void _setPolygonMode(PolygonMode level) = 0;
 
         /** Sets profile hints for layout */
-        virtual void _setPassHints( const Pass* pass ) {}   // default no-op — every other backend ignores it for free
+        virtual void _setPassHints( const Pass* pass ) {}
 
         virtual ushort _getCurrentPassNumTextureUnits() const
         {
