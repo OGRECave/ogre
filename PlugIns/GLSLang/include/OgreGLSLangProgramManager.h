@@ -35,7 +35,11 @@ class GLSLangProgram : public HighLevelGpuProgram
     void prepareImpl() override;
 
     std::vector<uint32> mAssembly;
+    String mDescriptorSetProfile;
 public:
+    void setDescriptorSetProfile(const String& profile) { mDescriptorSetProfile = profile; }
+    const String& getDescriptorSetProfile() const { return mDescriptorSetProfile; }
+
     GLSLangProgram(ResourceManager* creator, const String& name, ResourceHandle handle, const String& group,
                    bool isManual, ManualResourceLoader* loader);
     ~GLSLangProgram();

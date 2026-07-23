@@ -82,6 +82,7 @@ namespace Ogre
         
         file << endl;
         file << "\t" << "num_texture_units " << StringConverter::toString(caps->getNumTextureUnits()) << endl;
+        file << "\t" << "num_texture_units_wide " << StringConverter::toString(caps->getNumTextureUnitsWide()) << endl;
         file << "\t" << "num_multi_render_targets " << StringConverter::toString(caps->getNumMultiRenderTargets()) << endl;
         file << "\t" << "vertex_program_constant_float_count " << StringConverter::toString(caps->getConstantFloatCount(GPT_VERTEX_PROGRAM)) << endl;
         file << "\t" << "fragment_program_constant_float_count " << StringConverter::toString(caps->getConstantFloatCount(GPT_FRAGMENT_PROGRAM)) << endl;
