@@ -305,9 +305,8 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
     mRenderOp.vertexData->vertexStart = 0;
 
     ImDrawData* draw_data = ImGui::GetDrawData();
-    for (int i = 0; i < draw_data->CmdListsCount; ++i)
+    for (const ImDrawList* draw_list : draw_data->CmdLists)
     {
-        const ImDrawList* draw_list = draw_data->CmdLists[i];
         mRenderOp.vertexData->vertexCount = draw_list->VtxBuffer.size();
 
         for (int j = 0; j < draw_list->CmdBuffer.Size; ++j)
@@ -444,13 +443,13 @@ void ImGuiOverlay::ImGUIRenderable::updateVertexData(ImDrawData* draw_data)
     // Copy all vertices
     size_t vtx_offset = 0;
     size_t idx_offset = 0;
-    for (int i = 0; i < draw_data->CmdListsCount; ++i)
+    for (const ImDrawList* draw_list : draw_data->CmdLists)
     {
-        const ImDrawList* draw_list = draw_data->CmdLists[i];
+        bool discard = vtx_offset == 0; // discard on first write
         bind->getBuffer(0)->writeData(vtx_offset, draw_list->VtxBuffer.size_in_bytes(), draw_list->VtxBuffer.Data,
-                                      i == 0); // discard on first write
+                                      discard);
         mRenderOp.indexData->indexBuffer->writeData(idx_offset, draw_list->IdxBuffer.size_in_bytes(),
-                                                    draw_list->IdxBuffer.Data, i == 0);
+                                                    draw_list->IdxBuffer.Data, discard);
         vtx_offset += draw_list->VtxBuffer.size_in_bytes();
         idx_offset += draw_list->IdxBuffer.size_in_bytes();
     }
