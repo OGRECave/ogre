@@ -30,6 +30,13 @@ void ApplicationContextSDL::removeInputListener(NativeWindowType* win, InputList
     mInputListeners.erase(std::make_pair(SDL_GetWindowID(win), lis));
 }
 
+static void removeDuplicates(std::vector<Ogre::String>& c)
+{
+    std::sort(c.begin(), c.end());
+    auto p = std::unique(c.begin(), c.end());
+    c.erase(p, c.end());
+}
+
 NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, Ogre::uint32 w, Ogre::uint32 h, Ogre::NameValuePairList miscParams)
 {
     NativeWindowPair ret = {NULL, NULL};
@@ -39,6 +46,18 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
             Ogre::LogManager::getSingleton().logMessage("[SDL] gamecontrollerdb.txt loaded");
 
         SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+
+        // For now we consider primary display only
+        int numDispModes = SDL_GetNumDisplayModes(0);
+        std::vector<Ogre::String> modes;
+        for(int i = 0; i < numDispModes; i++) {
+            SDL_DisplayMode mode;
+            SDL_GetDisplayMode(0, i, &mode);
+            modes.push_back(Ogre::StringUtil::format("%4d x %4d", mode.w, mode.h));
+        }
+        removeDuplicates(modes);
+        for(auto rs : mRoot->getAvailableRenderers())
+            const_cast<Ogre::ConfigOption&>(rs->getConfigOptions().at("Video Mode")).possibleValues = modes;
     }
 
     auto p = mRoot->getRenderSystem()->getRenderWindowDescription();
