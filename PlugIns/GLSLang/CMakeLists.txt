@@ -10,6 +10,7 @@ target_compile_features(Plugin_GLSLangProgramManager PRIVATE cxx_std_17)
 if(ANDROID)
     target_include_directories(Plugin_GLSLangProgramManager SYSTEM PRIVATE
         ${ANDROID_NDK}/sources/third_party/shaderc/third_party/glslang
+        ${ANDROID_NDK}/sources/third_party/shaderc/obj/local/${ANDROID_ABI}/include/
         ${ANDROID_NDK}/sources/third_party/shaderc/third_party/)
     target_link_libraries(Plugin_GLSLangProgramManager PUBLIC OgreMain
         ${ANDROID_NDK}/sources/third_party/shaderc/libs/c++_static/${ANDROID_ABI}/libshaderc.a)

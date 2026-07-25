@@ -10,6 +10,11 @@
 
 #include <glslang/Public/ShaderLang.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
+#ifndef GLSLANG_MINOR_VERSION
+#include <glslang/build_info.h>
+#else
+#define GLSLANG_VERSION_MAJOR 10
+#endif
 #include "gl_types.h"
 
 namespace
@@ -485,7 +490,12 @@ void GLSLangProgram::prepareImpl()
             }
         }
 
+#if GLSLANG_VERSION_MAJOR < 14
+        auto utype = program.getUniformTType(i);
+#else
         auto utype = (const TType*)program.getUniformTType(i);
+#endif
+
         GpuConstantDefinition def;
         def.logicalIndex = isUBO ? uoffset : utype->getQualifier().layoutLocation;
         def.arraySize = program.getUniformArraySize(i);
