@@ -132,6 +132,8 @@ namespace Ogre {
         , mTextureLoadFailed(false)
         , mRecalcTexMatrix(false)
         , mTextureCoordSetIndex(0)
+        , mProjectiveTexturingFrustum(0)
+        , mTexCoordCalcMethod(TEXCALC_NONE)
         , mFramePtrs(1)
         , mSampler(TextureManager::getSingletonPtr() ? TextureManager::getSingleton().getDefaultSampler() : DUMMY_SAMPLER)
         , mParent(parent)
@@ -673,13 +675,25 @@ namespace Ogre {
     {
         if (enable)
         {
-            TextureEffect eff = {ET_ENVIRONMENT_MAP};
-            eff.subtype = envMapType;
-            addEffect(eff);
+            switch (envMapType)
+            {
+            case ENV_CURVED:
+                mTexCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP;
+                break;
+            case ENV_PLANAR:
+                mTexCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP_PLANAR;
+                break;
+            case ENV_REFLECTION:
+                mTexCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP_REFLECTION;
+                break;
+            case ENV_NORMAL:
+                mTexCoordCalcMethod = TEXCALC_ENVIRONMENT_MAP_NORMAL;
+                break;
+            }
         }
         else
         {
-            removeEffect(ET_ENVIRONMENT_MAP);
+            mTexCoordCalcMethod = TEXCALC_NONE;
         }
     }
     //-----------------------------------------------------------------------
@@ -1160,25 +1174,19 @@ namespace Ogre {
     {
         if (enable)
         {
-            TextureEffect eff = {ET_PROJECTIVE_TEXTURE};
-            eff.frustum = projectionSettings;
-            addEffect(eff);
+            mProjectiveTexturingFrustum = projectionSettings;
+            mTexCoordCalcMethod = TEXCALC_PROJECTIVE_TEXTURE;
         }
         else
         {
-            removeEffect(ET_PROJECTIVE_TEXTURE);
+            mProjectiveTexturingFrustum = 0;
+            mTexCoordCalcMethod = TEXCALC_NONE;
         }
 
     }
     const Frustum* TextureUnitState::getProjectiveTexturingFrustum() const
     {
-        EffectMap::const_iterator i = mEffects.find(ET_PROJECTIVE_TEXTURE);
-        if (i != mEffects.end())
-        {
-            return i->second.frustum;
-        }
-
-        return 0;
+        return mProjectiveTexturingFrustum;
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setName(const String& name)
@@ -1218,28 +1226,5 @@ namespace Ogre {
         return mSampler;
     }
 
-    TexCoordCalcMethod TextureUnitState::_deriveTexCoordCalcMethod() const
-    {
-        TexCoordCalcMethod texCoordCalcMethod = TEXCALC_NONE;
-        for (const auto& effi : mEffects)
-        {
-            switch (effi.second.type)
-            {
-            case ET_ENVIRONMENT_MAP:
-                texCoordCalcMethod = (TexCoordCalcMethod)effi.second.subtype;
-                break;
-            case ET_UVSCROLL:
-            case ET_USCROLL:
-            case ET_VSCROLL:
-            case ET_ROTATE:
-            case ET_TRANSFORM:
-                break;
-            case ET_PROJECTIVE_TEXTURE:
-                texCoordCalcMethod = TEXCALC_PROJECTIVE_TEXTURE;
-                break;
-            }
-        }
-
-        return texCoordCalcMethod;
-    }
-}
+    TexCoordCalcMethod TextureUnitState::_deriveTexCoordCalcMethod() const { return mTexCoordCalcMethod; }
+    } // namespace Ogre
