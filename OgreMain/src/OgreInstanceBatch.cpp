@@ -454,17 +454,16 @@ namespace Ogre
         //Get the index at this depth
         unsigned short idx = mMaterial->getLodIndex( lodValue );
 
-        //TODO: Replace subEntity for MovableObject
         // Construct event object
-        /*EntityMaterialLodChangedEvent subEntEvt;
-        subEntEvt.subEntity = this;
+        MaterialLodChangedEvent subEntEvt;
+        subEntEvt.renderable = this;
         subEntEvt.camera = cam;
         subEntEvt.lodValue = lodValue;
-        subEntEvt.previousLodIndex = m_materialLodIndex;
+        subEntEvt.previousLodIndex = mMaterialLodIndex;
         subEntEvt.newLodIndex = idx;
 
         //Notify LOD event listeners
-        cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);*/
+        cam->getSceneManager()->_notifyMaterialLodChanged(subEntEvt);
 
         // Change LOD index
         mMaterialLodIndex = idx;
