@@ -158,7 +158,7 @@ vec3 evaluateLight(
     // https://google.github.io/filament/Filament.md.html#materialsystem/improvingthebrdfs/energylossinspecularreflectance
     vec3 color = NoL * lightColor * (Fr * pixel.energyCompensation + Fd);
 
-    color *= getDistanceAttenuation(pointParams.yzw, fLightD);
+    color *= getDistanceAttenuation(pointParams, fLightD);
 
     if(spotParams.w != 0.0)
     {
