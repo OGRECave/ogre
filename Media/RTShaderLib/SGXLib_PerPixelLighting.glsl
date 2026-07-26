@@ -153,7 +153,7 @@ void evaluateLight(
 	if (nDotL <= 0.0)
 		return;
 
-	float fAtten	   = getDistanceAttenuation(vAttParams.yzw, fLightD);
+	float fAtten	   = getDistanceAttenuation(vAttParams, fLightD);
 
 #ifdef SHADOWLIGHT_COUNT
 	fAtten *= shadowFactor;
