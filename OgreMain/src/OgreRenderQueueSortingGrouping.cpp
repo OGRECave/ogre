@@ -44,28 +44,21 @@ namespace {
 
         bool operator()(const RenderablePass& a, const RenderablePass& b) const
         {
-            if (a.renderable == b.renderable)
-            {
-                // Same renderable, sort by pass hash
-                return a.pass->getHash() < b.pass->getHash();
-            }
-            else
-            {
-                // Different renderables, sort by distance
-                Real adist = a.renderable->getSquaredViewDepth(camera);
-                Real bdist = b.renderable->getSquaredViewDepth(camera);
-                if (Math::RealEqual(adist, bdist))
-                {
-                    // Must return deterministic result, doesn't matter what
-                    return a.pass < b.pass;
-                }
-                else
-                {
-                    // Sort DESCENDING by dist (i.e. far objects first)
-                    return (adist > bdist);
-                }
-            }
+            const Real adist = a.renderable->getSquaredViewDepth(camera);
+            const Real bdist = b.renderable->getSquaredViewDepth(camera);
 
+            // Primary key: distance, DESCENDING (far objects first).
+            // Exact compare (no tolerance) so the ordering stays transitive.
+            if (adist != bdist)
+                return adist > bdist;
+
+            // Equal distance: tie-break by pass hash. The hash is content-based
+            // and therefore stable across runs.
+            // If the hashes are also equal we return false here (and so does the
+            // mirrored call comp(b, a)) -> the elements are reported as
+            // *equivalent*, and std::stable_sort preserves their original,
+            // deterministic input order.
+            return a.pass->getHash() < b.pass->getHash();
         }
     };
 
