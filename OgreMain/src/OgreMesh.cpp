@@ -2278,6 +2278,35 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
+    size_t Mesh::getPoseIndex(const String& name) const
+    {
+        for (size_t i = 0; i < mPoseList.size(); ++i)
+        {
+            if (mPoseList[i]->getName() == name)
+                return i;
+        }
+        StringStream str;
+        str << "No pose called " << name << " found in Mesh " << mName;
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+            str.str(),
+            "Mesh::getPoseIndex");
+
+    }
+    //---------------------------------------------------------------------
+    size_t Mesh::getPoseIndex(const Pose* pose) const
+    {
+        for (size_t i = 0; i < mPoseList.size(); ++i)
+        {
+            if (mPoseList[i] == pose)
+                return i;
+        }
+        StringStream str;
+        str << "Pose not found in Mesh " << mName;
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+            str.str(),
+            "Mesh::getPoseIndex");
+    }
+    //---------------------------------------------------------------------
     void Mesh::removePose(ushort index)
     {
         OgreAssert(index < mPoseList.size(), "");
