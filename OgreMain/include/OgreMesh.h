@@ -920,6 +920,10 @@ namespace Ogre {
         Pose* getPose(size_t index) const { return mPoseList.at(index); }
         /** Retrieve an existing Pose by name.*/
         Pose* getPose(const String& name) const;
+        /** Retrieve an existing Pose's index by name.*/
+        size_t getPoseIndex(const String& name) const;
+        /** Retrieve an existing Pose's index.*/
+        size_t getPoseIndex(const Pose* pose) const;
         /** Destroy a pose by index.
         @note
             This will invalidate any animation tracks referring to this pose or those after it.

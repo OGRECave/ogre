@@ -475,7 +475,7 @@ namespace Ogre {
         return mDerivedScale;
     }
     //-----------------------------------------------------------------------
-    Vector3 Node::convertWorldToLocalPosition( const Vector3 &worldPos )
+    Vector3 Node::convertWorldToLocalPosition( const Vector3 &worldPos ) const
     {
         if (mNeedParentUpdate)
         {
@@ -488,7 +488,7 @@ namespace Ogre {
 #endif
     }
     //-----------------------------------------------------------------------
-    Vector3 Node::convertLocalToWorldPosition( const Vector3 &localPos )
+    Vector3 Node::convertLocalToWorldPosition( const Vector3 &localPos ) const
     {
         if (mNeedParentUpdate)
         {
@@ -497,7 +497,7 @@ namespace Ogre {
         return _getFullTransform() * localPos;
     }
     //-----------------------------------------------------------------------
-    Vector3 Node::convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale )
+    Vector3 Node::convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale ) const
     {
         if (mNeedParentUpdate)
         {
@@ -514,7 +514,7 @@ namespace Ogre {
 #endif
     }
     //-----------------------------------------------------------------------
-    Vector3 Node::convertLocalToWorldDirection( const Vector3 &localDir, bool useScale )
+    Vector3 Node::convertLocalToWorldDirection( const Vector3 &localDir, bool useScale ) const
     {
         if (mNeedParentUpdate)
         {
@@ -523,7 +523,7 @@ namespace Ogre {
         return useScale ? _getFullTransform().linear() * localDir : mDerivedOrientation * localDir;
     }
     //-----------------------------------------------------------------------
-    Quaternion Node::convertWorldToLocalOrientation( const Quaternion &worldOrientation )
+    Quaternion Node::convertWorldToLocalOrientation( const Quaternion &worldOrientation ) const
     {
         if (mNeedParentUpdate)
         {
@@ -532,7 +532,7 @@ namespace Ogre {
         return mDerivedOrientation.Inverse() * worldOrientation;
     }
     //-----------------------------------------------------------------------
-    Quaternion Node::convertLocalToWorldOrientation( const Quaternion &localOrientation )
+    Quaternion Node::convertLocalToWorldOrientation( const Quaternion &localOrientation ) const
     {
         if (mNeedParentUpdate)
         {

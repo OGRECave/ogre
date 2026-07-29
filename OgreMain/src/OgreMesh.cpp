@@ -224,8 +224,7 @@ namespace Ogre {
 
         if (!data) {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                        "Data doesn't appear to have been prepared in " + mName,
-                        "Mesh::loadImpl()");
+                        "Data doesn't appear to have been prepared in " + mName);
         }
 
         String baseName, strExt;
@@ -1200,8 +1199,7 @@ namespace Ogre {
     {
         SubMeshNameMap::const_iterator i = mSubMeshNameMap.find(name) ;
         if (i == mSubMeshNameMap.end())
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No SubMesh named " + name + " found.",
-                "Mesh::_getSubMeshIndex");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No SubMesh named " + name + " found.");
 
         return i->second;
     }
@@ -2105,8 +2103,7 @@ namespace Ogre {
                         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Animation tracks for shared vertex data on mesh "
                             + mName + " try to mix vertex animation types, which is "
-                            "not allowed.",
-                            "Mesh::_determineAnimationTypes");
+                            "not allowed.");
                     }
                     mSharedVertexDataAnimationType = track->getAnimationType();
                     if (track->getAnimationType() == VAT_MORPH)
@@ -2127,8 +2124,7 @@ namespace Ogre {
                             "Animation tracks for dedicated vertex data "
                             + StringConverter::toString(handle-1) + " on mesh "
                             + mName + " try to mix vertex animation types, which is "
-                            "not allowed.",
-                            "Mesh::_determineAnimationTypes");
+                            "not allowed.");
                     }
                     sm->mVertexAnimationType = track->getAnimationType();
                     if (track->getAnimationType() == VAT_MORPH)
@@ -2150,8 +2146,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(
                 Exception::ERR_DUPLICATE_ITEM,
-                "An animation with the name " + name + " already exists",
-                "Mesh::createAnimation");
+                "An animation with the name " + name + " already exists");
         }
 
         Animation* ret = OGRE_NEW Animation(name, length);
@@ -2173,8 +2168,7 @@ namespace Ogre {
         if (!ret)
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "No animation entry found named " + name,
-                "Mesh::getAnimation");
+                "No animation entry found named " + name);
         }
 
         return ret;
@@ -2223,8 +2217,7 @@ namespace Ogre {
 
         if (i == mAnimationsList.end())
         {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No animation entry found named " + name,
-                "Mesh::getAnimation");
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No animation entry found named " + name);
         }
 
         OGRE_DELETE i->second;
@@ -2270,12 +2263,30 @@ namespace Ogre {
             if (i->getName() == name)
                 return i;
         }
-        StringStream str;
-        str << "No pose called " << name << " found in Mesh " << mName;
         OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-            str.str(),
-            "Mesh::getPose");
-
+                    StringUtil::format("No pose called %s found in Mesh %s", name.c_str(), mName.c_str()));
+    }
+    //---------------------------------------------------------------------
+    size_t Mesh::getPoseIndex(const String& name) const
+    {
+        for (size_t i = 0; i < mPoseList.size(); ++i)
+        {
+            if (mPoseList[i]->getName() == name)
+                return i;
+        }
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                    StringUtil::format("No pose called %s found in Mesh %s", name.c_str(), mName.c_str()));
+    }
+    //---------------------------------------------------------------------
+    size_t Mesh::getPoseIndex(const Pose* pose) const
+    {
+        for (size_t i = 0; i < mPoseList.size(); ++i)
+        {
+            if (mPoseList[i] == pose)
+                return i;
+        }
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                    StringUtil::format("Pose not found in Mesh %s", mName.c_str()));
     }
     //---------------------------------------------------------------------
     void Mesh::removePose(ushort index)
@@ -2299,11 +2310,8 @@ namespace Ogre {
                 return;
             }
         }
-        StringStream str;
-        str << "No pose called " << name << " found in Mesh " << mName;
         OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-            str.str(),
-            "Mesh::removePose");
+                    StringUtil::format("No pose called %s found in Mesh %s", name.c_str(), mName.c_str()));
     }
     //---------------------------------------------------------------------
     void Mesh::removeAllPoses(void)

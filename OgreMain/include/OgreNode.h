@@ -590,11 +590,11 @@ namespace Ogre {
         const Vector3& getInitialPosition(void) const { return mInitialPosition; }
 
         /** Gets the local position, relative to this node, of the given world-space position */
-        Vector3 convertWorldToLocalPosition( const Vector3 &worldPos );
+        Vector3 convertWorldToLocalPosition( const Vector3 &worldPos ) const;
 
         /** Gets the world position of a point in the node local space
             useful for simple transforms that don't require a child node.*/
-        Vector3 convertLocalToWorldPosition( const Vector3 &localPos );
+        Vector3 convertLocalToWorldPosition( const Vector3 &localPos ) const;
 
         /** Gets the local direction, relative to this node, of the
             given world-space direction
@@ -603,7 +603,7 @@ namespace Ogre {
         @param useScale determines if this node or it's parents' scale affects
             the magnitude of the returned worldDir vector.
         */
-        Vector3 convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale );
+        Vector3 convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale ) const;
 
         /** Gets the world direction of a point in the node local space
             useful for simple transforms that don't require a child node.
@@ -612,14 +612,14 @@ namespace Ogre {
         @param useScale determines if this node or it's parents' scale affects
             the magnitude of the returned localDir vector.
         */
-        Vector3 convertLocalToWorldDirection( const Vector3 &localDir, bool useScale );
+        Vector3 convertLocalToWorldDirection( const Vector3 &localDir, bool useScale ) const;
 
         /** Gets the local orientation, relative to this node, of the given world-space orientation */
-        Quaternion convertWorldToLocalOrientation( const Quaternion &worldOrientation );
+        Quaternion convertWorldToLocalOrientation( const Quaternion &worldOrientation ) const;
 
         /** Gets the world orientation of an orientation in the node local space
             useful for simple transforms that don't require a child node.*/
-        Quaternion convertLocalToWorldOrientation( const Quaternion &localOrientation );
+        Quaternion convertLocalToWorldOrientation( const Quaternion &localOrientation ) const;
 
         /** Gets the initial orientation of this node, see setInitialState for more info. */
         const Quaternion& getInitialOrientation(void) const { return mInitialOrientation; }
