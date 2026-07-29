@@ -173,7 +173,7 @@ void SceneManager::SkyBoxRenderer::create(
     mSceneNode->attachObject(mSkyBoxObj.get());
 
     mSkyBoxObj->setRenderQueueGroup(renderQueue);
-    mSkyBoxObj->begin(materialName, RenderOperation::OT_TRIANGLE_STRIP, groupName);
+    mSkyBoxObj->begin(m, RenderOperation::OT_TRIANGLE_STRIP);
 
     // rendering cube, only using 14 vertices
     const Vector3 cube_strip[14] = {
