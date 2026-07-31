@@ -71,67 +71,20 @@ void evaluateLight(
 				in vec4 vAttParams,
 				in vec4 vLightDirView,
 				in vec4 spotParams,
-				in vec4 vDiffuseColour,
+				in vec3 vDiffuseColour,
+				in float shadowFactor,
 				inout vec3 vOutDiffuse
-#if defined(TVC_DIFFUSE) || defined(TVC_SPECULAR)
-				, in vec4 vInVertexColour
-#endif
 #ifdef USE_SPECULAR
-				, in vec4 vSpecularColour,
+				, in vec3 vSpecularColour,
 				in float fSpecularPower,
 				inout vec3 vOutSpecular
-#endif
-#ifdef SHADOWLIGHT_COUNT
-				, in float shadowFactor
-#endif
-#ifdef HAVE_AREA_LIGHTS
-				, in sampler2D ltcLUT1,
-				in sampler2D ltcLUT2
 #endif
 				)
 {
 
     vec3 vLightView = vLightPos.xyz;
 
-#ifdef TVC_DIFFUSE
-	vDiffuseColour *= vInVertexColour;
-#endif
-
-#ifdef HAVE_AREA_LIGHTS
-	if(spotParams.w == 2.0)
-	{
-		// rect area light
-		vec3 dcol = vDiffuseColour.rgb;
-#ifdef USE_SPECULAR
-#ifdef TVC_SPECULAR
-		vSpecularColour *= vInVertexColour;
-#endif
-		vec3 scol = vSpecularColour.rgb;
-#else
-		vec3 scol = vec3_splat(0.0);
-		float fSpecularPower = 0.0;
-#endif
-		float roughness = saturate(1.0 - fSpecularPower/128.0); // convert specular to roughness
-		roughness *= roughness; // perceptual to physical roughness
-		evaluateRectLight(ltcLUT1, ltcLUT2, roughness, normalize(vNormal), vViewPos, vLightPos.xyz, spotParams.xyz, vAttParams.xyz, scol, dcol);
-
-#ifdef SHADOWLIGHT_COUNT
-		dcol *= shadowFactor;
-		scol *= shadowFactor;
-#endif
-
-		// linear to gamma
-		dcol = pow(dcol, vec3_splat(1.0/2.2));
-		vOutDiffuse.rgb = FFP_SATURATE(vOutDiffuse.rgb + dcol);
-#ifdef USE_SPECULAR
-		scol = pow(scol, vec3_splat(1.0/2.2));
-		vOutSpecular.rgb = FFP_SATURATE(vOutSpecular.rgb + scol);
-#endif
-		return;
-	}
-#endif
-
-	float fAtten = 1.0;
+	float fAtten = shadowFactor;
     if (vLightPos.w != 0.0)
     {
 		f32vec3 tmp = vLightPos.xyz - vViewPos;
@@ -141,8 +94,7 @@ void evaluateLight(
             return;
 
 		vLightView = tmp / fLightD; // normalize
-
-		fAtten	   *= getDistanceAttenuation(vAttParams, fLightD);
+		fAtten    *= getDistanceAttenuation(vAttParams, fLightD);
     }
 	else
 	{
@@ -155,29 +107,103 @@ void evaluateLight(
 	if (nDotL <= 0.0)
 		return;
 
-#ifdef SHADOWLIGHT_COUNT
-	fAtten *= shadowFactor;
-#endif
-
     if(spotParams.w != 0.0)
     {
         fAtten *= getAngleAttenuation(spotParams.xyz, vLightDirView.xyz, vLightView);
     }
 
-	vOutDiffuse  += vDiffuseColour.rgb * nDotL * fAtten;
+	vOutDiffuse  += vDiffuseColour * nDotL * fAtten;
 	vOutDiffuse = FFP_SATURATE(vOutDiffuse);
 
 #ifdef USE_SPECULAR
 	f32vec3 vView       = -normalize(vViewPos);
 	f32vec3 vHalfWay    = normalize(vView + vLightView);
 	float32_t nDotH  = saturate(dot(vNormalView, vHalfWay));
-#ifdef TVC_SPECULAR
-	vSpecularColour *= vInVertexColour;
-#endif
 #ifdef NORMALISED
 	vSpecularColour *= (fSpecularPower + 8.0)/(8.0 * M_PI);
 #endif
-	vOutSpecular += vSpecularColour.rgb * pow(nDotH, fSpecularPower) * fAtten;
+	vOutSpecular += vSpecularColour * pow(nDotH, fSpecularPower) * fAtten;
 	vOutSpecular = FFP_SATURATE(vOutSpecular);
 #endif
 }
+
+#if LIGHT_COUNT > 0
+void FFP_Lights(
+#ifdef SHADOWLIGHT_COUNT
+				in float shadowFactor[SHADOWLIGHT_COUNT],
+#endif
+#ifdef HAVE_AREA_LIGHTS
+				in sampler2D ltcLUT1,
+				in sampler2D ltcLUT2,
+#endif
+				in vec3 vNormal,
+				in f32vec3 vViewPos,
+				in vec4 vLightPos[LIGHT_COUNT],
+				in vec4 vAttParams[LIGHT_COUNT],
+				in vec4 vLightDirView[LIGHT_COUNT],
+				in vec4 spotParams[LIGHT_COUNT],
+				in vec4 vDiffuseColour[LIGHT_COUNT],
+				inout vec3 vOutDiffuse
+#if defined(TVC_DIFFUSE) || defined(TVC_SPECULAR)
+				, in vec4 vInVertexColour
+#endif
+#ifdef USE_SPECULAR
+				, in vec4 vSpecularColour[LIGHT_COUNT],
+				in float fSpecularPower,
+				inout vec3 vOutSpecular
+#endif
+				)
+{
+	for (int i = 0; i < LIGHT_COUNT; ++i)
+	{
+		// resolve per-light inputs: vertex colour tracking and shadows
+		vec3 dcol = vDiffuseColour[i].rgb;
+#ifdef TVC_DIFFUSE
+		dcol *= vInVertexColour.rgb;
+#endif
+		vec3 scol = vec3_splat(0.0);
+#ifdef USE_SPECULAR
+		scol = vSpecularColour[i].rgb;
+#ifdef TVC_SPECULAR
+		scol *= vInVertexColour.rgb;
+#endif
+#endif
+		float fShadowFactor = 1.0;
+#ifdef SHADOWLIGHT_COUNT
+		// lights beyond SHADOWLIGHT_COUNT do not cast shadows
+		if (i < SHADOWLIGHT_COUNT)
+			fShadowFactor = shadowFactor[i];
+#endif
+
+#ifdef HAVE_AREA_LIGHTS
+		if (spotParams[i].w == 2.0)
+		{
+			// rect area light - evaluated in linear space
+			float roughness = 1.0;
+#ifdef USE_SPECULAR
+			roughness = saturate(1.0 - fSpecularPower/128.0); // specular power to roughness
+			roughness *= roughness; // perceptual to physical roughness
+#endif
+			evaluateRectLight(ltcLUT1, ltcLUT2, roughness, normalize(vNormal), vViewPos,
+							  vLightPos[i].xyz, spotParams[i].xyz, vAttParams[i].xyz, scol, dcol);
+
+			// linear to gamma
+			dcol = pow(dcol * fShadowFactor, vec3_splat(1.0/2.2));
+			vOutDiffuse = FFP_SATURATE(vOutDiffuse + dcol);
+#ifdef USE_SPECULAR
+			scol = pow(scol * fShadowFactor, vec3_splat(1.0/2.2));
+			vOutSpecular = FFP_SATURATE(vOutSpecular + scol);
+#endif
+			continue;
+		}
+#endif
+
+		evaluateLight(vNormal, vViewPos, vLightPos[i], vAttParams[i], vLightDirView[i],
+					  spotParams[i], dcol, fShadowFactor, vOutDiffuse
+#ifdef USE_SPECULAR
+					  , scol, fSpecularPower, vOutSpecular
+#endif
+					  );
+	}
+}
+#endif

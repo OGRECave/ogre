@@ -143,9 +143,9 @@ protected:
     void addGlobalIlluminationInvocation(const FunctionStageRef& stage);
             
     /** 
-    Internal method that adds per light illumination component functions invocations.
+    Internal method that adds illumination component functions invocations.
     */
-    void addIlluminationInvocation(int i, const FunctionStageRef& stage);
+    void addIlluminationInvocation(const FunctionStageRef& stage);
 
 
     // Track per vertex colour type.

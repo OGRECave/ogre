@@ -190,10 +190,7 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
 	addGlobalIlluminationInvocation(stage);
 
     // Add per light functions.
-	for (int i = 0; i < mLightCount; i++)
-	{
-		addIlluminationInvocation(i, stage);
-	}
+	addIlluminationInvocation(stage);
 
     auto psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     auto psMain = psProgram->getMain();
@@ -261,37 +258,31 @@ void FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
 }
 
 //-----------------------------------------------------------------------
-void FFPLighting::addIlluminationInvocation(int i, const FunctionStageRef& stage)
+void FFPLighting::addIlluminationInvocation(const FunctionStageRef& stage)
 {
-    std::vector<Operand> args = {In(mViewNormal),         In(mViewPos), In(mPositions),      At(i),
-                                 In(mAttenuatParams),     At(i),        In(mDirections),     At(i),
-                                 In(mSpotParams),         At(i),        In(mDiffuseColours), At(i),
-                                 InOut(mOutDiffuse).xyz()};
+	if(mLightCount == 0)
+		return;
 
-    if (mTrackVertexColourType & (TVC_DIFFUSE | TVC_SPECULAR))
-    {
-		args.push_back(In(mInDiffuse));
-    }
-
-    if (mSpecularEnable)
-    {
-		args.insert(args.end(), {In(mSpecularColours), At(i), In(mSurfaceShininess), InOut(mOutSpecular).xyz()});
-	}
-
+    // call FFP_Lights
+	std::vector<Operand> args;
 	if (mShadowFactor)
-	{
-		if(i < int(mShadowFactor->getSize()))
-			args.insert(args.end(), {In(mShadowFactor), At(i)});
-		else
-			args.push_back(In(1));
-	}
+		args.push_back(In(mShadowFactor));
 
-	if(mLTCLUT1)
-	{
+	if (mLTCLUT1)
 		args.insert(args.end(), {In(mLTCLUT1), In(mLTCLUT2)});
-	}
 
-	stage.callFunction("evaluateLight", args);
+	args.insert(args.end(), {In(mViewNormal), In(mViewPos), In(mPositions), In(mAttenuatParams),
+							In(mDirections), In(mSpotParams), In(mDiffuseColours),
+							InOut(mOutDiffuse).xyz()});
+
+	if (mTrackVertexColourType & (TVC_DIFFUSE | TVC_SPECULAR))
+		args.push_back(In(mInDiffuse));
+
+	if (mSpecularEnable)
+		args.insert(args.end(),
+					{In(mSpecularColours), In(mSurfaceShininess), InOut(mOutSpecular).xyz()});
+
+	stage.callFunction("FFP_Lights", args);
 }
 
 
