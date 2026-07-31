@@ -239,11 +239,7 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
 
     mShadowFactor = psMain->getLocalParameter("lShadowFactor");
 
-    // Add per light functions.
-    for (int i = 0; i < mLightCount; i++)
-    {
-        addIlluminationInvocation(i, stage);
-    }
+    addIlluminationInvocation(stage);
 
     // Assign back temporary variables
     stage.assign(mOutDiffuse, mInDiffuse);
