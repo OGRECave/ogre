@@ -119,15 +119,17 @@ vec3 evaluateLight(
                 in PixelParams pixel)
 {
     f32vec3 vLightView = lightPos.xyz;
-    float fLightD = 0.0;
+    float atten = 1.0;
 
     if (lightPos.w != 0.0)
     {
         vLightView -= viewPos; // to light
-        fLightD     = length(vLightView);
+        float fLightD     = length(vLightView);
 
         if(fLightD > pointParams.x)
             return vec3_splat(0.0);
+
+        atten *= getDistanceAttenuation(pointParams, fLightD);
     }
 
 	vLightView		   = normalize(vLightView);
@@ -156,9 +158,7 @@ vec3 evaluateLight(
     vec3 Fd = pixel.diffuseColor * Fd_Lambert();
 
     // https://google.github.io/filament/Filament.md.html#materialsystem/improvingthebrdfs/energylossinspecularreflectance
-    vec3 color = NoL * lightColor * (Fr * pixel.energyCompensation + Fd);
-
-    color *= getDistanceAttenuation(pointParams, fLightD);
+    vec3 color = NoL * lightColor * (Fr * pixel.energyCompensation + Fd) * atten;
 
     if(spotParams.w != 0.0)
     {
