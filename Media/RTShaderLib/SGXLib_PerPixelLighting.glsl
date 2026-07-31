@@ -92,7 +92,6 @@ void evaluateLight(
 {
 
     vec3 vLightView = vLightPos.xyz;
-    float fLightD = 0.0;
 
 #ifdef TVC_DIFFUSE
 	vDiffuseColour *= vInVertexColour;
@@ -132,15 +131,18 @@ void evaluateLight(
 	}
 #endif
 
+	float fAtten = 1.0;
     if (vLightPos.w != 0.0)
     {
 		f32vec3 tmp = vLightPos.xyz - vViewPos;
-        fLightD     = length(tmp);
+        float fLightD     = length(tmp);
 
         if(fLightD > vAttParams.x)
             return;
 
 		vLightView = tmp / fLightD; // normalize
+
+		fAtten	   *= getDistanceAttenuation(vAttParams, fLightD);
     }
 	else
 	{
@@ -152,8 +154,6 @@ void evaluateLight(
 	
 	if (nDotL <= 0.0)
 		return;
-
-	float fAtten	   = getDistanceAttenuation(vAttParams, fLightD);
 
 #ifdef SHADOWLIGHT_COUNT
 	fAtten *= shadowFactor;
