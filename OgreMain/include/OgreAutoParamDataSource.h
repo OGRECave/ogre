@@ -37,6 +37,7 @@ namespace Ogre {
 
     // forward decls
     struct VisibleObjectsBoundsInfo;
+    struct Froxelizer;
 
     /** \addtogroup Core
     *  @{
@@ -121,6 +122,7 @@ namespace Ogre {
         mutable bool mLodCameraPositionDirty;
         mutable bool mLodCameraPositionObjectSpaceDirty;
 
+        std::unique_ptr<Froxelizer> mFroxelizer;
         const Renderable* mCurrentRenderable;
         const Camera* mCurrentCamera;
         std::vector<const Camera*> mCameraArray;
@@ -138,12 +140,14 @@ namespace Ogre {
         Light mBlankLight;
         /// Last light sets
         uint32 mLastLightHash;
+        uint32 mFroxelizerLastLightHash;
         /// Gpu params that need rebinding (mask of GpuParamVariability)
         uint16 mGpuParamsDirty;
         bool mCurrentUseIdentityView;
         bool mCurrentUseIdentityProj;
     public:
         AutoParamDataSource();
+        ~AutoParamDataSource();
         /** Updates the current renderable */
         void setCurrentRenderable(const Renderable* rend);
         /** Sets the world matrices, avoid query from renderable again */
@@ -298,6 +302,14 @@ namespace Ogre {
         uint16 getGpuParamsDirty() const { return mGpuParamsDirty; }
         void resetGpuParamsDirty() { mGpuParamsDirty = 0; }
         void updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const;
+
+        const Vector4f& getFroxelTileParams() const;
+        const Vector4f& getFroxelDepthParams() const;
+        /// must be called before getFroxelGrid() or getFroxelRecords()
+        /// returns true if the froxel data was updated
+        bool refreshFroxelData() const;
+        const std::vector<uint32>& getFroxelGrid() const;
+        const std::vector<uint32>& getFroxelRecords() const;
     };
     /** @} */
     /** @} */
