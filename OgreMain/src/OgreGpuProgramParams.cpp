@@ -185,6 +185,8 @@ namespace Ogre
         AutoConstantDefinition(ACT_LIGHT_CUSTOM,        "light_custom", 4, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_POINT_PARAMS,                    "point_params",                   4, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_MATERIAL_LOD_INDEX,       "material_lod_index",             1, ET_INT, ACDT_NONE),
+        AutoConstantDefinition(ACT_FROXEL_TILE_PARAMS,   "froxel_tile_params",   4, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_FROXEL_DEPTH_PARAMS, "froxel_depth_params", 4, ET_REAL, ACDT_NONE),
 
         // NOTE: new auto constants must be added before this line, as the following are merely aliases
         // to allow legacy world_ names in scripts
@@ -661,7 +663,7 @@ namespace Ogre
         , mActivePassIterationIndex(std::numeric_limits<size_t>::max())
         , mUseLinearColours(false)
     {
-        static_assert((sizeof(AutoConstantDictionary) / sizeof(AutoConstantDefinition) - 5) == ACT_MATERIAL_LOD_INDEX,
+        static_assert((sizeof(AutoConstantDictionary) / sizeof(AutoConstantDefinition) - 5) == ACT_FROXEL_DEPTH_PARAMS,
                       "AutoConstantDictionary out of sync");
     }
     GpuProgramParameters::~GpuProgramParameters() {}
@@ -1017,6 +1019,8 @@ namespace Ogre
         case ACT_PASS_NUMBER:
         case ACT_TEXTURE_MATRIX:
         case ACT_LOD_CAMERA_POSITION:
+        case ACT_FROXEL_TILE_PARAMS:
+        case ACT_FROXEL_DEPTH_PARAMS:
 
             return (uint16)GPV_GLOBAL;
 
@@ -1452,6 +1456,17 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     void GpuProgramParameters::_updateAutoParams(const AutoParamDataSource* source, uint16 mask)
     {
+        for (const auto& usage : mSharedParamSets)
+        {
+            if(usage.getName() == "OgreFroxels" && source->refreshFroxelData())
+            {
+                const auto& froxelGrid = source->getFroxelGrid();
+                usage.getSharedParams()->setNamedConstant("froxelGrid", froxelGrid.data(), froxelGrid.size());
+                const auto& froxelRecords = source->getFroxelRecords();
+                usage.getSharedParams()->setNamedConstant("froxelRecords", froxelRecords.data(), froxelRecords.size());
+            }
+        }
+
         // abort early if no autos
         if (!hasAutoConstants()) return;
         // abort early if variability doesn't match any param
@@ -2091,7 +2106,12 @@ namespace Ogre
                                           source->getSpotlightViewProjMatrix(l),ac.elementCount);
                     }
                     break;
-
+                case ACT_FROXEL_TILE_PARAMS:
+                    _writeRawConstant(ac.physicalIndex, source->getFroxelTileParams(), ac.elementCount);
+                    break;
+                case ACT_FROXEL_DEPTH_PARAMS:
+                    _writeRawConstant(ac.physicalIndex, source->getFroxelDepthParams(), ac.elementCount);
+                    break;
                 default:
                     break;
                 };

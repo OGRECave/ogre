@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 #include "OgreControllerManager.h"
 #include "OgreViewport.h"
+#include "OgreFroxelizer.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------------
@@ -75,6 +76,8 @@ namespace Ogre {
         mBlankLight.setSpecularColour(ColourValue::Black);
         mBlankLight.setAttenuation(0,1,0,0);
         mDummyNode.attachObject(&mBlankLight);
+        mFroxelizer = std::make_unique<Froxelizer>();
+
         for(size_t i = 0; i < OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i)
         {
             mTextureViewProjMatrixDirty[i] = true;
@@ -86,6 +89,7 @@ namespace Ogre {
         }
 
     }
+    AutoParamDataSource::~AutoParamDataSource() = default;
     //-----------------------------------------------------------------------------
 	const Camera* AutoParamDataSource::getCurrentCamera() const
 	{
@@ -1294,5 +1298,30 @@ namespace Ogre {
         }
     }
 
-}
+    const Vector4f& AutoParamDataSource::getFroxelTileParams() const
+    {
+        mFroxelizer->updateLayout(mCurrentCamera, mCurrentViewport);
+        return mFroxelizer->getTileParams();
+    }
 
+    const Vector4f& AutoParamDataSource::getFroxelDepthParams() const
+    {
+        mFroxelizer->updateLayout(mCurrentCamera, mCurrentViewport);
+        return mFroxelizer->getDepthParams();
+    }
+    bool AutoParamDataSource::refreshFroxelData() const
+    {
+        mFroxelizer->updateLayout(mCurrentCamera, mCurrentViewport);
+        return mFroxelizer->binLights(mCurrentCamera, *mCurrentLightList);
+    }
+    const std::vector<uint32>& AutoParamDataSource::getFroxelGrid() const
+    {
+        refreshFroxelData();
+        return mFroxelizer->getGrid();
+    }
+    const std::vector<uint32>& AutoParamDataSource::getFroxelRecords() const
+    {
+        refreshFroxelData();
+        return mFroxelizer->getRecords();
+    }
+} // namespace Ogre
