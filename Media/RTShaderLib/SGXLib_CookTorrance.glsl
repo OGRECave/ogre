@@ -149,9 +149,10 @@ vec3 evaluateLight(
     vec3 h    = normalize(vView + vLightView);
     float NoH = saturate(dot(vNormalView, h));
     float NoV = clampNoV(abs(dot(vNormalView, vView)));
+    float LoH = saturate(dot(vLightView, h));
 
     float V = V_SmithGGXCorrelated(pixel.roughness, NoV, NoL);
-    vec3 F  = F_Schlick(pixel.f0, f90, NoH);
+    vec3 F  = F_Schlick(pixel.f0, f90, LoH);
     float D = D_GGX(pixel.roughness, NoH, h, vNormalView);
 
     vec3 Fr = (D * V) * F;
@@ -204,7 +205,7 @@ void PBR_Lights(
                 in f32vec4 pointParams[LIGHT_COUNT],
                 in f32vec4 vLightDirView[LIGHT_COUNT],
                 in f32vec4 spotParams[LIGHT_COUNT],
-                in PixelParams pixel,
+                inout PixelParams pixel,
                 inout vec3 vOutColour)
 {
     // Energy compensation for multiple scattering in a microfacet model
