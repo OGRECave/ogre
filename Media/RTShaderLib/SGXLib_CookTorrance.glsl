@@ -188,6 +188,11 @@ void PBR_MakeParams(in vec3 baseColor, in vec3 ormParam, out PixelParams pixel)
     pixel.energyCompensation = vec3_splat(0.0); // will be set later
 }
 
+#ifndef USE_FROXELS
+#define CURRENT_LIGHT_COUNT LIGHT_COUNT
+#define GET_LIGHT_INDEX(n) n
+#endif
+
 #if LIGHT_COUNT > 0
 void PBR_Lights(
 #ifdef SHADOWLIGHT_COUNT
@@ -196,6 +201,9 @@ void PBR_Lights(
 #ifdef HAVE_AREA_LIGHTS
                 in sampler2D ltcLUT1,
                 in sampler2D ltcLUT2,
+#endif
+#ifdef USE_FROXELS
+				in FroxelLights lights,
 #endif
                 in vec3 vNormal,
                 in f32vec3 viewPos,
@@ -212,8 +220,9 @@ void PBR_Lights(
     // See "Multiple-Scattering Microfacet BSDFs with the Smith Model"
     pixel.energyCompensation = 1.0 + pixel.f0 * (1.0 / pixel.dfg.y - 1.0);
 
-    for(int i = 0; i < LIGHT_COUNT; i++)
+    for(int n = 0; n < CURRENT_LIGHT_COUNT; n++)
     {
+        int i = GET_LIGHT_INDEX(n);
 #ifdef HAVE_AREA_LIGHTS
         if(spotParams[i].w == 2.0)
         {

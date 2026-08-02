@@ -145,7 +145,7 @@ protected:
     /** 
     Internal method that adds illumination component functions invocations.
     */
-    void addIlluminationInvocation(const FunctionStageRef& stage);
+    void addIlluminationInvocation(const FunctionStageRef& stage, const ParameterPtr& lights);
 
 
     // Track per vertex colour type.

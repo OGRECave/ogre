@@ -190,7 +190,7 @@ bool FFPLighting::addFunctionInvocations(ProgramSet* programSet)
 	addGlobalIlluminationInvocation(stage);
 
     // Add per light functions.
-	addIlluminationInvocation(stage);
+	addIlluminationInvocation(stage, nullptr);
 
     auto psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     auto psMain = psProgram->getMain();
@@ -258,7 +258,7 @@ void FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
 }
 
 //-----------------------------------------------------------------------
-void FFPLighting::addIlluminationInvocation(const FunctionStageRef& stage)
+void FFPLighting::addIlluminationInvocation(const FunctionStageRef& stage, const ParameterPtr& lights)
 {
 	if(mLightCount == 0)
 		return;
@@ -281,6 +281,11 @@ void FFPLighting::addIlluminationInvocation(const FunctionStageRef& stage)
 	if (mSpecularEnable)
 		args.insert(args.end(),
 					{In(mSpecularColours), In(mSurfaceShininess), InOut(mOutSpecular).xyz()});
+
+	if(lights)
+	{
+		args.insert(args.end(), {In(lights)});
+	}
 
 	stage.callFunction("FFP_Lights", args);
 }

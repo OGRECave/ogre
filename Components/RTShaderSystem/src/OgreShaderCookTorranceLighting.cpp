@@ -144,6 +144,11 @@ bool CookTorranceLighting::createCpuSubPrograms(ProgramSet* programSet)
                                        In(lightDiffuse),     In(pointParams), In(lightDirView),      In(spotParams),
                                        In(pixelParams),      InOut(outDiffuse).xyz()};
 
+        if(auto lights = psMain->getLocalParameter("lights"))
+        {
+            params.insert(params.begin(), {In(lights)});
+        }
+
         if(mLtcLUT1SamplerIndex > -1)
         {
             auto ltcLUT1 = psProgram->resolveParameter(GCT_SAMPLER2D, "ltcLUT1Sampler", mLtcLUT1SamplerIndex);

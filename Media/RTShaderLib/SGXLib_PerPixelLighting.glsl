@@ -127,6 +127,11 @@ void evaluateLight(
 #endif
 }
 
+#ifndef USE_FROXELS
+#define CURRENT_LIGHT_COUNT LIGHT_COUNT
+#define GET_LIGHT_INDEX(n) n
+#endif
+
 #if LIGHT_COUNT > 0
 void FFP_Lights(
 #ifdef SHADOWLIGHT_COUNT
@@ -152,10 +157,15 @@ void FFP_Lights(
 				in float fSpecularPower,
 				inout vec3 vOutSpecular
 #endif
+#ifdef USE_FROXELS
+				, in FroxelLights lights
+#endif
 				)
 {
-	for (int i = 0; i < LIGHT_COUNT; ++i)
+	for (int n = 0; n < CURRENT_LIGHT_COUNT; ++n)
 	{
+		int i = GET_LIGHT_INDEX(n);
+
 		// resolve per-light inputs: vertex colour tracking and shadows
 		vec3 dcol = vDiffuseColour[i].rgb;
 #ifdef TVC_DIFFUSE
