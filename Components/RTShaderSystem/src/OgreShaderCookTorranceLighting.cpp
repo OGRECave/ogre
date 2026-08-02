@@ -182,6 +182,17 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
 
     mLightCount = renderState->getLightCount();
 
+	// Case this pass should run once per light(s) -> override the light policy.
+	if (srcPass->getIteratePerLight())
+	{		
+		mLightCount = srcPass->getLightCountPerIteration();
+	}
+
+	if(srcPass->getMaxSimultaneousLights() == 0)
+	{
+		mLightCount = 0;
+	}
+
     if(renderState->haveAreaLights())
         mLtcLUT1SamplerIndex = ensureLtcLUTPresent(dstPass);
 
