@@ -280,6 +280,10 @@ void ShaderGenerator::createBuiltinSRSFactories()
         curFactory = OGRE_NEW HardwareSkinningFactory;
         addSubRenderStateFactory(curFactory);
         mBuiltinSRSFactories.push_back(curFactory);
+
+        curFactory = OGRE_NEW ClusteredLightCullingFactory;
+        addSubRenderStateFactory(curFactory);
+        mBuiltinSRSFactories.push_back(curFactory);
     }
 
     curFactory = OGRE_NEW TriplanarTexturingFactory;

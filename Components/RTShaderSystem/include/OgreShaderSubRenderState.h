@@ -76,6 +76,8 @@ _OgreRTSSExport extern const String SRS_TRIPLANAR_TEXTURING;
 _OgreRTSSExport extern const String SRS_LAYERED_BLENDING;
 /// Include skinning calculations for Skeletal Animation in the shader to move computations to the GPU
 _OgreRTSSExport extern const String SRS_HARDWARE_SKINNING;
+/// Enable clustered light culling and per-fragment light list generation
+_OgreRTSSExport extern const String SRS_CLUSTERED_LIGHT_CULLING;
 
 /** This class is the base interface of sub part from a shader based rendering pipeline.
 * All sub parts implementations should derive from it and implement the needed methods.
