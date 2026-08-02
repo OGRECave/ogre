@@ -236,6 +236,6 @@ void PBR_Lights(
         vOutColour += lightVal;
     }
     // apply ambient occlusion to the indirect (ambient) term only
-    vOutColour += pixel.baseColor * ambient.rgb * pixel.ambientOcclusion;
+    vOutColour += pixel.diffuseColor * ambient.rgb * pixel.ambientOcclusion;
 }
 #endif

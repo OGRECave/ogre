@@ -184,7 +184,7 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
 
 	// Case this pass should run once per light(s) -> override the light policy.
 	if (srcPass->getIteratePerLight())
-	{		
+	{
 		mLightCount = srcPass->getLightCountPerIteration();
 	}
 
