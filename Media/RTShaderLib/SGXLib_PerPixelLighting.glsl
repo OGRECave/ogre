@@ -138,17 +138,17 @@ void FFP_Lights(
 #endif
 				in vec3 vNormal,
 				in f32vec3 vViewPos,
-				in vec4 vLightPos[LIGHT_COUNT],
-				in vec4 vAttParams[LIGHT_COUNT],
-				in vec4 vLightDirView[LIGHT_COUNT],
-				in vec4 spotParams[LIGHT_COUNT],
-				in vec4 vDiffuseColour[LIGHT_COUNT],
+				in f32vec4 vLightPos[LIGHT_COUNT],
+				in f32vec4 vAttParams[LIGHT_COUNT],
+				in f32vec4 vLightDirView[LIGHT_COUNT],
+				in f32vec4 spotParams[LIGHT_COUNT],
+				in f32vec4 vDiffuseColour[LIGHT_COUNT],
 				inout vec3 vOutDiffuse
 #if defined(TVC_DIFFUSE) || defined(TVC_SPECULAR)
 				, in vec4 vInVertexColour
 #endif
 #ifdef USE_SPECULAR
-				, in vec4 vSpecularColour[LIGHT_COUNT],
+				, in f32vec4 vSpecularColour[LIGHT_COUNT],
 				in float fSpecularPower,
 				inout vec3 vOutSpecular
 #endif
