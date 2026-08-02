@@ -48,6 +48,10 @@
 #define ivec3 int3
 #define ivec4 int4
 
+#define uvec2 uint2
+#define uvec3 uint3
+#define uvec4 uint4
+
 #define texture1D tex1D
 #define texture2D tex2D
 #define texture3D tex3D
