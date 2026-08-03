@@ -6,7 +6,7 @@
 #define M_PI 3.14159265359
 
 // classical attenuation formula
-float getDistanceAttenuation(const vec3 params, float distance)
+float getDistanceAttenuation(const vec3 params, float32_t distance)
 {
     return 1.0 / (params.x + params.y * distance + params.z * distance * distance);
 }
