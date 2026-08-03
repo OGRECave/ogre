@@ -588,7 +588,7 @@ namespace Ogre {
         const Corners& getWorldSpaceCorners(void) const override;
         /// @copydoc Frustum::getFrustumPlane
         const Plane& getFrustumPlane( unsigned short plane ) const override;
-        /// @copydoc Frustum::projectSphere
+        using Frustum::projectSphere;
         bool projectSphere(const Sphere& sphere, 
             Real* left, Real* top, Real* right, Real* bottom) const override;
         float getNearClipDistance(void) const override;
