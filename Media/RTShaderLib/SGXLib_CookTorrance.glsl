@@ -169,7 +169,7 @@ vec3 evaluateLight(
     return color;
 }
 
-void PBR_MakeParams(in vec3 baseColor, in vec3 ormParam, in PixelParams pixel)
+void PBR_MakeParams(in vec3 baseColor, in vec3 ormParam, out PixelParams pixel)
 {
     pixel.baseColor = baseColor;
 
