@@ -322,8 +322,20 @@ namespace Ogre {
         {
             D3D11_BOX dstBox = getSubresourceBox(dst);
             UINT dstSubresource = getSubresourceIndex(dst.front);
-            UINT srcRowPitch = PixelUtil::getMemorySize(src.getWidth(), 1, 1, src.format);
-            UINT srcDepthPitch = PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), 1, src.format); // H * rowPitch is invalid for compressed formats
+
+            UINT srcRowPitch, srcDepthPitch;
+            if (PixelUtil::isCompressed(src.format))
+            {
+                // pitches in blocks - consecutive layout assumed
+                srcRowPitch   = PixelUtil::getMemorySize(src.getWidth(), 1, 1, src.format);
+                srcDepthPitch = PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), 1, src.format);
+            }
+            else
+            {
+                size_t elemBytes = PixelUtil::getNumElemBytes(src.format);
+                srcRowPitch   = UINT(src.rowPitch * elemBytes);
+                srcDepthPitch = UINT(src.slicePitch * elemBytes);
+            }
 
             mDevice.GetImmediateContext()->UpdateSubresource(
                 mParentTexture->getTextureResource(), dstSubresource, &dstBox,
