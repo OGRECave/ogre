@@ -91,6 +91,7 @@ int main(int argc, char *argv[]) {
     catch (Ogre::Exception& e)
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        Ogre::LogManager::getSingleton().logError(e.getFullDescription());
         MessageBoxA(NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_ICONERROR | MB_TASKMODAL);
 #else
         std::cerr << "An exception has occurred: " << e.getFullDescription().c_str() << std::endl;
