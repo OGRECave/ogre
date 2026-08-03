@@ -507,21 +507,15 @@ namespace Ogre
 
         /** Project a sphere onto the near plane and get the bounding rectangle. 
         @param sphere The world-space sphere to project.
-        @param left
-            Pointers to destination values, these will be completed with 
-            the normalised device coordinates (in the range {-1,1}).
-        @param top
-            Pointers to destination values, these will be completed with 
-            the normalised device coordinates (in the range {-1,1}).
-        @param right
-            Pointers to destination values, these will be completed with 
-            the normalised device coordinates (in the range {-1,1}).
-        @param bottom
-            Pointers to destination values, these will be completed with 
-            the normalised device coordinates (in the range {-1,1}).
+        @param rect The normalised device coordinates (in the range {-1,1}).
         @return @c true if the sphere was projected to a subset of the near plane,
             @c false if the entire near plane was contained.
         */
+        bool projectSphere(const Sphere& sphere, RealRect& rect) const
+        {
+            return projectSphere(sphere, &rect.left, &rect.top, &rect.right, &rect.bottom);
+        }
+
         virtual bool projectSphere(const Sphere& sphere, 
             Real* left, Real* top, Real* right, Real* bottom) const;
 

@@ -2561,7 +2561,7 @@ static void buildScissor(const Light* light, const Camera* cam, RealRect& rect)
 {
     // Project the sphere onto the camera
     Sphere sphere(light->getDerivedPosition(), light->getAttenuationRange());
-    cam->Frustum::projectSphere(sphere, &(rect.left), &(rect.top), &(rect.right), &(rect.bottom));
+    cam->Frustum::projectSphere(sphere, rect);
 }
 const RealRect& SceneManager::getLightScissorRect(Light* l, const Camera* cam)
 {
