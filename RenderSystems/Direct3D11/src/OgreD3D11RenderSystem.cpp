@@ -2498,8 +2498,7 @@ namespace Ogre
     Real D3D11RenderSystem::getMaximumDepthInputValue(void)
     {
         // Range [0.0f, 1.0f]
-        // D3D inverts even identity view matrices, so maximum INPUT is -1.0
-        return -1.0f;
+        return 1.0f;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::determineFSAASettings(uint fsaa, const String& fsaaHint, 
