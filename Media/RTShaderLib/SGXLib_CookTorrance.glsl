@@ -110,7 +110,7 @@ float D_GGX(float roughness, float32_t NoH, const vec3 h, const vec3 n) {
 
 vec3 evaluateLight(
                 in f32vec3 vNormal,
-                in vec3 viewPos,
+                in f32vec3 viewPos,
                 in f32vec4 lightPos,
                 in vec3 lightColor,
                 in vec4 pointParams,
@@ -198,7 +198,7 @@ void PBR_Lights(
                 in sampler2D ltcLUT2,
 #endif
                 in vec3 vNormal,
-                in vec3 viewPos,
+                in f32vec3 viewPos,
                 in vec4 ambient,
                 in f32vec4 lightPos[LIGHT_COUNT],
                 in f32vec4 lightColor[LIGHT_COUNT],
