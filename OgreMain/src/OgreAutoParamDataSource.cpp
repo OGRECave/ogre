@@ -174,13 +174,16 @@ namespace Ogre {
         static LightList NULL_LIGHTS;
         ll = ll ? ll : &NULL_LIGHTS;
 
+        // always refresh the pointer: callers may pass a stack-local LightList
+        // whose address differs from the previous one, even if its hash happens to match
+        mCurrentLightList = ll;
+
         uint32 hash = FastHash((const char*)ll->data(), ll->size() * sizeof(Light*));
         if (hash == mLastLightHash)
             return;
 
         mLastLightHash = hash;
         mGpuParamsDirty |= GPV_LIGHTS;
-        mCurrentLightList = ll;
 
         mLightPosViewSpaceArray.clear();
         mLightAttenuationArray.clear();
