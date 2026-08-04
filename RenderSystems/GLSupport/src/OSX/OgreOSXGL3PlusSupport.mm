@@ -80,7 +80,9 @@ ConfigOptionMap OSXGLSupport::getConfigOptions()
 
 	// Video mode possibilities
 	CFArrayRef displayModes = CGDisplayCopyAllDisplayModes(CGMainDisplayID(), NULL);
-	CFIndex numModes = CFArrayGetCount(displayModes);
+	// NULL for an invalid display, which includes a process that has no window
+	// server session. Report no video modes instead of dereferencing it.
+	CFIndex numModes = displayModes ? CFArrayGetCount(displayModes) : 0;
 	CFMutableArrayRef goodModes = NULL;
 	goodModes = CFArrayCreateMutable(kCFAllocatorDefault, numModes, NULL);
 	
@@ -120,7 +122,8 @@ ConfigOptionMap OSXGLSupport::getConfigOptions()
 	}
 	
     // Release memory
-    CFRelease(displayModes);
+    if(displayModes)
+        CFRelease(displayModes);
 
 	// Sort the modes...
 	CFArraySortValues(goodModes, CFRangeMake(0, CFArrayGetCount(goodModes)), 
