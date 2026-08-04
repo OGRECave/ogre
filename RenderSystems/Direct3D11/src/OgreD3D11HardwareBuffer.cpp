@@ -250,6 +250,7 @@ namespace Ogre {
         const void* pSource,
         bool discardWholeBuffer)
     {
+        discardWholeBuffer = discardWholeBuffer || (offset == 0 && length == mSizeInBytes);
         // There is no functional interface in D3D, just do via manual 
         // lock, copy & unlock
         HardwareBufferLockGuard thisLock(this, offset, length,
