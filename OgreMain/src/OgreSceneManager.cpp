@@ -3566,8 +3566,7 @@ void SceneManager::useLights(const LightList* lights, ushort limit)
 //---------------------------------------------------------------------
 void SceneManager::bindGpuProgram(GpuProgram* prog)
 {
-    // need to dirty the light hash, and params that need resetting, since program params will have been invalidated
-    mAutoParamDataSource->setCurrentLightList(nullptr);
+    // need to dirty the params that need resetting, since program params will have been invalidated
     mAutoParamDataSource->markGpuParamsDirty(GPV_ALL);
     mDestRenderSystem->bindGpuProgram(prog);
 }
