@@ -57,6 +57,11 @@ namespace Ogre {
         IS_UNKNOWN
     };
 
+    enum class DescriptorProfileHint
+    {
+        Default, AllUnits, Compute
+    };
+
     /** Class defining a single pass of a Technique (of a Material): a single rendering call.
 
         If a pass does not explicitly use a vertex or fragment shader, %Ogre will calculate
@@ -238,6 +243,8 @@ namespace Ogre {
         PolygonMode mPolygonMode;
         /// Illumination stage?
         IlluminationStage mIlluminationStage;
+        /// Descriptor set profile hint
+        DescriptorProfileHint mDescriptorProfileHint;
 
         Light::LightTypes mOnlyLightType;
         FogMode mFogMode;
@@ -1474,6 +1481,15 @@ namespace Ogre {
         void setIlluminationStage(IlluminationStage is) { mIlluminationStage = is; }
         /// Get the manually assigned illumination stage, if any
         IlluminationStage getIlluminationStage() const { return mIlluminationStage; }
+
+        /// Manually set the descriptor set profile hint for Vulkan
+        void setDescriptorProfileHint(DescriptorProfileHint hint)
+        {
+            mDescriptorProfileHint = hint;
+        }
+        /// Get the manually assigned descriptor set profile hint
+        DescriptorProfileHint getDescriptorProfileHint() const { return mDescriptorProfileHint; }
+
         /** There are some default hash functions used to order passes so that
             render state changes are minimised, this enumerates them.
         */

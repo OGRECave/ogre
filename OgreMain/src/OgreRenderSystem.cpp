@@ -422,7 +422,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::_setTextureUnitSettings(size_t texUnit, TextureUnitState& tl)
     {
-        if(texUnit >= getCapabilities()->getNumTextureUnits())
+        if(texUnit >= _getCurrentPassNumTextureUnits())
             return;
 
         // This method is only ever called to set a texture unit to valid details

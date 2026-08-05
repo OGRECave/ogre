@@ -247,6 +247,7 @@ namespace Ogre {
         mLightScissoring = oth.mLightScissoring;
         mLightClipPlanes = oth.mLightClipPlanes;
         mIlluminationStage = oth.mIlluminationStage;
+        mDescriptorProfileHint = oth.mDescriptorProfileHint;
         mLightMask = oth.mLightMask;
 
         for(int i = 0; i < GPT_PIPELINE_COUNT; i++)

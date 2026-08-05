@@ -90,7 +90,7 @@ namespace Ogre
 
         static VkInstance createInstance( FastArray<const char *> &extensions,
                                           FastArray<const char *> &layers,
-                                          PFN_vkDebugReportCallbackEXT debugCallback );
+                                          void* pNext = nullptr);
 
         void createPhysicalDevice( uint32 deviceIdx );
 

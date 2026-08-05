@@ -777,6 +777,14 @@ namespace Ogre
         /** Sets how to rasterise triangles, as points, wireframe or solid polys. */
         virtual void _setPolygonMode(PolygonMode level) = 0;
 
+        /** Sets profile hints for layout */
+        virtual void _setPassHints( const Pass* pass ) {}
+
+        virtual ushort _getCurrentPassNumTextureUnits() const
+        {
+            return getCapabilities()->getNumTextureUnits();
+        }
+
         /** This method allows you to set all the stencil buffer parameters in one call.
 
         Unlike other render states, stencilling is left for the application to turn

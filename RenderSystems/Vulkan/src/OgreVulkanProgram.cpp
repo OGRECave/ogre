@@ -42,17 +42,82 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    namespace
+    {
+        class CmdDescriptorSetProfile : public ParamCommand
+        {
+        public:
+            String doGet( const void *target ) const override
+            {
+                const auto *program = static_cast<const VulkanProgram *>( target );
+                switch( program->getDescriptorSetProfileHint() )
+                {
+                case VulkanProgram::DescriptorSetProfileGraphics:
+                    return "Graphics";
+                case VulkanProgram::DescriptorSetProfileCompute:
+                    return "Compute";
+                case VulkanProgram::DescriptorSetProfileAllUnits:
+                    return "AllUnits";
+                default:
+                    return "Auto";
+                }
+            }
+
+            void doSet( void *target, const String &val ) override
+            {
+                auto *program = static_cast<VulkanProgram *>( target );
+                String lowered = val;
+                StringUtil::toLowerCase( lowered );
+
+                if( lowered == "auto" )
+                {
+                    program->setDescriptorSetProfileHint( VulkanProgram::DescriptorSetProfileAuto );
+                }
+                else if( lowered == "graphics" )
+                {
+                    program->setDescriptorSetProfileHint(
+                        VulkanProgram::DescriptorSetProfileGraphics );
+                }
+                else if( lowered == "compute" )
+                {
+                    program->setDescriptorSetProfileHint(
+                        VulkanProgram::DescriptorSetProfileCompute );
+                }
+                else if( lowered == "allunits" )
+                {
+                    program->setDescriptorSetProfileHint(
+                        VulkanProgram::DescriptorSetProfileAllUnits );
+                }
+                {
+                    LogManager::getSingleton().logWarning(
+                        "[Vulkan] Unknown descriptor_set_profile '" + val +
+                        "'. Falling back to Auto" );
+                    program->setDescriptorSetProfileHint( VulkanProgram::DescriptorSetProfileAuto );
+                }
+            }
+        };
+
+        static CmdDescriptorSetProfile msDescriptorSetProfileCmd;
+    }
+
     //-----------------------------------------------------------------------
     VulkanProgram::VulkanProgram( ResourceManager *creator, const String &name, ResourceHandle handle,
                                   const String &group, bool isManual, ManualResourceLoader *loader,
                                   VulkanDevice *device ) :
         GpuProgram( creator, name, handle, group, isManual, loader ),
         mDevice( device ),
-        mShaderModule( VK_NULL_HANDLE )
+        mShaderModule( VK_NULL_HANDLE ),
+        mDescriptorSetProfileHint( DescriptorSetProfileAuto )
     {
         if( createParamDictionary( "VulkanProgram" ) )
         {
             setupBaseParamDictionary();
+            ParamDictionary *dict = getParamDictionary();
+            dict->addParameter( ParameterDef( "descriptor_set_profile",
+                                              "Descriptor set profile override. Values: Auto, "
+                                              "Graphics, Compute, AllUnits",
+                                              PT_STRING ),
+                                &msDescriptorSetProfileCmd );
         }
 
         mDrawIdLocation = /*( mShaderSyntax == GLSL ) */ true ? 15 : 0;

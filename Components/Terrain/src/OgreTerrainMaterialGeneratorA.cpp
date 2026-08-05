@@ -253,23 +253,35 @@ namespace Ogre
         }
         // clear everything
         mat->removeAllTechniques();
-        
-        // Automatically disable normal & parallax mapping if card cannot handle it
-        // We do this rather than having a specific technique for it since it's simpler
-        auto rsc = Root::getSingletonPtr()->getRenderSystem()->getCapabilities();
-        if (getRequiredLayers(terrain, mPSSM) > rsc->getNumTextureUnits())
-        {
-            setLayerNormalMappingEnabled(false);
-            setLayerParallaxMappingEnabled(false);
-            LogManager::getSingleton().logWarning(
-                "TerrainMaterialGeneratorA: Normal mapping disabled due to lack of texture units");
-        }
+
 
         Pass* pass;
         pass = mat->createTechnique()->createPass();
         pass->getUserObjectBindings().setUserAny("Terrain", terrain);
         pass->setSpecular(ColourValue::White);
         pass->setShininess(32); // user param
+
+        // Automatically disable normal & parallax mapping if card cannot handle it
+        // We do this rather than having a specific technique for it since it's simpler
+        auto rsc = Root::getSingletonPtr()->getRenderSystem()->getCapabilities();
+        const uint8 requiredLayers = getRequiredLayers(terrain, mPSSM);
+
+        if( requiredLayers > rsc->getNumTextureUnits() )
+        {
+            if( requiredLayers <= rsc->getNumTextureUnitsWide() )
+            {
+                // fits in the wider profile — no need to disable features
+                pass->setDescriptorProfileHint( DescriptorProfileHint::AllUnits );
+            }
+            else
+            {
+                // still doesn't fit even with the widest available profile — fall back as before
+                setLayerNormalMappingEnabled(false);
+                setLayerParallaxMappingEnabled(false);
+                LogManager::getSingleton().logWarning(
+                    "TerrainMaterialGeneratorA: Normal mapping disabled due to lack of texture units");
+            }
+        }
 
         if(mLayerSpecularMappingEnabled)
         {
