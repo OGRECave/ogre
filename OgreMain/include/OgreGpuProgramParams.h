@@ -1176,8 +1176,8 @@ namespace Ogre {
             AutoConstantType acType;
             String name;
             size_t elementCount;
-            /// The type of the constant in the program
-            ElementType elementType;
+            /// @deprecated do not use
+            OGRE_DEPRECATED ElementType elementType;
             /// The type of any extra data
             ACDataType dataType;
 
