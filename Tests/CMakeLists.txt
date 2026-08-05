@@ -181,4 +181,8 @@ if(OGRE_BUILD_FUZZERS)
   add_executable(ogre_deep_fuzz fuzz/ogre_deep_fuzz.cpp)
   target_link_libraries(ogre_deep_fuzz OgreMain ${LIB_FUZZING_ENGINE})
   target_compile_features(ogre_deep_fuzz PRIVATE cxx_std_17)
+
+  add_executable(ogre_fuzz fuzz/script_fuzz.cpp)
+  target_link_libraries(ogre_fuzz OgreMain ${LIB_FUZZING_ENGINE})
+  target_compile_features(ogre_fuzz PRIVATE cxx_std_17)
 endif ()
