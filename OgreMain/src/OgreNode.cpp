@@ -177,13 +177,9 @@ namespace Ogre {
             else
             {
                 // Just update selected children
-                ChildUpdateSet::iterator it, itend;
-                itend = mChildrenToUpdate.end();
-                for(it = mChildrenToUpdate.begin(); it != itend; ++it)
-                {
-                    Node* child = *it;
-                    child->_update(true, false);
-                }
+                // index-based: a re-entrant requestUpdate() may push_back and reallocate
+                for (size_t i = 0; i < mChildrenToUpdate.size(); ++i)
+                    mChildrenToUpdate[i]->_update(true, false);
 
             }
 
@@ -702,7 +698,7 @@ namespace Ogre {
             return;
         }
 
-        mChildrenToUpdate.insert(child);
+        mChildrenToUpdate.push_back(child);
         // Request selective update of me, if we didn't do it before
         if (mParent && (!mParentNotified || forceParentUpdate))
         {
@@ -714,7 +710,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::cancelUpdate(Node* child)
     {
-        mChildrenToUpdate.erase(child);
+        mChildrenToUpdate.erase(std::remove(mChildrenToUpdate.begin(), mChildrenToUpdate.end(), child),
+                                mChildrenToUpdate.end());
 
         // Propagate this up if we're done
         if (mChildrenToUpdate.empty() && mParent && !mNeedChildUpdate)

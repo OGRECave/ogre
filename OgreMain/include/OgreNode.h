@@ -101,7 +101,7 @@ namespace Ogre {
         /// Collection of pointers to direct children
         ChildNodeMap mChildren;
 
-        typedef std::set<Node*> ChildUpdateSet;
+        typedef std::vector<Node*> ChildUpdateSet;
         /// List of children which need updating, used if self is not out of date but children are
         ChildUpdateSet mChildrenToUpdate;
         /// Friendly name of this node
