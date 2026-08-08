@@ -507,7 +507,8 @@ namespace Ogre {
     {
         if (mWorldViewProjMatrixDirty)
         {
-            mWorldViewProjMatrix = getProjectionMatrix() * getWorldViewMatrix();
+            // (proj*view) * world: spares a matrix multiply, if only the renderable changes
+            mWorldViewProjMatrix = getViewProjectionMatrix() * getWorldMatrix();
             mWorldViewProjMatrixDirty = false;
         }
         return mWorldViewProjMatrix;
