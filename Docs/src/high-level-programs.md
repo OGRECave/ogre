@@ -669,18 +669,20 @@ Often, not every parameter you want to pass to a shader is unique to that progra
 shared_params YourSharedParamsName
 {
     param_named mySharedParam1 float4 0.1 0.2 0.3 0.4
+    param_named froxelGrid uint4 [1024] froxel_grid
     ...
 }
 ```
 
 As you can see, you need to use the keyword ’shared\_params’ and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the [param_named](#param_005fnamed) syntax. The definition of these lines is:
 @par
-Format: param\_named &lt;name&gt; &lt;type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;\]
+Format: param\_named &lt;name&gt; &lt;type&gt; \[&lt;\[array\_size\]&gt;\] \[&lt;initial\_values&gt;|&lt;auto\_constant\_name&gt;\]
 
 @param name must be unique within the set
 @param type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4.
 @param array_size allows you to define arrays of param\_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param\_type with whitespace).
 @param initial_values If you wish, you can also initialise the parameters by providing a list of values.
+@param auto_constant_name Instead of literal values, you can name one of the auto constants listed in [param_named_auto](#param_005fnamed_005fauto). The parameter is then updated automatically by %Ogre, just like an auto constant on a regular program parameter. For array auto constants, @c array_size determines the number of entries.
 
 Once you have defined the shared parameters, you can reference them inside default\_params and params blocks using [shared_params_ref](#shared_005fparams_005fref). You can also obtain a reference to them in your code via Ogre::GpuProgramManager::getSharedParameters, and update the values for all instances using them.
 

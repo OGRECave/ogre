@@ -144,6 +144,8 @@ namespace Ogre {
         uint16 mGpuParamsDirty;
         bool mCurrentUseIdentityView;
         bool mCurrentUseIdentityProj;
+
+        bool refreshFroxelData() const;
     public:
         AutoParamDataSource();
         ~AutoParamDataSource();
@@ -304,7 +306,6 @@ namespace Ogre {
 
         const Vector4f& getFroxelTileParams() const;
         const Vector4f& getFroxelDepthParams() const;
-        bool refreshFroxelData() const;
         const std::vector<uint32>& getFroxelGrid() const;
         const std::vector<uint32>& getFroxelRecords() const;
     };

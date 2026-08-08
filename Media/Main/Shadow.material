@@ -86,6 +86,6 @@ material Ogre/Debug/ShadowVolumes
 
 shared_params OgreFroxels
 {
-    param_named froxelGrid uint4 [1024]
-    param_named froxelRecords uint4 [1024]
+    param_named froxelGrid uint4 [1024] froxel_grid
+    param_named froxelRecords uint4 [1024] froxel_records
 }

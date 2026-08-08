@@ -386,161 +386,6 @@ namespace Ogre {
     */
     typedef std::vector<uchar> ConstantList;
 
-    /** A group of manually updated parameters that are shared between many parameter sets.
-
-        Sometimes you want to set some common parameters across many otherwise
-        different parameter sets, and keep them all in sync together. This class
-        allows you to define a set of parameters that you can share across many
-        parameter sets and have the parameters that match automatically be pulled
-        from the shared set, rather than you having to set them on all the parameter
-        sets individually.
-        @par
-        Parameters in a shared set are matched up with instances in a GpuProgramParameters
-        structure by matching names. It is up to you to define the named parameters
-        that a shared set contains, and ensuring the definition matches.
-        @note
-        Shared parameter sets can be named, and looked up using the GpuProgramManager.
-    */
-    class _OgreExport GpuSharedParameters : public GpuParamsAlloc
-    {
-        /// Name of the shared parameter set.
-        String mName;
-
-        /// Shared parameter definitions and related data.
-        GpuNamedConstants mNamedConstants;
-
-        /// List of constant values.
-        ConstantList mConstants;
-
-        /// Optional rendersystem backed storage
-        HardwareBufferPtr mHardwareBuffer;
-
-        /// Version number of the definitions in this buffer.
-        uint32 mVersion;
-
-		/// Accumulated offset used to calculate uniform location.
-		size_t mOffset;
-
-        bool mDirty;
-
-        template <typename T> void _setNamedConstant(const String& name, const T* val, uint32 count);
-    public:
-        GpuSharedParameters(const String& name);
-
-        /// Get the name of this shared parameter set.
-        const String& getName() { return mName; }
-
-        /** Add a new constant definition to this shared set of parameters.
-
-            Unlike GpuProgramParameters, where the parameter list is defined by the
-            program being compiled, this shared parameter set is defined by the
-            user. Only parameters which have been predefined here may be later
-            updated.
-        */
-        void addConstantDefinition(const String& name, GpuConstantType constType, uint32 arraySize = 1);
-
-        /// @deprecated removing a constant requires a full rebuild due to changed alignments
-        OGRE_DEPRECATED void removeConstantDefinition(const String& name);
-
-        /** Remove a constant definition from this shared set of parameters.
-         */
-        void removeAllConstantDefinitions();
-
-        /** Get the version number of this shared parameter set, can be used to identify when
-            changes have occurred.
-        */
-        uint32 getVersion() const { return mVersion; }
-
-        /** Calculate the expected size of the shared parameter buffer based
-            on constant definition data types.
-        */
-        size_t calculateSize(void) const;
-
-        /** True if this parameter set is dirty (values have been modified,
-            but the render system has not updated them yet).
-        */
-        bool isDirty() const { return mDirty; }
-
-        /** Mark the shared set as being clean (values successfully updated
-            by the render system).
-
-            You do not need to call this yourself. The set is marked as clean
-            whenever the render system updates dirty shared parameters.
-        */
-        void _markClean();
-
-        /** Mark the shared set as being dirty (values modified and not yet
-            updated in render system).
-
-            You do not need to call this yourself. The set is marked as
-            dirty whenever setNamedConstant or (non const) getFloatPointer
-            et al are called.
-        */
-        void _markDirty();
-
-        /// @deprecated use getConstantDefinitions()
-        OGRE_DEPRECATED GpuConstantDefinitionIterator getConstantDefinitionIterator(void) const;
-
-        /** Get a specific GpuConstantDefinition for a named parameter.
-         */
-        const GpuConstantDefinition& getConstantDefinition(const String& name) const;
-
-        /** Get the full list of GpuConstantDefinition instances.
-         */
-        const GpuNamedConstants& getConstantDefinitions() const;
-
-        /// Get the constant definitions ordered by their physical index.
-        std::vector<std::pair<String, GpuConstantDefinition>> getConstantDefinitionsSorted() const;
-
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String&, Real) */
-        template <typename T> void setNamedConstant(const String& name, T val)
-        {
-            setNamedConstant(name, &val, 1);
-        }
-        /// @overload
-        template <int dims, typename T>
-        void setNamedConstant(const String& name, const Vector<dims, T>& vec)
-        {
-            setNamedConstant(name, vec.ptr(), dims);
-        }
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4& m) */
-        void setNamedConstant(const String& name, const Matrix4& m);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries) */
-        void setNamedConstant(const String& name, const Matrix4* m, uint32 numEntries);
-        void setNamedConstant(const String& name, const float *val, uint32 count);
-        void setNamedConstant(const String& name, const double *val, uint32 count);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const ColourValue& colour) */
-        void setNamedConstant(const String& name, const ColourValue& colour);
-        void setNamedConstant(const String& name, const int *val, uint32 count);
-        void setNamedConstant(const String& name, const uint *val, uint32 count);
-        /// Get a pointer to the 'nth' item in the float buffer
-        float* getFloatPointer(size_t pos) { _markDirty(); return (float*)&mConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the float buffer
-        const float* getFloatPointer(size_t pos) const { return (const float*)&mConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the double buffer
-        double* getDoublePointer(size_t pos) { _markDirty(); return (double*)&mConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the double buffer
-        const double* getDoublePointer(size_t pos) const { return (const double*)&mConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the int buffer
-        int* getIntPointer(size_t pos) { _markDirty(); return (int*)&mConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the int buffer
-        const int* getIntPointer(size_t pos) const { return (const int*)&mConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the uint buffer
-        uint* getUnsignedIntPointer(size_t pos) { _markDirty(); return (uint*)&mConstants[pos]; }
-        /// Get a pointer to the 'nth' item in the uint buffer
-        const uint* getUnsignedIntPointer(size_t pos) const { return (const uint*)&mConstants[pos]; }
-        /// Get a reference to the list of constants
-        const ConstantList& getConstantList() const { return mConstants; }
-        /** Internal method that the RenderSystem might use to store optional data. */
-        void _setHardwareBuffer(const HardwareBufferPtr& data) { mHardwareBuffer = data; }
-        /** Internal method that the RenderSystem might use to store optional data. */
-        const HardwareBufferPtr& _getHardwareBuffer() const { return mHardwareBuffer; }
-        /// upload parameter data to GPU memory. Must have a HardwareBuffer
-        void _upload() const;
-        /// download data from GPU memory. Must have a writable HardwareBuffer
-        void download();
-    };
-
     class GpuProgramParameters;
 
     /** This class records the usage of a set of shared parameters in a concrete
@@ -583,7 +428,7 @@ namespace Ogre {
         void _copySharedParamsToTargetParams() const;
 
         /// Get the name of the shared parameter set
-        const String& getName() const { return mSharedParams->getName(); }
+        const String& getName() const;
 
         GpuSharedParametersPtr getSharedParams() const { return mSharedParams; }
         GpuProgramParameters* getTargetParams() const { return mParams; }
@@ -1152,6 +997,10 @@ namespace Ogre {
             /// Clustered (froxel) lighting depth parameters
             /// packed as `(scaleZ, biasZ, linZ, sliceCount)`
             ACT_FROXEL_DEPTH_PARAMS,
+            /// (offset << 8) | count, into froxel record buffer: uint32 x 4096
+            ACT_FROXEL_GRID,
+            /// Light indices: uint8 packed as uint32 x 4096
+            ACT_FROXEL_RECORDS
         };
 
         /** Defines the type of the extra data item used by the auto constant.
@@ -1850,6 +1699,176 @@ namespace Ogre {
         /// @}
 
         size_t calculateSize(void) const;
+    };
+
+    /** A group of manually updated parameters that are shared between many parameter sets.
+
+        Sometimes you want to set some common parameters across many otherwise
+        different parameter sets, and keep them all in sync together. This class
+        allows you to define a set of parameters that you can share across many
+        parameter sets and have the parameters that match automatically be pulled
+        from the shared set, rather than you having to set them on all the parameter
+        sets individually.
+        @par
+        Parameters in a shared set are matched up with instances in a GpuProgramParameters
+        structure by matching names. It is up to you to define the named parameters
+        that a shared set contains, and ensuring the definition matches.
+        @note
+        Shared parameter sets can be named, and looked up using the GpuProgramManager.
+    */
+    class _OgreExport GpuSharedParameters : public GpuParamsAlloc
+    {
+        /// Name of the shared parameter set.
+        String mName;
+
+        /// Shared parameter definitions and related data.
+        GpuNamedConstants mNamedConstants;
+
+        /// List of constant values.
+        ConstantList mConstants;
+
+        /// Optional rendersystem backed storage
+        HardwareBufferPtr mHardwareBuffer;
+
+        /// Version number of the definitions in this buffer.
+        uint32 mVersion;
+
+		/// Accumulated offset used to calculate uniform location.
+		size_t mOffset;
+
+        struct AutoConstantEntry
+        {
+            size_t physicalIndex;
+            GpuProgramParameters::AutoConstantType acType;
+            size_t arraySize;
+            uint32 elementCount;
+            uint32 hash;
+        };
+        std::vector<AutoConstantEntry> mAutoConstants;
+
+        bool mDirty;
+
+        template <typename T> void _setNamedConstant(const String& name, const T* val, uint32 count);
+    public:
+        GpuSharedParameters(const String& name);
+
+        /// Get the name of this shared parameter set.
+        const String& getName() { return mName; }
+
+        /** Add a new constant definition to this shared set of parameters.
+
+            Unlike GpuProgramParameters, where the parameter list is defined by the
+            program being compiled, this shared parameter set is defined by the
+            user. Only parameters which have been predefined here may be later
+            updated.
+        */
+        void addConstantDefinition(const String& name, GpuConstantType constType, uint32 arraySize = 1);
+
+        /** Make a constant definition auto updated from AutoConstantType */
+        void setAutoConstant(const String& name, GpuProgramParameters::AutoConstantType acType);
+
+        void _updateAutoParams(const AutoParamDataSource* source);
+
+        /// @deprecated removing a constant requires a full rebuild due to changed alignments
+        OGRE_DEPRECATED void removeConstantDefinition(const String& name);
+
+        /** Remove a constant definition from this shared set of parameters.
+         */
+        void removeAllConstantDefinitions();
+
+        /** Get the version number of this shared parameter set, can be used to identify when
+            changes have occurred.
+        */
+        uint32 getVersion() const { return mVersion; }
+
+        /** Calculate the expected size of the shared parameter buffer based
+            on constant definition data types.
+        */
+        size_t calculateSize(void) const;
+
+        /** True if this parameter set is dirty (values have been modified,
+            but the render system has not updated them yet).
+        */
+        bool isDirty() const { return mDirty; }
+
+        /** Mark the shared set as being clean (values successfully updated
+            by the render system).
+
+            You do not need to call this yourself. The set is marked as clean
+            whenever the render system updates dirty shared parameters.
+        */
+        void _markClean();
+
+        /** Mark the shared set as being dirty (values modified and not yet
+            updated in render system).
+
+            You do not need to call this yourself. The set is marked as
+            dirty whenever setNamedConstant or (non const) getFloatPointer
+            et al are called.
+        */
+        void _markDirty();
+
+        /// @deprecated use getConstantDefinitions()
+        OGRE_DEPRECATED GpuConstantDefinitionIterator getConstantDefinitionIterator(void) const;
+
+        /** Get a specific GpuConstantDefinition for a named parameter.
+         */
+        const GpuConstantDefinition& getConstantDefinition(const String& name) const;
+
+        /** Get the full list of GpuConstantDefinition instances.
+         */
+        const GpuNamedConstants& getConstantDefinitions() const;
+
+        /// Get the constant definitions ordered by their physical index.
+        std::vector<std::pair<String, GpuConstantDefinition>> getConstantDefinitionsSorted() const;
+
+        /** @copydoc GpuProgramParameters::setNamedConstant(const String&, Real) */
+        template <typename T> void setNamedConstant(const String& name, T val)
+        {
+            setNamedConstant(name, &val, 1);
+        }
+        /// @overload
+        template <int dims, typename T>
+        void setNamedConstant(const String& name, const Vector<dims, T>& vec)
+        {
+            setNamedConstant(name, vec.ptr(), dims);
+        }
+        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4& m) */
+        void setNamedConstant(const String& name, const Matrix4& m);
+        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries) */
+        void setNamedConstant(const String& name, const Matrix4* m, uint32 numEntries);
+        void setNamedConstant(const String& name, const float *val, uint32 count);
+        void setNamedConstant(const String& name, const double *val, uint32 count);
+        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const ColourValue& colour) */
+        void setNamedConstant(const String& name, const ColourValue& colour);
+        void setNamedConstant(const String& name, const int *val, uint32 count);
+        void setNamedConstant(const String& name, const uint *val, uint32 count);
+        /// Get a pointer to the 'nth' item in the float buffer
+        float* getFloatPointer(size_t pos) { _markDirty(); return (float*)&mConstants[pos]; }
+        /// Get a pointer to the 'nth' item in the float buffer
+        const float* getFloatPointer(size_t pos) const { return (const float*)&mConstants[pos]; }
+        /// Get a pointer to the 'nth' item in the double buffer
+        double* getDoublePointer(size_t pos) { _markDirty(); return (double*)&mConstants[pos]; }
+        /// Get a pointer to the 'nth' item in the double buffer
+        const double* getDoublePointer(size_t pos) const { return (const double*)&mConstants[pos]; }
+        /// Get a pointer to the 'nth' item in the int buffer
+        int* getIntPointer(size_t pos) { _markDirty(); return (int*)&mConstants[pos]; }
+        /// Get a pointer to the 'nth' item in the int buffer
+        const int* getIntPointer(size_t pos) const { return (const int*)&mConstants[pos]; }
+        /// Get a pointer to the 'nth' item in the uint buffer
+        uint* getUnsignedIntPointer(size_t pos) { _markDirty(); return (uint*)&mConstants[pos]; }
+        /// Get a pointer to the 'nth' item in the uint buffer
+        const uint* getUnsignedIntPointer(size_t pos) const { return (const uint*)&mConstants[pos]; }
+        /// Get a reference to the list of constants
+        const ConstantList& getConstantList() const { return mConstants; }
+        /** Internal method that the RenderSystem might use to store optional data. */
+        void _setHardwareBuffer(const HardwareBufferPtr& data) { mHardwareBuffer = data; }
+        /** Internal method that the RenderSystem might use to store optional data. */
+        const HardwareBufferPtr& _getHardwareBuffer() const { return mHardwareBuffer; }
+        /// upload parameter data to GPU memory. Must have a HardwareBuffer
+        void _upload() const;
+        /// download data from GPU memory. Must have a writable HardwareBuffer
+        void download();
     };
 
     /** @} */

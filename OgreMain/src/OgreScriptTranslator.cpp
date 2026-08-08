@@ -4176,16 +4176,36 @@ namespace Ogre{
                 }
             }
 
+            // Look up the auto constant - if the next token is a known auto constant name,
+            // the parameter is driven automatically instead of by literal values
+            const GpuProgramParameters::AutoConstantDefinition* autoDef = NULL;
+            if (arrayStart != arrayEnd && (*arrayStart)->type == ANT_ATOM)
+            {
+                String acName = static_cast<AtomAbstractNode*>(arrayStart->get())->value;
+                StringUtil::toLowerCase(acName);
+                autoDef = GpuProgramParameters::getAutoConstantDefinition(acName);
+                arrayStart++;
+            }
+
             // define constant entry
             try
             {
                 sharedParams->addConstantDefinition(pName, constType, arraySz);
+
+                if(autoDef)
+                    sharedParams->setAutoConstant(pName, autoDef->acType);
             }
             catch(Exception& e)
             {
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                    e.getDescription());
                 continue;
+            }
+
+            if (autoDef && arrayStart != arrayEnd)
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                   "unexpected extra parameters after auto constant name");
             }
 
             // amount of individual numbers to read
