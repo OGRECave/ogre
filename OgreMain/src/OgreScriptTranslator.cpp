@@ -3436,6 +3436,14 @@ namespace Ogre{
 
                     ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, value);
                     compiler->_fireEvent(&evt, 0);
+
+                    if (evt.mName == obj->name)
+                    {
+                        compiler->addError(*prop, "cannot be a delegate of itself",
+                                           ScriptCompiler::CE_INVALIDPARAMETERS);
+                        continue;
+                    }
+
                     delegates.push_back(evt.mName);
                 }
                 else
