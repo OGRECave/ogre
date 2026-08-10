@@ -2107,33 +2107,15 @@ namespace Ogre{
                         {
                             if(val)
                             {
-                                AbstractNodeList::const_iterator i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2),
-                                    i3 = getNodeAt(prop->values, 3);
-
                                 if (prop->values.size() > 1)
                                 {
-
-                                    Real constant = 0.0f, linear = 1.0f, quadratic = 0.0f;
-
-                                    if(i1 == prop->values.end() || !getValue(*i1, constant))
+                                    std::vector<float> data;
+                                    if(prop->values.size() != 4 || !getVector(++prop->values.begin(), prop->values.end(), data, 3))
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           (*i1)->getValue() + " is not a valid number");
+                                        compiler->addError(*prop);
+                                        return;
                                     }
-
-                                    if(i2 == prop->values.end() || !getValue(*i2, linear))
-                                    {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           (*i2)->getValue() + " is not a valid number");
-                                    }
-
-                                    if(i3 == prop->values.end() && !getValue(*i3, quadratic))
-                                    {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           (*i3)->getValue() + " is not a valid number");
-                                    }
-
-                                    mPass->setPointAttenuation(true, constant, linear, quadratic);
+                                    mPass->setPointAttenuation(true, data[0], data[1], data[2]);
                                 }
                                 else
                                 {
