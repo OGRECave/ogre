@@ -3083,7 +3083,7 @@ namespace Ogre{
                 case ID_SCROLL:
                     {
                         std::vector<float> v;
-                        if(_getVector(prop->values.begin(), prop->values.end(), v, 2))
+                        if(prop->values.size() == 2 && getVector(prop->values.begin(), prop->values.end(), v, 2))
                             mUnit->setTextureScroll(v[0], v[1]);
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
@@ -3093,7 +3093,7 @@ namespace Ogre{
                 case ID_SCROLL_ANIM:
                     {
                         std::vector<float> v;
-                        if(_getVector(prop->values.begin(), prop->values.end(), v, 2))
+                        if(prop->values.size() == 2 && getVector(prop->values.begin(), prop->values.end(), v, 2))
                             mUnit->setScrollAnimation(v[0], v[1]);
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
@@ -3111,7 +3111,7 @@ namespace Ogre{
                 case ID_SCALE:
                     {
                         std::vector<float> v;
-                        if(_getVector(prop->values.begin(), prop->values.end(), v, 2))
+                        if(prop->values.size() == 2 && getVector(prop->values.begin(), prop->values.end(), v, 2))
                             mUnit->setTextureScale(v[0], v[1]);
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
