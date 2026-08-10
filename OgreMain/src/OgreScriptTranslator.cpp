@@ -3081,45 +3081,23 @@ namespace Ogre{
                     }
                     break;
                 case ID_SCROLL:
-                    if(prop->values.empty())
                     {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 2)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "scroll must have at most 2 arguments");
-                    }
-                    else
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
-                        Real x, y;
-                        if(getReal(*i0, &x) && getReal(*i1, &y))
-                            mUnit->setTextureScroll(x, y);
+                        std::vector<float> v;
+                        if(_getVector(prop->values.begin(), prop->values.end(), v, 2))
+                            mUnit->setTextureScroll(v[0], v[1]);
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               (*i0)->getValue() + " and/or " + (*i1)->getValue() + " is invalid; both must be numbers");
+                                               "scroll requires exactly 2 numeric arguments");
                     }
                     break;
                 case ID_SCROLL_ANIM:
-                    if(prop->values.empty())
                     {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 2)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "scroll_anim must have at most 2 arguments");
-                    }
-                    else
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
-                        Real x, y;
-                        if(getReal(*i0, &x) && getReal(*i1, &y))
-                            mUnit->setScrollAnimation(x, y);
+                        std::vector<float> v;
+                        if(_getVector(prop->values.begin(), prop->values.end(), v, 2))
+                            mUnit->setScrollAnimation(v[0], v[1]);
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               (*i0)->getValue() + " and/or " + (*i1)->getValue() + " is invalid; both must be numbers");
+                                               "scroll_anim requires exactly 2 numeric arguments");
                     }
                     break;
                 case ID_ROTATE:
@@ -3131,35 +3109,20 @@ namespace Ogre{
                         mUnit->setRotateAnimation(fval);
                     break;
                 case ID_SCALE:
-                    if(prop->values.empty())
                     {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 2)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "scale must have at most 2 arguments");
-                    }
-                    else
-                    {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
-                        Real x, y;
-                        if(getReal(*i0, &x) && getReal(*i1, &y))
-                            mUnit->setTextureScale(x, y);
+                        std::vector<float> v;
+                        if(_getVector(prop->values.begin(), prop->values.end(), v, 2))
+                            mUnit->setTextureScale(v[0], v[1]);
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "first and second arguments must both be valid number values (received " + (*i0)->getValue() + ", " + (*i1)->getValue() + ")");
+                                               "scale requires exactly 2 numeric arguments");
                     }
                     break;
                 case ID_WAVE_XFORM:
-                    if(prop->values.empty())
+                    if(prop->values.size() != 6)
                     {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 6)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "wave_xform must have at most 6 arguments");
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                           "wave_xform requires exactly 6 arguments");
                     }
                     else
                     {
