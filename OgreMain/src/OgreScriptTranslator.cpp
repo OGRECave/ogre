@@ -4155,7 +4155,6 @@ namespace Ogre{
                 String acName = static_cast<AtomAbstractNode*>(arrayStart->get())->value;
                 StringUtil::toLowerCase(acName);
                 autoDef = GpuProgramParameters::getAutoConstantDefinition(acName);
-                arrayStart++;
             }
 
             // define constant entry
@@ -4164,7 +4163,10 @@ namespace Ogre{
                 sharedParams->addConstantDefinition(pName, constType, arraySz);
 
                 if(autoDef)
+                {
                     sharedParams->setAutoConstant(pName, autoDef->acType);
+                    arrayStart++;
+                }
             }
             catch(Exception& e)
             {
