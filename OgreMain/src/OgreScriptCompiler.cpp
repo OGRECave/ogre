@@ -110,6 +110,9 @@ namespace Ogre
         ObjectAbstractNode *parentNode = (ObjectAbstractNode*)this->parent;
         while(parentNode)
         {
+            if (parentNode->type != ANT_OBJECT)
+                break; // invalid node hierarchy: abort
+
             i = parentNode->mEnv.find(inName);
             if(i != parentNode->mEnv.end())
                 return std::make_pair(true, i->second);
