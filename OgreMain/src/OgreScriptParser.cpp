@@ -81,8 +81,12 @@ namespace Ogre
                         temp->token = unquoted(i->lexeme, temp->type == CNT_QUOTE);
                         node->children.push_back(temp);
 
-                        // The second-next token is the source
+                        // The next token must be "from"
                         ++i;
+                        if (i == end || i->type != TID_WORD || i->lexeme != "from")
+                            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                                        StringUtil::format("expected 'from' at line %d", node->line));
+                        // The token after "from" is the source
                         ++i;
                         if(i == end || (i->type != TID_WORD && i->type != TID_QUOTE))
                             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
