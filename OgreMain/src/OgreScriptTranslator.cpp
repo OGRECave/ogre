@@ -5097,6 +5097,14 @@ namespace Ogre{
                                 }
                             }
 
+                            if(id >= OGRE_MAX_TEXTURE_LAYERS)
+                            {
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   "input id must be less than " +
+                                                       std::to_string(OGRE_MAX_TEXTURE_LAYERS));
+                                return;
+                            }
+
                             mPass->setInput(id, name, index);
                         }
                         else
