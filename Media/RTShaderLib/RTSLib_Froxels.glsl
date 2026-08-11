@@ -12,6 +12,10 @@
 #define CURRENT_LIGHT_COUNT lights.count
 #define GET_LIGHT_INDEX(n) int(getLightIndex(lights, n))
 
+#if !defined(OGRE_GLSLANG) && (__VERSION__ < (400 - 90 * GL_ES))
+#define bitfieldExtract(word, offset, bits) uint(int(word >> uint(offset)) & ((1 << bits) - 1))
+#endif
+
 struct FroxelLights
 {
     int offset;
@@ -43,7 +47,7 @@ uvec3 getFroxelCoord(in vec3 fragCoord, in vec4 froxel_params, in vec4 froxel_z_
 uint getLightIndex(uint record)
 {
     uint word = froxelRecords[record >> 4][(record >> 2) & 3u]; // which uint
-    return (word >> ((record & 3u) * 8u)) & 0xFFu;              // which byte
+    return bitfieldExtract(word, int((record & 3u) * 8u), 8);     // which byte
 }
 
 // wrapper considering dir lights
@@ -85,8 +89,8 @@ void getFroxelLights(in vec3 fragCoord, in vec4 froxel_params, in vec4 froxel_z_
     uvec3 f   = getFroxelCoord(fragCoord, froxel_params, froxel_z_params);
     uint fidx     = (f.z * uint(froxel_params.y) + f.y) * uint(froxel_params.x) + f.x;
     uint grid  = froxelGrid[fidx >> 2][fidx & 3u];
-    lights.offset = int(grid >> 8) - lights.dirLights;
-    lights.count  = int(grid & 0xFFu) + lights.dirLights;
+    lights.offset = int(bitfieldExtract(grid, 8, 16)) - lights.dirLights;
+    lights.count  = int(bitfieldExtract(grid, 0, 8)) + lights.dirLights;
 
 #ifdef DEBUG_FROXELS
     // depth
