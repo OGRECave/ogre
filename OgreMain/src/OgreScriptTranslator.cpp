@@ -5202,7 +5202,7 @@ namespace Ogre{
         if(node->type == ANT_OBJECT)
         {
             ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
-            ObjectAbstractNode *parent = obj->parent ? static_cast<ObjectAbstractNode*>(obj->parent) : 0;
+            ObjectAbstractNode *parent = obj->parent && obj->parent->type == ANT_OBJECT ? static_cast<ObjectAbstractNode*>(obj->parent) : 0;
             if(obj->id == ID_MATERIAL)
                 translator = &mMaterialTranslator;
             else if(obj->id == ID_TECHNIQUE && parent && parent->id == ID_MATERIAL)
