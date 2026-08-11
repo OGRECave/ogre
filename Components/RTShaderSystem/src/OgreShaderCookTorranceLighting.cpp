@@ -210,6 +210,8 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
     if(mSampler)
         dstPass->getTextureUnitState(mMRMapSamplerIndex)->setSampler(mSampler);
 
+    srcPass->setShadingMode(SO_PHONG); // signal per-pixe lighting
+
     return true;
 }
 

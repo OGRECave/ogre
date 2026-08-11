@@ -349,6 +349,11 @@ bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcP
 	if (renderState->haveAreaLights())
 		mLtcLUT1SamplerIndex = ensureLtcLUTPresent(dstPass);
 
+	if(getType() == SRS_PER_PIXEL_LIGHTING)
+	{
+		srcPass->setShadingMode(SO_PHONG); // signal per-pixe lighting
+	}
+
 	return true;
 }
 
