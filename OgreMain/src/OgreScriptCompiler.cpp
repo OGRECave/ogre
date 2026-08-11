@@ -107,16 +107,14 @@ namespace Ogre
         if(i != mEnv.end())
             return std::make_pair(true, i->second);
 
-        ObjectAbstractNode *parentNode = (ObjectAbstractNode*)this->parent;
-        while(parentNode)
+        auto parentNode = this->parent;
+        while(parentNode && parentNode->type == ANT_OBJECT)
         {
-            if (parentNode->type != ANT_OBJECT)
-                break; // invalid node hierarchy: abort
-
-            i = parentNode->mEnv.find(inName);
-            if(i != parentNode->mEnv.end())
+            ObjectAbstractNode *parentObj = (ObjectAbstractNode*)parentNode;
+            i = parentObj->mEnv.find(inName);
+            if(i != parentObj->mEnv.end())
                 return std::make_pair(true, i->second);
-            parentNode = (ObjectAbstractNode*)parentNode->parent;
+            parentNode = parentNode->parent;
         }
         return std::make_pair(false, "");
     }
