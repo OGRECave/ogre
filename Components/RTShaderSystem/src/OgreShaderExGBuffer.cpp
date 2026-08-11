@@ -47,6 +47,7 @@ int GBuffer::getExecutionOrder() const { return FFP_LIGHTING; }
 bool GBuffer::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
     srcPass->getParent()->getParent()->setReceiveShadows(false);
+    srcPass->setMaxSimultaneousLights(0); // signal that no lights are evaluated now
     return true;
 }
 
