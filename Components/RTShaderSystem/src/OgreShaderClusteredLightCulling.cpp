@@ -29,7 +29,7 @@ bool ClusteredLightCulling::setParameter(const String& name, const String& value
 //-----------------------------------------------------------------------
 bool ClusteredLightCulling::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-    if (!srcPass->getLightingEnabled())
+    if (!srcPass->getLightingEnabled() || srcPass->getShadingMode() != SO_PHONG)
         return false;
 
     // must match the light count used by the lighting SRS, so the
