@@ -74,7 +74,6 @@ namespace Ogre {
             const LinkedSkeletonAnimationSource& link);
         
         void readBones(Skeleton* skel, pugi::xml_node& mBonesNode);
-        void readBones2(Skeleton* skel, pugi::xml_node& mBonesNode);
         void createHierarchy(Skeleton* skel, pugi::xml_node& mHierNode);
         void readKeyFrames(NodeAnimationTrack* track, const pugi::xml_node& mKeyfNode);
         void readAnimations(Skeleton* skel, pugi::xml_node& mAnimNode) ;
