@@ -5226,9 +5226,9 @@ namespace Ogre{
                 translator = &mSharedParamsTranslator;
             else if(obj->id == ID_PARTICLE_SYSTEM)
                 translator = &mParticleSystemTranslator;
-            else if(obj->id == ID_EMITTER)
+            else if(obj->id == ID_EMITTER && parent && parent->id == ID_PARTICLE_SYSTEM)
                 translator = &mParticleEmitterTranslator;
-            else if(obj->id == ID_AFFECTOR)
+            else if(obj->id == ID_AFFECTOR && parent && parent->id == ID_PARTICLE_SYSTEM)
                 translator = &mParticleAffectorTranslator;
             else if(obj->id == ID_COMPOSITOR)
                 translator = &mCompositorTranslator;
