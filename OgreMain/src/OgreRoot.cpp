@@ -99,7 +99,7 @@ namespace Ogre {
         const String& logFileName)
       : mQueuedEnd(false)
       , mCurrentSceneManager(NULL)
-      , mNextFrame(0)
+      , mNextFrame(1)
       , mFrameSmoothingTime(0.0f)
       , mRemoveQueueStructuresOnClear(false)
       , mDefaultMinPixelSize(0)
