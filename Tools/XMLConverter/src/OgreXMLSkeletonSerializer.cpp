@@ -79,27 +79,23 @@ namespace Ogre {
         elem = rootElem.child("bones");
         if (elem)
         {
-            readBones(pSkeleton, elem);         
-            elem = rootElem.child("bonehierarchy");
+            readBones(pSkeleton, elem);
+            readBones2(pSkeleton, elem);
 
+            elem = rootElem.child("bonehierarchy");
             if (elem)
             {
                 createHierarchy(pSkeleton, elem) ;
-                elem = rootElem.child("bones");
-                if (elem)
-                {
-                    readBones2(pSkeleton, elem);
-                    elem = rootElem.child("animations");
-                    if (elem)
-                    {
-                        readAnimations(pSkeleton, elem);
-                    }
-                    elem = rootElem.child("animationlinks");
-                    if (elem)
-                    {
-                        readSkeletonAnimationLinks(pSkeleton, elem);
-                    }
-                }
+            }
+            elem = rootElem.child("animations");
+            if (elem)
+            {
+                readAnimations(pSkeleton, elem);
+            }
+            elem = rootElem.child("animationlinks");
+            if (elem)
+            {
+                readSkeletonAnimationLinks(pSkeleton, elem);
             }
         }
         LogManager::getSingleton().logMessage("XMLSkeletonSerializer: Finished. Running SkeletonSerializer..." );
