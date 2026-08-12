@@ -501,9 +501,9 @@ namespace Ogre
                     for(; j != end; ++j)
                     {
                         // Locate this target and insert it into the import table
-                        AbstractNodeList newNodes = locateTarget(*import.second, j->second);
-                        if(!newNodes.empty())
-                            mImportTable.insert(mImportTable.begin(), newNodes.begin(), newNodes.end());
+                        auto target = locateTarget(*import.second, j->second);
+                        if(target)
+                            mImportTable.insert(mImportTable.begin(), target);
                         else
                             // -1 for line as we lost that info here
                             addError(CE_REFERENCETOANONEXISTINGOBJECT, nodes.front()->file, -1, j->second);
@@ -537,27 +537,18 @@ namespace Ogre
         return retval;
     }
 
-    AbstractNodeList ScriptCompiler::locateTarget(const AbstractNodeList& nodes, const Ogre::String &target)
+    AbstractNodePtr ScriptCompiler::locateTarget(const AbstractNodeList& nodes, const Ogre::String &target)
     {
-        SharedPtr<AbstractNode> iter = nullptr;
-
         // Search for a top-level object node
-        for(auto i : nodes)
+        for(const auto& n : nodes)
         {
-            if(i->type == ANT_OBJECT)
+            if(n->type == ANT_OBJECT && static_cast<ObjectAbstractNode*>(n.get())->name == target)
             {
-                ObjectAbstractNode *impl = (ObjectAbstractNode*)i.get();
-                if(impl->name == target)
-                    iter = i;
+                return n;
             }
         }
 
-        AbstractNodeList newNodes;
-        if(iter)
-        {
-            newNodes.push_back(iter);
-        }
-        return newNodes;
+        return nullptr;
     }
 
     void ScriptCompiler::processObjects(AbstractNodeList& nodes, const AbstractNodeList &top)
@@ -575,31 +566,29 @@ namespace Ogre
                 for (String& base : obj->bases)
                 {
                     // Check the top level first, then check the import table
-                    AbstractNodeList newNodes = locateTarget(top, base);
-                    if(newNodes.empty())
-                        newNodes = locateTarget(mImportTable, base);
+                    auto target = locateTarget(top, base);
+                    if(!target)
+                        target = locateTarget(mImportTable, base);
 
-                    if (newNodes.empty())
-                        addError(CE_OBJECTBASENOTFOUND, obj->file, obj->line, base);
-
-                    for(const auto& n : newNodes)
+                    if (!target)
                     {
-                        if(n->type != ANT_OBJECT) continue;
+                        addError(CE_OBJECTBASENOTFOUND, obj->file, obj->line, base);
+                        continue;
+                    }
 
-                        auto src = static_cast<const ObjectAbstractNode&>(*n);
+                    auto src = static_cast<const ObjectAbstractNode&>(*target);
 
 #ifdef OGRE_BUILD_COMPONENT_OVERLAY
-                        // uses custom inheritance for renaming children
-                        if(isOverlayElement)
-                        {
-                            if(src.abstract)
-                                base = ""; // hide from custom inheritance
-                            else
-                                continue;
-                        }
-#endif
-                        overlayObject(src, *obj);
+                    // uses custom inheritance for renaming children
+                    if (isOverlayElement)
+                    {
+                        if (src.abstract)
+                            base = ""; // hide from custom inheritance
+                        else
+                            continue;
                     }
+#endif
+                    overlayObject(src, *obj);
                 }
 
                 // Recurse into children

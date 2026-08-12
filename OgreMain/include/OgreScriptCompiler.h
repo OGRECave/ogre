@@ -281,7 +281,7 @@ namespace Ogre
         /// Loads the requested script and converts it to an AST
         AbstractNodeListPtr loadImportPath(const String &name);
         /// Returns the abstract nodes from the given tree which represent the target
-        AbstractNodeList locateTarget(const AbstractNodeList& nodes, const String &target);
+        AbstractNodePtr locateTarget(const AbstractNodeList& nodes, const String &target);
         /// Handles object inheritance and variable expansion
         void processObjects(AbstractNodeList& nodes, const AbstractNodeList &top);
         /// Handles processing the variables
