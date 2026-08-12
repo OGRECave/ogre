@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "OgreScriptLexer.h"
 
 namespace Ogre {
+    static const uint32 MAX_BRACE_LAYER = 100;
+
     ScriptTokenList ScriptLexer::tokenize(const String &str, const String& source)
     {
         String error;
@@ -68,7 +70,14 @@ namespace Ogre {
                 {
                     if(braceLayer == 0)
                         firstOpenBrace = line;
-                    
+
+                    if (braceLayer >= MAX_BRACE_LAYER)
+                    {
+                        error = StringUtil::format("too deeply nested open brackets '{' (max %u) at %s:%d",
+                                                   MAX_BRACE_LAYER, source, line);
+                        return tokens;
+                    }
+
                     braceLayer ++;
                 }
                 else if(c == closebrace)
