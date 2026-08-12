@@ -117,23 +117,20 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     writeProgramTitle(os, program);
     os << std::endl;
 
+    // Generate global variable code.
     int sharedRegister = 1;
     for (const auto& shared : program->getSharedParameters())
         writeSharedParams(os, shared->getName(), sharedRegister++, shared);
-
-    // Generate dependencies.
-    writeProgramDependencies(os, program);
-    os << std::endl;
-
-    // Generate global variable code.
-    writeUniformParametersTitle(os, program);
-    os << std::endl;
 
     for (const auto& p : program->getParameters())
     {
         p->isSampler() ? writeSamplerParameter(os, p) : writeParameter(os, p);
         os << ";" << std::endl;
     }
+    os << std::endl;
+
+    // Generate dependencies.
+    writeProgramDependencies(os, program);
     os << std::endl;
 
     Function* curFunction = program->getMain();

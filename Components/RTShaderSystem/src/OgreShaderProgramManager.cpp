@@ -182,6 +182,10 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     {
         programName += "_FS";
     }
+    else
+    {
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported shader type");
+    }
 
     // Try to get program by name.
     auto pGpuProgram = GpuProgramManager::getSingleton().getByName(programName, RGN_INTERNAL);

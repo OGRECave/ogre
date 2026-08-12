@@ -73,9 +73,6 @@ protected:
     /** Write the program title. */
     void                writeProgramTitle           (std::ostream& os, Program* program);
 
-    /** Write the uniform parameters title. */
-    void                writeUniformParametersTitle (std::ostream& os, Program* program);
-
     /** Write a function title. */
     void                writeFunctionTitle          (std::ostream& os, Function* function);
 

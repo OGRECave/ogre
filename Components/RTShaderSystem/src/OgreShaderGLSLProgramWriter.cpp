@@ -128,9 +128,53 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
         os << "#extension GL_ARB_shader_viewport_layer_array : require\n";
     }
 
+    writeProgramTitle(os, program);
+
     int sharedBinding = GPT_FRAGMENT_PROGRAM + 1;
     for (const auto& shared : program->getSharedParameters())
         writeUniformBlock(os, shared->getName(), sharedBinding++, shared);
+
+    const UniformParameterList& parameterList = program->getParameters();
+
+    // Generate global variable code.
+    auto* rs = Root::getSingleton().getRenderSystem();
+    auto hasSSO = rs ? rs->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) : false;
+
+    // Write the uniforms
+    UniformParameterList uniforms;
+    for (const auto& param : parameterList)
+    {
+        if(!param->isSampler())
+        {
+            uniforms.push_back(param);
+            continue;
+        }
+        writeSamplerParameter(os, param);
+        os << ";" << std::endl;
+    }
+    if (mIsVulkan && !uniforms.empty())
+    {
+        writeUniformBlock(os, "OgreUniforms", program->getType(), uniforms);
+        uniforms.clear();
+    }
+
+    int uniformLoc = 0;
+    for (const auto& uparam : uniforms)
+    {
+        if(mGLSLVersion >= 430 && hasSSO)
+        {
+            os << "layout(location = " << uniformLoc << ") ";
+            auto esize = GpuConstantDefinition::getElementSize(uparam->getType(), true) / 4;
+            uniformLoc += esize * std::max<int>(uparam->getSize(), 1);
+        }
+
+        os << "uniform\t";
+        if(mIsGLSLES)
+            os << "highp\t"; // force highp to avoid precision mismatch between VP/ FP
+        writeParameter(os, uparam);
+        os << ";\n";
+    }
+    os << std::endl;
 
     // Generate dependencies.
     writeProgramDependencies(os, program);
@@ -184,65 +228,13 @@ void GLSLProgramWriter::writeUniformBlock(std::ostream& os, const String& name, 
 
 void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
 {
-    GpuProgramType gpuType = program->getType();
-    if(gpuType == GPT_GEOMETRY_PROGRAM)
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-            "Geometry Program not supported in GLSL writer ",
-            "GLSLProgramWriter::writeSourceCode" );
-    }
-
-    const UniformParameterList& parameterList = program->getParameters();
-
-    // Generate global variable code.
-    writeUniformParametersTitle(os, program);
-    os << std::endl;
-
-    auto* rs = Root::getSingleton().getRenderSystem();
-    auto hasSSO = rs ? rs->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) : false;
-
-    // Write the uniforms
-    UniformParameterList uniforms;
-    for (const auto& param : parameterList)
-    {
-        if(!param->isSampler())
-        {
-            uniforms.push_back(param);
-            continue;
-        }
-        writeSamplerParameter(os, param);
-        os << ";" << std::endl;
-    }
-    if (mIsVulkan && !uniforms.empty())
-    {
-        writeUniformBlock(os, "OgreUniforms", gpuType, uniforms);
-        uniforms.clear();
-    }
-
-    int uniformLoc = 0;
-    for (const auto& uparam : uniforms)
-    {
-        if(mGLSLVersion >= 430 && hasSSO)
-        {
-            os << "layout(location = " << uniformLoc << ") ";
-            auto esize = GpuConstantDefinition::getElementSize(uparam->getType(), true) / 4;
-            uniformLoc += esize * std::max<int>(uparam->getSize(), 1);
-        }
-
-        os << "uniform\t";
-        if(mIsGLSLES)
-            os << "highp\t"; // force highp to avoid precision mismatch between VP/ FP
-        writeParameter(os, uparam);
-        os << ";\n";
-    }
-    os << std::endl;
-
     Function* curFunction = program->getMain();
     const ShaderParameterList& inParams = curFunction->getInputParameters();
 
     writeFunctionTitle(os, curFunction);
 
     // Write inout params and fill mInputToGLStatesMap
+    GpuProgramType gpuType = program->getType();
     writeInputParameters(os, curFunction, gpuType);
     writeOutParameters(os, curFunction, gpuType);
 
@@ -258,6 +250,7 @@ void GLSLProgramWriter::writeMainSourceCode(std::ostream& os, Program* program)
     }
     os << std::endl;
 
+    const UniformParameterList& parameterList = program->getParameters();
     for (const auto& pFuncInvoc : curFunction->getAtomInstances())
     {
         redirectGlobalWrites(os, pFuncInvoc, inParams, parameterList);
