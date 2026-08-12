@@ -440,13 +440,17 @@ namespace Ogre {
         }
 
         // Write parents
-        pugi::xml_node hierElem = rootNode.append_child("bonehierarchy");
+        pugi::xml_node hierElem;
         for (Bone* pBone : pSkel->getBones())
         {
             String name = pBone->getName() ;
 
             if (auto pParent = pBone->getParent())
             {
+                if (!hierElem)
+                {
+                    hierElem = rootNode.append_child("bonehierarchy");
+                }
                 writeBoneParent(hierElem, name, pParent->getName());
             }
         }
