@@ -283,7 +283,7 @@ namespace Ogre
         /// Returns the abstract nodes from the given tree which represent the target
         AbstractNodePtr locateTarget(const AbstractNodeList& nodes, const String &target);
         /// Handles object inheritance and variable expansion
-        void processObjects(AbstractNodeList& nodes, const AbstractNodeList &top);
+        void processObjects(AbstractNodeList& nodes, const AbstractNodeList &top, const ObjectAbstractNode* exclude = nullptr);
         /// Handles processing the variables
         void processVariables(AbstractNodeList& nodes);
         /// This function overlays the given object on the destination object following inheritance rules

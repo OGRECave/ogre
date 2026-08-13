@@ -551,13 +551,15 @@ namespace Ogre
         return nullptr;
     }
 
-    void ScriptCompiler::processObjects(AbstractNodeList& nodes, const AbstractNodeList &top)
+    void ScriptCompiler::processObjects(AbstractNodeList& nodes, const AbstractNodeList &top, const ObjectAbstractNode* exclude)
     {
         for(auto& node : nodes)
         {
             if(node->type == ANT_OBJECT)
             {
                 ObjectAbstractNode *obj = (ObjectAbstractNode*)node.get();
+
+                auto skipNode = exclude ? exclude : obj; // set to us at the top level
 
 #ifdef OGRE_BUILD_COMPONENT_OVERLAY
                 bool isOverlayElement = obj->cls == "overlay_element";
@@ -576,7 +578,19 @@ namespace Ogre
                         continue;
                     }
 
-                    auto src = static_cast<const ObjectAbstractNode&>(*target);
+                    auto& src = static_cast<const ObjectAbstractNode&>(*target);
+
+                    if (target.get() == skipNode)
+                    {
+                        addError(CE_OBJECTBASENOTFOUND, obj->file, obj->line, "cannot inherit from itself");
+                        continue;
+                    }
+
+                    if (src.cls != obj->cls)
+                    {
+                        addError(CE_OBJECTBASENOTFOUND, obj->file, obj->line, "cannot inherit from a different type");
+                        continue;
+                    }
 
 #ifdef OGRE_BUILD_COMPONENT_OVERLAY
                     // uses custom inheritance for renaming children
@@ -592,7 +606,7 @@ namespace Ogre
                 }
 
                 // Recurse into children
-                processObjects(obj->children, top);
+                processObjects(obj->children, top, skipNode);
 
                 // Overrides now exist in obj's overrides list. These are non-object nodes which must now
                 // Be placed in the children section of the object node such that overriding from parents
