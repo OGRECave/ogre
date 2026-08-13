@@ -434,6 +434,8 @@ namespace Ogre {
         //find where the node would end up in parent's local space
         if(mParent)
             setPosition( mParent->convertWorldToLocalPosition( pos ) );
+        else
+            setPosition( pos );
     }
     //-----------------------------------------------------------------------
     void Node::_setDerivedOrientation( const Quaternion& q )
@@ -441,6 +443,8 @@ namespace Ogre {
         //find where the node would end up in parent's local space
         if(mParent)
             setOrientation( mParent->convertWorldToLocalOrientation( q ) );
+        else
+            setOrientation( q );
     }
 
     //-----------------------------------------------------------------------
