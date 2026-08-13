@@ -1511,16 +1511,7 @@ namespace Ogre{
                     }
                     break;
                 case ID_SCENE_BLEND:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 2)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "scene_blend supports at most 2 arguments");
-                    }
-                    else if(prop->values.size() == 1)
+                    if(prop->values.size() == 1)
                     {
                         SceneBlendType enval;
                         if(getValue(prop->values.front(), enval))
@@ -1529,11 +1520,10 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "scene_blend does not support \"" + prop->values.front()->getValue() + "\" for argument 1");
+                            compiler->addError(*prop, prop->values.front()->getString());
                         }
                     }
-                    else
+                    else if(prop->values.size() == 2)
                     {
                         AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
                         SceneBlendFactor sbf0, sbf1;
@@ -1547,23 +1537,13 @@ namespace Ogre{
                                                "scene_blend does not support \"" + (*i0)->getValue() + "\" and \"" + (*i1)->getValue() + "\" as arguments");
                         }
                     }
+                    else
+                    {
+                        compiler->addError(*prop, "scene_blend must have 1 or 2 arguments");
+                    }
                     break;
                 case ID_SEPARATE_SCENE_BLEND:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() == 3)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "separate_scene_blend must have 2 or 4 arguments");
-                    }
-                    else if(prop->values.size() > 4)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "separate_scene_blend must have 2 or 4 arguments");
-                    }
-                    else if(prop->values.size() == 2)
+                    if(prop->values.size() == 2)
                     {
                         AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
                         SceneBlendType sbt0, sbt1;
@@ -1573,33 +1553,29 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "separate_scene_blend does not support \"" + (*i0)->getValue() + "\" as argument 1");
+                            compiler->addError(*prop, "one of the arguments to separate_scene_blend is not a valid "
+                                                      "scene blend factor directive");
+                        }
+                    }
+                    else if(prop->values.size() == 4)
+                    {
+                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1),
+                            i2 = getNodeAt(prop->values, 2), i3 = getNodeAt(prop->values, 3);
+                        SceneBlendFactor sbf0, sbf1, sbf2, sbf3;
+                        if(getSceneBlendFactor(*i0, &sbf0) && getSceneBlendFactor(*i1, &sbf1) && getSceneBlendFactor(*i2, &sbf2) &&
+                            getSceneBlendFactor(*i3, &sbf3))
+                        {
+                            mPass->setSeparateSceneBlending(sbf0, sbf1, sbf2, sbf3);
+                        }
+                        else
+                        {
+                            compiler->addError(*prop, "one of the arguments to separate_scene_blend is not a valid "
+                                                      "scene blend factor");
                         }
                     }
                     else
                     {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1),
-                            i2 = getNodeAt(prop->values, 2), i3 = getNodeAt(prop->values, 3);
-                        if((*i0)->type == ANT_ATOM && (*i1)->type == ANT_ATOM && (*i2)->type == ANT_ATOM && (*i3)->type == ANT_ATOM)
-                        {
-                            SceneBlendFactor sbf0, sbf1, sbf2, sbf3;
-                            if(getSceneBlendFactor(*i0, &sbf0) && getSceneBlendFactor(*i1, &sbf1) && getSceneBlendFactor(*i2, &sbf2) &&
-                               getSceneBlendFactor(*i3, &sbf3))
-                            {
-                                mPass->setSeparateSceneBlending(sbf0, sbf1, sbf2, sbf3);
-                            }
-                            else
-                            {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "one of the arguments to separate_scene_blend is not a valid scene blend factor directive");
-                            }
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "one of the arguments to separate_scene_blend is not a valid scene blend factor directive");
-                        }
+                        compiler->addError(*prop, "separate_scene_blend must have 2 or 4 arguments");
                     }
                     break;
                 case ID_SCENE_BLEND_OP:
