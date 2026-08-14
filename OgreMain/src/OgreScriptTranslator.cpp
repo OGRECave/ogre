@@ -4247,51 +4247,31 @@ namespace Ogre{
         {
             if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
-                if(prop->values.empty())
+                auto prop = i->getProperty();
+                if(prop.values.empty())
                 {
-                    compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, i->file, i->line);
                     return;
                 }
 
                 String value;
-                if(prop->id == ID_MATERIAL)
+                if(static_cast<PropertyAbstractNode*>(i.get())->id == ID_MATERIAL)
                 {
-                    if(prop->values.front()->type == ANT_ATOM)
-                    {
-                        value = ((AtomAbstractNode*)prop->values.front().get())->value;
-
-                        ProcessResourceNameScriptCompilerEvent locEvt(ProcessResourceNameScriptCompilerEvent::MATERIAL, value);
-                        compiler->_fireEvent(&locEvt, 0);
-                        value = locEvt.mName;
-                    }
+                    ProcessResourceNameScriptCompilerEvent locEvt(ProcessResourceNameScriptCompilerEvent::MATERIAL, prop.values.front());
+                    compiler->_fireEvent(&locEvt, 0);
+                    value = locEvt.mName;
                 }
                 else
                 {
-                    // Glob the values together
-                    for(auto& v : prop->values)
-                    {
-                        if(v->type == ANT_ATOM)
-                        {
-                            if(value.empty())
-                                value = ((AtomAbstractNode*)v.get())->value;
-                            else
-                                value = value + " " + ((AtomAbstractNode*)v.get())->value;
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                            return;
-                        }
-                    }
+                    value = StringConverter::toString(prop.values);
                 }
 
-                if(!mSystem->setParameter(prop->name, value))
+                if(!mSystem->setParameter(prop.name, value))
                 {
                     if(auto renderer = mSystem->getRenderer())
                     {
-                        if(!renderer->setParameter(prop->name, value))
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        if(!renderer->setParameter(prop.name, value))
+                            compiler->addError(*i);
                     }
                 }
             }
@@ -4329,7 +4309,7 @@ namespace Ogre{
         }
         catch(Exception &e)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, e.getDescription());
+            compiler->addError(*obj, e.getDescription());
             return;
         }
 
@@ -4337,29 +4317,10 @@ namespace Ogre{
         {
             if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
-                String value;
-
-                // Glob the values together
-                for(const auto& v : prop->values)
+                auto prop = i->getProperty();
+                if(!mEmitter->setParameter(prop.name, StringConverter::toString(prop.values)))
                 {
-                    if(v->type == ANT_ATOM)
-                    {
-                        if(value.empty())
-                            value = ((AtomAbstractNode*)v.get())->value;
-                        else
-                            value = value + " " + ((AtomAbstractNode*)v.get())->value;
-                    }
-                    else
-                    {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        break;
-                    }
-                }
-
-                if(!mEmitter->setParameter(prop->name, value))
-                {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    compiler->addError(*i);
                 }
             }
             else
@@ -4395,7 +4356,7 @@ namespace Ogre{
         }
         catch(Exception &e)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, e.getDescription());
+            compiler->addError(*obj, e.getDescription());
             return;
         }
 
@@ -4403,29 +4364,10 @@ namespace Ogre{
         {
             if(i->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
-                String value;
-
-                // Glob the values together
-                for (const auto& v : prop->values)
+                auto prop = i->getProperty();
+                if(!mAffector->setParameter(prop.name, StringConverter::toString(prop.values)))
                 {
-                    if(v->type == ANT_ATOM)
-                    {
-                        if(value.empty())
-                            value = ((AtomAbstractNode*)v.get())->value;
-                        else
-                            value = value + " " + ((AtomAbstractNode*)v.get())->value;
-                    }
-                    else
-                    {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        break;
-                    }
-                }
-
-                if(!mAffector->setParameter(prop->name, value))
-                {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    compiler->addError(*i);
                 }
             }
             else
