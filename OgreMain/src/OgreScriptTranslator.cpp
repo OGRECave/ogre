@@ -1063,7 +1063,7 @@ namespace Ogre{
                             if (strategy)
                                 mMaterial->setLodStrategy(strategy);
                             else
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, sval);
+                                compiler->addError(*prop, sval);
                     }
                     break;
                 case ID_RECEIVE_SHADOWS:
@@ -1077,8 +1077,7 @@ namespace Ogre{
                 case ID_SET_TEXTURE_ALIAS:
                     if(prop->values.size() != 2)
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                            "set_texture_alias must have 2 string arguments");
+                        compiler->addError(*prop, "set_texture_alias must have 2 string arguments");
                     }
                     else
                     {
@@ -1190,14 +1189,12 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "gpu_vendor_rule cannot accept \"" + (*i0)->getValue() + "\" as first argument");
+                            compiler->addError(*prop, "gpu_vendor_rule cannot accept \"" + (*i0)->getValue() + "\" as first argument");
                         }
 
                         String vendor;
                         if(!getString(*i1, &vendor))
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "gpu_vendor_rule cannot accept \"" + (*i1)->getValue() + "\" as second argument");
+                            compiler->addError(*prop, "gpu_vendor_rule cannot accept \"" + (*i1)->getValue() + "\" as second argument");
 
                         rule.vendor = RenderSystemCapabilities::vendorFromString(vendor);
 
@@ -1235,20 +1232,17 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "gpu_device_rule cannot accept \"" + (*i0)->getValue() + "\" as first argument");
+                            compiler->addError(*prop, "gpu_device_rule cannot accept \"" + (*i0)->getValue() + "\" as first argument");
                         }
 
                         if(!getString(*i1, &rule.devicePattern))
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "gpu_device_rule cannot accept \"" + (*i1)->getValue() + "\" as second argument");
+                            compiler->addError(*prop, "gpu_device_rule cannot accept \"" + (*i1)->getValue() + "\" as second argument");
 
                         if (prop->values.size() == 3)
                         {
                             AbstractNodeList::const_iterator i2 = getNodeAt(prop->values, 2);
                             if (!getBoolean(*i2, &rule.caseSensitive))
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "gpu_device_rule third argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+                                compiler->addError(*prop, "gpu_device_rule third argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
                         }
 
                         mTechnique->addGPUDeviceNameRule(rule);
@@ -1320,8 +1314,7 @@ namespace Ogre{
                             if(getColour(prop->values.begin(), prop->values.end(), &val))
                                 mPass->setAmbient(val);
                             else
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "ambient requires 3 or 4 colour arguments, or a \"vertexcolour\" directive");
+                                compiler->addError(*prop, "ambient requires 3 or 4 colour arguments, or a \"vertexcolour\" directive");
                         }
                     }
                     break;
@@ -1347,8 +1340,7 @@ namespace Ogre{
                             if(getColour(prop->values.begin(), prop->values.end(), &val))
                                 mPass->setDiffuse(val);
                             else
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "diffuse requires 3 or 4 colour arguments, or a \"vertexcolour\" directive");
+                                compiler->addError(*prop, "diffuse requires 3 or 4 colour arguments, or a \"vertexcolour\" directive");
                         }
                     }
                     break;
@@ -1374,8 +1366,7 @@ namespace Ogre{
                                 if(getReal(prop->values.back(), &val))
                                     mPass->setShininess(val);
                                 else
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       "specular does not support \"" + prop->values.back()->getValue() + "\" as its second argument");
+                                    compiler->addError(*prop, "specular does not support \"" + prop->values.back()->getValue() + "\" as its second argument");
                             }
                         }
                         else
@@ -1404,14 +1395,12 @@ namespace Ogre{
                                         if(getReal(*getNodeAt(prop->values, 4), &shininess))
                                             mPass->setShininess(shininess);
                                         else
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               "specular fourth argument must be a valid number for shininess attribute");
+                                            compiler->addError(*prop, "specular fourth argument must be a valid number for shininess attribute");
                                     }
                                 }
                                 else
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       "specular must have first 3 arguments be a valid colour");
+                                    compiler->addError(*prop, "specular must have first 3 arguments be a valid colour");
                                 }
                             }
 
@@ -1440,8 +1429,7 @@ namespace Ogre{
                             if(getColour(prop->values.begin(), prop->values.end(), &val))
                                 mPass->setSelfIllumination(val);
                             else
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "emissive requires 3 or 4 colour arguments, or a \"vertexcolour\" directive");
+                                compiler->addError(*prop, "emissive requires 3 or 4 colour arguments, or a \"vertexcolour\" directive");
                         }
                     }
                     break;
@@ -1468,8 +1456,7 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "scene_blend does not support \"" + (*i0)->getValue() + "\" and \"" + (*i1)->getValue() + "\" as arguments");
+                            compiler->addError(*prop, "scene_blend does not support \"" + (*i0)->getValue() + "\" and \"" + (*i1)->getValue() + "\" as arguments");
                         }
                     }
                     else
@@ -1538,8 +1525,7 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + ": unrecognized argument");
+                            compiler->addError(*prop, prop->values.front()->getValue() + ": unrecognized argument");
                         }
                     }
                     break;
@@ -1573,8 +1559,7 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "depth_bias does not support \"" + (*i0)->getValue() + "\" for argument 1");
+                            compiler->addError(*prop, "depth_bias does not support \"" + (*i0)->getValue() + "\" for argument 1");
                         }
                     }
                     break;
@@ -1609,15 +1594,13 @@ namespace Ogre{
                                 if(getUInt(*i1, &val))
                                     mPass->setAlphaRejectSettings(func, static_cast<unsigned char>(val));
                                 else
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*i1)->getValue() + " is not a valid integer");
+                                    compiler->addError(*prop, (*i1)->getValue() + " is not a valid integer");
                             }
                             else
                                 mPass->setAlphaRejectFunction(func);
                         }
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               (*i0)->getValue() + " is not a valid CompareFunction");
+                            compiler->addError(*prop, (*i0)->getValue() + " is not a valid CompareFunction");
                     }
                     break;
                 case ID_ALPHA_TO_COVERAGE:
@@ -1660,8 +1643,7 @@ namespace Ogre{
                             }
                             else
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   prop->values.front()->getValue() + " must be boolean or force");
+                                compiler->addError(*prop, prop->values.front()->getValue() + " must be boolean or force");
                             }
                         }
                     }
@@ -1741,15 +1723,13 @@ namespace Ogre{
                                         mode = FOG_EXP2;
                                         break;
                                     default:
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           (*i1)->getValue() + " is not a valid FogMode");
+                                        compiler->addError(*prop, (*i1)->getValue() + " is not a valid FogMode");
                                         break;
                                     }
                                 }
                                 else
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*i1)->getValue() + " is not a valid FogMode");
+                                    compiler->addError(*prop, (*i1)->getValue() + " is not a valid FogMode");
                                     break;
                                 }
                             }
@@ -1758,8 +1738,7 @@ namespace Ogre{
                             {
                                 if(!getColour(i2, prop->values.end(), &clr, 3))
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*i2)->getValue() + " is not a valid colour");
+                                    compiler->addError(*prop, (*i2)->getValue() + " is not a valid colour");
                                     break;
                                 }
 
@@ -1770,8 +1749,7 @@ namespace Ogre{
                             {
                                 if(!getReal(*i2, &dens))
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*i2)->getValue() + " is not a valid number");
+                                    compiler->addError(*prop, (*i2)->getValue() + " is not a valid number");
                                     break;
                                 }
                                 ++i2;
@@ -1781,8 +1759,7 @@ namespace Ogre{
                             {
                                 if(!getReal(*i2, &start))
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*i2)->getValue() + " is not a valid number");
+                                    compiler->addError(*prop, (*i2)->getValue() + " is not a valid number");
                                     return;
                                 }
                                 ++i2;
@@ -1792,8 +1769,7 @@ namespace Ogre{
                             {
                                 if(!getReal(*i2, &end))
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*i2)->getValue() + " is not a valid number");
+                                    compiler->addError(*prop, (*i2)->getValue() + " is not a valid number");
                                     return;
                                 }
                                 ++i2;
@@ -1802,8 +1778,7 @@ namespace Ogre{
                             mPass->setFog(val, mode, clr, dens, start, end);
                         }
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid boolean");
+                            compiler->addError(*prop, prop->values.front()->getValue() + " is not a valid boolean");
                     }
                     break;
                 case ID_COLOUR_WRITE:
@@ -1830,8 +1805,7 @@ namespace Ogre{
                         {
                             if(!getBoolean(abstractNode, &colourMask[channelIndex++]))
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   abstractNode->getValue() + " is not a valid boolean");
+                                compiler->addError(*prop, abstractNode->getValue() + " is not a valid boolean");
                                 break;
                             }
                         }
@@ -1884,8 +1858,7 @@ namespace Ogre{
                                         mPass->setIteratePerLight(true, true, Light::LT_SPOTLIGHT);
                                         break;
                                     default:
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           prop->values.front()->getValue() + " is not a valid light type (point, directional, or spot)");
+                                        compiler->addError(*prop, prop->values.front()->getValue() + " is not a valid light type (point, directional, or spot)");
                                     }
                                 }
                                 else
@@ -1920,8 +1893,7 @@ namespace Ogre{
                                                 mPass->setIteratePerLight(true, true, Light::LT_SPOTLIGHT);
                                                 break;
                                             default:
-                                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                   (*i2)->getValue() + " is not a valid light type (point, directional, or spot)");
+                                                compiler->addError(*prop, (*i2)->getValue() + " is not a valid light type (point, directional, or spot)");
                                             }
                                         }
                                         else
@@ -1954,8 +1926,7 @@ namespace Ogre{
                                                         mPass->setIteratePerLight(true, true, Light::LT_SPOTLIGHT);
                                                         break;
                                                     default:
-                                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                           (*i3)->getValue() + " is not a valid light type (point, directional, or spot)");
+                                                        compiler->addError(*prop, (*i3)->getValue() + " is not a valid light type (point, directional, or spot)");
                                                     }
                                                 }
                                                 else
@@ -1979,12 +1950,12 @@ namespace Ogre{
                             }
                             else
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                compiler->addError(*prop);
                             }
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                         }
                     }
                     break;
@@ -2038,8 +2009,7 @@ namespace Ogre{
                             }
                         }
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid boolean");
+                            compiler->addError(*prop, prop->values.front()->getValue() + " is not a valid boolean");
                     }
                     break;
                 case ID_POINT_SIZE_MIN:
@@ -2228,8 +2198,7 @@ namespace Ogre{
 
                     if(!getValue(*i0, mode.u))
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                           (*i0)->getValue() + " not supported as first argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
+                        compiler->addError(*prop, (*i0)->getValue() + " not supported as first argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
                         return;
                     }
                     mode.v = mode.u;
@@ -2239,8 +2208,7 @@ namespace Ogre{
                     {
                         if(!getValue(*i1, mode.v))
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               (*i1)->getValue() + " not supported as second argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
+                            compiler->addError(*prop, (*i1)->getValue() + " not supported as second argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
                         }
                     }
 
@@ -2248,8 +2216,7 @@ namespace Ogre{
                     {
                         if(!getValue(*i2, mode.w))
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               (*i2)->getValue() + " not supported as third argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
+                            compiler->addError(*prop, (*i2)->getValue() + " not supported as third argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
                         }
                     }
 
@@ -2268,8 +2235,7 @@ namespace Ogre{
                 if(getColour(prop->values.begin(), prop->values.end(), &val))
                     sampler->setBorderColour(val);
                 else
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                       "tex_border_colour only accepts a colour argument");
+                    compiler->addError(*prop, "tex_border_colour only accepts a colour argument");
             }
             break;
         case ID_FILTERING:
@@ -2294,8 +2260,7 @@ namespace Ogre{
                     sampler->setFiltering(TFO_ANISOTROPIC);
                     break;
                 default:
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                       prop->values.front()->getValue() + " not supported as first argument (must be \"none\", \"bilinear\", \"trilinear\", or \"anisotropic\")");
+                    compiler->addError(*prop, prop->values.front()->getValue() + " not supported as first argument (must be \"none\", \"bilinear\", \"trilinear\", or \"anisotropic\")");
                 }
             }
             else if(prop->values.size() == 3)
@@ -2310,7 +2275,7 @@ namespace Ogre{
                 }
                 else
                 {
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    compiler->addError(*prop);
                 }
             }
             else
@@ -2499,15 +2464,13 @@ namespace Ogre{
                                             format = PixelUtil::getFormatFromName(atom->value, true);
 
                                             if (format == PF_UNKNOWN)
-                                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS,
-                                                                   prop->file, prop->line, atom->value);
+                                                compiler->addError(*prop, atom->value);
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*j)->getValue() + " is not a supported argument to the texture property");
+                                    compiler->addError(*prop, (*j)->getValue() + " is not a supported argument to the texture property");
                                 }
                                 ++j;
                             }
@@ -2528,8 +2491,7 @@ namespace Ogre{
                                 if (tex->getDesiredFormat() != format || tex->getNumMipmaps() != uint(mipmaps) ||
                                     tex->isHardwareGammaEnabled() != sRGBRead || tex->getTextureType() != texType)
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       "overriding previous declarations of texture '" + evt.mName +
+                                    compiler->addError(*prop, "overriding previous declarations of texture '" + evt.mName +
                                                            "' with different parameters");
                                 }
                             }
@@ -2543,8 +2505,7 @@ namespace Ogre{
                             mUnit->setHardwareGammaEnabled(sRGBRead);
                         }
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               (*j)->getValue() + " is not a valid texture name");
+                            compiler->addError(*prop, (*j)->getValue() + " is not a valid texture name");
                     }
                     break;
                 case ID_ANIM_TEXTURE:
@@ -2571,8 +2532,7 @@ namespace Ogre{
                             }
                             else
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "anim_texture short form requires a texture name, number of frames, and animation duration");
+                                compiler->addError(*prop, "anim_texture short form requires a texture name, number of frames, and animation duration");
                             }
                         }
                         else
@@ -2603,8 +2563,7 @@ namespace Ogre{
                                         }
                                     }
                                     else
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           (*j)->getValue() + " is not supported as a texture name");
+                                        compiler->addError(*prop, (*j)->getValue() + " is not supported as a texture name");
                                     ++j;
                                 }
 
@@ -2641,7 +2600,7 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                         }
                     }
                     else if(prop->values.size() == 7)
@@ -2734,8 +2693,7 @@ namespace Ogre{
                                 if(i3 != prop->values.end())
                                 {
                                     if(!getReal(*i3, &manualBlend))
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           (*i3)->getValue() + " is not a valid number argument");
+                                        compiler->addError(*prop, (*i3)->getValue() + " is not a valid number argument");
                                 }
                                 else
                                 {
@@ -2752,8 +2710,7 @@ namespace Ogre{
                                 if(j != prop->values.end())
                                 {
                                     if(!getColour(j, prop->values.end(), &arg1, 3))
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "valid colour expected when src_manual is used");
+                                        compiler->addError(*prop, "valid colour expected when src_manual is used");
                                 }
                                 else
                                 {
@@ -2766,8 +2723,7 @@ namespace Ogre{
                                 if(j != prop->values.end())
                                 {
                                     if(!getColour(j, prop->values.end(), &arg2, 3))
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "valid colour expected when src_manual is used");
+                                        compiler->addError(*prop, "valid colour expected when src_manual is used");
                                 }
                                 else
                                 {
@@ -2780,7 +2736,7 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                         }
                     }
                     break;
@@ -2814,8 +2770,7 @@ namespace Ogre{
                             mUnit->setColourOpMultipassFallback(SBF_ONE, SBF_ZERO);
                             break;
                         default:
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "argument must be a valid scene blend type (add, modulate, colour_blend, alpha_blend, or replace)");
+                            compiler->addError(*prop, "argument must be a valid scene blend type (add, modulate, colour_blend, alpha_blend, or replace)");
                         }
                     }
                     else
@@ -2825,8 +2780,7 @@ namespace Ogre{
                         if(getSceneBlendFactor(*i0, &sbf0) && getSceneBlendFactor(*i1, &sbf1))
                             mUnit->setColourOpMultipassFallback(sbf0, sbf1);
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "arguments must be valid scene blend factors");
+                            compiler->addError(*prop, "arguments must be valid scene blend factors");
                     }
                     break;
                 case ID_ALPHA_OP_EX:
@@ -2858,8 +2812,7 @@ namespace Ogre{
                                 if(i3 != prop->values.end())
                                 {
                                     if(!getReal(*i3, &manualBlend))
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "valid number expected when blend_manual is used");
+                                        compiler->addError(*prop, "valid number expected when blend_manual is used");
                                 }
                                 else
                                 {
@@ -2876,8 +2829,7 @@ namespace Ogre{
                                 if(j != prop->values.end())
                                 {
                                     if(!getReal(*j, &arg1))
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "valid colour expected when src_manual is used");
+                                        compiler->addError(*prop, "valid colour expected when src_manual is used");
                                     else
                                         ++j;
                                 }
@@ -2892,8 +2844,7 @@ namespace Ogre{
                                 if(j != prop->values.end())
                                 {
                                     if(!getReal(*j, &arg2))
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "valid colour expected when src_manual is used");
+                                        compiler->addError(*prop, "valid colour expected when src_manual is used");
                                 }
                                 else
                                 {
@@ -2906,7 +2857,7 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                         }
                     }
                     break;
@@ -2940,8 +2891,7 @@ namespace Ogre{
                             mUnit->setEnvironmentMap(true, TextureUnitState::ENV_NORMAL);
                             break;
                         default:
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid argument (must be \"off\", \"spherical\", \"planar\", \"cubic_reflection\", or \"cubic_normal\")");
+                            compiler->addError(*prop, prop->values.front()->getValue() + " is not a valid argument (must be \"off\", \"spherical\", \"planar\", \"cubic_reflection\", or \"cubic_normal\")");
                         }
                     }
                     break;
@@ -2951,8 +2901,7 @@ namespace Ogre{
                         if(prop->values.size() == 2 && getVector(prop->values.begin(), prop->values.end(), v, 2))
                             mUnit->setTextureScroll(v[0], v[1]);
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "scroll requires exactly 2 numeric arguments");
+                            compiler->addError(*prop, "scroll requires exactly 2 numeric arguments");
                     }
                     break;
                 case ID_SCROLL_ANIM:
@@ -2961,8 +2910,7 @@ namespace Ogre{
                         if(prop->values.size() == 2 && getVector(prop->values.begin(), prop->values.end(), v, 2))
                             mUnit->setScrollAnimation(v[0], v[1]);
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "scroll_anim requires exactly 2 numeric arguments");
+                            compiler->addError(*prop, "scroll_anim requires exactly 2 numeric arguments");
                     }
                     break;
                 case ID_ROTATE:
@@ -2979,15 +2927,13 @@ namespace Ogre{
                         if(prop->values.size() == 2 && getVector(prop->values.begin(), prop->values.end(), v, 2))
                             mUnit->setTextureScale(v[0], v[1]);
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "scale requires exactly 2 numeric arguments");
+                            compiler->addError(*prop, "scale requires exactly 2 numeric arguments");
                     }
                     break;
                 case ID_WAVE_XFORM:
                     if(prop->values.size() != 6)
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                           "wave_xform requires exactly 6 arguments");
+                        compiler->addError(*prop, "wave_xform requires exactly 6 arguments");
                     }
                     else
                     {
@@ -3020,8 +2966,7 @@ namespace Ogre{
                                 type = TextureUnitState::TT_ROTATE;
                                 break;
                             default:
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   atom0->value + " is not a valid transform type (must be \"scroll_x\", \"scroll_y\", \"scale_x\", \"scale_y\", or \"rotate\")");
+                                compiler->addError(*prop, atom0->value + " is not a valid transform type (must be \"scroll_x\", \"scroll_y\", \"scale_x\", \"scale_y\", or \"rotate\")");
                             }
 
                             switch(atom1->id)
@@ -3042,19 +2987,17 @@ namespace Ogre{
                                 wave = WFT_INVERSE_SAWTOOTH;
                                 break;
                             default:
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   atom1->value + " is not a valid waveform type (must be \"sine\", \"triangle\", \"square\", \"sawtooth\", or \"inverse_sawtooth\")");
+                                compiler->addError(*prop, atom1->value + " is not a valid waveform type (must be \"sine\", \"triangle\", \"square\", \"sawtooth\", or \"inverse_sawtooth\")");
                             }
 
                             if(!getReal(*i2, &base) || !getReal(*i3, &freq) || !getReal(*i4, &phase) || !getReal(*i5, &amp))
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "arguments 3, 4, 5, and 6 must be valid numbers; received " + (*i2)->getValue() + ", " + (*i3)->getValue() + ", " + (*i4)->getValue() + ", " + (*i5)->getValue());
+                                compiler->addError(*prop, "arguments 3, 4, 5, and 6 must be valid numbers; received " + (*i2)->getValue() + ", " + (*i3)->getValue() + ", " + (*i4)->getValue() + ", " + (*i5)->getValue());
 
                             mUnit->setTransformAnimation(type, wave, base, freq, phase, amp);
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                         }
                     }
                     break;
@@ -3064,7 +3007,7 @@ namespace Ogre{
                         if(getMatrix4(prop->values.begin(), prop->values.end(), &m))
                             mUnit->setTextureTransform(m);
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                     }
                     break;
                 case ID_CONTENT_TYPE:
@@ -3109,14 +3052,12 @@ namespace Ogre{
                             }
                             else
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "content_type compositor must have an additional 2 or 3 parameters");
+                                compiler->addError(*prop, "content_type compositor must have an additional 2 or 3 parameters");
                             }
 
                             break;
                         default:
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid content type (must be \"named\" or \"shadow\" or \"compositor\")");
+                            compiler->addError(*prop, prop->values.front()->getValue() + " is not a valid content type (must be \"named\" or \"shadow\" or \"compositor\")");
                         }
                     }
                     break;
@@ -3251,7 +3192,7 @@ namespace Ogre{
         {
             if(!getString(lnode, &language))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
+                compiler->addError(*obj);
                 return;
             }
 
@@ -3295,8 +3236,7 @@ namespace Ogre{
 
                     if (evt.mName == obj->name)
                     {
-                        compiler->addError(*prop, "cannot be a delegate of itself",
-                                           ScriptCompiler::CE_INVALIDPARAMETERS);
+                        compiler->addError(*prop, "cannot be a delegate of itself");
                         continue;
                     }
 
@@ -3357,8 +3297,7 @@ namespace Ogre{
 
             if (source.empty() && language != "unified")
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,
-                                   "No 'source' provided for GPU program");
+                compiler->addError(*obj, "No 'source' provided for GPU program");
                 return;
             }
 
@@ -3397,7 +3336,7 @@ namespace Ogre{
         {
             if(prog->isSupported() && !prog->setParameter(p.first->name, p.second))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, p.first->file, p.first->line, p.first->name);
+                compiler->addError(*p.first, p.first->name);
             }
         }
 
@@ -3474,7 +3413,7 @@ namespace Ogre{
         std::vector<T> vals;
         if (!_getVector(arrayStart, arrayEnd, vals, roundedCount))
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            compiler->addError(*prop);
             return;
         }
 
@@ -3487,7 +3426,7 @@ namespace Ogre{
         }
         catch (Exception& e)
         {
-            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, e.getDescription());
+            compiler->addError(*prop, e.getDescription());
         }
     }
 
@@ -3519,8 +3458,7 @@ namespace Ogre{
                         }
                         catch(Exception& e)
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               e.getDescription());
+                            compiler->addError(*prop, e.getDescription());
                         }
                     }
                     break;
@@ -3536,8 +3474,7 @@ namespace Ogre{
 
                             if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "name or index and parameter type expected");
+                                compiler->addError(*prop, "name or index and parameter type expected");
                                 return;
                             }
 
@@ -3571,8 +3508,7 @@ namespace Ogre{
                                     }
                                     catch (Exception& e)
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           e.getDescription());
+                                        compiler->addError(*prop, e.getDescription());
                                     }
                                 }
                                 else
@@ -3627,14 +3563,12 @@ namespace Ogre{
                                         }
                                         catch (Exception& e)
                                         {
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               e.getDescription());
+                                            compiler->addError(*prop, e.getDescription());
                                         }
                                     }
                                     else
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           "incorrect boolean constant declaration");
+                                        compiler->addError(*prop, "incorrect boolean constant declaration");
                                     }
 
                                     compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
@@ -3642,15 +3576,13 @@ namespace Ogre{
                                 }
                                 else
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       "incorrect type specified; only variants of int, uint, float, double, and bool allowed");
+                                    compiler->addError(*prop, "incorrect type specified; only variants of int, uint, float, double, and bool allowed");
                                 }
                             }
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "param_named and param_indexed properties requires at least 3 arguments");
+                            compiler->addError(*prop, "param_named and param_indexed properties requires at least 3 arguments");
                         }
                     }
                     break;
@@ -3667,8 +3599,7 @@ namespace Ogre{
                                 i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2), i3 = getNodeAt(prop->values, 3);
                             if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "name or index and auto constant type expected");
+                                compiler->addError(*prop, "name or index and auto constant type expected");
                                 return;
                             }
                             AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
@@ -3693,8 +3624,7 @@ namespace Ogre{
                                 case GpuProgramParameters::ACDT_NONE:
                                     if (i2 != prop->values.end())
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file,
-                                                           prop->line, "unexpected <extraInfo> parameter");
+                                        compiler->addError(*prop, "unexpected <extraInfo> parameter");
                                     }
 
                                     // Set the auto constant
@@ -3707,8 +3637,7 @@ namespace Ogre{
                                     }
                                     catch(Exception& e)
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                           e.getDescription());
+                                        compiler->addError(*prop, e.getDescription());
                                     }
                                     break;
                                 case GpuProgramParameters::ACDT_INT:
@@ -3723,8 +3652,7 @@ namespace Ogre{
                                         }
                                         catch(Exception& e)
                                         {
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               e.getDescription());
+                                            compiler->addError(*prop, e.getDescription());
                                         }
                                     }
                                     else
@@ -3748,8 +3676,7 @@ namespace Ogre{
                                                 }
                                                 catch (Exception& e)
                                                 {
-                                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                       e.getDescription());
+                                                    compiler->addError(*prop, e.getDescription());
                                                 }
                                             }
                                             else
@@ -3790,14 +3717,12 @@ namespace Ogre{
                                                 }
                                                 catch (Exception& e)
                                                 {
-                                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                       e.getDescription());
+                                                    compiler->addError(*prop, e.getDescription());
                                                 }
                                             }
                                             else
                                             {
-                                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                   "invalid auto constant <extraInfo> parameter");
+                                                compiler->addError(*prop, "invalid auto constant <extraInfo> parameter");
                                             }
                                         }
                                     }
@@ -3819,8 +3744,7 @@ namespace Ogre{
                                         }
                                         catch (Exception& e)
                                         {
-                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                               e.getDescription());
+                                            compiler->addError(*prop, e.getDescription());
                                         }
                                     }
                                     else
@@ -3839,14 +3763,12 @@ namespace Ogre{
                                                 }
                                                 catch(Exception& e)
                                                 {
-                                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                       e.getDescription());
+                                                    compiler->addError(*prop, e.getDescription());
                                                 }
                                             }
                                             else
                                             {
-                                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                                   "incorrect float argument definition in <extraInfo> parameter");
+                                                compiler->addError(*prop, "incorrect float argument definition in <extraInfo> parameter");
                                             }
                                         }
                                         else
@@ -3860,12 +3782,12 @@ namespace Ogre{
                             }
                             else
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, atom1->value);
+                                compiler->addError(*prop, atom1->value);
                             }
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                         }
                     }
                     break;
@@ -3952,8 +3874,7 @@ namespace Ogre{
             PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(i.get());
             if (prop->id != ID_SHARED_PARAM_NAMED && prop->id != ID_PARAM_NAMED)
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                   prop->name);
+                compiler->addError(*prop, prop->name);
                 continue;
             }
 
@@ -3965,8 +3886,7 @@ namespace Ogre{
 
             if (prop->values.size() < 2)
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                   prop->name + " - expected 2 or more arguments");
+                compiler->addError(*prop, prop->name + " - expected 2 or more arguments");
                 continue;
             }
 
@@ -3977,8 +3897,7 @@ namespace Ogre{
 
             if (!getValue(*i0, pName) || !getConstantType(i1, &constType))
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                   "name and parameter type expected");
+                compiler->addError(*prop, "name and parameter type expected");
                 continue;
             }
 
@@ -4026,15 +3945,13 @@ namespace Ogre{
             }
             catch(Exception& e)
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                   e.getDescription());
+                compiler->addError(*prop, e.getDescription());
                 continue;
             }
 
             if (autoDef && arrayStart != arrayEnd)
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                   "unexpected extra parameters after auto constant name");
+                compiler->addError(*prop, "unexpected extra parameters after auto constant name");
             }
 
             // amount of individual numbers to read
@@ -4048,7 +3965,7 @@ namespace Ogre{
                 if(_getVector(arrayStart, arrayEnd, values, arraySz))
                     sharedParams->setNamedConstant(pName, &values[0], arraySz);
                 else
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    compiler->addError(*prop);
                 break;
             }
             case BCT_INT:
@@ -4057,7 +3974,7 @@ namespace Ogre{
                 if(_getVector(arrayStart, arrayEnd, values, arraySz))
                     sharedParams->setNamedConstant(pName, &values[0], arraySz);
                 else
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    compiler->addError(*prop);
                 break;
             }
             case BCT_DOUBLE:
@@ -4066,7 +3983,7 @@ namespace Ogre{
                 if(_getVector(arrayStart, arrayEnd, values, arraySz))
                     sharedParams->setNamedConstant(pName, &values[0], arraySz);
                 else
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    compiler->addError(*prop);
                 break;
             }
             case BCT_UINT:
@@ -4077,7 +3994,7 @@ namespace Ogre{
                     sharedParams->setNamedConstant(pName, &values[0], arraySz);
                 }
                 else
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    compiler->addError(*prop);
                 break;
             }
             case BCT_BOOL:
@@ -4091,12 +4008,11 @@ namespace Ogre{
                     sharedParams->setNamedConstant(pName, &values[0], arraySz);
                 }
                 else
-                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    compiler->addError(*prop);
                 break;
             }
             default:
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                   "invalid parameter type");
+                compiler->addError(*prop, "invalid parameter type");
                 break;
             }
         }
@@ -4393,7 +4309,7 @@ namespace Ogre{
                             it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
                             if((*it)->type != ANT_ATOM)
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                compiler->addError(*prop);
                                 return;
                             }
                             AtomAbstractNode *atom = (AtomAbstractNode*)(*it).get();
@@ -4431,7 +4347,7 @@ namespace Ogre{
                                     it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
                                     if(prop->values.end() == it || !getValue(*it, *pFactor))
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                        compiler->addError(*prop);
                                         return;
                                     }
 
@@ -4471,7 +4387,7 @@ namespace Ogre{
                                 it = getNodeAt(prop->values, atomIndex++);
                                 if(prop->values.end() == it || !getValue(*it, fsaa))
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                    compiler->addError(*prop);
                                     return;
                                 }
                                 break;
@@ -4481,7 +4397,7 @@ namespace Ogre{
                                     it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
                                     if(prop->values.end() == it || !getValue(*it, uival))
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                        compiler->addError(*prop);
                                         return;
                                     }
                                     depthBufferId = Math::uint16Cast(uival);
@@ -4506,7 +4422,7 @@ namespace Ogre{
                                     }
                                     else
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                        compiler->addError(*prop);
                                         return;
                                     }
                                 }
@@ -4516,7 +4432,7 @@ namespace Ogre{
                                     PixelFormat format = PixelUtil::getFormatFromName(atom->value, true);
                                     if (format == PF_UNKNOWN)
                                     {
-                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, atom->value);
+                                        compiler->addError(*prop, atom->value);
                                         return;
                                     }
                                     formats.push_back(format);
@@ -4527,15 +4443,13 @@ namespace Ogre{
                         }
                         if (!widthSet || !heightSet || !formatSet)
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "texture definition must specify width, height, and format");
+                            compiler->addError(*prop, "texture definition must specify width, height, and format");
                             return;
                         }
 
                         if(depth != 1 && type != TEX_TYPE_2D_ARRAY)
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "depth only supported for 2d_array textures");
+                            compiler->addError(*prop, "depth only supported for 2d_array textures");
                             return;
                         }
 
@@ -4557,7 +4471,7 @@ namespace Ogre{
                         }
                         catch (Exception &e)
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, e.getDescription());
+                            compiler->addError(*prop, e.getDescription());
                         }
                     }
                     break;
@@ -4568,8 +4482,7 @@ namespace Ogre{
                     }
                     else if(prop->values.size() != 3)
                     {
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                           "texture_ref only supports 3 argument");
+                        compiler->addError(*prop, "texture_ref only supports 3 argument");
                     }
                     else
                     {
@@ -4577,18 +4490,15 @@ namespace Ogre{
 
                         AbstractNodeList::const_iterator it = getNodeAt(prop->values, 0);
                         if(!getString(*it, &texName))
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "texture_ref must have 3 string arguments");
+                            compiler->addError(*prop, "texture_ref must have 3 string arguments");
 
                         it = getNodeAt(prop->values, 1);
                         if(!getString(*it, &refCompName))
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "texture_ref must have 3 string arguments");
+                            compiler->addError(*prop, "texture_ref must have 3 string arguments");
 
                         it = getNodeAt(prop->values, 2);
                         if(!getString(*it, &refTexName))
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               "texture_ref must have 3 string arguments");
+                            compiler->addError(*prop, "texture_ref must have 3 string arguments");
 
                         CompositionTechnique::TextureDefinition* refTexDef =
                             mTechnique->createTextureDefinition(texName);
@@ -4648,8 +4558,7 @@ namespace Ogre{
             mTarget = technique->getOutputTargetPass();
             if (!mTarget->getPasses().empty() || mTarget->getInputMode() != CompositionTargetPass::IM_NONE)
             {
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,
-                                   "target_output can only be used once per technique");
+                compiler->addError(*obj, "target_output can only be used once per technique");
             }
         }
         obj->context = mTarget;
@@ -4746,7 +4655,7 @@ namespace Ogre{
                 ptype = CompositionPass::PT_RENDERCUSTOM;
                 break;
             default:
-                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line, atom->value);
+                compiler->addError(*obj, atom->value);
                 return;
         }
 
@@ -4833,7 +4742,7 @@ namespace Ogre{
                                 buffers |= FBT_STENCIL;
                                 break;
                             default:
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                compiler->addError(*prop);
                             }
                         }
                         mPass->setClearBuffers(buffers);
@@ -4852,7 +4761,7 @@ namespace Ogre{
                         else if(getColour(prop->values.begin(), prop->values.end(), &val))
                             mPass->setClearColour(val);
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                     }
                     break;
                 case ID_DEPTH_VALUE:
@@ -4906,8 +4815,7 @@ namespace Ogre{
 
                             if(id >= OGRE_MAX_TEXTURE_LAYERS)
                             {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "input id must be less than " +
+                                compiler->addError(*prop, "input id must be less than " +
                                                        std::to_string(OGRE_MAX_TEXTURE_LAYERS));
                                 return;
                             }
@@ -4916,7 +4824,7 @@ namespace Ogre{
                         }
                         else
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                         }
                     }
                     break;
@@ -4962,7 +4870,7 @@ namespace Ogre{
                         else if(quadNormalsId == ID_CAMERA_FAR_CORNERS_WORLD_SPACE)
                             mPass->setQuadFarCorners(true, false);
                         else
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            compiler->addError(*prop);
                     }
                     break;
                 case ID_CAMERA:
