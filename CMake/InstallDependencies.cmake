@@ -80,6 +80,17 @@ macro(copy_release INPUT)
   endif ()
 endmacro ()
 
+# The bundled Bullet headers are part of the exported OgreBullet target's
+# interface ($<INSTALL_INTERFACE:include/bullet>), so they must be installed
+# whenever the component was built against the bundled Bullet - regardless of
+# OGRE_INSTALL_DEPENDENCIES, which defaults to OFF outside Windows/Apple.
+# Otherwise the installed package config advertises a non-existent include
+# directory and any project that links OGRE_LIBRARIES after find_package(OGRE)
+# fails to configure.
+if(OGRE_BUILD_DEPENDENCIES AND OGRE_BUILD_COMPONENT_BULLET)
+  install(DIRECTORY ${OGRE_DEP_DIR}/include/bullet DESTINATION include)
+endif()
+
 if (OGRE_INSTALL_DEPENDENCIES)
   if (OGRE_STATIC)
     # for static builds, projects must link against all Ogre dependencies themselves, so copy full include and lib dir
@@ -106,10 +117,6 @@ if (OGRE_INSTALL_DEPENDENCIES)
       install(DIRECTORY ${OGRE_DEP_DIR}/bin/ DESTINATION ${OGRE_BIN_DIRECTORY})
     endif ()
   endif ()
-
-  if(OGRE_BUILD_DEPENDENCIES AND OGRE_BUILD_COMPONENT_BULLET)
-    install(DIRECTORY ${OGRE_DEP_DIR}/include/bullet DESTINATION include)
-  endif()
 
   if(WIN32)
     if(OGRE_BUILD_SAMPLES OR OGRE_BUILD_TESTS)
