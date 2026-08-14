@@ -285,7 +285,7 @@ namespace Ogre
         /// Handles object inheritance and variable expansion
         void processObjects(AbstractNodeList& nodes, const AbstractNodeList &top, const ObjectAbstractNode* exclude = nullptr);
         /// Handles processing the variables
-        void processVariables(AbstractNodeList& nodes);
+        void processVariables(AbstractNodeList& nodes, std::set<String>& expadingVars);
         /// This function overlays the given object on the destination object following inheritance rules
         void overlayObject(const ObjectAbstractNode &source, ObjectAbstractNode& dest);
         /// Returns true if the given class is name excluded

@@ -349,7 +349,8 @@ namespace Ogre
         // Process object inheritance
         processObjects(*ast, *ast);
         // Process variable expansion
-        processVariables(*ast);
+        std::set<String> expadingVars;
+        processVariables(*ast, expadingVars);
 
         // Allows early bail-out through the listener
         if(mListener && !mListener->postConversion(this, ast))
@@ -832,7 +833,7 @@ namespace Ogre
         return false;
     }
 
-    void ScriptCompiler::processVariables(AbstractNodeList& nodes)
+    void ScriptCompiler::processVariables(AbstractNodeList& nodes, std::set<String>& expandingVars)
     {
         AbstractNodeList::iterator i = nodes.begin();
         while(i != nodes.end())
@@ -846,14 +847,14 @@ namespace Ogre
                 ObjectAbstractNode *obj = (ObjectAbstractNode*)(*cur).get();
                 if(!obj->abstract)
                 {
-                    processVariables(obj->children);
-                    processVariables(obj->values);
+                    processVariables(obj->children, expandingVars);
+                    processVariables(obj->values, expandingVars);
                 }
             }
             else if((*cur)->type == ANT_PROPERTY)
             {
                 PropertyAbstractNode *prop = (PropertyAbstractNode*)(*cur).get();
-                processVariables(prop->values);
+                processVariables(prop->values, expandingVars);
             }
             else if((*cur)->type == ANT_VARIABLE_ACCESS)
             {
@@ -886,6 +887,14 @@ namespace Ogre
 
                 if(varAccess.first)
                 {
+                    if(!expandingVars.insert(var->name).second)
+                    {
+                        // Error
+                        addError(CE_INVALIDPARAMETERS, var->file, var->line, var->name+ " is defined recursively");
+                        nodes.erase(cur);
+                        continue;
+                    }
+
                     // Found the variable, so process it and insert it into the tree
                     ConcreteNodeListPtr cst = ScriptParser::parseChunk(ScriptLexer::tokenize(varAccess.second, var->file), var->file);
                     AbstractNodeListPtr ast = convertToAST(*cst);
@@ -895,10 +904,12 @@ namespace Ogre
                         j->parent = var->parent;
 
                     // Recursively handle variable accesses within the variable expansion
-                    processVariables(*ast);
+                    processVariables(*ast, expandingVars);
 
                     // Insert the nodes in place of the variable
                     nodes.insert(cur, ast->begin(), ast->end());
+
+                    expandingVars.erase(var->name);
                 }
                 else
                 {
