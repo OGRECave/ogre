@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreScriptLexer.h"
 
 namespace Ogre {
-    static const uint32 MAX_BRACE_LAYER = 100;
+    static const uint32 MAX_BRACE_LAYER = 32;
 
     ScriptTokenList ScriptLexer::tokenize(const String &str, const String& source)
     {
