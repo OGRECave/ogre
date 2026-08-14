@@ -70,6 +70,11 @@ namespace Ogre{
         }
     }
 
+    static uint32 getAtomId(const AbstractNodePtr& node)
+    {
+        return node->type == ANT_ATOM ? static_cast<AtomAbstractNode*>(node.get())->id : 0;
+    }
+
     template <typename T>
     bool getValue(const AbstractNodePtr &node, T& result);
     template<> bool getValue(const AbstractNodePtr &node, float& result)
@@ -109,10 +114,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, IlluminationStage& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_AMBIENT:
             result = IS_AMBIENT;
@@ -130,10 +132,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, SceneBlendType& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_ADD:
             result = SBT_ADD;
@@ -155,10 +154,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, SceneBlendOperation& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_ADD:
             result = SBO_ADD;
@@ -183,10 +179,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, CullingMode& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_CLOCKWISE:
             result = CULL_CLOCKWISE;
@@ -205,10 +198,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, ManualCullingMode& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_FRONT:
             result = MANUAL_CULL_FRONT;
@@ -227,10 +217,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, ShadeOptions& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_FLAT:
             result = SO_FLAT;
@@ -249,10 +236,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, PolygonMode& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_SOLID:
             result = PM_SOLID;
@@ -271,10 +255,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, LayerBlendOperation& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_REPLACE:
             result = LBO_REPLACE;
@@ -296,10 +277,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, LayerBlendOperationEx& op)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_SOURCE1:
             op = LBX_SOURCE1;
@@ -354,10 +332,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, LayerBlendSource& source1)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_SRC_CURRENT:
             source1 = LBS_CURRENT;
@@ -382,10 +357,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, CompositionTargetPass::InputMode& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_NONE:
             result = CompositionTargetPass::IM_NONE;
@@ -401,10 +373,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, FilterOptions& tmip)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_NONE:
             tmip = FO_NONE;
@@ -426,10 +395,7 @@ namespace Ogre{
 
     template<> bool getValue(const AbstractNodePtr& node, TextureAddressingMode& result)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-
-        switch (static_cast<AtomAbstractNode*>(node.get())->id)
+        switch (getAtomId(node))
         {
         case ID_WRAP:
             result = TextureUnitState::TAM_WRAP;
@@ -631,10 +597,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getSceneBlendFactor(const Ogre::AbstractNodePtr &node, Ogre::SceneBlendFactor *sbf)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-        AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        switch(atom->id)
+        switch(getAtomId(node))
         {
         case ID_ONE:
             *sbf = SBF_ONE;
@@ -674,10 +637,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getCompareFunction(const AbstractNodePtr &node, CompareFunction *func)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-        AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        switch(atom->id)
+        switch(getAtomId(node))
         {
         case ID_ALWAYS_FAIL:
             *func = CMPF_ALWAYS_FAIL;
@@ -865,10 +825,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getStencilOp(const Ogre::AbstractNodePtr &node, Ogre::StencilOperation *op)
     {
-        if(node->type != ANT_ATOM)
-            return false;
-        AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        switch(atom->id)
+        switch(getAtomId(node))
         {
         case ID_KEEP:
             *op = SOP_KEEP;
@@ -1222,34 +1179,14 @@ namespace Ogre{
                         AbstractNodeList::const_iterator i1 = getNodeAt(prop->values, 1);
 
                         Technique::GPUVendorRule rule;
-                        if ((*i0)->type == ANT_ATOM)
+                        uint32 id0 = getAtomId(*i0);
+                        if (id0 == ID_INCLUDE)
                         {
-                            AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get();
-                            if (atom0->id == ID_INCLUDE)
-                            {
-                                rule.includeOrExclude = Technique::INCLUDE;
-                            }
-                            else if (atom0->id == ID_EXCLUDE)
-                            {
-                                rule.includeOrExclude = Technique::EXCLUDE;
-                            }
-                            else
-                            {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "gpu_vendor_rule cannot accept \"" + (*i0)->getValue() + "\" as first argument");
-                            }
-
-                            String vendor;
-                            if(!getString(*i1, &vendor))
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "gpu_vendor_rule cannot accept \"" + (*i1)->getValue() + "\" as second argument");
-
-                            rule.vendor = RenderSystemCapabilities::vendorFromString(vendor);
-
-                            if (rule.vendor != GPU_UNKNOWN)
-                            {
-                                mTechnique->addGPUVendorRule(rule);
-                            }
+                            rule.includeOrExclude = Technique::INCLUDE;
+                        }
+                        else if (id0 == ID_EXCLUDE)
+                        {
+                            rule.includeOrExclude = Technique::EXCLUDE;
                         }
                         else
                         {
@@ -1257,6 +1194,17 @@ namespace Ogre{
                                                "gpu_vendor_rule cannot accept \"" + (*i0)->getValue() + "\" as first argument");
                         }
 
+                        String vendor;
+                        if(!getString(*i1, &vendor))
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "gpu_vendor_rule cannot accept \"" + (*i1)->getValue() + "\" as second argument");
+
+                        rule.vendor = RenderSystemCapabilities::vendorFromString(vendor);
+
+                        if (rule.vendor != GPU_UNKNOWN)
+                        {
+                            mTechnique->addGPUVendorRule(rule);
+                        }
                     }
                     break;
                 case ID_GPU_DEVICE_RULE:
@@ -1276,36 +1224,14 @@ namespace Ogre{
                         AbstractNodeList::const_iterator i1 = getNodeAt(prop->values, 1);
 
                         Technique::GPUDeviceNameRule rule;
-                        if ((*i0)->type == ANT_ATOM)
+                        uint32 id0 = getAtomId(*i0);
+                        if (id0 == ID_INCLUDE)
                         {
-                            AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get();
-                            if (atom0->id == ID_INCLUDE)
-                            {
-                                rule.includeOrExclude = Technique::INCLUDE;
-                            }
-                            else if (atom0->id == ID_EXCLUDE)
-                            {
-                                rule.includeOrExclude = Technique::EXCLUDE;
-                            }
-                            else
-                            {
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "gpu_device_rule cannot accept \"" + (*i0)->getValue() + "\" as first argument");
-                            }
-
-                            if(!getString(*i1, &rule.devicePattern))
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "gpu_device_rule cannot accept \"" + (*i1)->getValue() + "\" as second argument");
-
-                            if (prop->values.size() == 3)
-                            {
-                                AbstractNodeList::const_iterator i2 = getNodeAt(prop->values, 2);
-                                if (!getBoolean(*i2, &rule.caseSensitive))
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       "gpu_device_rule third argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
-                            }
-
-                            mTechnique->addGPUDeviceNameRule(rule);
+                            rule.includeOrExclude = Technique::INCLUDE;
+                        }
+                        else if (id0 == ID_EXCLUDE)
+                        {
+                            rule.includeOrExclude = Technique::EXCLUDE;
                         }
                         else
                         {
@@ -1313,6 +1239,19 @@ namespace Ogre{
                                                "gpu_device_rule cannot accept \"" + (*i0)->getValue() + "\" as first argument");
                         }
 
+                        if(!getString(*i1, &rule.devicePattern))
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "gpu_device_rule cannot accept \"" + (*i1)->getValue() + "\" as second argument");
+
+                        if (prop->values.size() == 3)
+                        {
+                            AbstractNodeList::const_iterator i2 = getNodeAt(prop->values, 2);
+                            if (!getBoolean(*i2, &rule.caseSensitive))
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   "gpu_device_rule third argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+                        }
+
+                        mTechnique->addGPUDeviceNameRule(rule);
                     }
                     break;
                 default:
@@ -1371,8 +1310,7 @@ namespace Ogre{
                     }
                     else
                     {
-                        if(prop->values.front()->type == ANT_ATOM &&
-                           ((AtomAbstractNode*)prop->values.front().get())->id == ID_VERTEXCOLOUR)
+                        if(getAtomId(prop->values.front()) == ID_VERTEXCOLOUR)
                         {
                             mPass->setVertexColourTracking(mPass->getVertexColourTracking() | TVC_AMBIENT);
                         }
@@ -1399,8 +1337,7 @@ namespace Ogre{
                     }
                     else
                     {
-                        if(prop->values.front()->type == ANT_ATOM &&
-                           ((AtomAbstractNode*)prop->values.front().get())->id == ID_VERTEXCOLOUR)
+                        if(getAtomId(prop->values.front()) == ID_VERTEXCOLOUR)
                         {
                             mPass->setVertexColourTracking(mPass->getVertexColourTracking() | TVC_DIFFUSE);
                         }
@@ -1427,8 +1364,7 @@ namespace Ogre{
                     }
                     else
                     {
-                        if(prop->values.front()->type == ANT_ATOM &&
-                           ((AtomAbstractNode*)prop->values.front().get())->id == ID_VERTEXCOLOUR)
+                        if(getAtomId(prop->values.front()) == ID_VERTEXCOLOUR)
                         {
                             mPass->setVertexColourTracking(mPass->getVertexColourTracking() | TVC_SPECULAR);
 
@@ -1494,8 +1430,7 @@ namespace Ogre{
                     }
                     else
                     {
-                        if(prop->values.front()->type == ANT_ATOM &&
-                           ((AtomAbstractNode*)prop->values.front().get())->id == ID_VERTEXCOLOUR)
+                        if(getAtomId(prop->values.front()) == ID_VERTEXCOLOUR)
                         {
                             mPass->setVertexColourTracking(mPass->getVertexColourTracking() | TVC_EMISSIVE);
                         }
@@ -2344,30 +2279,21 @@ namespace Ogre{
             }
             else if(prop->values.size() == 1)
             {
-                if(prop->values.front()->type == ANT_ATOM)
+                switch(getAtomId(prop->values.front()))
                 {
-                    AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-                    switch(atom->id)
-                    {
-                    case ID_NONE:
-                        sampler->setFiltering(TFO_NONE);
-                        break;
-                    case ID_BILINEAR:
-                        sampler->setFiltering(TFO_BILINEAR);
-                        break;
-                    case ID_TRILINEAR:
-                        sampler->setFiltering(TFO_TRILINEAR);
-                        break;
-                    case ID_ANISOTROPIC:
-                        sampler->setFiltering(TFO_ANISOTROPIC);
-                        break;
-                    default:
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                           prop->values.front()->getValue() + " not supported as first argument (must be \"none\", \"bilinear\", \"trilinear\", or \"anisotropic\")");
-                    }
-                }
-                else
-                {
+                case ID_NONE:
+                    sampler->setFiltering(TFO_NONE);
+                    break;
+                case ID_BILINEAR:
+                    sampler->setFiltering(TFO_BILINEAR);
+                    break;
+                case ID_TRILINEAR:
+                    sampler->setFiltering(TFO_TRILINEAR);
+                    break;
+                case ID_ANISOTROPIC:
+                    sampler->setFiltering(TFO_ANISOTROPIC);
+                    break;
+                default:
                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                        prop->values.front()->getValue() + " not supported as first argument (must be \"none\", \"bilinear\", \"trilinear\", or \"anisotropic\")");
                 }
@@ -2870,33 +2796,24 @@ namespace Ogre{
                     }
                     else if(prop->values.size() == 1)
                     {
-                        if(prop->values.front()->type == ANT_ATOM)
+                        switch(getAtomId(prop->values.front()))
                         {
-                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-                            switch(atom->id)
-                            {
-                            case ID_ADD:
-                                mUnit->setColourOpMultipassFallback(SBF_ONE, SBF_ONE);
-                                break;
-                            case ID_MODULATE:
-                                mUnit->setColourOpMultipassFallback(SBF_DEST_COLOUR, SBF_ZERO);
-                                break;
-                            case ID_COLOUR_BLEND:
-                                mUnit->setColourOpMultipassFallback(SBF_SOURCE_COLOUR, SBF_ONE_MINUS_SOURCE_COLOUR);
-                                break;
-                            case ID_ALPHA_BLEND:
-                                mUnit->setColourOpMultipassFallback(SBF_SOURCE_ALPHA, SBF_ONE_MINUS_SOURCE_ALPHA);
-                                break;
-                            case ID_REPLACE:
-                                mUnit->setColourOpMultipassFallback(SBF_ONE, SBF_ZERO);
-                                break;
-                            default:
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   "argument must be a valid scene blend type (add, modulate, colour_blend, alpha_blend, or replace)");
-                            }
-                        }
-                        else
-                        {
+                        case ID_ADD:
+                            mUnit->setColourOpMultipassFallback(SBF_ONE, SBF_ONE);
+                            break;
+                        case ID_MODULATE:
+                            mUnit->setColourOpMultipassFallback(SBF_DEST_COLOUR, SBF_ZERO);
+                            break;
+                        case ID_COLOUR_BLEND:
+                            mUnit->setColourOpMultipassFallback(SBF_SOURCE_COLOUR, SBF_ONE_MINUS_SOURCE_COLOUR);
+                            break;
+                        case ID_ALPHA_BLEND:
+                            mUnit->setColourOpMultipassFallback(SBF_SOURCE_ALPHA, SBF_ONE_MINUS_SOURCE_ALPHA);
+                            break;
+                        case ID_REPLACE:
+                            mUnit->setColourOpMultipassFallback(SBF_ONE, SBF_ZERO);
+                            break;
+                        default:
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                "argument must be a valid scene blend type (add, modulate, colour_blend, alpha_blend, or replace)");
                         }
@@ -3005,33 +2922,24 @@ namespace Ogre{
                     }
                     else
                     {
-                        if(prop->values.front()->type == ANT_ATOM)
+                        switch(getAtomId(prop->values.front()))
                         {
-                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-                            switch(atom->id)
-                            {
-                            case ScriptCompiler::ID_OFF:
-                                mUnit->setEnvironmentMap(false);
-                                break;
-                            case ID_SPHERICAL:
-                                mUnit->setEnvironmentMap(true, TextureUnitState::ENV_CURVED);
-                                break;
-                            case ID_PLANAR:
-                                mUnit->setEnvironmentMap(true, TextureUnitState::ENV_PLANAR);
-                                break;
-                            case ID_CUBIC_REFLECTION:
-                                mUnit->setEnvironmentMap(true, TextureUnitState::ENV_REFLECTION);
-                                break;
-                            case ID_CUBIC_NORMAL:
-                                mUnit->setEnvironmentMap(true, TextureUnitState::ENV_NORMAL);
-                                break;
-                            default:
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   prop->values.front()->getValue() + " is not a valid argument (must be \"off\", \"spherical\", \"planar\", \"cubic_reflection\", or \"cubic_normal\")");
-                            }
-                        }
-                        else
-                        {
+                        case ScriptCompiler::ID_OFF:
+                            mUnit->setEnvironmentMap(false);
+                            break;
+                        case ID_SPHERICAL:
+                            mUnit->setEnvironmentMap(true, TextureUnitState::ENV_CURVED);
+                            break;
+                        case ID_PLANAR:
+                            mUnit->setEnvironmentMap(true, TextureUnitState::ENV_PLANAR);
+                            break;
+                        case ID_CUBIC_REFLECTION:
+                            mUnit->setEnvironmentMap(true, TextureUnitState::ENV_REFLECTION);
+                            break;
+                        case ID_CUBIC_NORMAL:
+                            mUnit->setEnvironmentMap(true, TextureUnitState::ENV_NORMAL);
+                            break;
+                        default:
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                prop->values.front()->getValue() + " is not a valid argument (must be \"off\", \"spherical\", \"planar\", \"cubic_reflection\", or \"cubic_normal\")");
                         }
@@ -3171,53 +3079,44 @@ namespace Ogre{
                     }
                     else
                     {
-                        if(prop->values.front()->type == ANT_ATOM)
+                        switch(getAtomId(prop->values.front()))
                         {
-                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-                            switch(atom->id)
+                        case ID_NAMED:
+                            mUnit->setContentType(TextureUnitState::CONTENT_NAMED);
+                            break;
+                        case ID_SHADOW:
+                            mUnit->setContentType(TextureUnitState::CONTENT_SHADOW);
+                            break;
+                        case ID_COMPOSITOR:
+                            mUnit->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
+                            if (prop->values.size() >= 3)
                             {
-                            case ID_NAMED:
-                                mUnit->setContentType(TextureUnitState::CONTENT_NAMED);
-                                break;
-                            case ID_SHADOW:
-                                mUnit->setContentType(TextureUnitState::CONTENT_SHADOW);
-                                break;
-                            case ID_COMPOSITOR:
-                                mUnit->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
-                                if (prop->values.size() >= 3)
-                                {
-                                    String compositorName;
-                                    getString(*getNodeAt(prop->values, 1), &compositorName);
-                                    String textureName;
-                                    getString(*getNodeAt(prop->values, 2), &textureName);
+                                String compositorName;
+                                getString(*getNodeAt(prop->values, 1), &compositorName);
+                                String textureName;
+                                getString(*getNodeAt(prop->values, 2), &textureName);
 
-                                    if (prop->values.size() == 4)
-                                    {
-                                        uint32 mrtIndex;
-                                        getUInt(*getNodeAt(prop->values, 3), (uint32*)&mrtIndex);
-                                        mUnit->setCompositorReference(compositorName, textureName, mrtIndex);
-                                    }
-                                    else
-                                    {
-                                        mUnit->setCompositorReference(compositorName, textureName);
-                                    }
+                                if (prop->values.size() == 4)
+                                {
+                                    uint32 mrtIndex;
+                                    getUInt(*getNodeAt(prop->values, 3), (uint32*)&mrtIndex);
+                                    mUnit->setCompositorReference(compositorName, textureName, mrtIndex);
                                 }
                                 else
                                 {
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       "content_type compositor must have an additional 2 or 3 parameters");
+                                    mUnit->setCompositorReference(compositorName, textureName);
                                 }
-
-                                break;
-                            default:
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   atom->value + " is not a valid content type (must be \"named\" or \"shadow\" or \"compositor\")");
                             }
-                        }
-                        else
-                        {
+                            else
+                            {
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   "content_type compositor must have an additional 2 or 3 parameters");
+                            }
+
+                            break;
+                        default:
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               prop->values.front()->getValue() + " is not a valid content type");
+                                               prop->values.front()->getValue() + " is not a valid content type (must be \"named\" or \"shadow\" or \"compositor\")");
                         }
                     }
                     break;
@@ -4922,25 +4821,20 @@ namespace Ogre{
                         uint32 buffers = 0;
                         for(const auto& v : prop->values)
                         {
-                            if(v->type == ANT_ATOM)
+                            switch(getAtomId(v))
                             {
-                                switch(((AtomAbstractNode*)v.get())->id)
-                                {
-                                case ID_COLOUR:
-                                    buffers |= FBT_COLOUR;
-                                    break;
-                                case ID_DEPTH:
-                                    buffers |= FBT_DEPTH;
-                                    break;
-                                case ID_STENCIL:
-                                    buffers |= FBT_STENCIL;
-                                    break;
-                                default:
-                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                                }
-                            }
-                            else
+                            case ID_COLOUR:
+                                buffers |= FBT_COLOUR;
+                                break;
+                            case ID_DEPTH:
+                                buffers |= FBT_DEPTH;
+                                break;
+                            case ID_STENCIL:
+                                buffers |= FBT_STENCIL;
+                                break;
+                            default:
                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                            }
                         }
                         mPass->setClearBuffers(buffers);
                     }
@@ -4953,8 +4847,7 @@ namespace Ogre{
                             return;
                         }
                         ColourValue val;
-                        if (prop->values.front()->type == ANT_ATOM &&
-                            ((AtomAbstractNode*)prop->values.front().get())->id == ID_AUTO)
+                        if (getAtomId(prop->values.front()) == ID_AUTO)
                             mPass->setAutomaticColour(true);
                         else if(getColour(prop->values.begin(), prop->values.end(), &val))
                             mPass->setClearColour(val);
@@ -5063,20 +4956,13 @@ namespace Ogre{
                     }
                     else
                     {
-                        if(prop->values.front()->type == ANT_ATOM)
-                        {
-                            atom = static_cast<AtomAbstractNode*>(prop->values.front().get());
-                            if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE)
-                                mPass->setQuadFarCorners(true, true);
-                            else if(atom->id == ID_CAMERA_FAR_CORNERS_WORLD_SPACE)
-                                mPass->setQuadFarCorners(true, false);
-                            else
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
+                        uint32 quadNormalsId = getAtomId(prop->values.front());
+                        if(quadNormalsId == ID_CAMERA_FAR_CORNERS_VIEW_SPACE)
+                            mPass->setQuadFarCorners(true, true);
+                        else if(quadNormalsId == ID_CAMERA_FAR_CORNERS_WORLD_SPACE)
+                            mPass->setQuadFarCorners(true, false);
                         else
-                        {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                        }
                     }
                     break;
                 case ID_CAMERA:
@@ -5095,9 +4981,7 @@ namespace Ogre{
                         if (!getValue(prop->values.front(), sval))
                             return;
                         mPass->setCameraName(sval);
-                        if (prop->values.back()->type == ANT_ATOM &&
-                            static_cast<AtomAbstractNode*>(prop->values.back().get())->id ==
-                                ID_ALIGN_TO_FACE)
+                        if (getAtomId(prop->values.back()) == ID_ALIGN_TO_FACE)
                         {
                             mPass->setAlignCameraToFace(true);
                         }
