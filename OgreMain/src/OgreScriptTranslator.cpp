@@ -4518,17 +4518,21 @@ namespace Ogre{
                 {
                 case ID_TEXTURE:
                     {
-                        size_t atomIndex = 1;
-
-                        AbstractNodeList::const_iterator it = getNodeAt(prop->values, 0);
-
-                        if((*it)->type != ANT_ATOM)
+                        if (prop->values.size() < 4)
                         {
-                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                            return;
+                            compiler->addError(*prop, "texture must have at least 4 arguments");
+                            continue;
                         }
+
                         // Save the first atom, should be name
-                        AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
+                        AbstractNodeList::const_iterator it = getNodeAt(prop->values, 0);
+                        const String& name = (*it)->getString();
+
+                        if(name.empty())
+                        {
+                            compiler->addError(*prop, "texture name cannot be empty");
+                            continue;
+                        }
 
                         uint32 width = 0, height = 0;
                         uint32 depth = 1;
@@ -4542,6 +4546,7 @@ namespace Ogre{
                         CompositionTechnique::TextureScope scope = CompositionTechnique::TS_LOCAL;
                         Ogre::PixelFormatList formats;
 
+                        size_t atomIndex = 1;
                         while (atomIndex < prop->values.size())
                         {
                             it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
@@ -4695,7 +4700,7 @@ namespace Ogre{
 
                         // No errors, create
                         try {
-                            CompositionTechnique::TextureDefinition *def = mTechnique->createTextureDefinition(atom0->value);
+                            CompositionTechnique::TextureDefinition *def = mTechnique->createTextureDefinition(name);
                             def->width = width;
                             def->height = height;
                             def->depth = depth;
