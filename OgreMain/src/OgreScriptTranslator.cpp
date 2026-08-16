@@ -45,6 +45,21 @@ THE SOFTWARE.
 #include "OgreGpuProgramUsage.h"
 
 namespace Ogre{
+    using ResourceType = ProcessResourceNameScriptCompilerEvent::ResourceType;
+    static String processResourceName(ScriptCompiler* compiler, ResourceType type, const String& name)
+    {
+        ProcessResourceNameScriptCompilerEvent evt(type, name);
+        compiler->_fireEvent(&evt, 0);
+        return evt.mName;
+    }
+    static void processResourceNames(ScriptCompiler* compiler, ResourceType type, StringVector& names)
+    {
+        if (!compiler->getListener())
+            return; // nothing would change
+        for (String& n : names)
+            n = processResourceName(compiler, type, n);
+    }
+
     static void applyTextureAliases(ScriptCompiler *compiler, const Material* mat, const NameValuePairList& aliasList)
     {
         for (auto t : mat->getTechniques())
@@ -57,14 +72,12 @@ namespace Ogre{
                     if (aliasIt == aliasList.end())
                         continue;
 
-                    ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, aliasIt->second);
-                    compiler->_fireEvent(&evt, 0);
-
+                    auto name = processResourceName(compiler, ResourceType::TEXTURE, aliasIt->second);
                     if (tus->getNumFrames() > 1)
-                        tus->setAnimatedTextureName(evt.mName, tus->getNumFrames(),
+                        tus->setAnimatedTextureName(name, tus->getNumFrames(),
                                                     tus->getAnimationDuration());
                     else
-                        tus->setTextureName(evt.mName, tus->getTextureType());
+                        tus->setTextureName(name, tus->getTextureType());
                 }
             }
         }
@@ -1147,19 +1160,11 @@ namespace Ogre{
                     break;
                 case ID_SHADOW_CASTER_MATERIAL:
                     if(getValue(prop, compiler, sval))
-                    {
-                        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, sval);
-                        compiler->_fireEvent(&evt, 0);
-                        mTechnique->setShadowCasterMaterial(evt.mName); // Use the processed name
-                    }
+                        mTechnique->setShadowCasterMaterial(processResourceName(compiler, ResourceType::MATERIAL, sval));
                     break;
                 case ID_SHADOW_RECEIVER_MATERIAL:
                     if(getValue(prop, compiler, sval))
-                    {
-                        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, sval);
-                        compiler->_fireEvent(&evt, 0);
-                        mTechnique->setShadowReceiverMaterial(evt.mName); // Use the processed name
-                    }
+                        mTechnique->setShadowReceiverMaterial(processResourceName(compiler, ResourceType::MATERIAL, sval));
                     break;
                 case ID_GPU_VENDOR_RULE:
                     if(prop->values.size() < 2)
@@ -2082,19 +2087,18 @@ namespace Ogre{
             return nullptr;
         }
 
-        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
-        compiler->_fireEvent(&evt, 0);
+        String name = processResourceName(compiler, ResourceType::GPU_PROGRAM, node->name);
 
         auto& mgr = GpuProgramManager::getSingleton();
-        if (auto ret = mgr.getByName(evt.mName, compiler->getResourceGroup()))
+        if (auto ret = mgr.getByName(name, compiler->getResourceGroup()))
             return ret;
 
         // recheck with auto resource group
-        if (auto ret = mgr.getByName(evt.mName, RGN_AUTODETECT))
+        if (auto ret = mgr.getByName(name, RGN_AUTODETECT))
             return ret;
 
         compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line,
-                           evt.mName);
+                           name);
         return nullptr;
     }
 
@@ -2475,8 +2479,7 @@ namespace Ogre{
                                 ++j;
                             }
 
-                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, val);
-                            compiler->_fireEvent(&evt, 0);
+                            String name = processResourceName(compiler, ResourceType::TEXTURE, val);
 
                             if(isAlpha)
                             {
@@ -2485,18 +2488,18 @@ namespace Ogre{
                                                    prop->line, "alpha. Use PF_A8 instead");
                             }
 
-                            if(const auto& tex = TextureManager::getSingleton().getByName(evt.mName, mUnit->getParent()->getResourceGroup()))
+                            if(const auto& tex = TextureManager::getSingleton().getByName(name, mUnit->getParent()->getResourceGroup()))
                             {
                                 // the texture is shared with another texture unit, report any discrepancies
                                 if (tex->getDesiredFormat() != format || tex->getNumMipmaps() != uint(mipmaps) ||
                                     tex->isHardwareGammaEnabled() != sRGBRead || tex->getTextureType() != texType)
                                 {
-                                    compiler->addError(*prop, "overriding previous declarations of texture '" + evt.mName +
+                                    compiler->addError(*prop, "overriding previous declarations of texture '" + name +
                                                            "' with different parameters");
                                 }
                             }
 
-                            mUnit->setTextureName(evt.mName, texType);
+                            mUnit->setTextureName(name, texType);
                             mUnit->setDesiredFormat(format);
                             OGRE_IGNORE_DEPRECATED_BEGIN
                             mUnit->setIsAlpha(isAlpha);
@@ -2525,10 +2528,7 @@ namespace Ogre{
                             Real val2;
                             if(nframes && getValue(*i0, val0) && getValue(*i2, val2))
                             {
-                                ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, val0);
-                                compiler->_fireEvent(&evt, 0);
-
-                                mUnit->setAnimatedTextureName(evt.mName, nframes, val2);
+                                mUnit->setAnimatedTextureName(processResourceName(compiler, ResourceType::TEXTURE, val0), nframes, val2);
                             }
                             else
                             {
@@ -2549,25 +2549,13 @@ namespace Ogre{
                                 while(j != in)
                                 {
                                     if((*j)->type == ANT_ATOM)
-                                    {
-                                        String name = ((AtomAbstractNode*)(*j).get())->value;
-                                        // Run the name through the listener
-                                        if(compiler->getListener())
-                                        {
-                                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, name);
-                                            compiler->_fireEvent(&evt, 0);
-                                            names.push_back(evt.mName);
-                                        }
-                                        else
-                                        {
-                                            names.push_back(name);
-                                        }
-                                    }
+                                        names.push_back(((AtomAbstractNode*)(*j).get())->value);
                                     else
                                         compiler->addError(*prop, (*j)->getValue() + " is not supported as a texture name");
                                     ++j;
                                 }
 
+                                processResourceNames(compiler, ResourceType::TEXTURE, names);
                                 mUnit->setAnimatedTextureName(names, duration);
                             }
                             else
@@ -2591,10 +2579,7 @@ namespace Ogre{
                         {
                             AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get();
 
-                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, atom0->value);
-                            compiler->_fireEvent(&evt, 0);
-
-                            mUnit->setTextureName(evt.mName, TEX_TYPE_CUBE_MAP);
+                            mUnit->setTextureName(processResourceName(compiler, ResourceType::TEXTURE, atom0->value), TEX_TYPE_CUBE_MAP);
 
                             compiler->addError(ScriptCompiler::CE_DEPRECATEDSYMBOL, prop->file, prop->line,
                                                    "'cubic_texture ..'. Use 'texture .. cubic' instead.");
@@ -2629,16 +2614,7 @@ namespace Ogre{
                             names[2] = atom4->value;
                             names[3] = atom5->value;
 
-                            if(compiler->getListener())
-                            {
-                                // Run each name through the listener
-                                for(int j = 0; j < 6; ++j)
-                                {
-                                    ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, names[j]);
-                                    compiler->_fireEvent(&evt, 0);
-                                    names[j] = evt.mName;
-                                }
-                            }
+                            processResourceNames(compiler, ResourceType::TEXTURE, names);
 
                             if(atom6->id != ID_COMBINED_UVW)
                             {
@@ -3232,16 +3208,15 @@ namespace Ogre{
                     if(!getValue(prop, compiler, value))
                         return;
 
-                    ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, value);
-                    compiler->_fireEvent(&evt, 0);
+                    String name = processResourceName(compiler, ResourceType::GPU_PROGRAM, value);
 
-                    if (evt.mName == obj->name)
+                    if (name == obj->name)
                     {
                         compiler->addError(*prop, "cannot be a delegate of itself");
                         continue;
                     }
 
-                    delegates.push_back(evt.mName);
+                    delegates.push_back(name);
                 }
                 else
                 {
@@ -3253,12 +3228,7 @@ namespace Ogre{
                         compiler->addError(*prop, "attach. Use the #include directive instead",
                                            ScriptCompiler::CE_DEPRECATEDSYMBOL);
 
-                        for (auto& value : values)
-                        {
-                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, value);
-                            compiler->_fireEvent(&evt, 0);
-                            value = evt.mName;
-                        }
+                        processResourceNames(compiler, ResourceType::GPU_PROGRAM, values);
                     }
 
                     String value = StringConverter::toString(values);
@@ -4073,9 +4043,7 @@ namespace Ogre{
                 String value;
                 if(static_cast<PropertyAbstractNode*>(i.get())->id == ID_MATERIAL)
                 {
-                    ProcessResourceNameScriptCompilerEvent locEvt(ProcessResourceNameScriptCompilerEvent::MATERIAL, prop.values.front());
-                    compiler->_fireEvent(&locEvt, 0);
-                    value = locEvt.mName;
+                    value = processResourceName(compiler, ResourceType::MATERIAL, prop.values.front());
                 }
                 else
                 {
@@ -4776,14 +4744,13 @@ namespace Ogre{
                 case ID_MATERIAL:
                     if(getValue(prop, compiler, sval))
                     {
-                        ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, sval);
-                        compiler->_fireEvent(&evt, 0);
-                        auto mat = MaterialManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup());
+                        String name = processResourceName(compiler, ResourceType::MATERIAL, sval);
+                        auto mat = MaterialManager::getSingleton().getByName(name, compiler->getResourceGroup());
                         if (mat)
                             mPass->setMaterial(mat);
                         else
                             compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, prop->file,
-                                               prop->line, evt.mName);
+                                               prop->line, name);
                     }
                     break;
                 case ID_INPUT:
