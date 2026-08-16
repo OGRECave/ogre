@@ -2523,7 +2523,7 @@ namespace Ogre{
                             AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i2 = getNodeAt(prop->values, 2);
                             String val0;
                             Real val2;
-                            if(getValue(*i0, val0) && getValue(*i2, val2))
+                            if(nframes && getValue(*i0, val0) && getValue(*i2, val2))
                             {
                                 ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, val0);
                                 compiler->_fireEvent(&evt, 0);
@@ -2532,7 +2532,8 @@ namespace Ogre{
                             }
                             else
                             {
-                                compiler->addError(*prop, "anim_texture short form requires a texture name, number of frames, and animation duration");
+                                compiler->addError(*prop, "anim_texture short form requires a texture name, a frame "
+                                                          "count > 0, and animation duration");
                             }
                         }
                         else

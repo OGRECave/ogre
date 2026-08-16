@@ -368,6 +368,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::setAnimatedTextureName(const String* const names, size_t numFrames, Real duration)
     {
+        OgreAssert(numFrames > 0, "numFrames must be greater than 0");
         setContentType(CONTENT_NAMED);
         mTextureLoadFailed = false;
 
