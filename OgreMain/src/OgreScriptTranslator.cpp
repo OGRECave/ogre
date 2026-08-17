@@ -1831,139 +1831,80 @@ namespace Ogre{
                         mPass->setLightMask(static_cast<uint16>(uival));
                     break;
                 case ID_ITERATION:
+                {
                     if(prop->values.empty())
                     {
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        break;
                     }
-                    else
+
+                    auto setLightType = [this, prop, compiler](AbstractNodeList::const_iterator it)
                     {
-                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
-                        if((*i0)->type == ANT_ATOM)
+                        if(it == prop->values.end())
                         {
-                            AtomAbstractNode *atom = (AtomAbstractNode*)(*i0).get();
-                            if(atom->id == ID_ONCE)
+                            mPass->setIteratePerLight(true, false);
+                            return;
+                        }
+                        switch(getAtomId(*it))
+                        {
+                        case ID_POINT:
+                            mPass->setIteratePerLight(true, true, Light::LT_POINT);
+                            break;
+                        case ID_DIRECTIONAL:
+                            mPass->setIteratePerLight(true, true, Light::LT_DIRECTIONAL);
+                            break;
+                        case ID_SPOT:
+                            mPass->setIteratePerLight(true, true, Light::LT_SPOTLIGHT);
+                            break;
+                        default:
+                            compiler->addError(*prop, (*it)->getValue() + " is not a valid light type (point, directional, or spot)");
+                        }
+                    };
+
+                    AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
+                    auto atomid = getAtomId(*i0);
+                    if(atomid == ID_ONCE)
+                    {
+                        mPass->setIteratePerLight(false);
+                    }
+                    else if(atomid == ID_ONCE_PER_LIGHT)
+                    {
+                        setLightType(getNodeAt(prop->values, 1));
+                    }
+                    else if(getValue(*i0, uival))
+                    {
+                        mPass->setPassIterationCount(uival);
+
+                        AbstractNodeList::const_iterator i1 = getNodeAt(prop->values, 1);
+                        if(i1 != prop->values.end())
+                        {
+                            atomid = getAtomId(*i1);
+                            if(atomid == ID_PER_LIGHT)
                             {
-                                mPass->setIteratePerLight(false);
+                                setLightType(getNodeAt(prop->values, 2));
                             }
-                            else if(atom->id == ID_ONCE_PER_LIGHT)
+                            else if(atomid == ID_PER_N_LIGHTS)
                             {
-                                AbstractNodeList::const_iterator i1 = getNodeAt(prop->values, 1);
-                                if(i1 != prop->values.end() && (*i1)->type == ANT_ATOM)
+                                AbstractNodeList::const_iterator i2 = getNodeAt(prop->values, 2);
+                                if(i2 != prop->values.end() && getValue(*i2, uival))
                                 {
-                                    atom = (AtomAbstractNode*)(*i1).get();
-                                    switch(atom->id)
-                                    {
-                                    case ID_POINT:
-                                        mPass->setIteratePerLight(true);
-                                        break;
-                                    case ID_DIRECTIONAL:
-                                        mPass->setIteratePerLight(true, true, Light::LT_DIRECTIONAL);
-                                        break;
-                                    case ID_SPOT:
-                                        mPass->setIteratePerLight(true, true, Light::LT_SPOTLIGHT);
-                                        break;
-                                    default:
-                                        compiler->addError(*prop, prop->values.front()->getValue() + " is not a valid light type (point, directional, or spot)");
-                                    }
+                                    mPass->setLightCountPerIteration(static_cast<unsigned short>(uival));
+                                    setLightType(getNodeAt(prop->values, 3));
                                 }
                                 else
                                 {
-                                    mPass->setIteratePerLight(true, false);
-                                }
-
-                            }
-                            else if(getValue(*i0, uival))
-                            {
-                                mPass->setPassIterationCount(uival);
-
-                                AbstractNodeList::const_iterator i1 = getNodeAt(prop->values, 1);
-                                if(i1 != prop->values.end() && (*i1)->type == ANT_ATOM)
-                                {
-                                    atom = (AtomAbstractNode*)(*i1).get();
-                                    if(atom->id == ID_PER_LIGHT)
-                                    {
-                                        AbstractNodeList::const_iterator i2 = getNodeAt(prop->values, 2);
-                                        if(i2 != prop->values.end() && (*i2)->type == ANT_ATOM)
-                                        {
-                                            atom = (AtomAbstractNode*)(*i2).get();
-                                            switch(atom->id)
-                                            {
-                                            case ID_POINT:
-                                                mPass->setIteratePerLight(true);
-                                                break;
-                                            case ID_DIRECTIONAL:
-                                                mPass->setIteratePerLight(true, true, Light::LT_DIRECTIONAL);
-                                                break;
-                                            case ID_SPOT:
-                                                mPass->setIteratePerLight(true, true, Light::LT_SPOTLIGHT);
-                                                break;
-                                            default:
-                                                compiler->addError(*prop, (*i2)->getValue() + " is not a valid light type (point, directional, or spot)");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            mPass->setIteratePerLight(true, false);
-                                        }
-                                    }
-                                    else if(atom->id == ID_PER_N_LIGHTS)
-                                    {
-                                        AbstractNodeList::const_iterator i2 = getNodeAt(prop->values, 2);
-                                        if(i2 != prop->values.end() && (*i2)->type == ANT_ATOM)
-                                        {
-                                            if(getValue(*i2, uival))
-                                            {
-                                                mPass->setLightCountPerIteration(static_cast<unsigned short>(uival));
-
-                                                AbstractNodeList::const_iterator i3 = getNodeAt(prop->values, 3);
-                                                if(i3 != prop->values.end() && (*i3)->type == ANT_ATOM)
-                                                {
-                                                    atom = (AtomAbstractNode*)(*i3).get();
-                                                    switch(atom->id)
-                                                    {
-                                                    case ID_POINT:
-                                                        mPass->setIteratePerLight(true);
-                                                        break;
-                                                    case ID_DIRECTIONAL:
-                                                        mPass->setIteratePerLight(true, true, Light::LT_DIRECTIONAL);
-                                                        break;
-                                                    case ID_SPOT:
-                                                        mPass->setIteratePerLight(true, true, Light::LT_SPOTLIGHT);
-                                                        break;
-                                                    default:
-                                                        compiler->addError(*prop, (*i3)->getValue() + " is not a valid light type (point, directional, or spot)");
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    mPass->setIteratePerLight(true, false);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                                   (*i2)->getValue() + " is not a valid number");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-                                                               prop->values.front()->getValue() + " is not a valid number");
-                                        }
-                                    }
+                                    compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                                       "per_n_lights requires a light count");
                                 }
                             }
-                            else
-                            {
-                                compiler->addError(*prop);
-                            }
-                        }
-                        else
-                        {
-                            compiler->addError(*prop);
                         }
                     }
-                    break;
+                    else
+                    {
+                        compiler->addError(*prop);
+                    }
+                }
+                break;
                 case ID_LINE_WIDTH:
                     if(getValue(prop, compiler, fval))
                         mPass->setLineWidth(fval);
