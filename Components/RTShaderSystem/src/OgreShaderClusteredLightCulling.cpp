@@ -32,6 +32,13 @@ bool ClusteredLightCulling::preAddToRenderState(const RenderState* renderState, 
     if (!srcPass->getLightingEnabled() || srcPass->getShadingMode() != SO_PHONG)
         return false;
 
+    if (SceneManager::hasPerRenderableLights())
+    {
+        LogManager::getSingleton().logError(
+            "ClusteredLightCulling is not compatible with per-renderable light sorting.");
+        return false;
+    }
+
     // must match the light count used by the lighting SRS, so the
     // ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY parameter is shared instead of duplicated
     mLightCount = renderState->getLightCount();
