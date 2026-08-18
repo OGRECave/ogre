@@ -52,6 +52,8 @@ THE SOFTWARE.
 #include "OgreVulkanWindow.h"
 #include "OgrePixelFormat.h"
 
+#define VULKAN_MAX_TEXTURE_UNITS 16
+
 namespace Ogre
 {
     static const uint32 VERTEX_ATTRIBUTE_INDEX[VES_COUNT] =
@@ -162,18 +164,18 @@ namespace Ogre
         // use a single descriptor set for all shaders
         mDescriptorSetBindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
         mDescriptorSetBindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
-        for(uint32 i = 0; i < OGRE_MAX_TEXTURE_COORD_SETS; ++i)
+        for(uint32 i = 0; i < VULKAN_MAX_TEXTURE_UNITS; ++i)
             mDescriptorSetBindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
 
         // one descriptor will have at most OGRE_MAX_TEXTURE_LAYERS and one UBO per shader type (for now)
         mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
-        mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, OGRE_MAX_TEXTURE_COORD_SETS});
+        mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VULKAN_MAX_TEXTURE_UNITS});
 
         // silence validation layer, when unused
         mUBOInfo[0].range = 1;
         mUBOInfo[1].range = 1;
 
-        mDescriptorWrites.resize(OGRE_MAX_TEXTURE_COORD_SETS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
+        mDescriptorWrites.resize(VULKAN_MAX_TEXTURE_UNITS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
         mDescriptorWrites[0].dstBinding = 0;
         mDescriptorWrites[0].descriptorCount = 1;
         mDescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
@@ -184,7 +186,7 @@ namespace Ogre
         mDescriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
         mDescriptorWrites[1].pBufferInfo = mUBOInfo.data() + 1;
 
-        for(int i = 0; i < OGRE_MAX_TEXTURE_COORD_SETS; i++)
+        for(int i = 0; i < VULKAN_MAX_TEXTURE_UNITS; i++)
         {
             mDescriptorWrites[i + 2].dstBinding = 2 + i;
             mDescriptorWrites[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -543,7 +545,7 @@ namespace Ogre
         rsc->setCapability( RSC_TEXTURE_1D );
 
         //rsc->setCapability( RSC_HWSTENCIL );
-        rsc->setNumTextureUnits( OGRE_MAX_TEXTURE_COORD_SETS );
+        rsc->setNumTextureUnits( VULKAN_MAX_TEXTURE_UNITS );
         rsc->setCapability( RSC_TEXTURE_COMPRESSION );
         rsc->setCapability( RSC_32BIT_INDEX );
         rsc->setCapability( RSC_TWO_SIDED_STENCIL );
@@ -893,7 +895,7 @@ namespace Ogre
         uint32 hash = HashCombine(0, mUBOInfo);
 
         int numTextures = 0;
-        for (; numTextures < OGRE_MAX_TEXTURE_COORD_SETS; numTextures++)
+        for (; numTextures < VULKAN_MAX_TEXTURE_UNITS; numTextures++)
         {
             if (!mImageInfos[numTextures].imageView)
                 break;
