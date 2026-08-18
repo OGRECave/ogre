@@ -1051,14 +1051,14 @@ namespace Ogre {
         */
         virtual ~SceneManager();
 
-        /** Toggle sorting of lights for each renderable
+        /** Toggle per-renderable light sorting
 
-            By default, lights are sorted for each renderable based on their distance.
-            This allows having more than 8 lights affecting the scene.
-            However, the sorting is expensive and prevents the use of more efficient algorithms.
+            When enabled, lights are sorted per renderable based on their distance, and
+            per-renderable light masks are supported. The sorting is expensive and prevents
+            the use of more efficient algorithms.
 
-            Disabling this option will make the lights be sorted only once per frame.
-            Also disables per-renderable light masks.
+            It is therefore disabled by default: lights are updated and sorted only once
+            per frame.
          */
         static void usePerRenderableLights(bool enabled) { msPerRenderableLights = enabled; }
 
