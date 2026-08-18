@@ -41,6 +41,14 @@ public:
         return SdkSample::frameRenderingQueued(evt);   // don't forget the parent class updates!
     }
 
+    void testCapabilities(const RenderSystemCapabilities* caps) override
+    {
+        if (!caps->hasCapability(RSC_UNIFORM_BUFFERS))
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "RSC_UNIFORM_BUFFERS not supported");
+        }
+    }
+
 protected:
 
     void setupContent() override

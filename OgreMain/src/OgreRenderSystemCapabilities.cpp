@@ -111,6 +111,7 @@ namespace Ogre {
             pLog->logMessage("   - Wrap stencil values: " +
                              StringConverter::toString(hasCapability(RSC_STENCIL_WRAP), true));
         }
+        pLog->logMessage(" * Uniform buffers: " + StringConverter::toString(hasCapability(RSC_UNIFORM_BUFFERS), true));
         pLog->logMessage(" * Gpu programs: " + StringConverter::toString(hasCapability(RSC_VERTEX_PROGRAM), true));
         if (hasCapability(RSC_VERTEX_PROGRAM))
         {

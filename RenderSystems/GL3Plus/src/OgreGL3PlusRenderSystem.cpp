@@ -262,6 +262,8 @@ namespace Ogre {
         // Vertex Array Objects are supported in 3.0
         rsc->setCapability(RSC_VAO);
 
+        rsc->setCapability(RSC_UNIFORM_BUFFERS);
+
         // Check for texture compression
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 

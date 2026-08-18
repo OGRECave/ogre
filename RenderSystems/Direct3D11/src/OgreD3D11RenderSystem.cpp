@@ -825,6 +825,8 @@ namespace Ogre
         rsc->setCapability(RSC_HWOCCLUSION);
         rsc->setCapability(RSC_HWOCCLUSION_ASYNCHRONOUS);
 
+        rsc->setCapability(RSC_UNIFORM_BUFFERS);
+
         convertVertexShaderCaps(rsc);
         convertPixelShaderCaps(rsc);
         convertGeometryShaderCaps(rsc);

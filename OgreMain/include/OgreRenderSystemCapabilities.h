@@ -176,6 +176,8 @@ namespace Ogre
         RSC_MESH_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 17),
         /// Supports setting viewport and rendertarget array index from any shader stage
         RSC_VP_RT_INDEX_ANY_SHADER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 18),
+        /// Supports backing GpuSharedParameters by a hardware constant/uniform buffer (UBO / cbuffer)
+        RSC_UNIFORM_BUFFERS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 19),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
