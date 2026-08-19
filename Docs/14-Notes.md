@@ -23,7 +23,7 @@ Since 14.5, multi-sample textures are supported via the `TEX_TYPE_2D_MULTISAMPLE
 
 Since 14.5, `GpuProgramParameters::setUseLinearColours` can be used to specify that automatic sRGB to linear conversion should be applied to colour parameters when setting them.
 
-Since 14.6, loading of mesh formats older than v1.8 is disabled by default. Use `MeshSerializer::enablePre1_8Formats(true)` to re-enable it.
+Since 14.6, `GpuSharedParameters` may contain auto constants, which allows sharing automatically updated values across programs.
 
 ### OgreUnifiedShader.h
 
@@ -120,6 +120,14 @@ Additionally, you can check `RSC_VP_RT_INDEX_ANY_SHADER` to see if the rendering
 The `hdrDisplay` option was added to the RenderSystem options (and as a window parameter). When enabled, the backbuffer is switched to FP16 and the scRGB colour space is requested.
 This requires an HDR capable monitor with HDR enabled in the OS settings and is available on Windows with the GL, GLES2, D3D11 and Vulkan render systems.
 
+### Hardened asset loading (since 14.6)
+
+The mesh, skeleton, script, DDS/KTX and zip loading paths received extensive validation and bounds checking, driven by fuzz testing.
+Recursive variable expansion, self-delegating unified shaders and self-inheriting materials are now detected and reported as script errors.
+
+Loading of mesh formats older than v1.8 is disabled by default. Use `MeshSerializer::enablePre1_8Formats(true)` to re-enable it or run them through
+`OgreMeshUpgrader`.
+
 ## Python
 
 The double `ImGui` namespacing in `Ogre.ImGui` enums was removed; e.g. `ImGui.ImGuiWindowFlags_NoTitleBar` is now `ImGui.WindowFlags_NoTitleBar`.
@@ -179,6 +187,8 @@ Additionally `parallax_occlusion` mapping is now supported by using the respecti
 
 Since 14.5, the lighting can be done in linear space by setting `ShaderGenerator::setTargetLinearColours`. This is enabled automatically by the `ApplicationContext` when the sRGB gamma correction is enabled and by the CookTorrance sub-renderstate.
 
+Since 14.6, `shared_params` can be referenced by sub-renderstates.
+
 Since 14.6, the `metal_roughness` sub-renderstate supports an additional `occlusion` parameter to sample ambient occlusion from the R channel of the texture.
 
 Since 14.6, clustered light culling (also known as Forward+) is available through the `SRS_CLUSTERED_LIGHT_CULLING` sub-renderstate.
@@ -219,3 +229,7 @@ On OSX, `texture2D` etc. functions are no longer implicitly upgraded to version 
 Ogre can now run on Wayland in Linux if compiled with `OGRE_USE_WAYLAND=TRUE`. This is supported across all GL and Vulkan render systems, as well as the OgreBites SDL2 integration.
 
 ## Vulkan on macOS (since 14.6)
+
+The Vulkan render system can now be used on macOS via [MoltenVK](https://github.com/KhronosGroup/MoltenVK).
+Window surfaces are created through the `VK_EXT_metal_surface` extension, so a Vulkan SDK (or a standalone
+MoltenVK build) providing this extension is required at runtime.
