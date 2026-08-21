@@ -43,6 +43,7 @@ material glTF2/PBR
 			texture_unit IBL_LUT
 			{
 				texture brdfLUT.png
+                tex_address_mode clamp
 			}
 
 			vertex_program_ref glTF2/PBR_vs

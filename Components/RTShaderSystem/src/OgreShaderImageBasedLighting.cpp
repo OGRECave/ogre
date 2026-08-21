@@ -62,6 +62,7 @@ bool ImageBasedLighting::preAddToRenderState(const RenderState* renderState, Pas
     {
         tus->setTexture(tex);
         tus->setNumMipmaps(0);
+        tus->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
     }
     mDfgLUTSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 

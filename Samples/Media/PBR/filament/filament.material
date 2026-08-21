@@ -68,6 +68,7 @@ abstract material Filament
             {
                 texture $BRDFLUT
                 sampler_ref PBRLUTSampler
+                tex_address_mode clamp
             }
             texture_unit IBL_SPECULAR
             {
