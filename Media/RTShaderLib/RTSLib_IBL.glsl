@@ -65,6 +65,7 @@ void evaluateIBL(inout PixelParams pixel,
     r = normalize(mul(invViewMat, vec4(r, 0.0)).xyz);
     r.z *= -1.0;
     shading_normal = normalize(mul(invViewMat, vec4(shading_normal, 0.0)).xyz);
+    shading_normal.z *= -1.0;
 
     // specular layer
     vec3 Fr = E * prefilteredRadiance(iblEnvTex, r, pixel.perceptualRoughness, iblRoughnessOneLevel);
