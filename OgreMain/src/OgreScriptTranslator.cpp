@@ -1159,12 +1159,30 @@ namespace Ogre{
                         mTechnique->setLodIndex(static_cast<uint16>(uival));
                     break;
                 case ID_SHADOW_CASTER_MATERIAL:
-                    if(getValue(prop, compiler, sval))
-                        mTechnique->setShadowCasterMaterial(processResourceName(compiler, ResourceType::MATERIAL, sval));
+                    if (getValue(prop, compiler, sval))
+                    {
+                        try
+                        {
+                            mTechnique->setShadowCasterMaterial(processResourceName(compiler, ResourceType::MATERIAL, sval));
+                        }
+                        catch (Exception& e)
+                        {
+                            compiler->addError(*prop, e.getDescription());
+                        }
+                    }
                     break;
                 case ID_SHADOW_RECEIVER_MATERIAL:
-                    if(getValue(prop, compiler, sval))
-                        mTechnique->setShadowReceiverMaterial(processResourceName(compiler, ResourceType::MATERIAL, sval));
+                    if (getValue(prop, compiler, sval))
+                    {
+                        try
+                        {
+                            mTechnique->setShadowReceiverMaterial(processResourceName(compiler, ResourceType::MATERIAL, sval));
+                        }
+                        catch (Exception& e)
+                        {
+                            compiler->addError(*prop, e.getDescription());
+                        }
+                    }
                     break;
                 case ID_GPU_VENDOR_RULE:
                     if(prop->values.size() < 2)

@@ -1010,6 +1010,9 @@ namespace Ogre {
         }
         else
         {
+            if(val.get() == mParent)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Using parent material as shadow caster material is not allowed");
+
             // shadow caster material should never receive shadows
             val->setReceiveShadows(false); // should we warn if this is not set?
             mShadowCasterMaterial = val;
@@ -1038,6 +1041,9 @@ namespace Ogre {
         }
         else
         {
+            if(val.get() == mParent)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Using parent material as shadow receiver material is not allowed");
+
             mShadowReceiverMaterial = val;
             mShadowReceiverMaterialName = val->getName();
         }
