@@ -546,7 +546,7 @@ namespace Ogre {
             mShadowCasterMaterial = MaterialManager::getSingleton().getByName(mShadowCasterMaterialName);
         }
 
-        if (mShadowCasterMaterial && mShadowCasterMaterial.get() != getParent())
+        if (mShadowCasterMaterial)
         {
             mShadowCasterMaterial->load();
         }
@@ -557,7 +557,7 @@ namespace Ogre {
             mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(mShadowReceiverMaterialName);
         }
 
-        if (mShadowReceiverMaterial && mShadowReceiverMaterial.get() != getParent())
+        if (mShadowReceiverMaterial)
         {
             mShadowReceiverMaterial->load();
         }
@@ -1011,7 +1011,7 @@ namespace Ogre {
         else
         {
             if(val.get() == mParent)
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Using parent material as shadow caster material is not allowed");
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Using parent material is not allowed");
 
             // shadow caster material should never receive shadows
             val->setReceiveShadows(false); // should we warn if this is not set?
@@ -1042,7 +1042,7 @@ namespace Ogre {
         else
         {
             if(val.get() == mParent)
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Using parent material as shadow receiver material is not allowed");
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Using parent material is not allowed");
 
             mShadowReceiverMaterial = val;
             mShadowReceiverMaterialName = val->getName();
@@ -1051,8 +1051,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void  Technique::setShadowReceiverMaterial(const Ogre::String &name)
     {
+        setShadowReceiverMaterial(MaterialManager::getSingleton().getByName(name));
         mShadowReceiverMaterialName = name;
-        mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(name);
     }
     //---------------------------------------------------------------------
     void Technique::addGPUVendorRule(GPUVendor vendor, Technique::IncludeOrExclude includeOrExclude)
