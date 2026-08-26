@@ -85,10 +85,17 @@ namespace Ogre
             if(!deleg || (!deleg->isSupported() && !deleg->hasCompileError()))
                 continue;
 
+            if (deleg->getLanguage() == sLanguage)
+            {
+                LogManager::getSingleton().logError("unified program '" + getName() +
+                                                    "' cannot delegate to another unified program '" + dn + "'");
+                continue;
+            }
+
             if (deleg->getType() != getType())
             {
                 LogManager::getSingleton().logError("unified program '" + getName() +
-                                                    "' delegating to program with different type '" + dn + "'");
+                                                    "' cannot delegate to program with different type '" + dn + "'");
                 continue;
             }
 
