@@ -90,6 +90,9 @@ static void purge_state() {
   /* Particle system templates are not Resources - they live in a private map
    * in ParticleSystemManager and would grow without bound otherwise. */
   Ogre::ParticleSystemManager::getSingleton().removeAllTemplates();
+
+  // clean the pass graveyard
+  Ogre::Pass::processPendingPassUpdates();
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
