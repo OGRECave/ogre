@@ -33,7 +33,7 @@ THE SOFTWARE.
 namespace Ogre {
     //-------------------------------------------------------------------------
     SkeletonInstance::SkeletonInstance(const SkeletonPtr& masterCopy)
-        : Skeleton()
+        : Skeleton(masterCopy->getName(), masterCopy->getHandle(), masterCopy->getGroup())
         , mSkeleton(masterCopy)
     {
     }
@@ -222,24 +222,6 @@ namespace Ogre {
 
             mFreeTagPoints.splice(mFreeTagPoints.end(), mActiveTagPoints, it);
         }
-    }
-    //-------------------------------------------------------------------------
-    const String& SkeletonInstance::getName(void) const
-    {
-        // delegate
-        return mSkeleton->getName();
-    }
-    //-------------------------------------------------------------------------
-    ResourceHandle SkeletonInstance::getHandle(void) const
-    {
-        // delegate
-        return mSkeleton->getHandle();
-    }
-    //-------------------------------------------------------------------------
-    const String& SkeletonInstance::getGroup(void) const
-    {
-        // delegate
-        return mSkeleton->getGroup();
     }
 
 }

@@ -84,7 +84,7 @@ namespace Ogre {
         friend class SkeletonInstance;
     private:
         /// Internal constructor for use by SkeletonInstance only
-        Skeleton();
+        Skeleton(const String& name, ResourceHandle handle, const String& group);
 
     public:
         /** Constructor, don't call directly, use SkeletonManager.

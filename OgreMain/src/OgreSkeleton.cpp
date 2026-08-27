@@ -37,8 +37,8 @@ THE SOFTWARE.
 namespace Ogre {
 
     //---------------------------------------------------------------------
-    Skeleton::Skeleton()
-        : Resource(),
+    Skeleton::Skeleton(const String& name, ResourceHandle handle, const String& group)
+        : Resource(name, handle, group),
         mBlendState(ANIMBLEND_AVERAGE),
         mManualBonesDirty(false)
     {

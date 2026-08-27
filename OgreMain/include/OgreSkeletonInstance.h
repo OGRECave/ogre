@@ -111,13 +111,6 @@ namespace Ogre {
         /// @copydoc Skeleton::_refreshAnimationState
         void _refreshAnimationState(AnimationStateSet* animSet) override;
 
-        /// @copydoc Resource::getName
-        const String& getName(void) const;
-        /// @copydoc Resource::getHandle
-        ResourceHandle getHandle(void) const;
-        /// @copydoc Resource::getGroup
-        const String& getGroup(void) const;
-
     private:
         /// Pointer back to master Skeleton
         SkeletonPtr mSkeleton;

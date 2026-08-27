@@ -161,8 +161,8 @@ namespace Ogre {
     protected:
         /** Protected unnamed constructor to prevent default construction. 
         */
-        Resource() 
-            : mCreator(0), mHandle(0), mLoadingState(LOADSTATE_UNLOADED), 
+        Resource(const String& name, ResourceHandle handle, const String& group)
+            : mCreator(0), mName(name), mGroup(group), mHandle(handle), mLoadingState(LOADSTATE_UNLOADED),
               mIsBackgroundLoaded(0), mIsManual(0), mSize(0), mLoader(0), mStateCount(0)
         { 
         }
