@@ -82,7 +82,7 @@ namespace Ogre
                 deleg = GpuProgramManager::getSingleton().getByName(dn, RGN_AUTODETECT);
 
             // Silently ignore missing links
-            if(!deleg || (!deleg->isSupported() && !deleg->hasCompileError()))
+            if(!deleg)
                 continue;
 
             if (deleg->getLanguage() == sLanguage)
@@ -98,6 +98,9 @@ namespace Ogre
                                                     "' cannot delegate to program with different type '" + dn + "'");
                 continue;
             }
+
+            if(!deleg->isSupported() && !deleg->hasCompileError())
+                continue;
 
             mChosenDelegate = deleg;
             break;
