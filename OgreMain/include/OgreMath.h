@@ -266,9 +266,7 @@ namespace Ogre
         static inline int IAbs (int iValue) { return ( iValue >= 0 ? iValue : -iValue ); }
         static inline int ICeil (float fValue) { return int(std::ceil(fValue)); }
         static inline int IFloor (float fValue) { return int(std::floor(fValue)); }
-        static int ISign (int iValue) {
-            return ( iValue > 0 ? +1 : ( iValue < 0 ? -1 : 0 ) );
-        }
+        static int ISign(int iValue) { return (iValue > 0) - (iValue < 0); }
 
         /** Absolute value function
             @param
@@ -373,14 +371,7 @@ namespace Ogre
 
         static inline Real Pow (Real fBase, Real fExponent) { return std::pow(fBase,fExponent); }
 
-        static Real Sign(Real fValue)
-        {
-            if (fValue > 0.0)
-                return 1.0;
-            if (fValue < 0.0)
-                return -1.0;
-            return 0.0;
-        }
+        static Real Sign(Real fValue) { return Real((fValue > 0) - (fValue < 0)); }
 
         static inline Radian Sign ( const Radian& rValue )
         {
