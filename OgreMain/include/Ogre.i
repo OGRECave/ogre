@@ -18,6 +18,8 @@
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreDefaultDebugDrawer.h"
 #include "OgreCompositorLogic.h"
+
+using namespace Ogre;
 %}
 
 %include stdint.i
@@ -52,6 +54,7 @@ typedef long int time_t;
 %feature("autodoc", "1");
 %feature("director") *::Listener;
 #ifdef SWIGPYTHON
+%feature("compactdefaultargs");
 // should be turned on globally if all renames are in place
 %feature("flatnested") Ogre::MaterialManager::Listener;
 %feature("flatnested") Ogre::SceneManager::Listener;
