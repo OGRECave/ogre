@@ -131,28 +131,30 @@ namespace Ogre
             m[1][1] = v[1];
             m[2][2] = v[2];
         }
-
-        /** Function for writing to a stream.
-         */
-        inline friend std::ostream& operator<<(std::ostream& o, const TransformBase& mat)
-        {
-            o << "Matrix" << rows << "x4(";
-            for (size_t i = 0; i < rows; ++i)
-            {
-                for (size_t j = 0; j < 4; ++j)
-                {
-                    o << mat[i][j];
-                    if(j != 3)
-                        o << ", ";
-                }
-
-                if(i != (rows - 1))
-                    o << "; ";
-            }
-            o << ")";
-            return o;
-        }
     };
+
+    /** Function for writing to a stream.
+    */
+    template <typename CharT, typename TraitsT, int rows, typename T>
+    std::basic_ostream<CharT, TraitsT>& operator<<(std::basic_ostream<CharT, TraitsT>& o,
+                                                   const TransformBase<rows, T>& mat)
+    {
+        o << "Matrix" << rows << "x4(";
+        for (size_t i = 0; i < rows; ++i)
+        {
+            for (size_t j = 0; j < 4; ++j)
+            {
+                o << mat[i][j];
+                if(j != 3)
+                    o << ", ";
+            }
+
+            if(i != (rows - 1))
+                o << "; ";
+        }
+        o << ")";
+        return o;
+    }
 
     struct _OgreExport TransformBaseReal : public TransformBase<4, Real>
     {

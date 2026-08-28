@@ -179,11 +179,7 @@ namespace Ogre
                 return OGRE_NEW_T(holder, MEMCATEGORY_GENERAL)(held);
             }
 
-            void writeToStream(std::ostream& o) override
-            {
-                o << "Any::ValueType";
-            }
-
+            void writeToStream(std::ostream& o) override {}
 
         public: // representation
 

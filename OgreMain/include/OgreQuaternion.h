@@ -350,18 +350,12 @@ namespace Ogre {
             return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) || Math::isNaN(w);
         }
 #endif
-
-        /** Function for writing to a stream. Outputs "Quaternion(w, x, y, z)" with w,x,y,z
-            being the member values of the quaternion.
-        */
-        inline friend std::ostream& operator <<
-            ( std::ostream& o, const Quaternion& q )
-        {
-            o << "Quaternion(" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << ")";
-            return o;
-        }
-
     };
+
+    /** Function for writing to a stream. Outputs "Quaternion(w, x, y, z)" with w,x,y,z
+        being the member values of the quaternion.
+    */
+    _OgreExport std::ostream& operator<<(std::ostream& o, const Quaternion& q);
     /** @} */
     /** @} */
 

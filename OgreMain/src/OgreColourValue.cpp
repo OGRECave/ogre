@@ -379,5 +379,9 @@ namespace {
         
     }
 
+    std::ostream& operator<<(std::ostream& o, const ColourValue& c)
+    {
+        return o << "ColourValue(" << c.r << ", " << c.g << ", " << c.b << ", " << c.a << ")";
+    }
 }
 

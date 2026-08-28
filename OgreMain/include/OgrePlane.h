@@ -247,13 +247,9 @@ namespace Ogre {
         {
             return (rhs.d != d || rhs.normal != normal);
         }
-
-        friend std::ostream& operator<<(std::ostream& o, const Plane& p)
-        {
-            o << "Plane(normal=" << p.normal << ", d=" << p.d << ")";
-            return o;
-        }
     };
+
+    _OgreExport std::ostream& operator<<(std::ostream& o, const Plane& p);
 
     inline Plane operator * (const Matrix4& mat, const Plane& p)
     {

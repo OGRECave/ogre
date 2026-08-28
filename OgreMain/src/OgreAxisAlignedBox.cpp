@@ -31,5 +31,22 @@ namespace Ogre
 {
     const AxisAlignedBox AxisAlignedBox::BOX_NULL;
     const AxisAlignedBox AxisAlignedBox::BOX_INFINITE(AxisAlignedBox::EXTENT_INFINITE);
+
+    std::ostream& operator<<(std::ostream& o, const AxisAlignedBox& aab)
+    {
+        if (aab.isNull())
+        {
+            o << "AxisAlignedBox(null)";
+        }
+        else if (aab.isFinite())
+        {
+            o << "AxisAlignedBox(min=" << aab.getMinimum() << ", max=" << aab.getMaximum() << ")";
+        }
+        else
+        {
+            o << "AxisAlignedBox(infinite)";
+        }
+        return o;
+    }
 }
 

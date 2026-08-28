@@ -21,7 +21,6 @@
 #include <algorithm>
 
 // C++ Stream stuff
-#include <ostream>
 #include <iosfwd>
 
 #include <atomic>

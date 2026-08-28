@@ -323,17 +323,11 @@ namespace Ogre {
         {
             getHSB(*hue, *saturation, *brightness);
         }
-
-        /** Function for writing to a stream.
-        */
-        inline friend std::ostream& operator <<
-            ( std::ostream& o, const ColourValue& c )
-        {
-            o << "ColourValue(" << c.r << ", " << c.g << ", " << c.b << ", " << c.a << ")";
-            return o;
-        }
-
     };
+
+    /** Function for writing to a stream.
+    */
+    _OgreExport std::ostream& operator<<(std::ostream& o, const ColourValue& c);
     /** @} */
     /** @} */
 

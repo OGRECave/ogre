@@ -702,7 +702,8 @@ namespace Ogre
             return ret;
         }
 
-        friend std::ostream& operator<<(std::ostream& o, const Vector& v)
+        template <typename CharT, typename TraitsT>
+        friend std::basic_ostream<CharT, TraitsT>& operator<<(std::basic_ostream<CharT, TraitsT>& o, const Vector& v)
         {
             o << "Vector" << dims << "(";
             for (int i = 0; i < dims; i++) {

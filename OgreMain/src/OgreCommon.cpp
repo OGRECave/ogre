@@ -71,4 +71,9 @@ namespace Ogre
                                destType.c_str(), destName.c_str(), name.c_str(), groupName.c_str()),
             lml);
     }
+
+    std::ostream& operator<<(std::ostream& o, const Plane& p)
+    {
+        return o << "Plane(normal=" << p.normal << ", d=" << p.d << ")";
+    }
 }

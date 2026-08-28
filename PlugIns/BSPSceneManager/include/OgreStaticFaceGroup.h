@@ -28,6 +28,8 @@ THE SOFTWARE.
 #ifndef __StaticFaceGroup_H__
 #define __StaticFaceGroup_H__
 
+#include <ostream>
+
 #include "OgrePrerequisites.h"
 
 #include "OgrePlane.h"

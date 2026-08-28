@@ -29,6 +29,8 @@ THE SOFTWARE.
 #ifndef __StringConverter_H__
 #define __StringConverter_H__
 
+#include <ios>
+
 #include "OgreCommon.h"
 #include "OgrePrerequisites.h"
 #include "OgreStringVector.h"
@@ -37,9 +39,9 @@ THE SOFTWARE.
 #include "OgreVector.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#   define locale_t _locale_t
+namespace Ogre { typedef _locale_t locale_t; }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-#   define locale_t int
+namespace Ogre { typedef int locale_t; }
 #endif
 
 // If compiling with make on macOS, these headers need to be included to get

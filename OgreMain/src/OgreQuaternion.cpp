@@ -547,4 +547,9 @@ namespace Ogre {
         result.normalise();
         return result;
     }
+
+    std::ostream& operator<<(std::ostream& o, const Quaternion& q)
+    {
+        return o << "Quaternion(" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << ")";
+    }
 }

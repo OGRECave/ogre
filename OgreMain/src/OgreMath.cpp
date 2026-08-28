@@ -778,4 +778,7 @@ namespace Ogre
 
         return ((min - max) * 0.5f).length();
     }
+
+    std::ostream& operator<<(std::ostream& o, const Radian& v) { return o << "Radian(" << v.valueRadians() << ")"; }
+    std::ostream& operator<<(std::ostream& o, const Degree& v) { return o << "Degree(" << v.valueDegrees() << ")"; }
 }
