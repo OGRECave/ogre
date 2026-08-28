@@ -393,18 +393,6 @@ namespace Ogre {
             : left( l ), top( t ), right( r ), bottom( b )
           {
           }
-          TRect( TRect const & o )
-            : left( o.left ), top( o.top ), right( o.right ), bottom( o.bottom )
-          {
-          }
-          TRect & operator=( TRect const & o )
-          {
-            left = o.left;
-            top = o.top;
-            right = o.right;
-            bottom = o.bottom;
-            return *this;
-          }
           T width() const
           {
             return right - left;
