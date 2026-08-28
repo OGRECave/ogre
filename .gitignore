@@ -9,6 +9,8 @@ cmake-build-*/
 /build/
 /installed/
 /android-build/
+/android-ndk-r25c/
+/android-ndk-r25c-linux.zip
 /embuild/
 /eminstall/
 /mingw/
