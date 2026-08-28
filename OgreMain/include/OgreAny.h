@@ -75,7 +75,7 @@ namespace Ogre
         {
         }
 
-        virtual ~Any()
+        ~Any()
         {
             reset();
         }
