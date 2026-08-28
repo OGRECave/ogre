@@ -66,9 +66,9 @@ namespace Ogre
     public:
         explicit Radian ( float r=0 ) : mRad(r) {}
         Radian ( const Degree& d );
-        Radian (const Ogre::Radian& rhs) : mRad(rhs.mRad) {}
-        Radian& operator = ( const float& f ) { mRad = f; return *this; }
-        Radian& operator = ( const Radian& r ) { mRad = r.mRad; return *this; }
+        Radian (const Radian& rhs) = default;
+        Radian& operator = ( float f ) { mRad = f; return *this; }
+        Radian& operator = ( const Radian& r ) = default;
         Radian& operator = ( const Degree& d );
 
         float valueDegrees() const; // see bottom of this file
@@ -117,10 +117,10 @@ namespace Ogre
 
     public:
         explicit Degree ( float d=0 ) : mDeg(d) {}
-        Degree ( const Radian& r ) : mDeg(r.valueDegrees()) {}
-        Degree (const Ogre::Degree& rhs) : mDeg(rhs.mDeg) {}
-        Degree& operator = ( const float& f ) { mDeg = f; return *this; }
-        Degree& operator = ( const Degree& d ) { mDeg = d.mDeg; return *this; }
+        Degree (Radian r ) : mDeg(r.valueDegrees()) {}
+        Degree (const Degree& rhs) = default;
+        Degree& operator = ( float f ) { mDeg = f; return *this; }
+        Degree& operator = ( const Degree& d ) = default;
         Degree& operator = ( const Radian& r ) { mDeg = r.valueDegrees(); return *this; }
 
         float valueDegrees() const { return mDeg; }
