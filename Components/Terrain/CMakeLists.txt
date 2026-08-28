@@ -50,6 +50,7 @@ if (OGRE_BUILD_COMPONENT_PAGING)
 	target_link_libraries(OgreTerrain PUBLIC OgrePaging)
 endif ()
 
+target_compile_options(OgreTerrain PRIVATE ${OGRE_FP_FLAGS})
 
 # install 
 ogre_config_framework(OgreTerrain)

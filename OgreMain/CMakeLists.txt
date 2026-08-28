@@ -232,6 +232,8 @@ endif()
 # specify a precompiled header to use
 add_native_precompiled_header(OgreMain "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/OgreStableHeaders.h>")
 
+target_compile_options(OgreMain PRIVATE ${OGRE_FP_FLAGS})
+
 # install OgreMain
 ogre_config_lib(OgreMain TRUE)
 install(FILES ${HEADER_FILES}

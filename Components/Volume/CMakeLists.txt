@@ -24,6 +24,8 @@ target_include_directories(OgreVolume PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   $<INSTALL_INTERFACE:include/OGRE/Volume>)
 
+target_compile_options(OgreVolume PRIVATE ${OGRE_FP_FLAGS})
+
 generate_export_header(OgreVolume 
     EXPORT_MACRO_NAME _OgreVolumeExport
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/OgreVolumePrerequisites.h)

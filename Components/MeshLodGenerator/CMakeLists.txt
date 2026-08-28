@@ -24,6 +24,8 @@ add_library(OgreMeshLodGenerator ${OGRE_COMP_LIB_TYPE} ${OgreMeshLodGenerator_pc
 set_target_properties(OgreMeshLodGenerator PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreMeshLodGenerator PUBLIC OgreMain)
 
+target_compile_options(OgreMeshLodGenerator PRIVATE ${OGRE_FP_FLAGS})
+
 target_include_directories(OgreMeshLodGenerator PUBLIC 
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   $<INSTALL_INTERFACE:include/OGRE/MeshLodGenerator>)

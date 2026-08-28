@@ -128,6 +128,15 @@ if (NOT ANDROID AND NOT EMSCRIPTEN AND UNIX OR MINGW)
   endif()
 endif()
 
+set(OGRE_FP_FLAGS "")
+if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+  if(MSVC_VERSION GREATER_EQUAL 1929 OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(OGRE_FP_FLAGS /fp:contract)
+  endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|IntelLLVM")
+  set(OGRE_FP_FLAGS -fno-math-errno -ffp-contract=fast -fno-trapping-math)
+endif()
+
 if(UNIX)
   # This is a set of sensible warnings that provide meaningful output
   set(OGRE_WARNING_FLAGS "-Wall -Winit-self -Wcast-qual -Wwrite-strings -Wextra -Wundef -Wmissing-declarations -Wno-unused-parameter -Wshadow -Wno-missing-field-initializers -Wno-long-long")
