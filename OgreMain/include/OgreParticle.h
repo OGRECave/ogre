@@ -79,7 +79,7 @@ namespace Ogre {
         Particle()
             : mWidth(0), mHeight(0),
             mRotation(0), mPosition(Vector3::ZERO), mDirection(Vector3::ZERO),
-            mColour(0xFFFFFFFF), mTimeToLive(10), mTotalTimeToLive(10),
+            mColour(ColourValue::White), mTimeToLive(10), mTotalTimeToLive(10),
             mRotationSpeed(0), mParticleType(Visual), mTexcoordIndex(0), mRandomTexcoordOffset(0)
         {
         }
