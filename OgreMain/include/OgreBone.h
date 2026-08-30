@@ -95,14 +95,16 @@ namespace Ogre
         /** Sets whether or not this bone is manually controlled. 
 
             Manually controlled bones can be altered by the application at runtime, 
-            and their positions will not be reset by the animation routines. Note 
-            that you should also make sure that there are no AnimationTrack objects
-            referencing this bone, or if there are, you should disable them using
-            pAnimation->destroyTrack(pBone->getHandle());
-        @par
-            You can also use AnimationState::setBlendMask to mask out animation from 
+            and their positions will not be reset by the animation routines.
+
+            Make sure no @ref AnimationTrack still references this bone. If one does, remove it with
+            @ref Animation::destroyNodeTrack(pBone->getHandle());
+
+            You can also use @ref AnimationState::setBlendMaskEntry to mask out animation from
             chosen tracks if you want to prevent application of a scripted animation 
             to a bone without altering the Animation definition.
+
+            @note Call this on the @ref SkeletonInstance, not on the @ref Skeleton template.
         */
         void setManuallyControlled(bool manuallyControlled);
 
