@@ -3520,7 +3520,7 @@ void SceneManager::_notifyEntityMeshLodChanged(EntityMeshLodChangedEvent& evt)
         mEntityMeshLodChangedEvents.push_back(evt);
 }
 //---------------------------------------------------------------------
-void SceneManager::_notifyEntityMaterialLodChanged(EntityMaterialLodChangedEvent& evt)
+void SceneManager::_notifyMaterialLodChanged(EntityMaterialLodChangedEvent& evt)
 {
     // Notify listeners and determine if event needs to be queued
     bool queueEvent = false;
@@ -3532,7 +3532,7 @@ void SceneManager::_notifyEntityMaterialLodChanged(EntityMaterialLodChangedEvent
 
     // Push event onto queue if requested
     if (queueEvent)
-        mEntityMaterialLodChangedEvents.push_back(evt);
+        mMaterialLodChangedEvents.push_back(evt);
 }
 //---------------------------------------------------------------------
 void SceneManager::_handleLodEvents()
@@ -3546,14 +3546,14 @@ void SceneManager::_handleLodEvents()
         for (auto& e : mEntityMeshLodChangedEvents)
             l->postqueueEntityMeshLodChanged(e);
 
-        for (auto& e : mEntityMaterialLodChangedEvents)
+        for (auto& e : mMaterialLodChangedEvents)
             l->postqueueEntityMaterialLodChanged(e);
     }
 
     // Clear event queues
     mMovableObjectLodChangedEvents.clear();
     mEntityMeshLodChangedEvents.clear();
-    mEntityMaterialLodChangedEvents.clear();
+    mMaterialLodChangedEvents.clear();
 }
 //---------------------------------------------------------------------
 void SceneManager::useLights(const LightList* lights, ushort limit)

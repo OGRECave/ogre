@@ -1228,9 +1228,21 @@ namespace Ogre
             MaterialPtr material = getMaterial();
             const LodStrategy *materialStrategy = material->getLodStrategy();
             Real lodValue = materialStrategy->getValue(this, cam);
+
+            // Construct event object
+            MaterialLodChangedEvent matLodEvt;
+            matLodEvt.renderable = this;
+            matLodEvt.camera = cam;
+            matLodEvt.lodValue = lodValue;
+            matLodEvt.previousLodIndex = mMaterialLodIndex;
+
             // Get the index at this biased depth
             mMaterialLodIndex = material->getLodIndex(lodValue);
+            
+            matLodEvt.newLodIndex = mMaterialLodIndex;
 
+            // Notify LOD event listeners
+            cam->getSceneManager()->_notifyMaterialLodChanged(matLodEvt);
 
             // For each LOD, the distance at which the LOD will transition *downwards*
             // is given by
