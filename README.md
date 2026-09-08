@@ -1,7 +1,7 @@
 [![GitHub release](https://img.shields.io/github/release/ogrecave/ogre.svg)](https://github.com/OGRECave/ogre/releases/latest)
 [![CI Build](https://github.com/OGRECave/ogre/actions/workflows/ci-build.yml/badge.svg)](https://github.com/OGRECave/ogre/actions/workflows/ci-build.yml)
 [![Downloads](https://static.pepy.tech/badge/ogre-python)](https://pepy.tech/project/ogre-python)
-[![Join the chat at https://gitter.im/OGRECave/ogre](https://badges.gitter.im/OGRECave/ogre.svg)](https://gitter.im/OGRECave/ogre?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Chatroom](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://ogre3d.zulipchat.com/#narrow/channel/631862-ogre)
 [![Patreon](https://img.shields.io/badge/patreon-donate-blue.svg)](https://www.patreon.com/ogre1)
 
 ![](Other/ogre_header.svg)
