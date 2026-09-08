@@ -71,7 +71,7 @@ namespace Ogre
 #  elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
                 pthread_setname_np(pthread_self(), mName.substr(0, 15).c_str());
 #  elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-                pthread_setname_np(name.c_str());
+                pthread_setname_np(mName.c_str());
 #  endif
                 _threadMain();
             });
