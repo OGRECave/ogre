@@ -1,8 +1,8 @@
 contact_links:
   - name: Community Forums
     url: https://forums.ogre3d.org/
-    about: Probably your usage question was already answered here
-  - name: Gitter Chat
-    url: https://gitter.im/OGRECave/ogre
-    about: Engage in live discussions with the community
+    about: Ask usage questions - chances are it's already answered
+  - name: Chatroom
+    url: https://ogre3d.zulipchat.com/#narrow/channel/631862-ogre
+    about: Join live discussions with the community
 blank_issues_enabled: true
