@@ -64,7 +64,18 @@ namespace Ogre
         mNumThreadsRegisteredWithRS = 0;
         for (size_t i = 0; i < mWorkerThreadCount; ++i)
         {
-            OGRE_THREAD_CREATE(t, [this]() { _threadMain(); });
+            auto threadProc = [this]() {
+#  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+                // std::wstring wname(mName.begin(), mName.end());
+                // SetThreadDescription(GetCurrentThread(), wname.c_str());
+#  elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+                pthread_setname_np(pthread_self(), mName.substr(0, 15).c_str());
+#  elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+                pthread_setname_np(mName.c_str());
+#  endif
+                _threadMain();
+            };
+            OGRE_THREAD_CREATE(t, threadProc);
             mWorkers.push_back(t);
         }
 
