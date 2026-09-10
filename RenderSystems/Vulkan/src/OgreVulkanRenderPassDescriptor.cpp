@@ -380,6 +380,22 @@ namespace Ogre
         fbCreateInfo.height = mTargetHeight;
         fbCreateInfo.layers = layers;
 
+        // Create a second render pass with LOAD_OP_LOAD for resuming after compute
+        // Modify attachments in-place (they're local)
+        for( uint32 i = 0; i < attachmentIdx; ++i )
+        {
+            if( attachments[i].loadOp == VK_ATTACHMENT_LOAD_OP_CLEAR )
+                attachments[i].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+            if( attachments[i].stencilLoadOp == VK_ATTACHMENT_LOAD_OP_CLEAR )
+                attachments[i].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+
+            // Must match the layout the previous pass left the attachment in
+            if( attachments[i].initialLayout == VK_IMAGE_LAYOUT_UNDEFINED )
+                attachments[i].initialLayout = attachments[i].finalLayout;
+        }
+
+        OGRE_VK_CHECK(vkCreateRenderPass( mQueue->mDevice, &renderPassCreateInfo, 0, &fboDesc.mRenderPassLoad ));
+
         const size_t numFramebuffers = std::max<size_t>( fboDesc.mWindowImageViews.size(), 1u );
         fboDesc.mFramebuffers.resize( numFramebuffers );
         for( size_t i = 0u; i < numFramebuffers; ++i )
@@ -432,6 +448,12 @@ namespace Ogre
 
         vkDestroyRenderPass( queue->mDevice, fboDesc.mRenderPass, 0 );
         fboDesc.mRenderPass = 0;
+
+        if( fboDesc.mRenderPassLoad )
+        {
+            vkDestroyRenderPass( queue->mDevice, fboDesc.mRenderPassLoad, 0 );
+            fboDesc.mRenderPassLoad = 0;
+        }
     }
     //-----------------------------------------------------------------------------------
     void VulkanRenderPassDescriptor::entriesModified( bool createFbo )
@@ -515,7 +537,7 @@ namespace Ogre
         return mSharedFboItor->second.mRenderPass;
     }
     //-----------------------------------------------------------------------------------
-    void VulkanRenderPassDescriptor::performLoadActions()
+void VulkanRenderPassDescriptor::performLoadActions()
     {
         VkCommandBuffer cmdBuffer = mQueue->mCurrentCmdBuffer;
 
@@ -530,13 +552,12 @@ namespace Ogre
             VkSemaphore semaphore = textureVulkan->getImageAcquiredSemaphore();
             if( semaphore )
             {
-                // We cannot start executing color attachment commands until the semaphore says so
                 mQueue->addWindowToWaitFor( semaphore );
             }
         }
 
         VkRenderPassBeginInfo passBeginInfo = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
-        passBeginInfo.renderPass = fboDesc.mRenderPass;
+        passBeginInfo.renderPass = mResuming ? fboDesc.mRenderPassLoad : fboDesc.mRenderPass;
         passBeginInfo.framebuffer = fboDesc.mFramebuffers[fboIdx];
         passBeginInfo.renderArea.offset.x = 0;
         passBeginInfo.renderArea.offset.y = 0;
@@ -559,6 +580,7 @@ namespace Ogre
         // Another encoder will have to be created, and don't let ours linger
         // since mCurrentRenderPassDescriptor probably doesn't even point to 'this'
         mQueue->endAllEncoders( false );
+        mResuming = true;
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
