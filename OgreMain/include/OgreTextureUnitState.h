@@ -794,7 +794,7 @@ namespace Ogre {
             which unfortunately doesn't support as many effects. This method is for you to specify the fallback
             operation which most suits you.
 
-            You'll notice that the interface is the same as the Ogre::TMaterial::setSceneBlending method; this is
+            You'll notice that the interface is the same as the Ogre::Material::setSceneBlending method; this is
             because multipass rendering IS effectively scene blending, since each layer is rendered on top
             of the last using the same mechanism as making an object transparent, it's just being rendered
             in the same place repeatedly to get the multitexture effect.
