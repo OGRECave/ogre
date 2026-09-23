@@ -162,6 +162,15 @@ namespace Ogre
             notifyThreadRegistered();
         }
 
+#  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+            // std::wstring wname(mName.begin(), mName.end());
+            // SetThreadDescription(GetCurrentThread(), wname.c_str());
+#  elif defined(__linux__) || defined(__ANDROID__)
+            pthread_setname_np(pthread_self(), mName.c_str());
+#  elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            pthread_setname_np(mName.c_str());
+#  endif
+
         // Spin forever until we're told to shut down
         while (!isShuttingDown())
         {
