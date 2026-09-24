@@ -81,7 +81,8 @@ namespace Ogre {
             VECTOR4,
             QUATERNION,
             COLOUR,
-            RADIAN
+            RADIAN,
+            CUSTOM
         };
     protected:
         /// Value type

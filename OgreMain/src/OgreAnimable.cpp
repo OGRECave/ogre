@@ -58,6 +58,9 @@ namespace Ogre {
         case RADIAN:        
             setValue(Radian(mBaseValueReal[0]));
             break;
+        case CUSTOM:
+        default:
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Override this function to provide custom behavior");
         }
     }
     //--------------------------------------------------------------------------
@@ -89,6 +92,9 @@ namespace Ogre {
         case RADIAN:
             setAsBaseValue(any_cast<Radian>(val));
             break;
+        case CUSTOM:
+        default:
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Override this function to provide custom behavior");
         }
     }
     //--------------------------------------------------------------------------
@@ -120,6 +126,9 @@ namespace Ogre {
         case RADIAN:
             setValue(any_cast<Radian>(val));
             break;
+        case CUSTOM:
+        default:
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Override this function to provide custom behavior");
         }
     }
     //--------------------------------------------------------------------------
@@ -151,6 +160,9 @@ namespace Ogre {
         case RADIAN:
             applyDeltaValue(any_cast<Radian>(val));
             break;
+        case CUSTOM:
+        default:
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Override this function to provide custom behavior");
         }
     }
     //--------------------------------------------------------------------------
@@ -174,6 +186,9 @@ namespace Ogre {
             return Math::lerp(any_cast<ColourValue>(v0), any_cast<ColourValue>(v1), t);
         case RADIAN:
             return Math::lerp(any_cast<Radian>(v0), any_cast<Radian>(v1), t);
+        case CUSTOM:
+        default:
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Override this function to provide custom behavior");
         }
     }
     //--------------------------------------------------------------------------
@@ -197,6 +212,9 @@ namespace Ogre {
             return any_cast<ColourValue>(v) * s;
         case RADIAN:
             return any_cast<Radian>(v) * s;
+        case CUSTOM:
+        default:
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Override this function to provide custom behavior");
         }
     }
 }
