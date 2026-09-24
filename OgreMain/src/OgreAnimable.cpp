@@ -153,7 +153,50 @@ namespace Ogre {
             break;
         }
     }
-
-
-
+    //--------------------------------------------------------------------------
+    Any AnimableValue::lerpAny(const Any& v0, const Any& v1, Real t)
+    {
+        switch(mType)
+        {
+        case INT:
+            return Math::lerp(any_cast<int>(v0), any_cast<int>(v1), t);
+        case REAL:
+            return Math::lerp(any_cast<Real>(v0), any_cast<Real>(v1), t);
+        case VECTOR2:
+            return Math::lerp(any_cast<Vector2>(v0), any_cast<Vector2>(v1), t);
+        case VECTOR3:
+            return Math::lerp(any_cast<Vector3>(v0), any_cast<Vector3>(v1), t);
+        case VECTOR4:
+            return Math::lerp(any_cast<Vector4>(v0), any_cast<Vector4>(v1), t);
+        case QUATERNION:
+            return Math::lerp(any_cast<Quaternion>(v0), any_cast<Quaternion>(v1), t);
+        case COLOUR:
+            return Math::lerp(any_cast<ColourValue>(v0), any_cast<ColourValue>(v1), t);
+        case RADIAN:
+            return Math::lerp(any_cast<Radian>(v0), any_cast<Radian>(v1), t);
+        }
+    }
+    //--------------------------------------------------------------------------
+    Any AnimableValue::scaleAny(const Any& v, Real s)
+    {
+        switch(mType)
+        {
+        case INT:
+            return any_cast<int>(v) * s;
+        case REAL:
+            return any_cast<Real>(v) * s;
+        case VECTOR2:
+            return any_cast<Vector2>(v) * s;
+        case VECTOR3:
+            return any_cast<Vector3>(v) * s;
+        case VECTOR4:
+            return any_cast<Vector4>(v) * s;
+        case QUATERNION:
+            return any_cast<Quaternion>(v) * s;
+        case COLOUR:
+            return any_cast<ColourValue>(v) * s;
+        case RADIAN:
+            return any_cast<Radian>(v) * s;
+        }
+    }
 }

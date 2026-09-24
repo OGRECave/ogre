@@ -219,6 +219,11 @@ namespace Ogre {
         /// Apply delta value 
         virtual void applyDeltaValue(const Any& val);
 
+        /// Interpolate between two values
+        virtual Any lerpAny(const Any& v0, const Any& v1, Real t);
+
+        /// Scale a value
+        virtual Any scaleAny(const Any& v, Real s);
 
     };
 
