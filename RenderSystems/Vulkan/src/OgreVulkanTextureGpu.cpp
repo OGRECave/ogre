@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 #include "OgreRoot.h"
 #include "OgreVulkanTextureGpuWindow.h"
+#include "OgreVulkanRenderSystem.h"
 
 #define TODO_add_resource_transitions
 
@@ -307,6 +308,12 @@ namespace Ogre
         vmaDestroyImage(device->getAllocator(), mFinalTextureName, mAllocation);
 
         destroyMsaaSurface();
+
+        if( mStorageImageView != VK_NULL_HANDLE )
+        {
+            vkDestroyImageView( device->mDevice, mStorageImageView, nullptr );
+            mStorageImageView = VK_NULL_HANDLE;
+        }
 
         mCurrLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         mNextLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -642,6 +649,14 @@ namespace Ogre
         return mDefaultDisplaySrv;
     }
     //-----------------------------------------------------------------------------------
+    void VulkanTextureGpu::createShaderAccessPoint( uint bindPoint, TextureAccess access,
+                                                    int mipmapLevel, int textureArrayIndex,
+                                                    PixelFormat format )
+    {
+        auto *rs = static_cast<VulkanRenderSystem *>( Root::getSingleton().getRenderSystem() );
+        rs->setStorageTexture( bindPoint, this, mipmapLevel );
+    }
+    //-----------------------------------------------------------------------------------
     VkImageMemoryBarrier VulkanTextureGpu::getImageMemoryBarrier( void ) const
     {
         VkImageMemoryBarrier imageMemBarrier = {VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
@@ -708,6 +723,45 @@ namespace Ogre
 
         VulkanDevice *device = static_cast<VulkanTextureGpuManager*>(mCreator)->getDevice();
         vmaDestroyImage(device->getAllocator(), mMsaaTextureName, mMsaaAllocation);
+    }
+
+    VkImageView VulkanTextureGpu::getStorageImageView( int mipmapLevel )
+    {
+        // If the view already exists and is for the correct mip level, return it
+        if( mStorageImageView != VK_NULL_HANDLE && mStorageViewMipLevel == mipmapLevel )
+            return mStorageImageView;
+
+        auto textureManager = static_cast<VulkanTextureGpuManager*>(mCreator);
+        VulkanDevice *device = textureManager->getDevice();
+
+        // If a previous view exists for a different mip level, destroy it
+        if( mStorageImageView != VK_NULL_HANDLE )
+        {
+            vkDestroyImageView( device->mDevice, mStorageImageView, nullptr );
+            mStorageImageView = VK_NULL_HANDLE;
+        }
+
+        const int maxMipLevel = static_cast<int>( getNumMipmaps() );
+        const int clampedMip = std::max( 0, std::min( mipmapLevel, maxMipLevel ) );
+
+        VkImageViewUsageCreateInfo viewUsageCi = {VK_STRUCTURE_TYPE_IMAGE_VIEW_USAGE_CREATE_INFO};
+        viewUsageCi.usage = VK_IMAGE_USAGE_STORAGE_BIT;
+
+        VkImageViewCreateInfo viewCi = {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
+        viewCi.pNext = &viewUsageCi;
+        viewCi.image = getFinalTextureName();
+        viewCi.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        viewCi.format = VulkanMappings::get( getFormat() );
+        viewCi.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        viewCi.subresourceRange.baseMipLevel = static_cast<uint32>( clampedMip );
+        viewCi.subresourceRange.levelCount = 1;
+        viewCi.subresourceRange.baseArrayLayer = 0;
+        viewCi.subresourceRange.layerCount = 1;
+
+        OGRE_VK_CHECK( vkCreateImageView( device->mDevice, &viewCi, nullptr, &mStorageImageView ) );
+
+        mStorageViewMipLevel = mipmapLevel;
+        return mStorageImageView;
     }
 
     VulkanRenderTexture::VulkanRenderTexture(const String& name, HardwarePixelBuffer* buffer, uint32 slice,
