@@ -250,6 +250,10 @@ namespace Ogre {
         flags = header.flags;
         flipEndian(&flags, sizeof(uint32));
 
+        // Image has no array dimension, so the surface count below must not scale the data
+        if (header.numSurfaces != 1)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Texture arrays are not supported", "PVRTCCodec::decodeV3");
+
         // Calculate total size from number of mipmaps, faces and size
         image->create(format, header.width, header.height, header.depth, header.numFaces, header.mipMapCount);
 
