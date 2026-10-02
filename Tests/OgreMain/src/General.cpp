@@ -470,6 +470,20 @@ TEST(Image, Compressed)
 #endif
 }
 
+#if OGRE_NO_PVRTC_CODEC == 0
+TEST(Image, PVRTextureArray)
+{
+    Root root;
+
+    // PVR3 header for a single 8x8 PVRTC 4bpp surface, but claiming two array members.
+    // The zeroed tail is 32 bytes of pixel data for each of them.
+    uint32 pvr[13 + 2 * 8] = {0x03525650, 0, 2, 0, 0, 0, 8, 8, 1, 2, 1, 0, 0};
+
+    Image img;
+    EXPECT_THROW(img.load(DataStreamPtr(new MemoryDataStream(pvr, sizeof(pvr))), "pvr"), InvalidParametersException);
+}
+#endif
+
 struct UsePreviousResourceLoadingListener : public ResourceLoadingListener
 {
     bool resourceCollision(Resource *resource, ResourceManager *resourceManager) override { return false; }
