@@ -69,14 +69,14 @@ namespace Ogre {
         ushort newLodIndex;
     };
 
-    /// Struct containing information about a material LOD change event for entities.
-    struct EntityMaterialLodChangedEvent
+    /// Struct containing information about a material LOD change event for renderables.
+    struct MaterialLodChangedEvent
     {
-        /// The sub-entity whose material's level of detail has changed.
-        SubEntity *subEntity;
+        /// The renderable whose material's level of detail has changed.
+        Renderable *renderable;
 
         /// The camera with respect to which the level of detail has changed.
-        Camera *camera;
+        const Camera *camera;
 
         /// LOD value as determined by LOD strategy.
         Real lodValue;
@@ -87,6 +87,8 @@ namespace Ogre {
         /// New level of detail index.
         ushort newLodIndex;
     };
+
+    typedef MaterialLodChangedEvent EntityMaterialLodChangedEvent;
 
 
     /** A interface class defining a listener which can be used to receive
@@ -172,7 +174,7 @@ namespace Ogre {
         { (void)evt; }
 
         /**
-        Called before an entity's material LOD has changed.
+        Called before an material LOD has changed.
 
         Do not change the Ogre state from this method,
         instead return true and perform changes in
@@ -187,16 +189,16 @@ namespace Ogre {
             postqueueMaterialLodChanged called after
             rendering is complete.
         */
-        virtual bool prequeueEntityMaterialLodChanged(EntityMaterialLodChangedEvent& evt)
+        virtual bool prequeueEntityMaterialLodChanged(MaterialLodChangedEvent& evt)
         { (void)evt; return false; }
 
         /**
-        Called after an entity's material LOD has changed.
+        Called after an material LOD has changed.
 
         May be called even if not requested from prequeueEntityMaterialLodChanged
         as only one event queue is maintained per SceneManger instance.
         */
-        virtual void postqueueEntityMaterialLodChanged(const EntityMaterialLodChangedEvent& evt)
+        virtual void postqueueEntityMaterialLodChanged(const MaterialLodChangedEvent& evt)
         { (void)evt; }
 
     };
