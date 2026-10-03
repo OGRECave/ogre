@@ -934,6 +934,7 @@ namespace OgreBites
 #ifndef OGRE_STATIC_LIB
             for (unsigned int i = 0; i < mLoadedSamplePlugins.size(); i++)
             {
+                if(!mRoot) break;
                 mRoot->unloadPlugin(mLoadedSamplePlugins[i]);
             }
 #endif
