@@ -9,10 +9,10 @@
 #include "OgreBulletExports.h"
 
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 #include "Ogre.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
-#include "BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 
 namespace Ogre
 {
@@ -22,8 +22,8 @@ namespace Bullet
 {
 
 /** \addtogroup Optional
-*  @{
-*/
+ *  @{
+ */
 /** \defgroup Bullet Bullet
  * [Bullet-Physics](https://pybullet.org) to %Ogre connection
  * @{
@@ -71,13 +71,14 @@ public:
 };
 
 /// height field data
-struct _OgreBulletExport HeightFieldData {
+struct _OgreBulletExport HeightFieldData
+{
     /** the position for a center of the shape, i.e. where to place btRigidBody
      *  or a child of btCompoundShape */
     Vector3 bodyPosition;
     /** a heightfield pointer to be freed when
      * btHeightfieldTerrainShape is freed */
-    float *terrainHeights;
+    float* terrainHeights;
 };
 
 /// create sphere collider using ogre provided data
@@ -95,15 +96,16 @@ _OgreBulletExport btConvexHullShape* createConvexHullCollider(const Entity* ent)
 /// create compound shape
 _OgreBulletExport btCompoundShape* createCompoundShape();
 /// create height field collider
-_OgreBulletExport btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain, struct HeightFieldData *data);
+_OgreBulletExport btHeightfieldTerrainShape* createHeightfieldTerrainShape(const Terrain* terrain,
+                                                                           struct HeightFieldData* data);
 
 struct _OgreBulletExport CollisionListener
 {
     virtual ~CollisionListener() {}
     /** Called when two objects collide
-    * @param other the other object
-    * @param manifoldPoint the collision point
-    */
+     * @param other the other object
+     * @param manifoldPoint the collision point
+     */
     virtual void contact(const MovableObject* other, const btManifoldPoint& manifoldPoint) = 0;
 };
 
@@ -111,9 +113,9 @@ struct _OgreBulletExport RayResultCallback
 {
     virtual ~RayResultCallback() {}
     /** Called for each object hit by the ray
-    * @param other the other object
-    * @param distance the distance from ray origin to hit point
-    */
+     * @param other the other object
+     * @param distance the distance from ray origin to hit point
+     */
     virtual void addSingleResult(const MovableObject* other, float distance) = 0;
 };
 
@@ -135,7 +137,7 @@ public:
     btCollisionObject* addCollisionObject(Entity* ent, ColliderType ct, int group = 1, int mask = -1);
 
     void rayTest(const Ray& ray, RayResultCallback* callback, float maxDist = 1000);
-    void attachCollisionObject(btCollisionObject *collisionObject, Entity *ent, int group = 1, int mask = -1);
+    void attachCollisionObject(btCollisionObject* collisionObject, Entity* ent, int group = 1, int mask = -1);
 };
 
 /// helper class for kinematic body motion
@@ -145,6 +147,7 @@ class _OgreBulletExport KinematicMotionSimple : public btActionInterface
     std::vector<btTransform> mCollisionTransforms;
     btPairCachingGhostObject* mGhostObject;
     btVector3 mCurrentPosition;
+    btVector3 mPreviousPosition;
     btQuaternion mCurrentOrientation;
     btManifoldArray mManifoldArray;
     btScalar mMaxPenetrationDepth;
@@ -153,10 +156,25 @@ class _OgreBulletExport KinematicMotionSimple : public btActionInterface
     bool mIsPenetrating;
     int mManifolds;
     bool mAllowManualNarrowPhase;
+    bool mVelocityMotion;
+    float mStepHeight;
+    float mCurrentStepOffset;
+    float mVerticalOffset;
+    btVector3 mUp;
     virtual bool needsCollision(const btCollisionObject* body0, const btCollisionObject* body1);
     void preStep(btCollisionWorld* collisionWorld);
     void playerStep(btCollisionWorld* collisionWorld, btScalar dt);
     void setupCollisionShapes(btCollisionObject* body);
+    btVector3 computeReflectionDirection(const btVector3& direction, const btVector3& normal);
+    btVector3 parallelComponent(const btVector3& direction, const btVector3& normal);
+    btVector3 perpindicularComponent(const btVector3& direction, const btVector3& normal);
+    void sweepTest(btCollisionWorld* world, const btTransform& start, const btTransform& end,
+                   btCollisionWorld::ClosestConvexResultCallback& callback, float margin = 0.0f);
+    void updateTargetPositionBasedOnCollision(bool current, btVector3& targetPosition, const btVector3& hitNormal,
+                                              btScalar tangentMag = 1.0f, btScalar normalMag = 1.0f);
+    void stepUp(btCollisionWorld* world, btScalar& verticalVelocity, bool interpolateUp);
+    void stepForwardAndStrafe(bool current, btCollisionWorld* world, const btVector3& motion, float margin = 0.0f,
+                              int iterations = 10);
 
 public:
     KinematicMotionSimple(btPairCachingGhostObject* ghostObject, Node* node);
@@ -169,11 +187,9 @@ public:
     int getManifolds() const { return mManifolds; }
     /** Enable manual narrow phase
      * @param enable if enabled
-    */
-    void enableManualNarrowPhase(bool enable)
-    {
-        mAllowManualNarrowPhase = enable;
-    }
+     */
+    void enableManualNarrowPhase(bool enable) { mAllowManualNarrowPhase = enable; }
+
     /** Report manual narrow phase enabled status */
     bool isManualNarrowPhaseEnabled() const { return mAllowManualNarrowPhase; }
 };
@@ -187,13 +203,13 @@ public:
     DynamicsWorld(btDynamicsWorld* btWorld) : CollisionWorld(btWorld) {}
 
     /** Add an Entity as a rigid body to the DynamicsWorld
-    * @param mass the mass of the object
-    * @param ent the entity to control
-    * @param ct the collider type
-    * @param listener a listener to call on collision with other objects
-    * @param group the collision group
-    * @param mask the collision mask
-    */
+     * @param mass the mass of the object
+     * @param ent the entity to control
+     * @param ct the collider type
+     * @param listener a listener to call on collision with other objects
+     * @param group the collision group
+     * @param mask the collision mask
+     */
     btRigidBody* addRigidBody(float mass, Entity* ent, ColliderType ct, CollisionListener* listener = nullptr,
                               int group = 1, int mask = -1);
     btRigidBody* addKinematicRigidBody(Entity* ent, ColliderType ct, int group = 1, int mask = -1);
@@ -206,7 +222,8 @@ public:
      * @param mask the collision mask
      * @param debugDraw allow debug drawing
      */
-    btRigidBody* addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group = 1, int mask = -1, bool debugDraw = false);
+    btRigidBody* addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group = 1, int mask = -1,
+                                     bool debugDraw = false);
     /** Add static body for Ogre terrain
      * @param terrain the terrain
      * @param group the collision group
@@ -215,8 +232,8 @@ public:
      */
     btRigidBody* addTerrainRigidBody(Terrain* terrain, int group = 1, int mask = -1, bool debugDraw = false);
 
-    void attachRigidBody(btRigidBody *rigidBody, Entity *ent, CollisionListener* listener = nullptr,
-                              int group = 1, int mask = -1);
+    void attachRigidBody(btRigidBody* rigidBody, Entity* ent, CollisionListener* listener = nullptr, int group = 1,
+                         int mask = -1);
     btDynamicsWorld* getBtWorld() const { return static_cast<btDynamicsWorld*>(mBtWorld); }
 };
 
@@ -252,7 +269,10 @@ public:
         drawLine(PointOnB, PointOnB + normalOnB * distance * 20, color);
     }
 
-    void reportErrorWarning(const char* warningString) override { LogManager::getSingleton().logWarning(warningString); }
+    void reportErrorWarning(const char* warningString) override
+    {
+        LogManager::getSingleton().logWarning(warningString);
+    }
 
     void draw3dText(const btVector3& location, const char* textString) override {}
 
