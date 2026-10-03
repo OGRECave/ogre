@@ -11,6 +11,8 @@
 #include "OgreWaylandEGLSupport.h"
 #include "OgreWaylandEGLWindow.h"
 
+#include <EGL/eglext.h>
+
 #include <chrono>
 #include <thread>
 
@@ -190,6 +192,11 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
             mHwGamma = StringConverter::parseBool(opt->second);
         }
 
+        if ((opt = miscParams->find("hdrDisplay")) != end)
+        {
+            mHdrDisplay = StringConverter::parseBool(opt->second);
+        }
+
         if ((opt = miscParams->find("externalGLControl")) != end)
         {
             mIsExternalGLControl = StringConverter::parseBool(opt->second);
@@ -200,6 +207,29 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
     }
 
     initNativeCreatedWindow(miscParams);
+
+    if (mHdrDisplay && mGLSupport->checkExtension("EGL_EXT_pixel_format_float"))
+    {
+        // HDR requires a FP16 surface, which in turn does not support multisampling
+        int hdrMinAttribs[] = {
+            EGL_COLOR_COMPONENT_TYPE_EXT, EGL_COLOR_COMPONENT_TYPE_FLOAT_EXT,
+            EGL_RED_SIZE, 16,
+            EGL_GREEN_SIZE, 16,
+            EGL_BLUE_SIZE, 16,
+            EGL_ALPHA_SIZE, 16,
+            EGL_DEPTH_SIZE, 16,
+            EGL_SAMPLE_BUFFERS, 0,
+            EGL_SAMPLES, 0,
+            EGL_NONE
+        };
+        int hdrMaxAttribs[] = {
+            EGL_DEPTH_SIZE, maxDepthSize,
+            EGL_STENCIL_SIZE, maxStencilSize,
+            EGL_NONE
+        };
+
+        mEglConfig = mGLSupport->selectGLConfig(hdrMinAttribs, hdrMaxAttribs);
+    }
 
     if (!mEglConfig)
     {
