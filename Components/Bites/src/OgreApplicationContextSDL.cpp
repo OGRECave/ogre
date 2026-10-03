@@ -135,6 +135,15 @@ void ApplicationContextSDL::shutdown()
 {
     ApplicationContextBase::shutdown();
 
+    // the render system may still use the native display (e.g. EGL on Wayland),
+    // so it has to be shut down before SDL closes the video subsystem
+    if(mRoot)
+    {
+        mRoot->saveConfig();
+        OGRE_DELETE mRoot;
+        mRoot = NULL;
+    }
+
     if(SDL_WasInit(SDL_INIT_VIDEO)) {
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
     }
