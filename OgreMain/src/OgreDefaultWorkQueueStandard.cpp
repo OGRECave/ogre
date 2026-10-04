@@ -27,8 +27,39 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 
+#if defined(_WIN32)
+  #include <windows.h>
+  #include <processthreadsapi.h>
+#endif
+
 namespace Ogre
 {
+// Names the *calling* thread. Truncate to 15 chars for Linux compatibility.
+static void set_current_thread_name(std::string name)
+{
+    name = name.substr(0, 15); // truncate to 15 chars for Linux compatibility
+#if defined(_WIN32)
+    // Windows 10 1607+ / Server 2016+; visible in debuggers and ETW traces.
+    std::wstring w(name.begin(), name.end()); // ASCII names only
+    ::SetThreadDescription(::GetCurrentThread(), w.c_str());
+
+#elif defined(__APPLE__)
+    pthread_setname_np(name.c_str()); // current thread only
+
+#elif defined(__linux__)
+    pthread_setname_np(pthread_self(), name.c_str());
+
+#elif defined(__FreeBSD__)
+    pthread_set_name_np(pthread_self(), name.c_str());
+
+#elif defined(__NetBSD__)
+    pthread_setname_np(pthread_self(), "%s", (void*)name.c_str());
+
+#else
+    (void)name; // unsupported platform
+#endif
+}
+
     //---------------------------------------------------------------------
     DefaultWorkQueue::DefaultWorkQueue(const String& name)
     : DefaultWorkQueueBase(name), mNumThreadsRegisteredWithRS(0)
@@ -154,6 +185,8 @@ namespace Ogre
         LogManager::getSingleton().stream() << 
             "DefaultWorkQueue('" << getName() << "')::WorkerFunc - thread " 
             << OGRE_THREAD_CURRENT_ID << " starting.";
+
+        set_current_thread_name("[Ogre] Worker");
 
         // Initialise the thread for RS if necessary
         if (mWorkerRenderSystemAccess)
