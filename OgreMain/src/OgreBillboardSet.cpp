@@ -1043,7 +1043,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& BillboardSet::getMovableType(void) const
     {
-        return MOT_BILLBOARD_SET;
+        static const String name = MOT_BILLBOARD_SET;
+        return name;
     }
     //-----------------------------------------------------------------------
     Real BillboardSet::getSquaredViewDepth(const Camera* const cam) const
@@ -1131,13 +1132,10 @@ namespace Ogre {
         }
     }
 
-    //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    const String MOT_BILLBOARD_SET = "BillboardSet";
-    //-----------------------------------------------------------------------
     const String& BillboardSetFactory::getType(void) const
     {
-        return MOT_BILLBOARD_SET;
+        static const String name = MOT_BILLBOARD_SET;
+        return name;
     }
     //-----------------------------------------------------------------------
     MovableObject* BillboardSetFactory::createInstanceImpl( const String& name,

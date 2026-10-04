@@ -374,7 +374,7 @@ namespace Ogre {
 
 
     /// Constant blank string, useful for returning by ref where local does not exist
-    const String BLANKSTRING;
+    constexpr const char* BLANKSTRING = "";
 
     typedef std::map<String, bool> UnaryOptionList;
     typedef std::map<String, String> BinaryOptionList;

@@ -925,7 +925,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& ParticleSystem::getMovableType(void) const
     {
-        return MOT_PARTICLE_SYSTEM;
+        static const String name = MOT_PARTICLE_SYSTEM;
+        return name;
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultDimensions( Real width, Real height )

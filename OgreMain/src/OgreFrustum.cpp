@@ -30,9 +30,6 @@ THE SOFTWARE.
 #include "OgreMovablePlane.h"
 
 namespace Ogre {
-
-    const String MOT_FRUSTUM = "Frustum";
-    const String MOT_FRUSTRUM = MOT_FRUSTUM;
     const Real Frustum::INFINITE_FAR_PLANE_ADJUST = 0.00001;
     //-----------------------------------------------------------------------
     Frustum::Frustum(const String& name) : 
@@ -733,7 +730,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& Frustum::getMovableType(void) const
     {
-        return MOT_FRUSTUM;
+        static const String name = MOT_FRUSTUM;
+        return name;
     }
     //-----------------------------------------------------------------------
     Real Frustum::getBoundingRadius(void) const
