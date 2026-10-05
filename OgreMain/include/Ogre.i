@@ -656,6 +656,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::GpuProgramParameters::setConstantFromTime;
 %ignore Ogre::GpuProgramParameters::getConstantDefinitionIterator;
 %ignore Ogre::GpuSharedParameters::getConstantDefinitionIterator;
+%template(GpuConstantDefinitionMap) std::map<std::string, Ogre::GpuConstantDefinition>;
 SHARED_PTR(GpuProgramParameters);
 %include "OgreGpuProgramParams.h"
 %ignore Ogre::Image::getFileExtFromMagic;
