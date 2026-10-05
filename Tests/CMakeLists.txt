@@ -182,10 +182,6 @@ if(OGRE_BUILD_FUZZERS)
   target_link_libraries(dds_fuzz OgreMain ${LIB_FUZZING_ENGINE})
   target_compile_features(dds_fuzz PRIVATE cxx_std_17)
 
-  add_executable(texture_codec_fuzz fuzz/texture_codec_fuzz.cpp)
-  target_link_libraries(texture_codec_fuzz OgreMain ${LIB_FUZZING_ENGINE})
-  target_compile_features(texture_codec_fuzz PRIVATE cxx_std_17)
-
   add_executable(ogre_deep_fuzz fuzz/ogre_deep_fuzz.cpp)
   target_link_libraries(ogre_deep_fuzz OgreMain ${LIB_FUZZING_ENGINE})
   target_compile_features(ogre_deep_fuzz PRIVATE cxx_std_17)
