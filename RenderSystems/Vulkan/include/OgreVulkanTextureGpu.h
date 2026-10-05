@@ -112,6 +112,9 @@ namespace Ogre
         /// Only used when hasMsaaExplicitResolves() == false
         VkImage mMsaaTextureName;
         VmaAllocation mMsaaAllocation;
+
+        VkImageView mStorageImageView = VK_NULL_HANDLE;
+        int mStorageViewMipLevel = -1;
     public:
         /// The current layout we're in. Including any internal stuff.
         VkImageLayout mCurrLayout;
@@ -134,7 +137,7 @@ namespace Ogre
         virtual void destroyMsaaSurface( void );
     public:
         bool hasMsaaExplicitResolves() const { return false; }
-        bool isUav() const { return false; }
+        bool isUav() const { return (getUsage() & TU_UNORDERED_ACCESS) != 0; }
         bool isMultisample() const { return mFSAA > 1; }
         virtual bool isRenderWindowSpecific() const { return false; }
 
@@ -160,6 +163,9 @@ namespace Ogre
 
         VkImageView createView( void ) const;
         VkImageView getDefaultDisplaySrv( void ) const { return mDefaultDisplaySrv; }
+        void createShaderAccessPoint( uint bindPoint, TextureAccess access = TA_READ_WRITE,
+                                      int mipmapLevel = 0, int textureArrayIndex = 0,
+                                      PixelFormat format = PF_UNKNOWN ) override;
 
         void destroyView( VkImageView imageView );
 
@@ -170,6 +176,8 @@ namespace Ogre
         VkImage getDisplayTextureName( void ) const { return mDisplayTextureName; }
         VkImage getFinalTextureName( void ) const { return mFinalTextureName; }
         VkImage getMsaaTextureName( void ) const { return mMsaaTextureName; }
+
+        VkImageView getStorageImageView( int mipmapLevel );
     };
 
     class VulkanRenderTexture : public RenderTexture

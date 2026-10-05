@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreVulkanPrerequisites.h"
 
 #include "OgreRenderSystem.h"
-#include "OgreVulkanProgram.h"
 
 #include "OgreVulkanRenderPassDescriptor.h"
 
@@ -53,6 +52,26 @@ namespace Ogre
     class _OgreVulkanExport VulkanRenderSystem : public RenderSystem
     {
         friend class VulkanSampler;
+        friend class VulkanTextureGpu;
+    public:
+        enum DescriptorSetProfileId {
+            Graphics,
+            Compute,
+            NUM_DESCRIPTOR_SET_PROFILES
+        };
+
+        struct DescriptorSetProfile {
+            VkDescriptorSetLayout layout;
+            VkPipelineLayout pipelineLayout;
+            std::shared_ptr<VulkanDescriptorPool> pool;
+            std::vector<VkDescriptorSetLayoutBinding> bindings;
+            std::vector<VkDescriptorPoolSize> poolSizes;
+            std::vector<VkWriteDescriptorSet> writes;
+            std::unordered_map<uint32, VkDescriptorSet> cache;
+            uint32 numTextureUnits = 0u;
+        };
+
+    private:
         bool mInitialized;
         VulkanHardwareBufferManager *mHardwareBufferManager;
 
@@ -70,6 +89,9 @@ namespace Ogre
         std::vector<uint32> mAutoParamsBufferUsage;
 
         void resizeAutoParamsBuffer(size_t size);
+
+        void initGraphicsDescriptorSetProfile( void );
+        void initComputeDescriptorSetProfile( void );
 
         VulkanDevice *mActiveDevice;
 
@@ -90,8 +112,6 @@ namespace Ogre
 
         void addInstanceDebugCallback( void );
 
-        void flushRootLayout( void );
-
         // Pipeline State Infos
         VkGraphicsPipelineCreateInfo pipelineCi;
         VkPipelineLayoutCreateInfo pipelineLayoutCi;
@@ -101,18 +121,20 @@ namespace Ogre
         VkPipelineRasterizationStateCreateInfo rasterState;
         VkPipelineColorBlendStateCreateInfo blendStateCi;
         std::array<VkPipelineShaderStageCreateInfo, GPT_COUNT> shaderStages;
+        VkPipelineShaderStageCreateInfo mComputeShaderStage;
         std::array<uint32, GPT_COUNT> mBoundGpuPrograms;
 
-        // descriptor set layout
-        std::vector<VkDescriptorSetLayoutBinding> mDescriptorSetBindings;
-        std::vector<VkDescriptorPoolSize> mDescriptorPoolSizes;
-        std::vector<VkWriteDescriptorSet> mDescriptorWrites;
+        std::array<DescriptorSetProfile, NUM_DESCRIPTOR_SET_PROFILES> mProfiles;
+
         std::array<VkDescriptorBufferInfo, 2> mUBOInfo;
         std::array<uint32, 2> mUBODynOffsets;
         std::array<VkDescriptorImageInfo, OGRE_MAX_TEXTURE_LAYERS> mImageInfos;
-        VkDescriptorSetLayout mDescriptorSetLayout;
-
-        VkPipelineLayout mLayout;
+        VkDescriptorImageInfo mComputeImageInfo;
+        std::array<VkDescriptorImageInfo, OGRE_MAX_TEXTURE_LAYERS> mStorageImageInfos;
+        std::array<VulkanTextureGpu *, OGRE_MAX_TEXTURE_LAYERS> mStorageTextures;
+        std::array<VkImageView, OGRE_MAX_TEXTURE_LAYERS> mStorageImageViews;
+        DescriptorSetProfileId mBoundComputeProfile;
+        DescriptorSetProfileId mBoundGraphicsProfile;
 
         std::array<VkPipelineColorBlendAttachmentState, OGRE_MAX_MULTIPLE_RENDER_TARGETS> blendStates;
 
@@ -121,11 +143,9 @@ namespace Ogre
         VkRect2D   mScissorRect;
         VkPipelineViewportStateCreateInfo viewportStateCi;
 
-        std::unordered_map<uint32, VkDescriptorSet> mDescriptorSetCache;
         std::unordered_map<uint32, VkRenderPass> mRenderPassCache;
         std::unordered_map<uint32, VkPipeline> mPipelineCache;
-
-        std::shared_ptr<VulkanDescriptorPool> mDescriptorPool;
+        std::unordered_map<uint32, VkPipeline> mComputePipelineCache;
 
         // clears the pipeline cache
         void clearPipelineCache();
@@ -133,9 +153,11 @@ namespace Ogre
         void initializeVkInstance( void );
         void enumerateDevices();
         uint32 getSelectedDeviceIdx() const;
+        void setStorageTexture( size_t texUnit, VulkanTextureGpu *texture, int mipmapLevel );
+        void clearStorageTextureBindings();
 
-        VkDescriptorSet getDescriptorSet();
-        VkPipeline getPipeline();
+        VkDescriptorSet getDescriptorSet( DescriptorSetProfileId profile );
+        VkPipeline getPipeline( DescriptorSetProfileId profile );
     public:
         VulkanRenderSystem();
         ~VulkanRenderSystem();
@@ -168,6 +190,7 @@ namespace Ogre
         void _endFrame( void ) override;
 
         void _render( const RenderOperation &op ) override;
+        void _dispatchCompute( const Vector3i &workgroupDim ) override;
 
         void bindGpuProgram(GpuProgram* prg) override;
         void bindGpuProgramParameters( GpuProgramType gptype,
