@@ -51,9 +51,13 @@ namespace Ogre
 
     HardwareIndexBufferPtr LodOutputProviderMesh::createIndexBufferImpl(size_t indexCount)
     {
-        auto indexType = indexCount - 1 <= std::numeric_limits<uint16>::max() ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT;
-
-        return mMesh->getHardwareBufferManager()->createIndexBuffer(indexType, indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
+        // A 16-bit index buffer can only address up to 65535 vertices, but the LOD output
+        // references the vertices of the source mesh, whose count is unrelated to the number
+        // of indices. The index count is not a valid criterion for the index type. Always
+        // allocate 32-bit indices so that the element size used for the allocation matches the
+        // element size used by the write path (writeTriangle/writeLine) and no out-of-bounds
+        // write can occur.
+        return mMesh->getHardwareBufferManager()->createIndexBuffer(HardwareIndexBuffer::IT_32BIT, indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
     }
 
     void LodOutputProviderMesh::createSubMeshLodIndexData(size_t subMeshIndex, int lodIndex, const HardwareIndexBufferPtr & indexBuffer, size_t indexStart, size_t indexCount)
