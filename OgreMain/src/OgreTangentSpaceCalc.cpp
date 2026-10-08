@@ -207,6 +207,16 @@ namespace Ogre
             if (v.parity == 0)
                 v.parity = -1;   // never leave it unset (orphan / degenerate-only verts)
 
+            // Vertices only touched by degenerate-UV (e.g. tiny) triangles
+            // can end up with a zero-length tangent/binormal. Exporting that
+            // yields NaN later on (cross/normalize of a zero vector in the
+            // shader), so replace it with an arbitrary vector orthogonal to
+            // the normal before normalising.
+            if (v.tangent.squaredLength() < 1e-12f)
+                v.tangent = v.norm.perpendicular();
+            if (v.binormal.squaredLength() < 1e-12f)
+                v.binormal = v.norm.crossProduct(v.tangent);
+
             v.tangent.normalise();
             v.binormal.normalise();
 
