@@ -336,23 +336,23 @@ namespace Ogre
     template <typename T, size_t Alignment = OGRE_SIMD_ALIGNMENT>
     using aligned_vector = std::vector<T, AlignedAllocator<T, Alignment>>;
 
-    _OgreExport extern const String MOT_ENTITY;
-    _OgreExport extern const String MOT_LIGHT;
-    _OgreExport extern const String MOT_MANUAL_OBJECT;
-    _OgreExport extern const String MOT_PARTICLE_SYSTEM;
-    _OgreExport extern const String MOT_BILLBOARD_SET;
-    _OgreExport extern const String MOT_BILLBOARD_CHAIN;
-    _OgreExport extern const String MOT_RIBBON_TRAIL;
-    _OgreExport extern const String MOT_RECTANGLE2D;
-    _OgreExport extern const String MOT_STATIC_GEOMETRY;
-    _OgreExport extern const String MOT_CAMERA;
+    constexpr const char* MOT_ENTITY = "Entity";
+    constexpr const char* MOT_LIGHT = "Light";
+    constexpr const char* MOT_MANUAL_OBJECT = "ManualObject";
+    constexpr const char* MOT_PARTICLE_SYSTEM = "ParticleSystem";
+    constexpr const char* MOT_BILLBOARD_SET = "BillboardSet";
+    constexpr const char* MOT_BILLBOARD_CHAIN = "BillboardChain";
+    constexpr const char* MOT_RIBBON_TRAIL = "RibbonTrail";
+    constexpr const char* MOT_RECTANGLE2D = "Rectangle2D";
+    constexpr const char* MOT_STATIC_GEOMETRY = "StaticGeometry";
+    constexpr const char* MOT_CAMERA = "Camera";
     /// @deprecated use #MOT_FRUSTUM
-    _OgreExport extern const String MOT_FRUSTRUM;
-    _OgreExport extern const String MOT_FRUSTUM;
-    _OgreExport extern const String MOT_MOVABLE_PLANE;
-    _OgreExport extern const String MOT_INSTANCE_BATCH;
-    _OgreExport extern const String MOT_INSTANCED_ENTITY;
-    _OgreExport extern const String MOT_SIMPLE_RENDERABLE;
+    constexpr const char* MOT_FRUSTRUM = "Frustum";
+    constexpr const char* MOT_FRUSTUM = "Frustum";
+    constexpr const char* MOT_MOVABLE_PLANE = "MovablePlane";
+    constexpr const char* MOT_INSTANCE_BATCH = "InstanceBatch";
+    constexpr const char* MOT_INSTANCED_ENTITY = "InstancedEntity";
+    constexpr const char* MOT_SIMPLE_RENDERABLE = "SimpleRenderable";
 }
 
 #endif // __OgrePrerequisites_H__

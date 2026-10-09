@@ -31,9 +31,22 @@ THE SOFTWARE.
 #include "OgreQuaternion.h"
 #include "OgreMatrix4.h"
 #include "OgreColourValue.h"
+#include "OgreScriptCompiler.h"
 
 
 using namespace Ogre;
+
+TEST_F(StringTests, ScriptNodeStringReferences)
+{
+    AtomAbstractNode atom(nullptr);
+    atom.value = "value";
+    EXPECT_EQ(&atom.value, &atom.getString());
+
+    ObjectAbstractNode object(nullptr);
+    const String* empty = &object.getString();
+    EXPECT_TRUE(empty->empty());
+    EXPECT_EQ(empty, &object.getString());
+}
 
 // Register the test suite
 
