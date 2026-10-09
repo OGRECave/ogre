@@ -373,7 +373,7 @@ namespace Ogre {
     typedef std::vector<Light*> LightList;
 
 
-    /// Constant blank string, useful for returning by ref where local does not exist
+    /// Constant blank string.
     constexpr const char* BLANKSTRING = "";
 
     typedef std::map<String, bool> UnaryOptionList;

@@ -674,6 +674,7 @@ void ShaderGenerator::setShaderProfiles(GpuProgramType type, const String& shade
 
 const String& ShaderGenerator::getShaderProfiles(GpuProgramType type) const
 {
+    static const String blank;
     switch(type)
     {
     case GPT_VERTEX_PROGRAM:
@@ -681,7 +682,7 @@ const String& ShaderGenerator::getShaderProfiles(GpuProgramType type) const
     case GPT_FRAGMENT_PROGRAM:
         return mFragmentShaderProfiles;
     default:
-        return BLANKSTRING;
+        return blank;
     }
 }
 //-----------------------------------------------------------------------------
@@ -1230,6 +1231,7 @@ size_t ShaderGenerator::getRTShaderSchemeCount() const
 //-----------------------------------------------------------------------------
 const String& ShaderGenerator::getRTShaderScheme(size_t index) const
 {
+    static const String blank;
     OGRE_LOCK_AUTO_MUTEX;
 
     SGSchemeMap::const_iterator it = mSchemeEntriesMap.begin();
@@ -1242,7 +1244,7 @@ const String& ShaderGenerator::getRTShaderScheme(size_t index) const
     assert((it != mSchemeEntriesMap.end()) && "Index out of bounds");
     if (it != mSchemeEntriesMap.end())
         return it->first;
-    else return BLANKSTRING;
+    else return blank;
 }
 
 void ShaderGenerator::_markNonFFP(const TextureUnitState* tu)

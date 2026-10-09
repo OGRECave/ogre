@@ -1122,13 +1122,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& ParticleSystem::getRendererName(void) const
     {
+        static const String blank;
         if (mRenderer)
         {
             return mRenderer->getType();
         }
         else
         {
-            return BLANKSTRING;
+            return blank;
         }
     }
     //-----------------------------------------------------------------------

@@ -573,9 +573,17 @@ namespace Ogre
             /// Retrieve render operation for manipulation
             RenderOperation* getRenderOperation(void);
             /// Retrieve the material name in use
-            const String& getMaterialName(void) const { return mMaterial ? mMaterial->getName() : BLANKSTRING; }
+            const String& getMaterialName(void) const
+            {
+                static const String blank;
+                return mMaterial ? mMaterial->getName() : blank;
+            }
             /// Retrieve the material group in use
-            const String& getMaterialGroup(void) const { return mMaterial ? mMaterial->getGroup() : BLANKSTRING; }
+            const String& getMaterialGroup(void) const
+            {
+                static const String blank;
+                return mMaterial ? mMaterial->getGroup() : blank;
+            }
             /// update the material name in use
             void setMaterialName(const String& name,
                 const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
