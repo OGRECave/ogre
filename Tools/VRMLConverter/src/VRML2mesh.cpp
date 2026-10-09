@@ -143,9 +143,8 @@ try
         log.logMessage("Exporting Mesh");
         meshSer.exportMesh(mesh.get(), outname);
 
-        ResourceManager::ResourceMapIterator it = materialMgr.getResourceIterator();
-        while(it.hasMoreElements()) {
-            matSer.queueForExport(static_pointer_cast<Ogre::Material>(it.getNext()));
+        for(auto r : materialMgr.getResources()) {
+            matSer.queueForExport(static_pointer_cast<Ogre::Material>(r));
         }
 
         matSer.exportQueued(path + gBaseName + ".material");
