@@ -150,14 +150,9 @@ void Sample_Compositor::registerCompositors(void)
 {
     Ogre::Viewport *vp = mViewport;
 
-    //iterate through Compositor Managers resources and add name keys to menu
-    Ogre::CompositorManager::ResourceMapIterator resourceIterator =
-        Ogre::CompositorManager::getSingleton().getResourceIterator();
-
     // add all compositor resources to the view container
-    while (resourceIterator.hasMoreElements())
+    for (const auto& resource : Ogre::CompositorManager::getSingleton().getResources())
     {
-        Ogre::ResourcePtr resource = resourceIterator.getNext();
         const Ogre::String& compositorName = resource->getName();
 
         // Don't add blacklisted compositor to view
