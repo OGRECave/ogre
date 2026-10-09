@@ -288,10 +288,12 @@ find_package(OpenEXR)
 macro_log_feature(OPENEXR_FOUND "OpenEXR" "Load High dynamic range images" "http://www.openexr.com/")
 
 # Python
-set(Python_ADDITIONAL_VERSIONS 3.4) # allows using python3 on Ubuntu 14.04
-find_package(PythonInterp)
-find_package(PythonLibs)
-macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from Python" "http://www.python.org/")
+if(SKBUILD)
+  # scikit-build-core passes Python_* hints, make sure we pick exactly that interpreter
+  set(Python3_FIND_STRATEGY LOCATION)
+endif()
+find_package(Python3 COMPONENTS Interpreter Development.Module)
+macro_log_feature(Python3_FOUND "Python" "Language bindings to use OGRE from Python" "http://www.python.org/")
 
 # SWIG
 find_package(SWIG 3.0.8 QUIET)

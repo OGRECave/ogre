@@ -14,7 +14,7 @@
 # and provide build configuration options.
 ######################################################################
 
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.18.0)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -41,6 +41,9 @@ if(POLICY CMP0078)
 endif()
 if(POLICY CMP0086)
   cmake_policy(SET CMP0086 NEW)
+endif()
+if(POLICY CMP0148)
+  cmake_policy(SET CMP0148 NEW)
 endif()
 
 if (APPLE AND NOT ANDROID AND NOT EMSCRIPTEN AND NOT ANDROID_PLATFORM)
