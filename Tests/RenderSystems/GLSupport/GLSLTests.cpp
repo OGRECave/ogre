@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "GLSL/OgreGLSLPreprocessor.h"
 #include "OgreString.h"
 
+#include <algorithm>
 #include <gtest/gtest.h>
 
 using namespace Ogre;
@@ -187,4 +188,131 @@ TEST(CPreprocessorTests, MacroConcat)
     StringUtil::trim(str);
     EXPECT_EQ(str, "HelloWorld");
     free(out);
+}
+
+static void checkMacroArgumentCondition(const String& condition, const String& defines,
+                                        bool enabled, bool commonFirst, bool forward = false)
+{
+    SCOPED_TRACE(condition + defines);
+    SCOPED_TRACE(commonFirst);
+    SCOPED_TRACE(forward);
+    CPreprocessor prep;
+    String common = "uniform TYPE common;\n";
+    String src = "#define TYPE vec4\n"
+                 "#define OGRE_UNIFORMS(params) params\n"
+                 "#define FORWARD(params) OGRE_UNIFORMS(params)\n" + defines +
+                 (forward ? "FORWARD(\n" : "OGRE_UNIFORMS(\n") +
+                 (commonFirst ? common : "") + condition + "\n"
+                 "uniform TYPE enabled;\n"
+                 "#else\n"
+                 "uniform TYPE disabled;\n"
+                 "#endif\n" + (commonFirst ? "" : common) + ")\nfloat after;\n";
+
+    size_t olen = 0;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    ASSERT_NE(out, nullptr);
+    String str(out, olen);
+    free(out);
+
+    String expected = (commonFirst ? "uniform vec4 common; " : "") +
+                      String(enabled ? "uniform vec4 enabled; " : "uniform vec4 disabled; ") +
+                      (commonFirst ? "" : "uniform vec4 common; ") + "float after;";
+    EXPECT_EQ(StringUtil::split(str), StringUtil::split(expected));
+
+    auto after = str.find("float after;");
+    ASSERT_NE(after, String::npos);
+    EXPECT_EQ(std::count(src.begin(), src.begin() + src.find("float after;"), '\n'),
+              std::count(str.begin(), str.begin() + after, '\n'));
+}
+
+TEST(CPreprocessorTests, MacroArgumentIfDef)
+{
+    for (const String& defines : {String(), String("#define FOO\n"), String("#define FOO 0\n"),
+                                 String("#define FOO 1\n"), String("#define FOO BAR\n#define BAR 0\n")})
+        for (bool commonFirst : {false, true})
+            checkMacroArgumentCondition("#ifdef FOO", defines, !defines.empty(), commonFirst);
+}
+
+TEST(CPreprocessorTests, MacroArgumentIfNDef)
+{
+    for (const String& defines : {String(), String("#define FOO\n"), String("#define FOO 0\n"),
+                                 String("#define FOO 1\n"), String("#define FOO BAR\n#define BAR 0\n")})
+        for (bool commonFirst : {false, true})
+            for (bool forward : {false, true})
+                checkMacroArgumentCondition("#ifndef FOO", defines, defines.empty(), commonFirst, forward);
+}
+
+TEST(CPreprocessorTests, MacroArgumentDefinedExpression)
+{
+    for (const String& defines : {String(), String("#define FOO\n"), String("#define FOO 0\n"),
+                                 String("#define FOO 1\n"), String("#define FOO BAR\n#define BAR 0\n")})
+        for (bool commonFirst : {false, true})
+            for (bool forward : {false, true})
+                checkMacroArgumentCondition("#if defined(FOO)", defines, !defines.empty(), commonFirst, forward);
+}
+
+TEST(CPreprocessorTests, MacroArgumentElifDefined)
+{
+    for (const String& defines : {String(), String("#define FOO\n"), String("#define FOO 0\n"),
+                                 String("#define FOO 1\n"), String("#define FOO BAR\n#define BAR 0\n")})
+        for (bool commonFirst : {false, true})
+            for (bool forward : {false, true})
+                checkMacroArgumentCondition("#if 0\nuniform TYPE rejected;\n#elif defined(FOO)",
+                                            defines, !defines.empty(), commonFirst, forward);
+}
+
+TEST(CPreprocessorTests, MacroArgumentForwardedIfDef)
+{
+    for (const String& defines : {String(), String("#define FOO\n"), String("#define FOO 0\n"),
+                                 String("#define FOO 1\n"), String("#define FOO BAR\n#define BAR 0\n")})
+        for (bool commonFirst : {false, true})
+            checkMacroArgumentCondition("#ifdef FOO", defines, !defines.empty(), commonFirst, true);
+}
+
+TEST(CPreprocessorTests, MacroRescanBorrowedTail)
+{
+    CPreprocessor prep;
+    String src = "#define EMIT(hash, body) hash if 1 body hash endif\n"
+                 "EMIT(#,\n"
+                 "#if 1\n"
+                 "float inside;\n"
+                 "#endif\n"
+                 ")\n"
+                 "float after;\n";
+
+    size_t olen = 0;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    ASSERT_NE(out, nullptr);
+    String str(out, olen);
+    free(out);
+    EXPECT_EQ(StringUtil::split(str), StringUtil::split("float inside; float after;"));
+    auto after = str.find("float after;");
+    ASSERT_NE(after, String::npos);
+    EXPECT_EQ(std::count(src.begin(), src.begin() + src.find("float after;"), '\n'),
+              std::count(str.begin(), str.begin() + after, '\n'));
+}
+
+TEST(CPreprocessorTests, MacroArgumentRepeatedMultiline)
+{
+    CPreprocessor prep;
+    String src = "#define DUP(value) ((value)+(value))\n"
+                 "float sum = DUP(1.0\n"
+                 "+2.0);\n"
+                 "float after;\n";
+
+    size_t olen = 0;
+    char* out = prep.Parse(src.c_str(), src.size(), olen);
+    ASSERT_NE(out, nullptr);
+    String str(out, olen);
+    free(out);
+
+    String compact = str;
+    compact.erase(std::remove_if(compact.begin(), compact.end(), [](char c) {
+        return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+    }), compact.end());
+    EXPECT_EQ(compact, "floatsum=((1.0+2.0)+(1.0+2.0));floatafter;");
+    auto after = str.find("float after;");
+    ASSERT_NE(after, String::npos);
+    EXPECT_EQ(std::count(src.begin(), src.begin() + src.find("float after;"), '\n'),
+              std::count(str.begin(), str.begin() + after, '\n'));
 }
