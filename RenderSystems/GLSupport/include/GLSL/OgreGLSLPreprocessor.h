@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <forward_list>
 #include <vector>
+#include <string>
 
 namespace Ogre {
 
@@ -98,6 +99,26 @@ namespace Ogre {
             Kind Type;
             /// True if string was allocated (and must be freed)
             mutable size_t Allocated;
+
+            // Ranges whose identifiers must stay suppressed on later rescans.
+            struct DisabledMacro
+            {
+                size_t Begin;
+                size_t End;
+                std::string Name;
+            };
+            std::vector<DisabledMacro> DisabledMacros;
+
+            bool IsDisabled(const Token& name) const
+            {
+                for (const auto& disabled : DisabledMacros)
+                    if (disabled.Begin == 0 && disabled.End >= Length &&
+                        disabled.Name.size() == name.Length &&
+                        memcmp(disabled.Name.data(), name.String, name.Length) == 0)
+                        return true;
+                return false;
+            }
+
             union
             {
                 /// A pointer somewhere into the input buffer
@@ -120,6 +141,7 @@ namespace Ogre {
 
             Token (const Token &iOther)
             {
+                DisabledMacros = iOther.DisabledMacros;
                 Type = iOther.Type;
                 Allocated = iOther.Allocated;
                 iOther.Allocated = 0; // !!! not quite correct but effective
@@ -134,6 +156,7 @@ namespace Ogre {
             Token &operator = (const Token &iOther)
                 {
                     if (Allocated) free (Buffer);
+                    DisabledMacros = iOther.DisabledMacros;
                     Type = iOther.Type;
                     Allocated = iOther.Allocated;
                     iOther.Allocated = 0; // !!! not quite correct but effective
@@ -197,6 +220,7 @@ namespace Ogre {
         friend class CPreprocessor::Macro;
 
         /// The current source text input
+        const Token* SourceToken;
         const char *Source;
         /// The end of the source text
         const char *SourceEnd;
