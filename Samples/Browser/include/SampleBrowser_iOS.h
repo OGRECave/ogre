@@ -52,8 +52,11 @@ namespace OgreBites
 @interface SampleBrowserGestureView : UIView
 {
     OgreBites::SampleBrowser *mBrowser;
+    void *mActiveTouch;   // single tracked UITouch (unretained, MRC)
 }
 @property (assign) OgreBites::SampleBrowser *mBrowser;
+
+- (void)attachToWindow:(UIWindow *)window;
 
 @end
 
@@ -84,14 +87,11 @@ namespace OgreBites
     return mLastFrameTime;
 }
 
-- (void)setLastFrameTime:(NSTimeInterval)frameInterval
+- (void)setMLastFrameTime:(NSTimeInterval)frameInterval
 {
     // Frame interval defines how many display frames must pass between each time the
-    // display link fires. The display link will only fire 30 times a second when the
-    // frame internal is two on a display that refreshes 60 times a second. The default
-    // frame interval setting of one will fire 60 times a second when the display refreshes
-    // at 60 times a second. A frame interval setting of less than one results in undefined
-    // behavior.
+    // display link fires. A frame interval setting of less than one results in
+    // undefined behavior.
     if (frameInterval >= 1)
     {
         mLastFrameTime = frameInterval;
@@ -152,8 +152,6 @@ namespace OgreBites
 
 - (void)renderOneFrame:(id)sender
 {
-    [sb.mGestureView becomeFirstResponder];
-
     // NSTimeInterval is a simple typedef for double
     NSTimeInterval currentFrameTime = -[mDate timeIntervalSinceNow];
     NSTimeInterval differenceInSeconds = currentFrameTime - mLastFrameTime;
@@ -171,6 +169,37 @@ namespace OgreBites
 
 @synthesize mBrowser;
 
+- (id)initWithFrame:(CGRect)frame
+{
+    if ((self = [super initWithFrame:frame]))
+    {
+        mBrowser     = 0;
+        mActiveTouch = NULL;
+
+        self.userInteractionEnabled = YES;
+        self.multipleTouchEnabled   = NO;    // single touch only
+        self.opaque                 = NO;
+        self.backgroundColor        = [UIColor clearColor];
+        self.autoresizingMask       = UIViewAutoresizingFlexibleWidth |
+                                      UIViewAutoresizingFlexibleHeight;
+    }
+    return self;
+}
+
+- (id)init
+{
+    return [self initWithFrame:[[UIScreen mainScreen] bounds]];
+}
+
+- (void)attachToWindow:(UIWindow *)window
+{
+    if (!window) return;
+
+    self.frame = window.bounds;
+    [window addSubview:self];
+    [window bringSubviewToFront:self];
+}
+
 - (BOOL)canBecomeFirstResponder
 {
     return YES;
@@ -180,31 +209,68 @@ namespace OgreBites
     [super dealloc];
 }
 
-- (void)motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event {
-    if(mBrowser && event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake)
-        mBrowser->motionBegan();
+// SampleBrowser implements only the mouse* handlers. Its TouchAgnosticInputListenerChain
+// converts finger events into mouse events and de-normalises the coordinates using the
+// render window size, so x/y/dx/dy must be normalised to 0..1 here (no contentScaleFactor).
+- (void)dispatchTouch:(UITouch *)touch ofType:(int)type
+{
+    if (!mBrowser || !touch) return;
 
-    if ([super respondsToSelector:@selector(motionBegan:withEvent:)]) {
-        [super motionBegan:motion withEvent:event];
-    }
+    CGSize sz = self.bounds.size;
+    if (sz.width <= 0.0f || sz.height <= 0.0f) return;
+
+    CGPoint p    = [touch locationInView:self];
+    CGPoint prev = [touch previousLocationInView:self];
+
+    OgreBites::Event evt = {};
+    evt.type             = type;
+    evt.tfinger.type     = type;
+    evt.tfinger.fingerId = 0;
+    evt.tfinger.x        = (float)(p.x / sz.width);
+    evt.tfinger.y        = (float)(p.y / sz.height);
+    evt.tfinger.dx       = (float)((p.x - prev.x) / sz.width);
+    evt.tfinger.dy       = (float)((p.y - prev.y) / sz.height);
+
+    mBrowser->_fireInputEvent(evt, 0);
 }
 
-- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
-    if(mBrowser && event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake)
-        mBrowser->motionEnded();
-
-    if ([super respondsToSelector:@selector(motionEnded:withEvent:)]) {
-        [super motionEnded:motion withEvent:event];
-    }
+- (BOOL)isActiveTouchIn:(NSSet *)touches
+{
+    for (UITouch *t in touches)
+        if ((void *)t == mActiveTouch)
+            return YES;
+    return NO;
 }
 
-- (void)motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent *)event {
-    if(mBrowser && event.type == UIEventTypeMotion && event.subtype == UIEventSubtypeMotionShake)
-        mBrowser->motionCancelled();
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (mActiveTouch) return;            // already tracking a finger: ignore
 
-    if ([super respondsToSelector:@selector(motionCancelled:withEvent:)]) {
-        [super motionCancelled:motion withEvent:event];
-    }
+    UITouch *t = [touches anyObject];
+    if (!t) return;
+
+    mActiveTouch = (void *)t;
+    [self dispatchTouch:t ofType:OgreBites::FINGERDOWN];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (![self isActiveTouchIn:touches]) return;
+    [self dispatchTouch:(UITouch *)mActiveTouch ofType:OgreBites::FINGERMOTION];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (![self isActiveTouchIn:touches]) return;
+    [self dispatchTouch:(UITouch *)mActiveTouch ofType:OgreBites::FINGERUP];
+    mActiveTouch = NULL;
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (![self isActiveTouchIn:touches]) return;
+    [self dispatchTouch:(UITouch *)mActiveTouch ofType:OgreBites::FINGERUP];
+    mActiveTouch = NULL;
 }
 @end
 

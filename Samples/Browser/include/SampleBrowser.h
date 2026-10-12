@@ -579,41 +579,6 @@ namespace OgreBites
             return SampleContext::keyPressed(evt);
         }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        void motionBegan( void )
-        {
-        }
-
-        void motionEnded( void )
-        {
-            if (mTrayMgr->isDialogVisible()) return;  // ignore keypresses when dialog is showing
-
-            if (mTitleLabel->getTrayLocation() != TL_NONE)
-            {
-                // if we're in the main screen and a sample's running, toggle sample pause state
-                if (mCurrentSample)
-                {
-                    if (mSamplePaused)
-                    {
-                        mTrayMgr->hideAll();
-                        unpauseCurrentSample();
-                    }
-                    else
-                    {
-                        pauseCurrentSample();
-                        mTrayMgr->showAll();
-                    }
-                }
-            }
-            else buttonHit((Button*)mTrayMgr->getWidget("Back"));  // if we're in config, just go back
-
-        }
-
-        void motionCancelled( void )
-        {
-        }
-#endif
-
         /*-----------------------------------------------------------------------------
           | Extends pointerPressed to inject mouse press into tray manager, and to check
           | for thumbnail clicks, just because we can.
@@ -780,10 +745,24 @@ namespace OgreBites
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            mGestureView = [[SampleBrowserGestureView alloc] init];
-            mGestureView.mBrowser = this;
+            // The UIWindow is only created by the render system, so the overlay
+            // view must be attached afterwards.
+            NativeWindowPair ret = ApplicationContext::createWindow(name, w, h, miscParams);
 
-            [[[UIApplication sharedApplication] keyWindow] addSubview:mGestureView];
+            UIWindow* uiWindow = [[UIApplication sharedApplication] keyWindow];
+            if (!uiWindow)
+            {
+                for (UIWindow* candidate in [[UIApplication sharedApplication] windows])
+                {
+                    if (!candidate.hidden) { uiWindow = candidate; break; }
+                }
+            }
+
+            mGestureView = [[SampleBrowserGestureView alloc] initWithFrame:uiWindow.bounds];
+            mGestureView.mBrowser = this;
+            [mGestureView attachToWindow:uiWindow];
+
+            return ret;
 #endif
 
             return ApplicationContext::createWindow(name, w, h, miscParams);
