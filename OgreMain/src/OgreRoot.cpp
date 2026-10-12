@@ -321,42 +321,22 @@ namespace Ogre {
         Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
         configFileName = iOSDocumentsDirectory() + "/" + outBaseName;
 
-        std::ifstream fp;
-        fp.open(configFileName.c_str(), std::ios::in);
-        if(fp.is_open())
+        if(FileSystemLayer::fileExists(configFileName))
         {
             // A config file exists in the users Documents dir, we'll use it
             mConfigFileName = configFileName;
         }
-        else
+        else if(!FileSystemLayer::fileExists(mConfigFileName))
         {
-            std::ifstream configFp;
-
             // This might be the first run because there is no config file in the
             // Documents directory.  It could also mean that a config file isn't being used at all
-
-            // Try the path passed into initialise
-            configFp.open(mConfigFileName.c_str(), std::ios::in);
-
+            // Check to see if one was included in the app bundle
+            mConfigFileName = macBundlePath() + "/ogre.cfg";
             // If we can't open this file then we have no default config file to work with
-            // Use the documents dir then.
-            if(!configFp.is_open())
-            {
-                // Check to see if one was included in the app bundle
-                mConfigFileName = macBundlePath() + "/ogre.cfg";
-
-                configFp.open(mConfigFileName.c_str(), std::ios::in);
-
-                // If we can't open this file then we have no default config file to work with
-                // Use the Documents dir then.
-                if(!configFp.is_open())
-                    mConfigFileName = configFileName;
-            }
-
-            configFp.close();
+            // Use the Documents dir then.
+            if(!FileSystemLayer::fileExists(mConfigFileName))
+                mConfigFileName = configFileName;
         }
-
-        fp.close();
 #endif
 
         if (mConfigFileName.empty ())
