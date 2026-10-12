@@ -316,3 +316,106 @@ TEST(CPreprocessorTests, MacroArgumentRepeatedMultiline)
     EXPECT_EQ(std::count(src.begin(), src.begin() + src.find("float after;"), '\n'),
               std::count(str.begin(), str.begin() + after, '\n'));
 }
+
+static void checkMacroExpansion(const String& source, const String& expected)
+{
+    CPreprocessor prep;
+    size_t length = 0;
+    char* output = prep.Parse(source.c_str(), source.size(), length);
+    ASSERT_NE(output, nullptr);
+    String result(output, length);
+    free(output);
+    EXPECT_EQ(StringUtil::split(result), StringUtil::split(expected));
+}
+
+TEST(CPreprocessorTests, MacroRecursiveAlias)
+{
+    checkMacroExpansion("#define foo bar foo\n#define test foo\ntest\n",
+                        "bar foo");
+}
+
+TEST(CPreprocessorTests, MacroRecursiveAliasRepeated)
+{
+    checkMacroExpansion("#define foo bar foo\n#define test foo foo\ntest foo test\n",
+                        "bar foo bar foo bar foo bar foo bar foo");
+}
+
+TEST(CPreprocessorTests, MacroMutualRecursionThroughAlias)
+{
+    checkMacroExpansion("#define A B + 1\n#define B A + 2\n#define USE A\nUSE\n",
+                        "A + 2 + 1");
+}
+
+TEST(CPreprocessorTests, MacroRecursiveFunctionThroughWrapper)
+{
+    checkMacroExpansion("#define SELF(x) (SELF(x))\n#define FORWARD(x) SELF(x)\nFORWARD(1)\n",
+                        "(SELF(1))");
+}
+
+TEST(CPreprocessorTests, MacroArgumentsDoNotExpandEachOther)
+{
+    checkMacroExpansion("#define PAIR(a, b) a + b\nPAIR(b, a)\n",
+                        "b + a");
+}
+
+TEST(CPreprocessorTests, MacroPastedNameRescan)
+{
+    checkMacroExpansion("#define HelloWorld 42\n#define CONCAT(a, b) a##b\nCONCAT(Hello, World)\n",
+                        "42");
+}
+
+TEST(CPreprocessorTests, MacroRepeatedArgumentStorage)
+{
+    String argument(256, 'x');
+    checkMacroExpansion("#define REPEAT(x) x + x + x\nREPEAT(" + argument + ")\n",
+                        argument + " + " + argument + " + " + argument);
+}
+
+TEST(CPreprocessorTests, MacroArgumentsKeepStringsAndComments)
+{
+    checkMacroExpansion("#define TEXT(x) print(\"x\", x) /* x */\nTEXT(value)\n",
+                        "print(\"x\", value)");
+}
+
+TEST(CPreprocessorTests, MacroRecursiveArgumentStaysSuppressed)
+{
+    checkMacroExpansion("#define foo bar foo\n#define ID(x) x\nID(foo)\n",
+                        "bar foo");
+}
+
+TEST(CPreprocessorTests, MacroRecursiveAndHigherOrderArguments)
+{
+    checkMacroExpansion("#define foo bar foo\n#define LEFT(a, b) a\n"
+                        "#define USE(a, b, F) foo F(a, b)\nUSE(1, 2, LEFT)\n",
+                        "bar foo 1");
+}
+
+TEST(CPreprocessorTests, MacroRecursiveConditionalExpression)
+{
+    checkMacroExpansion("#define A A\n#define ID(x) x\n#if ID(A)\nbad\n#else\ngood\n#endif\n",
+                        "good");
+    checkMacroExpansion("#define A A\n#define ID(x) x\n#if ID(A + 1)\ngood\n#else\nbad\n#endif\n",
+                        "good");
+}
+
+TEST(CPreprocessorTests, MacroNestedRecursiveArguments)
+{
+    checkMacroExpansion("#define foo bar foo\n#define ID(x) x\n#define DUP(x) x + x\n"
+                        "ID(ID(foo)) DUP(foo) foo\n",
+                        "bar foo bar foo + bar foo bar foo");
+    checkMacroExpansion("#define A B + 1\n#define B A + 2\n#define ID(x) x\nID(A) A\n",
+                        "A + 2 + 1 A + 2 + 1");
+}
+
+TEST(CPreprocessorTests, MacroMutualFunctionsStaySuppressed)
+{
+    checkMacroExpansion("#define A(x) B(x)\n#define B(x) A(x)\n#define ID(x) x\nID(A(1)) A(2)\n",
+                        "A(1) A(2)");
+}
+
+TEST(CPreprocessorTests, MacroRecursiveFreshInvocations)
+{
+    checkMacroExpansion("#define F(x) G(x)\n#define G(x) F(x)\n#define ALIAS F\n"
+                        "#define WRAP(x) F(x) ALIAS(x)\nWRAP(3)\n",
+                        "F(3) F(3)");
+}
