@@ -273,6 +273,11 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
+    static void writeLine(DataStreamPtr& stream, const String& line)
+    {
+        stream->write(line.c_str(), line.size());
+        stream->write("\n", 1);
+    }
     void Root::saveConfig(void)
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
@@ -280,45 +285,30 @@ namespace Ogre {
             "Root::saveConfig");
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // Check the Documents directory within the application sandbox
-        Ogre::String outBaseName, extension, configFileName;
-        Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
-        configFileName = iOSDocumentsDirectory() + "/" + outBaseName;
-		std::ofstream of(configFileName.c_str());
-        if (of.is_open())
-            mConfigFileName = configFileName;
-        else
-            mConfigFileName.clear();
-#else
+        if(!mConfigFileName.empty())
+        {
+            // Check the Documents directory within the application sandbox
+            Ogre::String outBaseName, basePath, configFileName;
+            Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, basePath);
+            mConfigFileName = iOSDocumentsDirectory() + "/" + outBaseName;
+        }
+#endif
+
         if (mConfigFileName.empty())
             return;
 
-        std::ofstream of(mConfigFileName.c_str());
-#endif
-        if (!of)
-            OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "Cannot create settings file.",
-            "Root::saveConfig");
+        auto stream = _openFileStream(mConfigFileName, std::ios::out | std::ios::binary);
 
-        if (mActiveRenderer)
-        {
-            of << "Render System=" << mActiveRenderer->getName() << std::endl;
-        }
-        else
-        {
-            of << "Render System=" << std::endl;
-        }
+        writeLine(stream, mActiveRenderer ? "Render System=" + mActiveRenderer->getName() : "Render System=");
 
         for (const auto& r : getAvailableRenderers())
         {
-            of << std::endl;
-            of << "[" << r->getName() << "]" << std::endl;
+            writeLine(stream, "");
+            writeLine(stream, "[" + r->getName() + "]");
             for (const auto& o : r->getConfigOptions()) {
-                of << o.first << "=" << o.second.currentValue << std::endl;
+                writeLine(stream, o.first + "=" + o.second.currentValue);
             }
         }
-
-        of.close();
-
     }
     //-----------------------------------------------------------------------
     bool Root::restoreConfig(void)
