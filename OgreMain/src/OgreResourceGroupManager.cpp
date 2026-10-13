@@ -734,19 +734,13 @@ namespace Ogre {
             OGRE_LOCK_AUTO_MUTEX;
 
         Real order = su->getLoadingOrder();
-        ScriptLoaderOrderMap::iterator oi = mScriptLoaderOrderMap.find(order);
-        while (oi != mScriptLoaderOrderMap.end() && oi->first == order)
+        auto range = mScriptLoaderOrderMap.equal_range(order);
+        for (auto oi = range.first; oi != range.second; /* no increment */)
         {
             if (oi->second == su)
-            {
-                // erase does not invalidate on multimap, except current
-                ScriptLoaderOrderMap::iterator del = oi++;
-                mScriptLoaderOrderMap.erase(del);
-            }
+                oi = mScriptLoaderOrderMap.erase(oi);   // returns next valid iterator
             else
-            {
                 ++oi;
-            }
         }
     }
     //-----------------------------------------------------------------------
