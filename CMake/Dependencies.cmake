@@ -281,7 +281,8 @@ if (NOT (APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
 endif ()
 
 # Find Vulkan SDK
-macro_log_feature(ENV{VULKAN_SDK} "Vulkan SDK" "Vulkan RenderSystem, glslang Plugin. Alternatively use system packages" "https://vulkan.lunarg.com/")
+set(VULKAN_SDK_FOUND "$ENV{VULKAN_SDK}")
+macro_log_feature(VULKAN_SDK_FOUND "Vulkan SDK" "Vulkan RenderSystem, glslang Plugin. Alternatively use system packages" "https://vulkan.lunarg.com/")
 
 # OpenEXR
 find_package(OpenEXR)

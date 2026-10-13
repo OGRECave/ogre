@@ -21,7 +21,7 @@ set( SOURCE_FILES ${SOURCE_FILES})
 
 add_library(RenderSystem_Vulkan ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 
-if(DEFINED ENV{VULKAN_SDK})
+if(VULKAN_SDK_FOUND)
     target_include_directories(RenderSystem_Vulkan SYSTEM PRIVATE $ENV{VULKAN_SDK}/include)
     target_link_directories(RenderSystem_Vulkan PUBLIC $ENV{VULKAN_SDK}/lib)
 endif()
