@@ -129,7 +129,7 @@ namespace Ogre {
         }
         else
         {
-            SettingsMultiMap::const_iterator i = seci->second.find(key);
+            SettingsMultiMap::const_iterator i = seci->second.lower_bound(key);
             if (i == seci->second.end())
             {
                 return defaultValue;
@@ -147,21 +147,14 @@ namespace Ogre {
         StringVector ret;
 
         SettingsBySection_::const_iterator seci = mSettings.find(section);
-        if (seci != mSettings.end())
-        {
-            SettingsMultiMap::const_iterator i;
+        if (seci == mSettings.end())
+            return ret;
 
-            i = seci->second.find(key);
-            // Iterate over matches
-            while (i != seci->second.end() && i->first == key)
-            {
-                ret.push_back(i->second);
-                ++i;
-            }
-        }
+        auto range = seci->second.equal_range(key);
+        for (auto i = range.first; i != range.second; ++i)
+            ret.push_back(i->second);
+
         return ret;
-
-
     }
     //-----------------------------------------------------------------------
     ConfigFile::SettingsIterator ConfigFile::getSettingsIterator(const String& section)
