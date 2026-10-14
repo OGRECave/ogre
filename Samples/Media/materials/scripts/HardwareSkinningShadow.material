@@ -8,6 +8,7 @@ material Ogre/RTShader/shadow_caster_skinning_1weight
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -25,6 +26,7 @@ material Ogre/RTShader/shadow_caster_skinning_2weight
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -42,6 +44,7 @@ material Ogre/RTShader/shadow_caster_skinning_3weight
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -59,6 +62,7 @@ material Ogre/RTShader/shadow_caster_skinning_4weight
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -75,6 +79,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_1weight
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -92,6 +97,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_2weight
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -109,6 +115,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_3weight
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -126,6 +133,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_4weight
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -142,6 +150,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -159,6 +168,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -176,6 +186,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
@@ -193,6 +204,7 @@ material Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase
 	{
 		pass
 		{
+			max_lights 0
 			diffuse 0 0 0
 			fog_override true none
             rtshader_system
