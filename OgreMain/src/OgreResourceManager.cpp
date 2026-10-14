@@ -524,6 +524,15 @@ namespace Ogre {
         mResourcePoolMap.clear();
     }
     //-----------------------------------------------------------------------
+    std::vector<ResourcePtr> ResourceManager::getResources(void) const
+    {
+        OGRE_LOCK_AUTO_MUTEX;
+        std::vector<ResourcePtr> ret;
+        ret.reserve(mResourcesByHandle.size());
+        for (auto & i : mResourcesByHandle)
+            ret.push_back(i.second);
+        return ret;
+    }
     //---------------------------------------------------------------------
     ResourceManager::ResourcePool::ResourcePool(const String& name)
         : mName(name)

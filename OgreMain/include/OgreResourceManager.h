@@ -417,8 +417,8 @@ namespace Ogre {
         /// destroy all pools
         void destroyAllResourcePools();
 
-
-
+        /// Get a snapshot of all resources currently managed by this manager.
+        std::vector<ResourcePtr> getResources(void) const;
 
     protected:
 
@@ -484,11 +484,8 @@ namespace Ogre {
 
     public:
         typedef MapIterator<ResourceHandleMap> ResourceMapIterator;
-        /** Returns an iterator over all resources in this manager. 
-        @note
-            Use of this iterator is NOT thread safe!
-        */
-        ResourceMapIterator getResourceIterator(void) 
+        /// @deprecated use getResources() instead
+        OGRE_DEPRECATED ResourceMapIterator getResourceIterator(void)
         {
             return ResourceMapIterator(mResourcesByHandle.begin(), mResourcesByHandle.end());
         }
