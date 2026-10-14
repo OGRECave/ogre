@@ -1061,22 +1061,17 @@ const TexturePtr& SceneManager::TextureShadowRenderer::getShadowTexture(size_t s
 
 void SceneManager::TextureShadowRenderer::resolveShadowTexture(TextureUnitState* tu, size_t shadowIndex, size_t shadowTexUnitIndex) const
 {
-    TexturePtr shadowTex;
-    if (shadowIndex < mShadowTextures.size())
+    if (shadowIndex >= mShadowTextures.size())
     {
-        shadowTex = mShadowTextures[shadowIndex];
-        // Enable projective texturing if fixed-function, but also need to
-        // disable it explicitly for program pipeline.
-        tu->setProjectiveTexturing(!tu->getParent()->hasVertexProgram(), mShadowTextureCameras[shadowIndex]);
-    }
-    else
-    {
-        // Use fallback no-shadow texture
-        // no projection since all uniform colour anyway
-        shadowTex = mNoShadowTexture;
+        tu->_setTexturePtr(mNoShadowTexture);
         tu->setProjectiveTexturing(false);
+        return;
     }
 
+    auto& shadowTex = mShadowTextures[shadowIndex];
+    // Enable projective texturing if fixed-function, but also need to
+    // disable it explicitly for program pipeline.
+    tu->setProjectiveTexturing(!tu->getParent()->hasVertexProgram(), mShadowTextureCameras[shadowIndex]);
     tu->_setTexturePtr(shadowTex);
 
     // set up projectors for all layers, fixed function does not support layered textures anyway
