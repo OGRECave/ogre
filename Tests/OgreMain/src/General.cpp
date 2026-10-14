@@ -92,6 +92,13 @@ TEST_F(CameraTests,customProjectionMatrix)
 
 }
 
+TEST(Root, builtinFactoryTypes)
+{
+    Root root("");
+    EXPECT_EQ(MOT_RECTANGLE2D, root.getMovableObjectFactory(MOT_RECTANGLE2D)->getType());
+    EXPECT_EQ(MOT_STATIC_GEOMETRY, root.getMovableObjectFactory(MOT_STATIC_GEOMETRY)->getType());
+}
+
 TEST(Root,shutdown)
 {
 #ifdef OGRE_STATIC_LIB

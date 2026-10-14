@@ -30,8 +30,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    const String MOT_SIMPLE_RENDERABLE = "SimpleRenderable";
-
     uint SimpleRenderable::msGenNameCount = 0;
 
     SimpleRenderable::SimpleRenderable() : SimpleRenderable(BLANKSTRING)
@@ -111,7 +109,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& SimpleRenderable::getMovableType(void) const
     {
-        return MOT_SIMPLE_RENDERABLE;
+        static const String name = MOT_SIMPLE_RENDERABLE;
+        return name;
     }
     //-----------------------------------------------------------------------
     const LightList& SimpleRenderable::getLights(void) const

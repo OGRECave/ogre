@@ -114,7 +114,8 @@ namespace Ogre {
 
         const String& getSource(void) const override
         {
-            return _getDelegate() ? _getDelegate()->getSource() : BLANKSTRING;
+            static const String blank;
+            return _getDelegate() ? _getDelegate()->getSource() : blank;
         }
 
         /** @copydoc GpuProgram::isSkeletalAnimationIncluded */
