@@ -30,6 +30,11 @@ THE SOFTWARE.
 #ifndef __EGLContext_H__
 #define __EGLContext_H__
 
+#ifdef OGRE_WAYLAND
+#include <wayland-client.h>
+#include <wayland-egl.h> // include before egl
+#endif
+
 #include "OgreGLContext.h"
 #include <EGL/egl.h>
 

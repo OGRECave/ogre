@@ -6,9 +6,6 @@
 #ifndef __WaylandEGLSupport_H__
 #define __WaylandEGLSupport_H__
 
-#include <wayland-client.h>
-#include <wayland-egl.h> // include before egl
-
 #include "OgreEGLSupport.h"
 #include <OgreGLNativeSupport.h>
 
@@ -31,7 +28,7 @@ public:
     WaylandEGLSupport(int profile);
     virtual ~WaylandEGLSupport();
 
-    NativeDisplayType getNativeDisplay(void);
+    MativeDisplayType getNativeDisplay(void);
     // This just sets the native variables needed by EGLSupport::getGLDisplay
     // Then it calls EGLSupport::getGLDisplay to do the rest of the work.
     EGLDisplay getGLDisplay();

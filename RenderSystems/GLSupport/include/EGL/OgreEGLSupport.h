@@ -30,26 +30,37 @@ THE SOFTWARE.
 #ifndef __EGLSupport_H__
 #define __EGLSupport_H__
 
-#ifndef OGRE_WAYLAND
-// Tell EGL that we are using X11 (to select the appropriate definitions)
-#define USE_X11
+#ifdef OGRE_WAYLAND
+#include <wayland-client.h>
+#include <wayland-egl.h> // include before egl
 #else
-// Tell EGL to not include X11 headers
-#define EGL_NO_X11
-// Tell EGL that we are using wayland
-#ifndef WL_EGL_PLATFORM
-#define WL_EGL_PLATFORM 1
-#endif
+#define USE_X11
 #endif
 
 #include "OgreGLNativeSupport.h"
 #include <EGL/egl.h>
+
+#ifdef OGRE_WAYLAND
+	typedef wl_display *         MativeDisplayType;
+	typedef wl_egl_window *      MativeWindowType;
+
+	#define MATIVE_DEFAULT_DISPLAY nullptr
+#else
+	typedef EGLNativeDisplayType MativeDisplayType;
+	typedef EGLNativeWindowType  MativeWindowType;
+
+	#define MATIVE_DEFAULT_DISPLAY EGL_DEFAULT_DISPLAY
+#endif
+
 #include "OgreEGLWindow.h"
 #include "OgreLogManager.h"
 
-#define ENABLE_EGL_CHECK 0
+#define ENABLE_EGL_CHECK 1
 
 #if ENABLE_EGL_CHECK
+    #define EGL_DISCARD_ERRORS \
+    while (eglGetError() != EGL_SUCCESS) { /* exhaust errors */ }
+
     #define EGL_CHECK_ERROR \
     { \
         int e = eglGetError(); \
@@ -62,6 +73,7 @@ THE SOFTWARE.
         } \
     }
 #else
+    #define EGL_DISCARD_ERRORS {}
     #define EGL_CHECK_ERROR {}
 #endif
 
@@ -70,7 +82,7 @@ namespace Ogre {
     {
         protected:
             EGLDisplay mGLDisplay;
-            NativeDisplayType mNativeDisplay;
+            MativeDisplayType mNativeDisplay;
 
             bool mIsExternalDisplay;
 
@@ -81,6 +93,7 @@ namespace Ogre {
 
             bool hasEGL15;
             void initialiseExtensions();
+            void initialiseExtensionsNodisp();
         public:
             EGLSupport(int profile);
 
@@ -108,9 +121,6 @@ namespace Ogre {
             ::EGLConfig selectGLConfig (const EGLint* minAttribs, const EGLint *maxAttribs);
             void switchMode(void);
             virtual void switchMode(uint& width, uint& height, short& frequency) {}
-           // virtual GLPBuffer* createPBuffer(PixelComponentType format,
-            //                           size_t width, size_t height) = 0;
-//          NativeDisplayType getNativeDisplay();
     };
 }
 

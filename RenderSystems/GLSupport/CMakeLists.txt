@@ -13,7 +13,7 @@
 
 if(EGL_FOUND)
   cmake_dependent_option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" TRUE "NOT WIN32" FALSE)
-  cmake_dependent_option(OGRE_USE_WAYLAND "use Wayland window manager" FALSE "UNIX;NOT APPLE;NOT EMSCRIPTEN;NOT ANDROID" FALSE)
+  cmake_dependent_option(OGRE_USE_WAYLAND "use Wayland window manager" TRUE "UNIX;NOT APPLE;NOT EMSCRIPTEN;NOT ANDROID;waylands_FOUND" FALSE)
 endif()
 
 if(ANDROID)
@@ -135,9 +135,9 @@ target_include_directories(OgreGLSupport PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL>"
     PRIVATE "$<BUILD_INTERFACE:${NATIVE_INCLUDES}>")
 
-  if(OGRE_USE_WAYLAND)
-    target_compile_definitions(OgreGLSupport PRIVATE OGRE_WAYLAND)
-  endif()
+if(OGRE_USE_WAYLAND)
+  target_compile_definitions(OgreGLSupport PRIVATE OGRE_WAYLAND)
+endif()
 
 set_property(TARGET OgreGLSupport PROPERTY POSITION_INDEPENDENT_CODE ON)
 generate_export_header(OgreGLSupport 

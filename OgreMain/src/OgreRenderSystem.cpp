@@ -193,7 +193,7 @@ namespace Ogre {
         if((opt = mOptions.find("FSAA")) != end)
         {
             StringStream fsaaMode(opt->second.currentValue);
-            uint32_t fsaa;
+            uint32_t fsaa = 0;
             fsaaMode >> fsaa;
             miscParams.emplace("FSAA", std::to_string(fsaa));
 

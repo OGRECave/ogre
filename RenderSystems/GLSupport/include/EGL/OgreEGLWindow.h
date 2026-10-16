@@ -40,8 +40,8 @@ namespace Ogre {
     private:
         protected:
             EGLSupport* mGLSupport;
-            NativeWindowType mWindow;
-            NativeDisplayType mNativeDisplay;
+            MativeWindowType mWindow;
+            MativeDisplayType mNativeDisplay;
             ::EGLDisplay mEglDisplay;
 
 
@@ -49,7 +49,7 @@ namespace Ogre {
             ::EGLSurface mEglSurface;
             bool mHdrDisplay;
 
-            ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, NativeWindowType win);
+            ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, MativeWindowType win);
 
             virtual void switchFullScreen(bool fullscreen) {}
             EGLContext * createEGLContext(::EGLContext external = NULL) const {

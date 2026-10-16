@@ -28,10 +28,9 @@ WaylandEGLWindow::WaylandEGLWindow(WaylandEGLSupport* glsupport) : EGLWindow(gls
 
 WaylandEGLWindow::~WaylandEGLWindow()
 {
-    if (mWindow && mIsTopLevel)
+    if (mWindow)
     {
-        if (!mIsExternal)
-            wl_egl_window_destroy(mWindow);
+        wl_egl_window_destroy(mWindow);
     }
     mWindow = nullptr;
 }
@@ -60,7 +59,7 @@ void WaylandEGLWindow::createNativeWindow(uint& width, uint& height)
         mWindow = wl_egl_window_create(mWlSurface, width, height);
     }
 
-    if (mWindow == EGL_NO_SURFACE)
+    if (mWindow == nullptr)
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Could not create EGL window");
     }
@@ -77,7 +76,6 @@ void WaylandEGLWindow::createNativeWindow(uint& width, uint& height)
 
 void WaylandEGLWindow::resize(uint width, uint height)
 {
-
     if (mClosed)
     {
         return;

@@ -41,7 +41,7 @@ namespace Ogre {
     EGLWindow::EGLWindow(EGLSupport *glsupport)
         : GLWindow(), mGLSupport(glsupport),
           mWindow(0),
-          mNativeDisplay(EGL_DEFAULT_DISPLAY),
+          mNativeDisplay(MATIVE_DEFAULT_DISPLAY),
           mEglDisplay(EGL_NO_DISPLAY),
           mEglConfig(0),
           mEglSurface(0),
@@ -141,7 +141,7 @@ namespace Ogre {
         } 
         else if (name == "WINDOW")
         {
-            *static_cast<NativeWindowType*>(pData) = mWindow;
+            *static_cast<MativeWindowType*>(pData) = mWindow;
             return;
         } 
     }
@@ -208,9 +208,9 @@ namespace Ogre {
     }
 
     ::EGLSurface EGLWindow::createSurfaceFromWindow(::EGLDisplay display,
-                                                    NativeWindowType win)
+                                                    MativeWindowType win)
     {
-        ::EGLSurface surface;
+        ::EGLSurface surface = EGL_NO_SURFACE;
 
         int* attrib_list = NULL;
 #if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
@@ -231,8 +231,18 @@ namespace Ogre {
         }
 #endif
 
-        surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, attrib_list);
-        EGL_CHECK_ERROR
+#if defined(EGL_VERSION_1_5) && defined(OGRE_WAYLAND)
+        if (mGLSupport->checkExtension("EGL_EXT_platform_wayland"))
+        {
+            surface = eglCreatePlatformWindowSurface(display, mEglConfig, win, nullptr);
+            EGL_CHECK_ERROR
+        }
+        else
+#endif
+        {
+            surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, attrib_list);
+            EGL_CHECK_ERROR
+        }
 
         if (surface == EGL_NO_SURFACE)
         {

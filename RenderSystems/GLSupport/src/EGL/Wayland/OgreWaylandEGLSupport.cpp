@@ -25,13 +25,15 @@ WaylandEGLSupport::WaylandEGLSupport(int profile) : EGLSupport(profile)
 
 void WaylandEGLSupport::doInit()
 {
-    // A connection that is NOT shared to enable independent event processing:
-    mNativeDisplay = getNativeDisplay();
+    // The window provider (e.g. SDL) may have already tarnished the EGL error state
+    EGL_DISCARD_ERRORS
+
+    initialiseExtensionsNodisp();
 
     // A connection that might be shared with the application for GL rendering:
     mGLDisplay = getGLDisplay();
 
-    if (mNativeDisplay == EGL_DEFAULT_DISPLAY)
+    if (mNativeDisplay == MATIVE_DEFAULT_DISPLAY)
     {
         // fake video mode
         mCurrentMode.width = 0;
@@ -67,36 +69,27 @@ void WaylandEGLSupport::doInit()
 
 WaylandEGLSupport::~WaylandEGLSupport()
 {
-    if (mNativeDisplay)
+    if (mNativeDisplay != MATIVE_DEFAULT_DISPLAY)
     {
         if (!mIsExternalDisplay)
         {
-            wl_display_disconnect(mNativeDisplay);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "externalWlDisplay expected");
         }
     }
 
-    if (mGLDisplay)
+    if (mGLDisplay != EGL_NO_DISPLAY)
     {
         eglTerminate(mGLDisplay);
+        eglReleaseThread();
     }
 }
 
-NativeDisplayType WaylandEGLSupport::getNativeDisplay()
+MativeDisplayType WaylandEGLSupport::getNativeDisplay()
 {
-    if (!mNativeDisplay)
+    if (mNativeDisplay == MATIVE_DEFAULT_DISPLAY)
     {
-        mNativeDisplay = wl_display_connect(nullptr);
-        if (mNativeDisplay == nullptr)
-        {
-            LogManager::getSingleton().logWarning("Couldn't connect to Wayland display");
-            return mNativeDisplay;
-        }
-
-        if (mNativeDisplay == EGL_DEFAULT_DISPLAY)
-        {
-            LogManager::getSingleton().logWarning("Couldn't open Wayland display");
-            return mNativeDisplay;
-        }
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Could not acquire native display "
+            "(Not targeting Wayland? Recompile with OGRE_USE_WAYLAND=OFF)");
     }
 
     return mNativeDisplay;
@@ -140,11 +133,11 @@ void WaylandEGLSupport::start()
 // then calls EGLSupport::getGLDisplay
 EGLDisplay WaylandEGLSupport::getGLDisplay()
 {
-    if (!mNativeDisplay)
+    if (mNativeDisplay == MATIVE_DEFAULT_DISPLAY)
     {
         mNativeDisplay = getNativeDisplay();
     }
-    if (!mGLDisplay)
+    if (mGLDisplay == EGL_NO_DISPLAY)
     {
         return EGLSupport::getGLDisplay();
     }

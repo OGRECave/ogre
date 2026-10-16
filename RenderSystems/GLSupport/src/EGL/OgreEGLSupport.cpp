@@ -47,8 +47,8 @@ namespace Ogre {
 
 
     EGLSupport::EGLSupport(int profile)
-        : GLNativeSupport(profile), mGLDisplay(0),
-          mNativeDisplay(EGL_DEFAULT_DISPLAY), hasEGL15(false)
+        : GLNativeSupport(profile), mGLDisplay(EGL_NO_DISPLAY),
+          mNativeDisplay(MATIVE_DEFAULT_DISPLAY), hasEGL15(false)
     {
     }
 
@@ -59,7 +59,7 @@ namespace Ogre {
         static auto eglQueryDeviceStringEXT =
             (PFNEGLQUERYDEVICESTRINGEXTPROC)eglGetProcAddress("eglQueryDeviceStringEXT");
 
-        if(eglQueryDevicesEXT && mNativeDisplay == EGL_DEFAULT_DISPLAY)
+        if(eglQueryDevicesEXT && mNativeDisplay == MATIVE_DEFAULT_DISPLAY)
         {
             int numDevices;
             eglQueryDevicesEXT(0, NULL, &numDevices);
@@ -84,11 +84,23 @@ namespace Ogre {
         }
         else
 #endif
+#if defined(EGL_VERSION_1_5) && defined(OGRE_WAYLAND)
+        if (checkExtension("EGL_EXT_platform_wayland"))
+        {
+            if (mNativeDisplay == MATIVE_DEFAULT_DISPLAY)
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "No native display before acquisition of EGL display");
+
+            mGLDisplay = eglGetPlatformDisplay(EGL_PLATFORM_WAYLAND_KHR, mNativeDisplay, nullptr);
+            EGL_CHECK_ERROR
+        }
+        else
+#else
         {
             mGLDisplay = eglGetDisplay(mNativeDisplay);
             EGL_CHECK_ERROR
         }
 
+#endif
         if(mGLDisplay == EGL_NO_DISPLAY)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Couldn`t get EGLDisplay");
@@ -111,18 +123,18 @@ namespace Ogre {
 
         if (eglChooseConfig(mGLDisplay, attribList, NULL, 0, nElements) == EGL_FALSE)
         {
+            (void)eglGetError();
             *nElements = 0;
             return 0;
         }
-        EGL_CHECK_ERROR
         configs = (EGLConfig*) malloc(*nElements * sizeof(EGLConfig));
         if (eglChooseConfig(mGLDisplay, attribList, configs, *nElements, nElements) == EGL_FALSE)
         {
+            (void)eglGetError();
             *nElements = 0;
             free(configs);
             return 0;
         }
-        EGL_CHECK_ERROR
         return configs;
     }
 
@@ -132,18 +144,18 @@ namespace Ogre {
 
         if (eglGetConfigs(mGLDisplay, NULL, 0, nElements) == EGL_FALSE)
         {
+            (void)eglGetError();
             *nElements = 0;
             return 0;
         }
-        EGL_CHECK_ERROR
         configs = (EGLConfig*) malloc(*nElements * sizeof(EGLConfig));
         if (eglGetConfigs(mGLDisplay, configs, *nElements, nElements) == EGL_FALSE)
         {
+            (void)eglGetError();
             *nElements = 0;
             free(configs);
             return 0;
         }
-        EGL_CHECK_ERROR
         return configs;
     }
 
@@ -170,10 +182,10 @@ namespace Ogre {
 
         if (eglQueryContext(mGLDisplay, context, EGL_CONFIG_ID, &id) == EGL_FALSE)
         {
+            (void)eglGetError();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to get config from context");
             return 0;
         }
-        EGL_CHECK_ERROR
         configs = getConfigs(&numConfigs);
         glConfig = configs[id];
         free(configs);
@@ -333,7 +345,7 @@ namespace Ogre {
         while(!context && (contextAttrs[1] >= 1))
         {
             context = eglCreateContext(eglDisplay, glconfig, shareList, contextAttrs);
-            eglGetError(); // errors from eglCreateContext are not fatal
+            (void)eglGetError(); // errors from eglCreateContext are not fatal
             contextAttrs[1] -= contextAttrs[3] == 0; // only decrement if minor == 0
 
             if(hasEGL15)
@@ -355,7 +367,6 @@ namespace Ogre {
             "******************************\n"
             "*** Starting EGL Subsystem ***\n"
             "******************************");
-        initialiseExtensions();
     }
 
     void EGLSupport::stop()
@@ -380,11 +391,6 @@ namespace Ogre {
 
         StringStream ext;
 
-        // client extensions
-        propStr = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-        if(propStr) // NULL = failure case
-            ext << propStr << " ";
-
         // display extension
         propStr = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
         ext << propStr;
@@ -395,6 +401,24 @@ namespace Ogre {
         while(ext >> instr)
         {
             extensionList.insert(instr);
+        }
+    }
+
+    void EGLSupport::initialiseExtensionsNodisp() {
+        // client extensions
+        const char* propStr = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+
+        if (propStr == nullptr)
+            return;
+
+        LogManager::getSingleton().stream() << "EGL_EXTENSIONS (EGL_NO_DISPLAY) = " << propStr;
+
+        StringStream ext(propStr);
+        String entry;
+
+        while (ext >> entry)
+        {
+            extensionList.insert(entry);
         }
     }
 
