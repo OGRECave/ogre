@@ -153,6 +153,7 @@ struct _OgreLodExport LodData {
     };
 
     union IndexBufferPointer {
+        size_t indexSize;
         unsigned short* pshort;
         unsigned int* pint;
     };

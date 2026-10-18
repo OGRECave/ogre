@@ -103,7 +103,7 @@ namespace Ogre
 
     inline void writeTriangle(LodData * data, size_t i)
     {
-        if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
+        if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.indexSize == 2) {
             for (unsigned int m : data->mTriangleList[i].vertexID) {
                 *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
                     static_cast<uint16>(m);
@@ -118,7 +118,7 @@ namespace Ogre
 
     inline void writeLine(LodData * data, size_t i)
     {
-        if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexSize == 2) {
+        if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.indexSize == 2) {
             for (unsigned int m : data->mLineList[i].vertexID) {
                 *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pshort++) =
                     static_cast<uint16>(m);
@@ -144,6 +144,7 @@ namespace Ogre
 
             createSubMeshLodIndexData(i, lodIndex, indexBuffer, 0, indexBuffer->getNumIndexes());
 
+            data->mIndexBufferInfoList[i].buf.indexSize = indexBuffer->getIndexSize();
             data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) indexBuffer->lock(HardwareBuffer::HBL_DISCARD);
 
             lockedBuffers.push_back(indexBuffer);
@@ -220,6 +221,7 @@ namespace Ogre
             HardwareIndexBufferPtr indexBuffer = createIndexBuffer(data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount);
             lockedBuffers.push_back(indexBuffer);
 
+            data->mIndexBufferInfoList[i].buf.indexSize = indexBuffer->getIndexSize();
             data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) indexBuffer->lock(HardwareBuffer::HBL_DISCARD);
 
             // Set up one Lod
@@ -241,7 +243,7 @@ namespace Ogre
                 assert(mTriangleCacheList[i].vertexID[0] != mTriangleCacheList[i].vertexID[1]);
                 assert(mTriangleCacheList[i].vertexID[1] != mTriangleCacheList[i].vertexID[2]);
                 assert(mTriangleCacheList[i].vertexID[2] != mTriangleCacheList[i].vertexID[0]);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
+                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.indexSize == 2) {
                     for (unsigned int m : mTriangleCacheList[i].vertexID) {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
                             static_cast<unsigned short>(m);
@@ -259,7 +261,7 @@ namespace Ogre
             if (mLineCacheList[i].vertexChanged) {
                 assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].prevIndexCount != 0);
                 assert(mLineCacheList[i].vertexID[0] != mLineCacheList[i].vertexID[1]);
-                if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexSize == 2) {
+                if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.indexSize == 2) {
                     for (unsigned int m : mLineCacheList[i].vertexID) {
                         *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pshort++) =
                             static_cast<uint16>(m);
