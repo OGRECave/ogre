@@ -56,6 +56,7 @@ THE SOFTWARE.
 
 #include "OgreBillboardSet.h"
 #include "OgreBillboard.h"
+#include "OgreParticleEmitter.h"
 
 #include <random>
 using std::minstd_rand;
@@ -754,4 +755,38 @@ TEST(Billboard, TextureCoords)
             bb->setTexcoordIndex((ysegs - y - 1)*xsegs + x);
         }
     }
+}
+
+struct ConstantRandom : public Math::RandomValueProvider
+{
+    Real value;
+    explicit ConstantRandom(Real v) : value(v) {}
+    Real getRandomUnit() override { return value; }
+};
+
+struct TestEmitter : public ParticleEmitter
+{
+    TestEmitter() : ParticleEmitter(NULL) {}
+    using ParticleEmitter::genEmissionDirection;
+};
+
+TEST(ParticleEmitter, AngleAbove180EmitsInAllDirections)
+{
+    // the largest random value picks the largest deviation from the base direction
+    ConstantRandom rand(1);
+    Math::SetRandomValueProvider(&rand);
+
+    TestEmitter emitter;
+    emitter.setDirection(Vector3::UNIT_X);
+
+    for (Real degrees : {180, 270, 360})
+    {
+        emitter.setAngle(Degree(degrees));
+
+        Vector3 dir;
+        emitter.genEmissionDirection(Vector3::ZERO, dir);
+        EXPECT_TRUE(dir.positionEquals(Vector3::NEGATIVE_UNIT_X, 1e-4)) << degrees << " degrees: " << dir;
+    }
+
+    Math::SetRandomValueProvider(NULL);
 }

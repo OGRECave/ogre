@@ -414,59 +414,38 @@ namespace Ogre {
         String::const_iterator strIt = tmpStr.begin();
         String::const_iterator patIt = tmpPattern.begin();
         String::const_iterator lastWildCardIt = tmpPattern.end();
-        while (strIt != tmpStr.end() && patIt != tmpPattern.end())
+        String::const_iterator lastWildCardStrIt = tmpStr.end();
+        while (strIt != tmpStr.end())
         {
-            if (*patIt == '*')
+            if (patIt != tmpPattern.end() && *patIt == '*')
             {
+                // remember the wildcard, let it match nothing for now
                 lastWildCardIt = patIt;
-                // Skip over looking for next character
+                lastWildCardStrIt = strIt;
                 ++patIt;
-                if (patIt == tmpPattern.end())
-                {
-                    // Skip right to the end since * matches the entire rest of the string
-                    strIt = tmpStr.end();
-                }
-                else
-                {
-                    // scan until we find next pattern character
-                    while(strIt != tmpStr.end() && *strIt != *patIt)
-                        ++strIt;
-                }
+            }
+            else if (patIt != tmpPattern.end() && *patIt == *strIt)
+            {
+                ++patIt;
+                ++strIt;
+            }
+            else if (lastWildCardIt != tmpPattern.end())
+            {
+                // let the last wildcard match one more character and retry from there
+                patIt = lastWildCardIt + 1;
+                strIt = ++lastWildCardStrIt;
             }
             else
             {
-                if (*patIt != *strIt)
-                {
-                    if (lastWildCardIt != tmpPattern.end())
-                    {
-                        // The last wildcard can match this incorrect sequence
-                        // rewind pattern to wildcard and keep searching
-                        patIt = lastWildCardIt;
-                        lastWildCardIt = tmpPattern.end();
-                    }
-                    else
-                    {
-                        // no wildwards left
-                        return false;
-                    }
-                }
-                else
-                {
-                    ++patIt;
-                    ++strIt;
-                }
+                // no wildcards left
+                return false;
             }
+        }
+        // the string is consumed, only wildcards may remain in the pattern
+        while (patIt != tmpPattern.end() && *patIt == '*')
+            ++patIt;
 
-        }
-        // If we reached the end of both the pattern and the string, we succeeded
-        if ((patIt == tmpPattern.end() || (*patIt == '*' && patIt + 1 == tmpPattern.end())) && strIt == tmpStr.end())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return patIt == tmpPattern.end();
 
     }
     //-----------------------------------------------------------------------

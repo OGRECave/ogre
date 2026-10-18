@@ -146,7 +146,8 @@ namespace Ogre
     void ParticleEmitter::setAngle(const Radian& angle)
     {
         // Store as radians for efficiency
-        mAngle = angle;
+        // anything above 180 degrees already covers the whole sphere
+        mAngle = std::min(angle, Radian(Math::PI));
     }
     //-----------------------------------------------------------------------
     const Radian& ParticleEmitter::getAngle(void) const
