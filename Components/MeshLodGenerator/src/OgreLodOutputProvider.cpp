@@ -103,7 +103,7 @@ namespace Ogre
 
     inline void writeTriangle(LodData * data, size_t i)
     {
-        if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
+        if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexType == HardwareIndexBuffer::IT_16BIT) {
             for (unsigned int m : data->mTriangleList[i].vertexID) {
                 *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
                     static_cast<uint16>(m);
@@ -118,7 +118,7 @@ namespace Ogre
 
     inline void writeLine(LodData * data, size_t i)
     {
-        if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexSize == 2) {
+        if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexType == HardwareIndexBuffer::IT_16BIT) {
             for (unsigned int m : data->mLineList[i].vertexID) {
                 *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pshort++) =
                     static_cast<uint16>(m);
@@ -139,8 +139,9 @@ namespace Ogre
 
         // Create buffers.
         for (size_t i = 0; i < submeshCount; i++) {
+            HardwareIndexBuffer::IndexType indexType = data->mIndexBufferInfoList[i].indexType;
             size_t indexCount = data->mIndexBufferInfoList[i].indexCount;
-            HardwareIndexBufferPtr indexBuffer = createIndexBuffer(indexCount);
+            HardwareIndexBufferPtr indexBuffer = createIndexBuffer(indexType, indexCount);
 
             createSubMeshLodIndexData(i, lodIndex, indexBuffer, 0, indexBuffer->getNumIndexes());
 
@@ -217,7 +218,8 @@ namespace Ogre
             assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].indexCount);
             assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].prevOnlyIndexCount);
 
-            HardwareIndexBufferPtr indexBuffer = createIndexBuffer(data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount);
+            HardwareIndexBuffer::IndexType indexType = data->mIndexBufferInfoList[i].indexType;
+            HardwareIndexBufferPtr indexBuffer = createIndexBuffer(indexType, data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount);
             lockedBuffers.push_back(indexBuffer);
 
             data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*) indexBuffer->lock(HardwareBuffer::HBL_DISCARD);
@@ -241,7 +243,7 @@ namespace Ogre
                 assert(mTriangleCacheList[i].vertexID[0] != mTriangleCacheList[i].vertexID[1]);
                 assert(mTriangleCacheList[i].vertexID[1] != mTriangleCacheList[i].vertexID[2]);
                 assert(mTriangleCacheList[i].vertexID[2] != mTriangleCacheList[i].vertexID[0]);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
+                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexType == HardwareIndexBuffer::IT_16BIT) {
                     for (unsigned int m : mTriangleCacheList[i].vertexID) {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
                             static_cast<unsigned short>(m);
@@ -259,7 +261,7 @@ namespace Ogre
             if (mLineCacheList[i].vertexChanged) {
                 assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].prevIndexCount != 0);
                 assert(mLineCacheList[i].vertexID[0] != mLineCacheList[i].vertexID[1]);
-                if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexSize == 2) {
+                if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexType == HardwareIndexBuffer::IT_16BIT) {
                     for (unsigned int m : mLineCacheList[i].vertexID) {
                         *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pshort++) =
                             static_cast<uint16>(m);
@@ -359,13 +361,13 @@ namespace Ogre
         }
     }
 
-    HardwareIndexBufferPtr LodOutputProvider::createIndexBuffer(size_t indexCount)
+    HardwareIndexBufferPtr LodOutputProvider::createIndexBuffer(HardwareIndexBuffer::IndexType indexType, size_t indexCount)
     {
         //If the index is empty we need to create a "dummy" triangle, just to keep the index buffer from being empty.
         //The main reason for this is that the OpenGL render system will crash with a segfault unless the index has some values.
         //This should hopefully be removed with future versions of Ogre. The most preferred solution would be to add the
         //ability for a submesh to be excluded from rendering for a given LOD (which isn't possible currently 2012-12-09).
-        HardwareIndexBufferPtr buffer = createIndexBufferImpl(indexCount ? indexCount : 3);
+        HardwareIndexBufferPtr buffer = createIndexBufferImpl(indexType, indexCount ? indexCount : 3);
 
         //Check if we should fill it with a "dummy" triangle.
         if (indexCount == 0)

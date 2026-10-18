@@ -74,9 +74,8 @@ namespace Ogre
         return mBuffer.submesh.size();
     }
 
-    HardwareIndexBufferPtr LodOutputProviderBuffer::createIndexBufferImpl(size_t indexCount)
+    HardwareIndexBufferPtr LodOutputProviderBuffer::createIndexBufferImpl(HardwareIndexBuffer::IndexType indexType, size_t indexCount)
     {
-        auto indexType = indexCount - 1 <= std::numeric_limits<uint16>::max() ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT;
         DefaultHardwareBufferManagerBase bfrMgr;
         return bfrMgr.createIndexBuffer(indexType, indexCount, HBU_CPU_ONLY);
     }
