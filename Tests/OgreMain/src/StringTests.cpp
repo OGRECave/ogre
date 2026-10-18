@@ -164,6 +164,22 @@ TEST_F(StringTests,MatchSuperGlobEnd)
     EXPECT_TRUE(StringUtil::match("normal", "*normal*", true));
 }
 //--------------------------------------------------------------------------
+TEST_F(StringTests,MatchGlobBacktrack)
+{
+    // the text after a wildcard also occurs earlier in the string
+    EXPECT_TRUE(StringUtil::match("glass", "*s", true));
+    EXPECT_TRUE(StringUtil::match("barbar", "*bar", true));
+    EXPECT_TRUE(StringUtil::match("a.mesh.mesh", "*.mesh", true));
+    EXPECT_TRUE(StringUtil::match("backup.tar.tar.gz", "*.tar.gz", true));
+    EXPECT_TRUE(StringUtil::match("aaab", "*aab", true));
+    EXPECT_TRUE(StringUtil::match("aabb", "aa*b", true));
+    EXPECT_TRUE(StringUtil::match("normal", "normal**", true));
+
+    EXPECT_FALSE(StringUtil::match("glass", "*sx", true));
+    EXPECT_FALSE(StringUtil::match("barbar", "*baz", true));
+    EXPECT_FALSE(StringUtil::match("a.mesh.mesh", "*.mesh.", true));
+}
+//--------------------------------------------------------------------------
 TEST_F(StringTests,ParseReal)
 {
     Real r = 23.454;
