@@ -32,6 +32,11 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    /// convert UTF-8 string to UTF-16 for use with wide Windows APIs
+    std::wstring windowsUtf8ToWide(const String& str);
+    /// convert UTF-16 string from wide Windows APIs to UTF-8
+    String windowsWideToUtf8(const wchar_t* wstr);
+
     /// @return unique temporary file name in the encoding expected by _openFileStream, or empty string on failure
     String windowsTempFileName();
 }

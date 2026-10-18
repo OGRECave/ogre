@@ -32,6 +32,31 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    std::wstring windowsUtf8ToWide(const String& str)
+    {
+        std::wstring ret;
+        const int length = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.size(), NULL, 0);
+        if (length > 0)
+        {
+            ret.resize(length);
+            MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.size(), &ret[0], length);
+        }
+        return ret;
+    }
+
+    String windowsWideToUtf8(const wchar_t* wstr)
+    {
+        String ret;
+        const int wlength = (int)wcslen(wstr);
+        const int length = WideCharToMultiByte(CP_UTF8, 0, wstr, wlength, NULL, 0, NULL, NULL);
+        if (length > 0)
+        {
+            ret.resize(length);
+            WideCharToMultiByte(CP_UTF8, 0, wstr, wlength, &ret[0], length, NULL, NULL);
+        }
+        return ret;
+    }
+
     String windowsTempFileName()
     {
         String ret;
@@ -40,16 +65,7 @@ namespace Ogre
         if (!tmpname)
             return ret;
 
-        // convert to UTF-8
-        const int length = WideCharToMultiByte(CP_UTF8, 0, tmpname, -1, NULL, 0, NULL, NULL);
-        if (length > 0)
-        {
-            ret.resize(length);
-            if (WideCharToMultiByte(CP_UTF8, 0, tmpname, -1, &ret[0], length, NULL, NULL))
-                ret.resize(length - 1); // drop terminating null
-            else
-                ret.clear();
-        }
+        ret = windowsWideToUtf8(tmpname);
 #else
         char* tmpname = _tempnam(".", "ogre");
         if (!tmpname)

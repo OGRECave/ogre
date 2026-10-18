@@ -45,6 +45,7 @@ THE SOFTWARE.
 #  include <windows.h>
 #  include <direct.h>
 #  include <io.h>
+#  include "windowsUtils.h"
 //#  define _OGRE_FILESYSTEM_ARCHIVE_UNICODE // base path and resources subpathes expected to be in UTF-8 and wchar_t file IO routines are used
 #endif
 
@@ -163,33 +164,6 @@ namespace {
         else
             return base + '/' + name;
     }
-	//-----------------------------------------------------------------------
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-	static std::wstring to_wpath(const String& text, unsigned codepage = CP_UTF8)
-	{
-		const int utf16Length = ::MultiByteToWideChar(codepage, 0, text.c_str(), (int)text.size(), NULL, 0);
-		if(utf16Length > 0)
-		{
-			std::wstring wt;
-			wt.resize(utf16Length);
-			if(0 != ::MultiByteToWideChar(codepage, 0, text.c_str(), (int)text.size(), &wt[0], (int)wt.size()))
-				return wt;
-		}
-		return L"";
-	}
-	static String from_wpath(const std::wstring& text, unsigned codepage = CP_UTF8)
-	{
-		const int length = ::WideCharToMultiByte(codepage, 0, text.c_str(), (int)text.size(), NULL, 0, NULL, NULL);
-		if(length > 0)
-		{
-			String str;
-			str.resize(length);
-			if(0 != ::WideCharToMultiByte(codepage, 0, text.c_str(), (int)text.size(), &str[0], (int)str.size(), NULL, NULL))
-				return str;
-		}
-		return "";
-	}
-#endif
     //-----------------------------------------------------------------------
     void FileSystemArchive::findFiles(const String& pattern, bool recursive, 
         bool dirs, StringVector* simpleList, FileInfoList* detailList) const
@@ -213,7 +187,7 @@ namespace {
         String full_pattern = concatenate_path(mName, pattern);
 
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-        lHandle = _wfindfirst(to_wpath(full_pattern).c_str(), &tagData);
+        lHandle = _wfindfirst(windowsUtf8ToWide(full_pattern).c_str(), &tagData);
 #else
         lHandle = _findfirst(full_pattern.c_str(), &tagData);
 #endif
@@ -227,7 +201,7 @@ namespace {
                 if (simpleList)
                 {
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-                    simpleList->push_back(directory + from_wpath(tagData.name));
+                    simpleList->push_back(directory + windowsWideToUtf8(tagData.name));
 #else
                     simpleList->push_back(directory + tagData.name);
 #endif
@@ -237,8 +211,8 @@ namespace {
                     FileInfo fi;
                     fi.archive = this;
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-                    fi.filename = directory + from_wpath(tagData.name);
-                    fi.basename = from_wpath(tagData.name);
+                    fi.filename = directory + windowsWideToUtf8(tagData.name);
+                    fi.basename = windowsWideToUtf8(tagData.name);
 #else
                     fi.filename = directory + tagData.name;
                     fi.basename = tagData.name;
@@ -279,7 +253,7 @@ namespace {
                 mask.append (pattern);
 
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-            lHandle = _wfindfirst(to_wpath(base_dir).c_str(), &tagData);
+            lHandle = _wfindfirst(windowsUtf8ToWide(base_dir).c_str(), &tagData);
 #else
             lHandle = _findfirst(base_dir.c_str (), &tagData);
 #endif
@@ -293,7 +267,7 @@ namespace {
                     // recurse
                     base_dir = directory;
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-                    base_dir.append (from_wpath(tagData.name)).append (mask);
+                    base_dir.append (windowsWideToUtf8(tagData.name)).append (mask);
 #else
                     base_dir.append (tagData.name).append (mask);
 #endif
@@ -347,7 +321,7 @@ namespace {
         // (quicker than streaming to the end and back)
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
 		struct _stat64i32 tagStat;
-		int ret = _wstat(to_wpath(full_path).c_str(), &tagStat);
+		int ret = _wstat(windowsUtf8ToWide(full_path).c_str(), &tagStat);
 #else
         struct stat tagStat;
         int ret = stat(full_path.c_str(), &tagStat);
@@ -362,7 +336,7 @@ namespace {
         {
             rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-			rwStream->open(to_wpath(full_path).c_str(), mode);
+			rwStream->open(windowsUtf8ToWide(full_path).c_str(), mode);
 #else
             rwStream->open(full_path.c_str(), mode);
 #endif
@@ -372,7 +346,7 @@ namespace {
         {
             roStream = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL)();
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-			roStream->open(to_wpath(full_path).c_str(), mode);
+			roStream->open(windowsUtf8ToWide(full_path).c_str(), mode);
 #else
             roStream->open(full_path.c_str(), mode);
 #endif
@@ -419,7 +393,7 @@ namespace {
         std::ios::openmode mode = std::ios::out | std::ios::binary;
         std::fstream* rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-		rwStream->open(to_wpath(full_path).c_str(), mode);
+		rwStream->open(windowsUtf8ToWide(full_path).c_str(), mode);
 #else
         rwStream->open(full_path.c_str(), mode);
 #endif
@@ -446,7 +420,7 @@ namespace {
         }
         String full_path = concatenate_path(mName, filename);
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-		::_wremove(to_wpath(full_path).c_str());
+		::_wremove(windowsUtf8ToWide(full_path).c_str());
 #else
         ::remove(full_path.c_str());
 #endif
@@ -501,7 +475,7 @@ namespace {
 
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
         struct _stat64i32 tagStat;
-        bool ret = (_wstat(to_wpath(full_path).c_str(), &tagStat) == 0);
+        bool ret = (_wstat(windowsUtf8ToWide(full_path).c_str(), &tagStat) == 0);
 #else
         struct stat tagStat;
         bool ret = (stat(full_path.c_str(), &tagStat) == 0);
@@ -532,7 +506,7 @@ namespace {
 
 #ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
 		struct _stat64i32 tagStat;
-		bool ret = (_wstat(to_wpath(full_path).c_str(), &tagStat) == 0);
+		bool ret = (_wstat(windowsUtf8ToWide(full_path).c_str(), &tagStat) == 0);
 #else
         struct stat tagStat;
         bool ret = (stat(full_path.c_str(), &tagStat) == 0);
