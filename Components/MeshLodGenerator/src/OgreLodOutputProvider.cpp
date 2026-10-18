@@ -153,15 +153,19 @@ namespace Ogre
         // Fill buffers.
         size_t triangleCount = data->mTriangleList.size();
         for (size_t i = 0; i < triangleCount; i++) {
-            if (!data->mTriangleList[i].isRemoved) {
-                assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
+            LodData::Triangle & tri = data->mTriangleList[i];
+            if (!tri.isRemoved) {
+                LodData::IndexBufferInfo & ibi = data->mIndexBufferInfoList[tri.submeshID];
+                assert(ibi.indexCount != 0);
                 writeTriangle(data, i);
             }
         }
         size_t lineCount = data->mLineList.size();
         for (size_t i = 0; i < lineCount; i++) {
-            if (!data->mLineList[i].isRemoved) {
-                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexCount != 0);
+            LodData::Line & line = data->mLineList[i];
+            if (!line.isRemoved) {
+                LodData::IndexBufferInfo & ibi = data->mIndexBufferInfoList[line.submeshID];
+                assert(ibi.indexCount != 0);
                 writeLine(data, i);
             }
         }
@@ -238,19 +242,21 @@ namespace Ogre
         // 1. prevLod only indices.
         size_t triangleCount = mTriangleCacheList.size();
         for (size_t i = 0; i < triangleCount; i++) {
-            if (mTriangleCacheList[i].vertexChanged) {
-                assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].prevIndexCount != 0);
-                assert(mTriangleCacheList[i].vertexID[0] != mTriangleCacheList[i].vertexID[1]);
-                assert(mTriangleCacheList[i].vertexID[1] != mTriangleCacheList[i].vertexID[2]);
-                assert(mTriangleCacheList[i].vertexID[2] != mTriangleCacheList[i].vertexID[0]);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.indexSize == 2) {
-                    for (unsigned int m : mTriangleCacheList[i].vertexID) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
+            TriangleCache & triCache = mTriangleCacheList[i];
+            if (triCache.vertexChanged) {
+                LodData::IndexBufferInfo & ibi = data->mIndexBufferInfoList[data->mTriangleList[i].submeshID];
+                assert(ibi.prevIndexCount != 0);
+                assert(triCache.vertexID[0] != triCache.vertexID[1]);
+                assert(triCache.vertexID[1] != triCache.vertexID[2]);
+                assert(triCache.vertexID[2] != triCache.vertexID[0]);
+                if (ibi.buf.indexSize == 2) {
+                    for (unsigned int m : triCache.vertexID) {
+                        *(ibi.buf.pshort++) =
                             static_cast<unsigned short>(m);
                     }
                 } else {
-                    for (unsigned int m : mTriangleCacheList[i].vertexID) {
-                        *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
+                    for (unsigned int m : triCache.vertexID) {
+                        *(ibi.buf.pint++) =
                             static_cast<unsigned int>(m);
                     }
                 }
@@ -258,17 +264,19 @@ namespace Ogre
         }
         size_t lineCount = mLineCacheList.size();
         for (size_t i = 0; i < lineCount; i++) {
-            if (mLineCacheList[i].vertexChanged) {
-                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].prevIndexCount != 0);
-                assert(mLineCacheList[i].vertexID[0] != mLineCacheList[i].vertexID[1]);
-                if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.indexSize == 2) {
-                    for (unsigned int m : mLineCacheList[i].vertexID) {
-                        *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pshort++) =
+            LineCache & lineCache = mLineCacheList[i];
+            if (lineCache.vertexChanged) {
+                LodData::IndexBufferInfo & ibi = data->mIndexBufferInfoList[data->mLineList[i].submeshID];
+                assert(ibi.prevIndexCount != 0);
+                assert(lineCache.vertexID[0] != lineCache.vertexID[1]);
+                if (ibi.buf.indexSize == 2) {
+                    for (unsigned int m : lineCache.vertexID) {
+                        *(ibi.buf.pshort++) =
                             static_cast<uint16>(m);
                     }
                 } else {
-                    for (unsigned int m : mLineCacheList[i].vertexID) {
-                        *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pint++) =
+                    for (unsigned int m : lineCache.vertexID) {
+                        *(ibi.buf.pint++) =
                             static_cast<uint32>(m);
                     }
                 }
@@ -277,37 +285,51 @@ namespace Ogre
 
         // 2. shared indices.
         for (size_t i = 0; i < triangleCount; i++) {
-            if (!data->mTriangleList[i].isRemoved && !mTriangleCacheList[i].vertexChanged) {
-                assert(mTriangleCacheList[i].vertexID[0] == data->mTriangleList[i].vertexID[0]);
-                assert(mTriangleCacheList[i].vertexID[1] == data->mTriangleList[i].vertexID[1]);
-                assert(mTriangleCacheList[i].vertexID[2] == data->mTriangleList[i].vertexID[2]);
+            LodData::Triangle & tri = data->mTriangleList[i];
+            TriangleCache & triCache = mTriangleCacheList[i];
+            if (!tri.isRemoved && !triCache.vertexChanged) {
+                assert(triCache.vertexID[0] == tri.vertexID[0]);
+                assert(triCache.vertexID[1] == tri.vertexID[1]);
+                assert(triCache.vertexID[2] == tri.vertexID[2]);
 
-                assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
-                assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].prevIndexCount != 0);
+                LodData::IndexBufferInfo & ibi = data->mIndexBufferInfoList[tri.submeshID];
+
+                assert(ibi.indexCount != 0);
+                assert(ibi.prevIndexCount != 0);
                 writeTriangle(data, i);
             }
         }
         for (size_t i = 0; i < lineCount; i++) {
-            if (!data->mLineList[i].isRemoved && !mLineCacheList[i].vertexChanged) {
-                assert(mLineCacheList[i].vertexID[0] == data->mLineList[i].vertexID[0]);
-                assert(mLineCacheList[i].vertexID[1] == data->mLineList[i].vertexID[1]);
+            LodData::Line & line = data->mLineList[i];
+            LineCache & lineCache = mLineCacheList[i];
+            if (!line.isRemoved && !lineCache.vertexChanged) {
+                assert(lineCache.vertexID[0] == line.vertexID[0]);
+                assert(lineCache.vertexID[1] == line.vertexID[1]);
 
-                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexCount != 0);
-                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].prevIndexCount != 0);
+                LodData::IndexBufferInfo & ibi = data->mIndexBufferInfoList[line.submeshID];
+
+                assert(ibi.indexCount != 0);
+                assert(ibi.prevIndexCount != 0);
                 writeLine(data, i);
             }
         }
 
         // 3. curLod indices only.
         for (size_t i = 0; i < triangleCount; i++) {
-            if (!data->mTriangleList[i].isRemoved && mTriangleCacheList[i].vertexChanged) {
-                assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
+            LodData::Triangle & tri = data->mTriangleList[i];
+            TriangleCache & triCache = mTriangleCacheList[i];
+            if (!tri.isRemoved && triCache.vertexChanged) {
+                LodData::IndexBufferInfo & ibi = data->mIndexBufferInfoList[tri.submeshID];
+                assert(ibi.indexCount != 0);
                 writeTriangle(data, i);
             }
         }
         for (size_t i = 0; i < lineCount; i++) {
-            if (!data->mLineList[i].isRemoved && mLineCacheList[i].vertexChanged) {
-                assert(data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexCount != 0);
+            LodData::Line & line = data->mLineList[i];
+            LineCache & lineCache = mLineCacheList[i];
+            if (!line.isRemoved && lineCache.vertexChanged) {
+                LodData::IndexBufferInfo & ibi = data->mIndexBufferInfoList[line.submeshID];
+                assert(ibi.indexCount != 0);
                 writeLine(data, i);
             }
         }
