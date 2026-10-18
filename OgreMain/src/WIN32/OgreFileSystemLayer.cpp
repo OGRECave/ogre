@@ -27,6 +27,7 @@
  */
 #include "OgreStableHeaders.h"
 #include "OgreFileSystemLayer.h"
+#include "windowsUtils.h"
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -39,6 +40,11 @@ namespace Ogre
 {
     static bool widePathToOgreString(String& dest, const WCHAR* wpath)
     {
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+        // UTF-8, as expected by _openFileStream and friends
+        dest = windowsWideToUtf8(wpath);
+        return !dest.empty();
+#else
         // need to convert to narrow (OEM or ANSI) codepage so that fstream can use it 
         // properly on international systems.
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -62,6 +68,7 @@ namespace Ogre
         dest.resize(length);
         WideCharToMultiByte(codepage, 0 /* Use default flags */, wpath, wlength, &dest[0], (int)dest.size(), NULL, NULL);
         return true;
+#endif
     }
 
     static String getModulePath(bool dllpath)
@@ -76,6 +83,28 @@ namespace Ogre
             return "";
         }
 
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+        std::wstring wbuf(256, L'\0');
+        for (;;)
+        {
+            DWORD retval = GetModuleFileNameW(hm, &wbuf[0], (DWORD)wbuf.size());
+            if (retval == 0)
+                return ""; // failed
+
+            if (retval < wbuf.size())
+            {
+                // operation was successful.
+                wbuf.resize(retval);
+                break;
+            }
+
+            // buffer was too small, grow buffer and try again
+            wbuf.resize(wbuf.size() * 2);
+        }
+
+        String ret;
+        widePathToOgreString(ret, wbuf.c_str());
+#else
         DWORD bufsize = 256;
         char* resolved = 0;
         do
@@ -104,6 +133,7 @@ namespace Ogre
 
         String ret = resolved;
         OGRE_FREE(resolved, Ogre::MEMCATEGORY_GENERAL);
+#endif
 
         // need to strip the module filename from the path
         String::size_type pos = ret.rfind('\\');
@@ -161,28 +191,53 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool FileSystemLayer::fileExists(const Ogre::String& path)
     {
-        return _access(path.c_str(), 04) == 0; // Use CRT API rather than GetFileAttributesExA to pass Windows Store validation
+        // Use CRT API rather than GetFileAttributesExA to pass Windows Store validation
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+        return _waccess(windowsUtf8ToWide(path).c_str(), 04) == 0;
+#else
+        return _access(path.c_str(), 04) == 0;
+#endif
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::createDirectory(const Ogre::String& path)
     {
-        return !_mkdir(path.c_str()) || errno == EEXIST; // Use CRT API rather than CreateDirectoryA to pass Windows Store validation
+        // Use CRT API rather than CreateDirectoryA to pass Windows Store validation
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+        return !_wmkdir(windowsUtf8ToWide(path).c_str()) || errno == EEXIST;
+#else
+        return !_mkdir(path.c_str()) || errno == EEXIST;
+#endif
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::removeDirectory(const Ogre::String& path)
     {
-        return !_rmdir(path.c_str()) || errno == ENOENT; // Use CRT API to pass Windows Store validation
+        // Use CRT API to pass Windows Store validation
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+        return !_wrmdir(windowsUtf8ToWide(path).c_str()) || errno == ENOENT;
+#else
+        return !_rmdir(path.c_str()) || errno == ENOENT;
+#endif
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::removeFile(const Ogre::String& path)
     {
-        return !_unlink(path.c_str()) || errno == ENOENT; // Use CRT API to pass Windows Store validation
+        // Use CRT API to pass Windows Store validation
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+        return !_wunlink(windowsUtf8ToWide(path).c_str()) || errno == ENOENT;
+#else
+        return !_unlink(path.c_str()) || errno == ENOENT;
+#endif
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::renameFile(const Ogre::String& oldname, const Ogre::String& newname)
     {
         if(fileExists(oldname) && fileExists(newname))
             removeFile(newname);
-        return !rename(oldname.c_str(), newname.c_str()); // Use CRT API to pass Windows Store validation
+        // Use CRT API to pass Windows Store validation
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+        return !_wrename(windowsUtf8ToWide(oldname).c_str(), windowsUtf8ToWide(newname).c_str());
+#else
+        return !rename(oldname.c_str(), newname.c_str());
+#endif
     }
 }
