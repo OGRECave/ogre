@@ -32,6 +32,8 @@
 #include "OgreDeflate.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#include "windowsUtils.h"
 #endif
 
 #define MINIZ_HEADER_FILE_ONLY
@@ -155,16 +157,11 @@ namespace Ogre
             {
                 // Write to temp file
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-                char* tmpname = _tempnam(".", "ogre");
-                if (!tmpname)
+                mTempFileName = windowsTempFileName();
+                if (mTempFileName.empty())
                 {
                     // Having no file name here will cause various problems later.
                     OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Temporary file name generation failed.", "DeflateStream::init");
-                }
-                else
-                {
-                    mTempFileName = tmpname;
-                    free(tmpname);
                 }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
                 mTempFileName = macTempFileName();

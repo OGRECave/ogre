@@ -43,6 +43,7 @@ list(REMOVE_ITEM SOURCE_FILES
 if (EMSCRIPTEN)
   set(PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFileSystemLayerNoOp.cpp")
 elseif (WIN32)
+  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/*.cpp")
 elseif (APPLE)
   if (APPLE_IOS)
@@ -152,6 +153,8 @@ if(OGRE_CONFIG_FILESYSTEM_UNICODE)
   set_source_files_properties(src/OgreZip.cpp
     PROPERTIES COMPILE_DEFINITIONS _OGRE_FILESYSTEM_ARCHIVE_UNICODE)
   set_source_files_properties(src/OgreLog.cpp
+    PROPERTIES COMPILE_DEFINITIONS _OGRE_FILESYSTEM_ARCHIVE_UNICODE)
+  set_source_files_properties(src/WIN32/windowsUtils.cpp
     PROPERTIES COMPILE_DEFINITIONS _OGRE_FILESYSTEM_ARCHIVE_UNICODE)
 endif()
 
