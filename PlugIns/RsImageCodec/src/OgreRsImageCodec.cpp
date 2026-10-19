@@ -7,6 +7,7 @@
 #include "OgreLogManager.h"
 #include "OgreDataStream.h"
 #include "OgreImage.h"
+#include "OgreRoot.h"
 
 enum ColorType
 {
@@ -121,14 +122,7 @@ void RsImageCodec::encodeToFile(const Any& input, const String& outFileName) con
 {
 #if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     MemoryDataStreamPtr data = static_pointer_cast<MemoryDataStream>(encode(input));
-    std::ofstream f(outFileName.c_str(), std::ios::out | std::ios::binary);
-
-    if (!f.is_open())
-    {
-        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "could not open file " + outFileName);
-    }
-
-    f.write((char*)data->getPtr(), data->size());
+    Root::createFileStream(outFileName, RGN_DEFAULT, true)->write(data->getPtr(), data->size());
 #endif
 }
 //---------------------------------------------------------------------
