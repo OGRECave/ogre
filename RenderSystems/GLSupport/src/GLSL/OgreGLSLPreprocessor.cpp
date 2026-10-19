@@ -29,7 +29,6 @@
 #include "OgreGLSLPreprocessor.h"
 #include "OgreLogManager.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <assert.h>
 
@@ -41,6 +40,16 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined( __MINGW32__ )
 #define snprintf _snprintf
 #endif
+
+    // Character classes with "C" locale semantics. The <ctype.h> functions
+    // depend on the global locale and are undefined for negative chars, which
+    // is what non-ASCII bytes are on most platforms.
+    static inline bool isSpace (char c) { return c == ' ' || (c >= '\t' && c <= '\r'); }
+    static inline bool isDigit (char c) { return c >= '0' && c <= '9'; }
+    static inline bool isXDigit (char c) { return isDigit (c) || ((c | 0x20) >= 'a' && (c | 0x20) <= 'f'); }
+    static inline bool isAlpha (char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
+    /// Can this character be part of a keyword (identifier)?
+    static inline bool isKeywordChar (char c) { return c == '_' || isAlpha (c) || isDigit (c); }
 
     /// Return closest power of two not smaller than given number
     static size_t ClosestPow2 (size_t x)
@@ -106,11 +115,11 @@ namespace Ogre {
         long val = 0;
         size_t i = 0;
 
-        while (isspace (String [i]))
+        while (i < Length && isSpace (String [i]))
             i++;
 
         long base = 10;
-        if (String [i] == '0')
+        if (i < Length && String [i] == '0')
         {
             if (Length > i + 1 && String [i + 1] == 'x')
                 base = 16, i += 2;
@@ -120,10 +129,11 @@ namespace Ogre {
 
         for (; i < Length; i++)
         {
-            int c = int (String [i]);
-            if (isspace (c))
+            if (isSpace (String [i]))
                 // Possible end of number
                 break;
+
+            int c = int (String [i]);
 
             if (c >= 'a' && c <= 'z')
                 c -= ('a' - 'A');
@@ -143,7 +153,7 @@ namespace Ogre {
 
         // Check that all other characters are just spaces
         for (; i < Length; i++)
-            if (!isspace (String [i]))
+            if (!isSpace (String [i]))
                 return false;
 
         oValue = val;
@@ -304,34 +314,34 @@ namespace Ogre {
                 Source++;
             return Token (Token::TK_NEWLINE, begin, Source - begin);
         }
-        else if (isspace (c))
+        else if (isSpace (c))
         {
             while (Source < SourceEnd &&
                    *Source != '\r' &&
                    *Source != '\n' &&
-                   isspace (*Source))
+                   isSpace (*Source))
                 Source++;
 
             return Token (Token::TK_WHITESPACE, begin, Source - begin);
         }
-        else if (isdigit (c))
+        else if (isDigit (c))
         {
             BOL = false;
             if (c == '0' && Peek () == 'x') // hex numbers
             {
                 Source++;
-                while (Source < SourceEnd && isxdigit (*Source))
+                while (Source < SourceEnd && isXDigit (*Source))
                     Source++;
             }
             else
-                while (Source < SourceEnd && isdigit (*Source))
+                while (Source < SourceEnd && isDigit (*Source))
                     Source++;
             return Token (Token::TK_NUMBER, begin, Source - begin);
         }
-        else if (c == '_' || isalnum (c))
+        else if (isKeywordChar (c))
         {
             BOL = false;
-            while (Source < SourceEnd && (*Source == '_' || isalnum (*Source)))
+            while (Source < SourceEnd && isKeywordChar (*Source))
                 Source++;
             Token t (Token::TK_KEYWORD, begin, Source - begin);
             if (SourceToken)
@@ -391,9 +401,9 @@ namespace Ogre {
         else if (c == '#' && BOL)
         {
             // Skip all whitespaces after '#'
-            while (Source < SourceEnd && isspace (*Source))
+            while (Source < SourceEnd && isSpace (*Source))
                 Source++;
-            while (Source < SourceEnd && !isspace (*Source))
+            while (Source < SourceEnd && !isSpace (*Source))
                 Source++;
             return Token (Token::TK_DIRECTIVE, begin, Source - begin);
         }
@@ -1196,7 +1206,7 @@ namespace Ogre {
         // Analyze preprocessor directive
         const char *directive = iToken.String + 1;
         size_t dirlen = iToken.Length - 1;
-        while (dirlen && isspace (*directive))
+        while (dirlen && isSpace (*directive))
             dirlen--, directive++;
 
         int old_line = Line;
