@@ -488,11 +488,10 @@ namespace Ogre {
 
             if (args.size() > cur->Args.size())
             {
-                char tmp [60];
-                snprintf (tmp, sizeof (tmp), "Macro `%.*s' passed %zu arguments, but takes just %zu",
-                          int (cur->Name.Length), cur->Name.String,
-                          args.size(), cur->Args.size());
-                Error (old_line, tmp);
+                std::string msg = "Macro `" + std::string (cur->Name.String, cur->Name.Length) +
+                    "' passed " + std::to_string (args.size ()) +
+                    " arguments, but takes just " + std::to_string (cur->Args.size ());
+                Error (old_line, msg.c_str ());
                 return Token (Token::TK_ERROR);
             }
 
@@ -527,8 +526,6 @@ namespace Ogre {
     CPreprocessor::Token CPreprocessor::GetExpression (
         Token &oResult, int iLine, int iOpPriority)
     {
-        char tmp [40];
-
         do
         {
             oResult = GetToken (true);
@@ -550,8 +547,8 @@ namespace Ogre {
                 long val;
                 if (!GetValue (oResult, val, iLine))
                 {
-                    snprintf (tmp, sizeof (tmp), "Unary '%c' not applicable", uop);
-                    Error (iLine, tmp, &oResult);
+                    std::string msg = std::string ("Unary '") + uop + "' not applicable";
+                    Error (iLine, msg.c_str (), &oResult);
                     return Token (Token::TK_ERROR);
                 }
 
@@ -643,16 +640,16 @@ namespace Ogre {
             long vlop, vrop;
             if (!GetValue (oResult, vlop, iLine))
             {
-                snprintf (tmp, sizeof (tmp), "Left operand of '%.*s' is not a number",
-                          int (op.Length), op.String);
-                Error (iLine, tmp, &oResult);
+                std::string msg = "Left operand of '" + std::string (op.String, op.Length) +
+                    "' is not a number";
+                Error (iLine, msg.c_str (), &oResult);
                 return Token (Token::TK_ERROR);
             }
             if (!GetValue (rop, vrop, iLine))
             {
-                snprintf (tmp, sizeof (tmp), "Right operand of '%.*s' is not a number",
-                          int (op.Length), op.String);
-                Error (iLine, tmp, &rop);
+                std::string msg = "Right operand of '" + std::string (op.String, op.Length) +
+                    "' is not a number";
+                Error (iLine, msg.c_str (), &rop);
                 return Token (Token::TK_ERROR);
             }
 
