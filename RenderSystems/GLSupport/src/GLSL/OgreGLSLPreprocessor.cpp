@@ -31,6 +31,9 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <algorithm>
+#include <iterator>
+#include <cstring>
 
 namespace Ogre {
 
@@ -61,157 +64,277 @@ namespace Ogre {
         return x + 1;
     }
 
-    void CPreprocessor::Token::Append (const char *iString, size_t iLength)
+    /// Growth policy of owned buffers
+    static size_t CapacityFor (size_t iSize) { return std::max<size_t> (64, ClosestPow2 (iSize)); }
+
+    CPreprocessor::Text::Text(Text&& iOther) noexcept
+        : String(iOther.String), Length(iOther.Length), Allocated(iOther.Allocated),
+          DisabledMacros(std::move(iOther.DisabledMacros))
     {
-        // The string is a literal or a temporary, not part of the source: it
-        // must be copied. Appending to a token without a string would make
-        // the token point to it instead.
-        if (!String)
-        {
-            String = "";
-            Length = 0;
-        }
-        Token t (Token::TK_TEXT, iString, iLength);
-        Append (t);
+        iOther.String = nullptr;
+        iOther.Length = iOther.Allocated = 0;
+        iOther.DisabledMacros.clear();
     }
 
-    void CPreprocessor::Token::Append (const Token &iOther)
+    CPreprocessor::Text& CPreprocessor::Text::operator=(Text&& iOther) noexcept
     {
-        if (!iOther.String)
-            return;
-
-        if (!String)
+        if (this != &iOther)
         {
+            FreeStorage();
             String = iOther.String;
             Length = iOther.Length;
             Allocated = iOther.Allocated;
-            iOther.Allocated = 0; // !!! not quite correct but effective
-            DisabledMacros = iOther.DisabledMacros;
-            return;
+            DisabledMacros = std::move(iOther.DisabledMacros);
+            iOther.String = nullptr;
+            iOther.Length = iOther.Allocated = 0;
+            iOther.DisabledMacros.clear();
         }
-
-        if (Allocated)
-        {
-            size_t new_alloc = ClosestPow2 (Length + iOther.Length);
-            if (new_alloc < 64)
-                new_alloc = 64;
-            if (new_alloc != Allocated)
-            {
-                Allocated = new_alloc;
-                Buffer = (char *)realloc (Buffer, Allocated);
-            }
-        }
-        else if (String + Length != iOther.String)
-        {
-            Allocated = ClosestPow2 (Length + iOther.Length);
-            if (Allocated < 64)
-                Allocated = 64;
-            char *newstr = (char *)malloc (Allocated);
-            memcpy (newstr, String, Length);
-            Buffer = newstr;
-        }
-
-        if (Allocated)
-            memcpy (Buffer + Length, iOther.String, iOther.Length);
-        for (const auto& disabled : iOther.DisabledMacros)
-            DisabledMacros.push_back({Length + disabled.Begin, Length + disabled.End, disabled.Name});
-        Length += iOther.Length;
+        return *this;
     }
 
-    bool CPreprocessor::Token::GetValue (long &oValue) const
+    CPreprocessor::Text CPreprocessor::Text::Borrow() const
     {
-        long val = 0;
-        size_t i = 0;
+        Text t(String, Length);
+        t.DisabledMacros = DisabledMacros;
+        return t;
+    }
 
-        while (i < Length && isSpace (String [i]))
-            i++;
+    CPreprocessor::Text CPreprocessor::Text::Clone() const
+    {
+        Text t;
+        t.DisabledMacros = DisabledMacros;
+        if (String)
+        {
+            t.EnsureAllocated(Length);
+            std::memcpy(t.Buffer(), String, Length);
+            t.Length = Length;
+        }
+        return t;
+    }
+
+    void CPreprocessor::Text::Truncate(size_t iLength)
+    {
+        assert(iLength <= Length);
+        Length = iLength;
+    }
+
+    void CPreprocessor::Text::ResizeBorrowed(size_t iLength)
+    {
+        assert(!IsAllocated());
+        Length = iLength;
+    }
+
+    void CPreprocessor::Text::Assign(const char* iString, size_t iLength)
+    {
+        DisabledMacros.clear();
+        if (!IsAllocated())
+            String = nullptr;
+        Length = 0;
+        EnsureAllocated(iLength);
+        std::memcpy(Buffer(), iString, iLength);
+        Length = iLength;
+    }
+
+    void CPreprocessor::Text::AppendView(StringView iString)
+    {
+        if (!iString.String)
+            return;
+        if (!String)
+        {
+            String = iString.String;
+            Length = iString.Length;
+            return;
+        }
+        AppendChars(iString.String, iString.Length);
+    }
+
+    void CPreprocessor::Text::AppendCopy(StringView iString)
+    {
+        if (!iString.String)
+            return;
+        EnsureAllocated(iString.Length);
+        std::memcpy(Buffer() + Length, iString.String, iString.Length);
+        Length += iString.Length;
+    }
+
+    void CPreprocessor::Text::Append(const Text& iOther)
+    {
+        if (!iOther.String)
+            return;
+        if (!String)
+        {
+            if (iOther.IsAllocated())
+                *this = iOther.Clone();
+            else
+            {
+                String = iOther.String;
+                Length = iOther.Length;
+                DisabledMacros = iOther.DisabledMacros;
+            }
+            return;
+        }
+        AppendDisabled(iOther);
+        AppendChars(iOther.String, iOther.Length);
+    }
+
+    void CPreprocessor::Text::Append(Text&& iOther)
+    {
+        if (!String && iOther.IsAllocated())
+            *this = std::move(iOther);
+        else
+            Append(static_cast<const Text&>(iOther));
+    }
+
+    void CPreprocessor::Text::AppendNL(int iCount)
+    {
+        if (iCount <= 0)
+            return;
+        EnsureAllocated(size_t(iCount));
+        std::memset(Buffer() + Length, '\n', size_t(iCount));
+        Length += size_t(iCount);
+    }
+
+    char* CPreprocessor::Text::Release()
+    {
+        char* p = const_cast<char*>(String);
+        String = nullptr;
+        Length = Allocated = 0;
+        return p;
+    }
+
+    bool CPreprocessor::Text::IsDisabled(StringView iMacroName) const
+    {
+        for (const DisabledMacro& disabled : DisabledMacros)
+            if (disabled.Begin == 0 && disabled.End >= Length &&
+                StringView(disabled.Name.data(), disabled.Name.size()) == iMacroName)
+                return true;
+        return false;
+    }
+
+    void CPreprocessor::Text::Disable(StringView iMacroName)
+    {
+        DisabledMacros.push_back({0, Length, std::string(iMacroName.String, iMacroName.Length)});
+    }
+
+    void CPreprocessor::Text::InheritDisabled(const Text& iSource, size_t iOffset, size_t iLength)
+    {
+        for (const DisabledMacro& disabled : iSource.DisabledMacros)
+            if (disabled.Begin <= iOffset && disabled.End >= iOffset + iLength)
+                DisabledMacros.push_back({0, iLength, disabled.Name});
+    }
+
+    void CPreprocessor::Text::FreeStorage()
+    {
+        if (Allocated)
+            std::free(Buffer());
+    }
+
+    void CPreprocessor::Text::AppendDisabled(const Text& iOther)
+    {
+        for (const DisabledMacro& disabled : iOther.DisabledMacros)
+            DisabledMacros.push_back({Length + disabled.Begin, Length + disabled.End, disabled.Name});
+    }
+
+    void CPreprocessor::Text::EnsureAllocated(size_t iExtra)
+    {
+        const size_t wanted = CapacityFor(Length + iExtra);
+        if (Allocated)
+        {
+            if (wanted != Allocated)
+            {
+                void* p = std::realloc(Buffer(), wanted);
+                if (!p)
+                    throw std::bad_alloc();
+                String = static_cast<char*>(p);
+                Allocated = wanted;
+            }
+        }
+        else
+        {
+            char* p = static_cast<char*>(std::malloc(wanted));
+            if (!p)
+                throw std::bad_alloc();
+            if (Length)
+                std::memcpy(p, String, Length);
+            String = p;
+            Allocated = wanted;
+        }
+    }
+
+    void CPreprocessor::Text::AppendChars(const char* iString, size_t iLength)
+    {
+        if (!IsAllocated() && String + Length == iString)
+        {
+            Length += iLength; // in situ: the new span directly follows ours
+            return;
+        }
+        EnsureAllocated(iLength);
+        std::memcpy(Buffer() + Length, iString, iLength);
+        Length += iLength;
+    }
+
+    // -----------------------------------------------------------------------
+    // CPreprocessor::Token
+    // -----------------------------------------------------------------------
+
+    int CPreprocessor::Token::CountNL() const
+    {
+        if (Type == TK_EOS || Type == TK_ERROR || !String())
+            return 0;
+        return int(std::count(String(), String() + Length(), '\n'));
+    }
+
+    bool CPreprocessor::Token::GetValue(long& oValue) const
+    {
+        const char* s = String();
+        const size_t n = Length();
+        size_t i = 0;
+        while (i < n && isSpace(s[i]))
+            ++i;
 
         long base = 10;
-        if (i < Length && String [i] == '0')
+        if (i < n && s[i] == '0')
         {
-            if (Length > i + 1 && String [i + 1] == 'x')
-                base = 16, i += 2;
+            if (n > i + 1 && s[i + 1] == 'x')
+            {
+                base = 16;
+                i += 2;
+            }
             else
                 base = 8;
         }
 
-        for (; i < Length; i++)
+        long val = 0;
+        for (; i < n && !isSpace(s[i]); ++i)
         {
-            if (isSpace (String [i]))
-                // Possible end of number
-                break;
-
-            int c = int (String [i]);
-
-            if (c >= 'a' && c <= 'z')
-                c -= ('a' - 'A');
-
-            c -= '0';
-            if (c < 0)
+            const char c = s[i];
+            long digit;
+            if (isDigit(c))
+                digit = c - '0';
+            else if (isAlpha(c))
+                digit = 10 + ((c | 0x20) - 'a');
+            else
                 return false;
-
-            if (c > 9)
-                c -= ('A' - '9' - 1);
-
-            if (c >= base)
+            if (digit >= base)
                 return false;
-
-            val = (val * base) + c;
+            val = val * base + digit;
         }
 
         // Check that all other characters are just spaces
-        for (; i < Length; i++)
-            if (!isSpace (String [i]))
+        for (; i < n; ++i)
+            if (!isSpace(s[i]))
                 return false;
 
         oValue = val;
         return true;
     }
 
-
-    void CPreprocessor::Token::SetValue (long iValue)
+    void CPreprocessor::Token::SetValue(long iValue)
     {
-        char tmp [24];
-        int len = snprintf (tmp, sizeof (tmp), "%ld", iValue);
-        Length = 0;
-        Append (tmp, len);
+        char tmp[24];
+        const int len = std::snprintf(tmp, sizeof(tmp), "%ld", iValue);
+        Str.Assign(tmp, size_t(len));
         Type = TK_NUMBER;
-    }
-
-
-    void CPreprocessor::Token::AppendNL (int iCount)
-    {
-        static const char newlines [8] =
-            { '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-
-        while (iCount > 8)
-        {
-            Append (newlines, 8);
-            iCount -= 8;
-        }
-        if (iCount > 0)
-            Append (newlines, iCount);
-    }
-
-
-    int CPreprocessor::Token::CountNL ()
-    {
-        if (Type == TK_EOS || Type == TK_ERROR)
-            return 0;
-
-        const char *s = String;
-        size_t l = Length;
-        int c = 0;
-        while (l > 0)
-        {
-            const char *n = (const char *)memchr (s, '\n', l);
-            if (!n)
-                return c;
-            c++;
-            l -= (n - s + 1);
-            s = n + 1;
-        }
-        return c;
     }
 
     CPreprocessor::Token CPreprocessor::Macro::Expand(const std::vector<Token>& iArgs,
@@ -227,46 +350,40 @@ namespace Ogre {
         size_t i;
         for (i = 0; i < iArgs.size(); i++)
         {
-            cpp.Define (Args [i].String, Args [i].Length,
-                        iArgs [i].String, iArgs [i].Length);
-            cpp.MacroList.front().Value.DisabledMacros = iArgs [i].DisabledMacros;
+            cpp.Define (Args [i].String (), Args [i].Length (),
+                        iArgs [i].String (), iArgs [i].Length ());
+            cpp.MacroList.front().Value.Str = iArgs [i].Str.Borrow ();
         }
         // The rest arguments are empty
         for (; i < Args.size(); i++)
-            cpp.Define (Args [i].String, Args [i].Length, "", 0);
+            cpp.Define (Args [i].String (), Args [i].Length (), "", 0);
 
         Token xt;
-        // make sure that no one down the line sets Value.Allocated = 0
-        Token new_xt = Token(Token::TK_TEXT, Value.String, Value.Length);
-        new_xt.DisabledMacros = Value.DisabledMacros;
+        Token new_xt = Token (Token::TK_TEXT, Value.Str.Borrow ());
         bool first = true;
         do {
-            xt = new_xt;
+            xt = std::move (new_xt);
             // Now run the macro expansion through the supplimentary preprocessor
             new_xt = cpp.Parse (xt);
 
             // The result can borrow an argument or a slice of xt's buffer.
-            if (!new_xt.Allocated && new_xt.String && new_xt.String != xt.String)
-            {
-                Token owned (new_xt.Type, "", 0);
-                owned.Append (new_xt);
-                new_xt = owned;
-            }
+            if (!new_xt.Str.IsAllocated () && new_xt.String () && new_xt.String () != xt.String ())
+                new_xt.Str = new_xt.Str.Clone ();
 
             // Remove the extra macros we have defined, only needed once.
             if (first) {
                 first = false;
                 for (int j = Args.size() - 1; j >= 0; j--)
-                    cpp.Undef (Args [j].String, Args [j].Length);
+                    cpp.Undef (Args [j].String (), Args [j].Length ());
             }
             // Repeat until there is no more change between parses
-        } while (xt.String != new_xt.String);
+        } while (xt.String () != new_xt.String ());
 
         Expanding = false;
         std::swap(cpp.MacroList, iMacros);
 
-        if (xt.Length)
-            xt.DisabledMacros.push_back({0, xt.Length, std::string(Name.String, Name.Length)});
+        if (xt.Length ())
+            xt.Str.Disable (Name.View ());
         return xt;
     }
 
@@ -274,7 +391,7 @@ namespace Ogre {
     {
         String msg;
         if (iToken)
-            msg = StringUtil::format("line %d: %s: `%.*s'\n", iLine, iError, int(iToken->Length), iToken->String);
+            msg = StringUtil::format("line %d: %s: `%.*s'\n", iLine, iError, int(iToken->Length ()), iToken->String ());
         else
             msg = StringUtil::format("line %d: %s\n", iLine, iError);
         LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
@@ -283,8 +400,8 @@ namespace Ogre {
     CPreprocessor::CPreprocessor (const Token &iToken, int iLine)
     {
         SourceToken = &iToken;
-        Source = iToken.String;
-        SourceEnd = iToken.String + iToken.Length;
+        Source = iToken.String ();
+        SourceEnd = iToken.String () + iToken.Length ();
         EnableOutput = 1;
         EnableElif = 0;
         Line = iLine;
@@ -353,14 +470,9 @@ namespace Ogre {
                 Source++;
             Token t (Token::TK_KEYWORD, begin, Source - begin);
             if (SourceToken)
-            {
-                size_t offset = begin - SourceToken->String;
-                for (const auto& disabled : SourceToken->DisabledMacros)
-                    if (disabled.Begin <= offset && disabled.End >= offset + t.Length)
-                        t.DisabledMacros.push_back({0, t.Length, disabled.Name});
-            }
+                t.Str.InheritDisabled (SourceToken->Str, begin - SourceToken->String (), t.Length ());
             if (iExpand)
-                t = ExpandMacro (t);
+                return ExpandMacro (std::move (t));
             return t;
         }
         else if (c == '"' || c == '\'')
@@ -448,17 +560,17 @@ namespace Ogre {
     CPreprocessor::Macro *CPreprocessor::IsDefined (const Token &iToken)
     {
         for (Macro& cur : MacroList)
-            if (cur.Name == iToken)
+            if (cur.Name.View () == iToken.View ())
                 return &cur;
 
         return NULL;
     }
 
 
-    CPreprocessor::Token CPreprocessor::ExpandMacro (const Token &iToken)
+    CPreprocessor::Token CPreprocessor::ExpandMacro (Token iToken)
     {
         Macro *cur = IsDefined (iToken);
-        if (cur && !cur->Expanding && !iToken.IsDisabled(cur->Name))
+        if (cur && !cur->Expanding && !iToken.Str.IsDisabled (cur->Name.View ()))
         {
             std::vector<Token> args;
             int old_line = Line;
@@ -472,15 +584,15 @@ namespace Ogre {
                 }
 
                 // Put the token back into the source pool; we'll handle it later
-                if (t.String)
+                if (t.String ())
                 {
                     // Returned token should never be allocated on heap
-                    assert (t.Allocated == 0);
-                    Source = t.String;
+                    assert (!t.Str.IsAllocated ());
+                    Source = t.String ();
                     Line -= t.CountNL ();
                 }
                 // If a macro is defined with arguments but gets not "called" it should behave like normal text
-                if (args.size() == 0 && (t.Type != Token::TK_PUNCTUATION || t.String [0] != '('))
+                if (args.size() == 0 && (t.Type != Token::TK_PUNCTUATION || t.String () [0] != '('))
                 {
                     return iToken;
                 }
@@ -488,7 +600,7 @@ namespace Ogre {
 
             if (args.size() > cur->Args.size())
             {
-                std::string msg = "Macro `" + std::string (cur->Name.String, cur->Name.Length) +
+                std::string msg = "Macro `" + std::string (cur->Name.String (), cur->Name.Length ()) +
                     "' passed " + std::to_string (args.size ()) +
                     " arguments, but takes just " + std::to_string (cur->Args.size ());
                 Error (old_line, msg.c_str ());
@@ -498,7 +610,7 @@ namespace Ogre {
             Token t = cur->ExpandFunc ?
                 cur->ExpandFunc (this, args) :
                 cur->Expand (args, MacroList);
-            t.AppendNL (Line - old_line - t.CountNL ());
+            t.Str.AppendNL (Line - old_line - t.CountNL ());
 
             return t;
         }
@@ -538,13 +650,13 @@ namespace Ogre {
         Token op (Token::TK_WHITESPACE, "", 0);
 
         // Handle unary operators here
-        if (oResult.Type == Token::TK_PUNCTUATION && oResult.Length == 1)
+        if (oResult.Type == Token::TK_PUNCTUATION && oResult.Length () == 1)
         {
             // (strchr() would also match the terminating zero)
-            if (oResult.String [0] == '+' || oResult.String [0] == '-' ||
-                oResult.String [0] == '!' || oResult.String [0] == '~')
+            if (oResult.String () [0] == '+' || oResult.String () [0] == '-' ||
+                oResult.String () [0] == '!' || oResult.String () [0] == '~')
             {
-                char uop = oResult.String [0];
+                char uop = oResult.String () [0];
                 op = GetExpression (oResult, iLine, 12);
                 long val;
                 if (!GetValue (oResult, val, iLine))
@@ -561,7 +673,7 @@ namespace Ogre {
                 else if (uop == '~')
                     oResult.SetValue (~val);
             }
-            else if (oResult.String [0] == '(')
+            else if (oResult.String () [0] == '(')
             {
                 op = GetExpression (oResult, iLine, 1);
                 if (op.Type == Token::TK_ERROR)
@@ -592,8 +704,8 @@ namespace Ogre {
                 return op;
 
             int prio = 0;
-            if (op.Length == 1)
-                switch (op.String [0])
+            if (op.Length () == 1)
+                switch (op.String () [0])
                 {
                 case ')': return op;
                 case '|': prio = 4; break;
@@ -607,23 +719,23 @@ namespace Ogre {
                 case '/':
                 case '%': prio = 11; break;
                 }
-            else if (op.Length == 2)
-                switch (op.String [0])
+            else if (op.Length () == 2)
+                switch (op.String () [0])
                 {
-                case '|': if (op.String [1] == '|') prio = 2; break;
-                case '&': if (op.String [1] == '&') prio = 3; break;
-                case '=': if (op.String [1] == '=') prio = 7; break;
-                case '!': if (op.String [1] == '=') prio = 7; break;
+                case '|': if (op.String () [1] == '|') prio = 2; break;
+                case '&': if (op.String () [1] == '&') prio = 3; break;
+                case '=': if (op.String () [1] == '=') prio = 7; break;
+                case '!': if (op.String () [1] == '=') prio = 7; break;
                 case '<':
-                    if (op.String [1] == '=')
+                    if (op.String () [1] == '=')
                         prio = 8;
-                    else if (op.String [1] == '<')
+                    else if (op.String () [1] == '<')
                         prio = 9;
                     break;
                 case '>':
-                    if (op.String [1] == '=')
+                    if (op.String () [1] == '=')
                         prio = 8;
-                    else if (op.String [1] == '>')
+                    else if (op.String () [1] == '>')
                         prio = 9;
                     break;
                 }
@@ -642,20 +754,20 @@ namespace Ogre {
             long vlop, vrop;
             if (!GetValue (oResult, vlop, iLine))
             {
-                std::string msg = "Left operand of '" + std::string (op.String, op.Length) +
+                std::string msg = "Left operand of '" + std::string (op.String (), op.Length ()) +
                     "' is not a number";
                 Error (iLine, msg.c_str (), &oResult);
                 return Token (Token::TK_ERROR);
             }
             if (!GetValue (rop, vrop, iLine))
             {
-                std::string msg = "Right operand of '" + std::string (op.String, op.Length) +
+                std::string msg = "Right operand of '" + std::string (op.String (), op.Length ()) +
                     "' is not a number";
                 Error (iLine, msg.c_str (), &rop);
                 return Token (Token::TK_ERROR);
             }
 
-            switch (op.String [0])
+            switch (op.String () [0])
             {
             case '|':
                 if (prio == 2)
@@ -670,7 +782,7 @@ namespace Ogre {
                     oResult.SetValue (vlop & vrop);
                 break;
             case '<':
-                if (op.Length == 1)
+                if (op.Length () == 1)
                     oResult.SetValue (vlop < vrop);
                 else if (prio == 8)
                     oResult.SetValue (vlop <= vrop);
@@ -678,7 +790,7 @@ namespace Ogre {
                     oResult.SetValue (vlop << (vrop & 63));
                 break;
             case '>':
-                if (op.Length == 1)
+                if (op.Length () == 1)
                     oResult.SetValue (vlop > vrop);
                 else if (prio == 8)
                     oResult.SetValue (vlop >= vrop);
@@ -698,14 +810,14 @@ namespace Ogre {
                     Error (iLine, "Division by zero");
                     return Token (Token::TK_ERROR);
                 }
-                if (op.String [0] == '/')
+                if (op.String () [0] == '/')
                     oResult.SetValue (vlop / vrop);
                 else
                     oResult.SetValue (vlop % vrop);
                 break;
             }
 
-            op = nextop;
+            op = std::move (nextop);
         }
     }
 
@@ -718,7 +830,7 @@ namespace Ogre {
         if ((vt->Type == Token::TK_KEYWORD ||
              vt->Type == Token::TK_TEXT ||
              vt->Type == Token::TK_NUMBER) &&
-            !vt->String)
+            !vt->String ())
         {
             Error (iLine, "Trying to evaluate an empty expression");
             return false;
@@ -757,9 +869,9 @@ namespace Ogre {
 
         case Token::TK_KEYWORD:
             // Try to expand the macro
-            if ((m = IsDefined (*vt)) && !m->Expanding && !vt->IsDisabled(m->Name))
+            if ((m = IsDefined (*vt)) && !m->Expanding && !vt->Str.IsDisabled (m->Name.View ()))
             {
-                Token x = ExpandMacro (*vt);
+                Token x = ExpandMacro (vt->Borrow ());
                 m->Expanding = true;
                 bool rc = GetValue (x, oValue, iLine);
                 m->Expanding = false;
@@ -803,12 +915,12 @@ namespace Ogre {
         if (!iExpand)
         {
             if (oArg.Type == Token::TK_EOS)
-                return oArg;
+                return Token (Token::TK_EOS);
             else if (oArg.Type == Token::TK_PUNCTUATION &&
-                     (oArg.String [0] == ',' ||
-                      oArg.String [0] == ')'))
+                     (oArg.String () [0] == ',' ||
+                      oArg.String () [0] == ')'))
             {
-                Token t = oArg;
+                Token t = std::move (oArg);
                 oArg = Token (Token::TK_TEXT, "", 0);
                 return t;
             }
@@ -822,10 +934,10 @@ namespace Ogre {
         size_t braceCount = 0;
         bool directive = oArg.Type == Token::TK_DIRECTIVE;
 
-        if( oArg.Type == Token::TK_PUNCTUATION && oArg.String[0] == '(' )
+        if( oArg.Type == Token::TK_PUNCTUATION && oArg.String ()[0] == '(' )
             ++braceCount;
 
-        size_t len = oArg.Length;
+        size_t len = oArg.Length ();
         while (true)
         {
             // Rescan directives later, before expanding their operands.
@@ -838,17 +950,17 @@ namespace Ogre {
             case Token::TK_ERROR:
                 return Token (Token::TK_ERROR);
             case Token::TK_PUNCTUATION:
-                if( t.String [0] == '(' )
+                if( t.String () [0] == '(' )
                 {
                     ++braceCount;
                 }
                 else if( !braceCount )
                 {
-                    if (t.String [0] == ',' ||
-                        t.String [0] == ')')
+                    if (t.String () [0] == ',' ||
+                        t.String () [0] == ')')
                     {
                         // Trim whitespaces at the end
-                        oArg.Length = len;
+                        oArg.Str.Truncate (len);
 
                         //Append "__arg_" to all macro arguments, otherwise if user does:
                         //  #define mad( a, b, c ) fma( a, b, c )
@@ -860,24 +972,24 @@ namespace Ogre {
                         //This does not fix the problem by the root, but
                         //typing "__arg_" by the user is extremely rare.
                         if( shouldAppendArg )
-                            oArg.Append( "__arg_", 6 );
+                            oArg.Str.AppendCopy ("__arg_");
                         return t;
                     }
                 }
                 else
                 {
-                    if( t.String [0] == ')' )
+                    if( t.String () [0] == ')' )
                         --braceCount;
                 }
                 break;
             case Token::TK_DIRECTIVE:
-                if (iExpand && oArg.Length && oArg.String[oArg.Length - 1] != '\n')
-                    oArg.Append ("\n", 1);
+                if (iExpand && oArg.Length () && oArg.String ()[oArg.Length () - 1] != '\n')
+                    oArg.Str.AppendCopy ("\n");
                 directive = true;
                 break;
             case Token::TK_NEWLINE:
                 if (iExpand && directive)
-                    oArg.Append (t);
+                    oArg.Str.Append (std::move (t.Str));
                 directive = false;
                 continue;
             case Token::TK_LINECONT:
@@ -895,10 +1007,10 @@ namespace Ogre {
                 return Token (Token::TK_ERROR);
             }
 
-            oArg.Append (t);
+            oArg.Str.Append (std::move (t.Str));
 
             if (t.Type != Token::TK_WHITESPACE)
-                len = oArg.Length;
+                len = oArg.Length ();
         }
     }
 
@@ -923,7 +1035,7 @@ namespace Ogre {
             t = GetToken (false);
 
             if( !isFirstTokenParsed &&
-                (t.Type != Token::TK_PUNCTUATION || t.String [0] != '(') )
+                (t.Type != Token::TK_PUNCTUATION || t.String () [0] != '(') )
             {
                 isFirstTokenNotAnOpenBrace = true;
             }
@@ -957,7 +1069,7 @@ namespace Ogre {
                 return Token (Token::TK_ERROR);
 
             case Token::TK_PUNCTUATION:
-                if (t.String [0] == ')')
+                if (t.String () [0] == ')')
                 {
                     // Likewise, this is the lookahead token after the argument
                     // list. If it were expanded, ExpandMacro() would "put back"
@@ -975,7 +1087,7 @@ namespace Ogre {
         }
 
     Done:
-        oArgs.insert(oArgs.begin(), args, args + nargs);
+        oArgs.insert(oArgs.begin(), std::make_move_iterator (args), std::make_move_iterator (args + nargs));
         return t;
     }
 
@@ -992,8 +1104,7 @@ namespace Ogre {
             return false;
         }
 
-        Macro m(t);
-        m.Body = iBody;
+        Macro m (t.Borrow ());
         t = cpp.GetArguments (m.Args, false, true);
         while (t.Type == Token::TK_WHITESPACE)
             t = cpp.GetToken (false);
@@ -1011,8 +1122,8 @@ namespace Ogre {
 
         default:
             t.Type = Token::TK_TEXT;
-            assert (t.String + t.Length == cpp.Source);
-            t.Length = cpp.SourceEnd - t.String;
+            assert (t.String () + t.Length () == cpp.Source);
+            t.Str.ResizeBorrowed (cpp.SourceEnd - t.String ());
             break;
         }
 
@@ -1026,15 +1137,18 @@ namespace Ogre {
             //  #define mad( a__arg_, b__arg_, c__arg_ ) fma( a__arg_, b__arg_, c__arg_ )
             for (const Token& arg : m.Args)
             {
-                cpp2.Define(arg.String, arg.Length - 6, arg.String, arg.Length);
+                if (arg.Length () >= 6) // empty for "#define F()"
+                    cpp2.Define(arg.String (), arg.Length () - 6, arg.String (), arg.Length ());
             }
 
             // Now run the macro expansion through the supplimentary preprocessor
             Token xt = cpp2.Parse( t );
-            t = xt;
+            t = std::move (xt);
         }
 
-        m.Value = t;
+        m.Value = std::move (t);
+        // The macro keeps the text that its name, arguments and value point into
+        m.Body = std::move (iBody);
         MacroList.push_front(std::move(m));
         return true;
     }
@@ -1053,7 +1167,7 @@ namespace Ogre {
         }
 
         // Don't barf if macro does not exist - standard C behaviour
-        Undef (t.String, t.Length);
+        Undef (t.String (), t.Length ());
 
         do
         {
@@ -1184,7 +1298,7 @@ namespace Ogre {
         if ((EnableElif & 1) || (EnableOutput & 1))
             EnableOutput ^= 1;
 
-        if (iBody.Length)
+        if (iBody.Length ())
             Error (iLine, "Warning: Ignoring garbage after #else", &iBody);
 
         return true;
@@ -1201,7 +1315,7 @@ namespace Ogre {
             return false;
         }
 
-        if (iBody.Length)
+        if (iBody.Length ())
             Error (iLine, "Warning: Ignoring garbage after #endif", &iBody);
 
         return true;
@@ -1211,8 +1325,8 @@ namespace Ogre {
     CPreprocessor::Token CPreprocessor::HandleDirective (Token &iToken, int iLine)
     {
         // Analyze preprocessor directive
-        const char *directive = iToken.String + 1;
-        size_t dirlen = iToken.Length - 1;
+        const char *directive = iToken.String () + 1;
+        size_t dirlen = iToken.Length () - 1;
         while (dirlen && isSpace (*directive))
             dirlen--, directive++;
 
@@ -1226,8 +1340,8 @@ namespace Ogre {
             if (t.Type == Token::TK_NEWLINE)
             {
                 // No directive arguments
-                last = t;
-                t.Length = 0;
+                last = t.Borrow ();
+                t.Str.Truncate (0);
                 goto Done;
             }
         } while (t.Type == Token::TK_WHITESPACE ||
@@ -1262,7 +1376,7 @@ namespace Ogre {
                 break;
             }
 
-            t.Append (last);
+            t.Str.Append (last.Str);
             t.Type = Token::TK_TEXT;
         }
     Done:
@@ -1304,9 +1418,9 @@ namespace Ogre {
 
             // Unknown preprocessor directive, roll back and pass through
             Line = old_line;
-            Source = iToken.String + iToken.Length;
+            Source = iToken.String () + iToken.Length ();
             iToken.Type = Token::TK_TEXT;
-            return iToken;
+            return std::move (iToken);
         }
 
 #undef IS_DIRECTIVE
@@ -1340,7 +1454,7 @@ namespace Ogre {
             auto itpp = std::next(it);
             if(itpp == MacroList.end()) break;
 
-            if (itpp->Name == name)
+            if (itpp->Name.View () == name.View ())
             {
                 MacroList.erase_after(it);
                 return true;
@@ -1354,8 +1468,8 @@ namespace Ogre {
     CPreprocessor::Token CPreprocessor::Parse (const Token &iSource)
     {
         SourceToken = &iSource;
-        Source = iSource.String;
-        SourceEnd = Source + iSource.Length;
+        Source = iSource.String ();
+        SourceEnd = Source + iSource.Length ();
         Line = 1;
         BOL = true;
         EnableOutput = 1;
@@ -1388,8 +1502,8 @@ namespace Ogre {
                 // C comments are replaced with single spaces.
                 if (output_enabled)
                 {
-                    output.Append (" ", 1);
-                    output.AppendNL (Line - old_line);
+                    output.Str.AppendCopy (" ");
+                    output.Str.AppendNL (Line - old_line);
                 }
                 break;
 
@@ -1405,14 +1519,14 @@ namespace Ogre {
                 if (output_enabled != old_output_enabled)
                 {
                     if (output_enabled)
-                        output.AppendNL (old_line - output_disabled_line);
+                        output.Str.AppendNL (old_line - output_disabled_line);
                     else
                         output_disabled_line = old_line;
                     old_output_enabled = output_enabled;
                 }
 
                 if (output_enabled)
-                    output.AppendNL (Line - old_line - t.CountNL ());
+                    output.Str.AppendNL (Line - old_line - t.CountNL ());
                 goto NextToken;
 
             case Token::TK_LINECONT:
@@ -1421,8 +1535,8 @@ namespace Ogre {
                 break;
 
             case Token::TK_PUNCTUATION:
-                if (output_enabled && (!SupplimentaryExpand || t.String[0] != '#'))
-                    output.Append (t);
+                if (output_enabled && (!SupplimentaryExpand || t.String ()[0] != '#'))
+                    output.Str.Append (std::move (t.Str));
                 break;
 
             case Token::TK_NEWLINE:
@@ -1431,7 +1545,7 @@ namespace Ogre {
                     // Compensate for the backslash-newline combinations
                     // we have encountered, otherwise line numeration is broken
                     if (output_enabled)
-                        output.AppendNL (empty_lines);
+                        output.Str.AppendNL (empty_lines);
                     empty_lines = 0;
                 }
                 OGRE_FALLTHROUGH; // to default
@@ -1440,7 +1554,7 @@ namespace Ogre {
             default:
                 // Passthrough all other tokens
                 if (output_enabled)
-                    output.Append (t);
+                    output.Str.Append (std::move (t.Str));
                 break;
             }
         }
@@ -1461,9 +1575,8 @@ namespace Ogre {
         if (retval.Type == Token::TK_ERROR)
             return NULL;
 
-        oLength = retval.Length;
-        retval.Allocated = 0;
-        return retval.Buffer;
+        oLength = retval.Length ();
+        return retval.Str.Release ();
     }
 
 } // namespace Ogre
