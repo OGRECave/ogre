@@ -67,6 +67,19 @@ namespace Ogre {
     /// Growth policy of owned buffers
     static size_t CapacityFor (size_t iSize) { return std::max<size_t> (64, ClosestPow2 (iSize)); }
 
+    /// Sets a flag for the lifetime of the object
+    class ScopedFlag
+    {
+    public:
+        explicit ScopedFlag(bool& iFlag) : Flag(iFlag) { Flag = true; }
+        ~ScopedFlag() { Flag = false; }
+        ScopedFlag(const ScopedFlag&) = delete;
+        ScopedFlag& operator=(const ScopedFlag&) = delete;
+
+    private:
+        bool& Flag;
+    };
+
     CPreprocessor::Text::Text(Text&& iOther) noexcept
         : String(iOther.String), Length(iOther.Length), Allocated(iOther.Allocated),
           DisabledMacros(std::move(iOther.DisabledMacros))
@@ -390,7 +403,7 @@ namespace Ogre {
     CPreprocessor::Token CPreprocessor::Macro::Expand(const std::vector<Token>& iArgs,
                                                       MacroTable& iMacros)
     {
-        Expanding = true;
+        ScopedFlag expanding(Expanding);
 
         CPreprocessor cpp;
         cpp.SupplimentaryExpand = true;
@@ -425,7 +438,6 @@ namespace Ogre {
             // Repeat until there is no more change between parses
         } while (xt.String () != new_xt.String ());
 
-        Expanding = false;
         std::swap(cpp.MacroList, iMacros);
 
         if (xt.Length ())
@@ -433,13 +445,14 @@ namespace Ogre {
         return xt;
     }
 
-    void CPreprocessor::Error(int iLine, const char *iError, const Token *iToken)
+    void CPreprocessor::Error(int iLine, const std::string& iError, const Token* iToken) const
     {
         String msg;
         if (iToken)
-            msg = StringUtil::format("line %d: %s: `%.*s'\n", iLine, iError, int(iToken->Length ()), iToken->String ());
+            msg = StringUtil::format("line %d: %s: `%.*s'\n", iLine, iError.c_str(), int(iToken->Length ()),
+                                     iToken->String () ? iToken->String () : "");
         else
-            msg = StringUtil::format("line %d: %s\n", iLine, iError);
+            msg = StringUtil::format("line %d: %s\n", iLine, iError.c_str());
         LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
     }
 
@@ -636,10 +649,9 @@ namespace Ogre {
 
             if (args.size() > cur->Args.size())
             {
-                std::string msg = "Macro `" + std::string (cur->Name.String, cur->Name.Length) +
-                    "' passed " + std::to_string (args.size ()) +
-                    " arguments, but takes just " + std::to_string (cur->Args.size ());
-                Error (old_line, msg.c_str ());
+                Error (old_line, "Macro `" + std::string (cur->Name.String, cur->Name.Length) + "' passed " +
+                                     std::to_string (args.size ()) + " arguments, but takes just " +
+                                     std::to_string (cur->Args.size ()));
                 return Token (Token::TK_ERROR);
             }
 
@@ -795,7 +807,7 @@ namespace Ogre {
                 long val;
                 if (!GetValue (oResult, val, iLine))
                 {
-                    Error (iLine, (std::string ("Unary '") + uop + "' not applicable").c_str (), &oResult);
+                    Error (iLine, std::string ("Unary '") + uop + "' not applicable", &oResult);
                     return Token (Token::TK_ERROR);
                 }
 
@@ -850,12 +862,12 @@ namespace Ogre {
             long vlop, vrop, val;
             if (!GetValue (oResult, vlop, iLine))
             {
-                Error (iLine, ("Left operand of '" + opText + "' is not a number").c_str (), &oResult);
+                Error (iLine, "Left operand of '" + opText + "' is not a number", &oResult);
                 return Token (Token::TK_ERROR);
             }
             if (!GetValue (rop, vrop, iLine))
             {
-                Error (iLine, ("Right operand of '" + opText + "' is not a number").c_str (), &rop);
+                Error (iLine, "Right operand of '" + opText + "' is not a number", &rop);
                 return Token (Token::TK_ERROR);
             }
             if (!Apply (binary, vlop, vrop, val))
@@ -921,10 +933,8 @@ namespace Ogre {
             {
                 MacroTable::Pin pin (MacroList, *m);
                 Token x = ExpandMacro (vt->Borrow ());
-                m->Expanding = true;
-                bool rc = GetValue (x, oValue, iLine);
-                m->Expanding = false;
-                return rc;
+                ScopedFlag expanding(m->Expanding);
+                return GetValue (x, oValue, iLine);
             }
 
             // Undefined macro, "expand" to 0 (mimic cpp behaviour)
