@@ -102,7 +102,8 @@ namespace Ogre
     {
         using namespace std;
 
-        ofstream file(filename.c_str());
+        ofstream file;
+        _openStdFstream(file, filename);
 
         write(caps, name, file);
 

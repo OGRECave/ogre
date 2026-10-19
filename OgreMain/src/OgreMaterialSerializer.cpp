@@ -63,33 +63,33 @@ namespace Ogre
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Queue is empty !", "MaterialSerializer::exportQueued");
 
         LogManager::getSingleton().logMessage("MaterialSerializer : writing material(s) to material script : " + fileName, LML_NORMAL);
-        FILE *fp;
-        fp = fopen(fileName.c_str(), "w");
-        if (!fp)
+        std::ofstream fp;
+        _openStdFstream(fp, fileName);
+        if (!fp.is_open())
             OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "Cannot create material file.",
             "MaterialSerializer::export");
 
         // output gpu program definitions to material script file if includeProgDef is true
         if (includeProgDef && !mGpuProgramBuffer.empty())
         {
-            fputs(mGpuProgramBuffer.c_str(), fp);
+            fp << mGpuProgramBuffer;
         }
 
         // output main buffer holding material script
-        fputs(mBuffer.c_str(), fp);
-        fclose(fp);
+        fp << mBuffer;
+        fp.close();
 
         // write program script if program filename and program definitions
         // were not included in material script
         if (!includeProgDef && !mGpuProgramBuffer.empty() && !programFilename.empty())
         {
-            FILE *locFp;
-            locFp = fopen(programFilename.c_str(), "w");
-            if (!locFp)
+            std::ofstream locFp;
+            _openStdFstream(locFp, programFilename);
+            if (!locFp.is_open())
                 OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "Cannot create program material file.",
                 "MaterialSerializer::export");
-            fputs(mGpuProgramBuffer.c_str(), locFp);
-            fclose(locFp);
+            locFp << mGpuProgramBuffer;
+            locFp.close();
         }
 
         LogManager::getSingleton().logMessage("MaterialSerializer : done.", LML_NORMAL);

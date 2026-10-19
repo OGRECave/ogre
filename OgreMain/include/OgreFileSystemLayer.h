@@ -132,7 +132,13 @@ namespace Ogre
         static bool removeDirectory(const Ogre::String& name);
         /** Test if the given file exists. */
         static bool fileExists(const Ogre::String& path);
-        /** Delete a file. */
+        /** Delete a file.
+
+         @note The static helpers of this class are the preferred way to manage files from
+         outside of OgreMain. On Windows, paths are expected to be UTF-8 encoded if
+         OGRE_CONFIG_FILESYSTEM_UNICODE is enabled. To read or write files, use
+         Root::openFileStream and Root::createFileStream.
+         */
         static bool removeFile(const Ogre::String& path);
         /** Rename a file. */
         static bool renameFile(const Ogre::String& oldpath, const Ogre::String& newpath);

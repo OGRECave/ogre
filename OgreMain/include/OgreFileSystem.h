@@ -45,8 +45,34 @@ namespace Ogre {
     *  @{
     */
 
-    /// internal method to open a FileStreamDataStream
+    /** internal method to open a FileStreamDataStream
+
+     The internal file access methods below are intentionally not exported, to keep the
+     platform specific path handling (e.g. UTF-8 paths on Windows) contained inside OgreMain.
+     Outside of OgreMain use Root::openFileStream, Root::createFileStream and the static
+     helpers of FileSystemLayer instead.
+     */
     DataStreamPtr _openFileStream(const String& path, std::ios::openmode mode, const String& name = "");
+
+    /** internal method to open a std::fstream
+     *
+     * Behaves like calling `stream.open(path, mode)`, but supports UTF-8 paths on Windows
+     * if OGRE_CONFIG_FILESYSTEM_UNICODE is enabled. Check `stream.is_open()` for success.
+     */
+    void _openStdFstream(std::ifstream& stream, const String& path, std::ios::openmode mode = std::ios::in);
+    /// @overload
+    void _openStdFstream(std::ofstream& stream, const String& path, std::ios::openmode mode = std::ios::out);
+    /// @overload
+    void _openStdFstream(std::fstream& stream, const String& path,
+                         std::ios::openmode mode = std::ios::in | std::ios::out);
+
+    /** internal method to delete a file
+     *
+     * Behaves like calling `remove(path)`, but supports UTF-8 paths on Windows
+     * if OGRE_CONFIG_FILESYSTEM_UNICODE is enabled.
+     * @return true on success
+     */
+    bool _removeFile(const String& path);
 
     /** Specialisation of the ArchiveFactory to allow reading of files from
         filesystem folders / directories.

@@ -304,7 +304,7 @@ namespace Ogre
         }
         
         std::ifstream inFile;
-        inFile.open(mTempFileName.c_str(), std::ios::in | std::ios::binary);
+        _openStdFstream(inFile, mTempFileName, std::ios::in | std::ios::binary);
         
         do 
         {
@@ -340,7 +340,7 @@ namespace Ogre
         deflateEnd(mZStream);
 
         inFile.close();
-        remove(mTempFileName.c_str());
+        _removeFile(mTempFileName);
                         
     }
     //---------------------------------------------------------------------

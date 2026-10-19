@@ -315,6 +315,37 @@ namespace {
 
         return _openFileStream(concatenate_path(mName, filename), mode, filename);
     }
+    //---------------------------------------------------------------------
+    template <typename T>
+    static void openStdFstreamImpl(T& stream, const String& path, std::ios::openmode mode)
+    {
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+        stream.open(windowsUtf8ToWide(path).c_str(), mode);
+#else
+        stream.open(path.c_str(), mode);
+#endif
+    }
+    void _openStdFstream(std::ifstream& stream, const String& path, std::ios::openmode mode)
+    {
+        openStdFstreamImpl(stream, path, mode);
+    }
+    void _openStdFstream(std::ofstream& stream, const String& path, std::ios::openmode mode)
+    {
+        openStdFstreamImpl(stream, path, mode);
+    }
+    void _openStdFstream(std::fstream& stream, const String& path, std::ios::openmode mode)
+    {
+        openStdFstreamImpl(stream, path, mode);
+    }
+    bool _removeFile(const String& path)
+    {
+#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+        return ::_wremove(windowsUtf8ToWide(path).c_str()) == 0;
+#else
+        return ::remove(path.c_str()) == 0;
+#endif
+    }
+    //---------------------------------------------------------------------
     DataStreamPtr _openFileStream(const String& full_path, std::ios::openmode mode, const String& name)
     {
         // Use filesystem to determine size 
@@ -335,21 +366,13 @@ namespace {
         if (mode & std::ios::out)
         {
             rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-			rwStream->open(windowsUtf8ToWide(full_path).c_str(), mode);
-#else
-            rwStream->open(full_path.c_str(), mode);
-#endif
+            _openStdFstream(*rwStream, full_path, mode);
             baseStream = rwStream;
         }
         else
         {
             roStream = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL)();
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-			roStream->open(windowsUtf8ToWide(full_path).c_str(), mode);
-#else
-            roStream->open(full_path.c_str(), mode);
-#endif
+            _openStdFstream(*roStream, full_path, mode);
             baseStream = roStream;
         }
 
@@ -392,11 +415,7 @@ namespace {
         // Also, always include reading
         std::ios::openmode mode = std::ios::out | std::ios::binary;
         std::fstream* rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-		rwStream->open(windowsUtf8ToWide(full_path).c_str(), mode);
-#else
-        rwStream->open(full_path.c_str(), mode);
-#endif
+        _openStdFstream(*rwStream, full_path, mode);
 
         // Should check ensure open succeeded, in case fail for some reason.
         if (rwStream->fail())
@@ -418,12 +437,7 @@ namespace {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot remove a file from a read-only archive");
         }
-        String full_path = concatenate_path(mName, filename);
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-		::_wremove(windowsUtf8ToWide(full_path).c_str());
-#else
-        ::remove(full_path.c_str());
-#endif
+        _removeFile(concatenate_path(mName, filename));
     }
     //-----------------------------------------------------------------------
     StringVectorPtr FileSystemArchive::list(bool recursive, bool dirs) const

@@ -427,7 +427,7 @@ namespace {
         {
             // Write the file
             std::ofstream of;
-            of.open(outFileName.c_str(), std::ios_base::binary | std::ios_base::out);
+            _openStdFstream(of, outFileName, std::ios_base::binary|std::ios_base::out);
 
             const size_t buffSize = 4096;
             char buffer[buffSize];

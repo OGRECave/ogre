@@ -540,6 +540,10 @@ namespace Ogre
             want to be more specific, you can include a location pattern here and
             only locations which match that pattern (as determined by StringUtil::match)
             will be considered candidates for creation.
+        @throws FileNotFoundException if the file cannot be created
+        @note This is the preferred way to write files from outside of OgreMain, as it
+            handles the platform specifics. On Windows, filename is expected to be UTF-8
+            encoded if OGRE_CONFIG_FILESYSTEM_UNICODE is enabled.
         */
         static DataStreamPtr createFileStream(const String& filename,
                 const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -553,6 +557,10 @@ namespace Ogre
         @param filename The name of the file to open.
         @param groupName The name of the group in which to create the file, if the
             resource system is used
+        @throws FileNotFoundException if the file cannot be opened
+        @note This is the preferred way to read files from outside of OgreMain, as it
+            handles the platform specifics. On Windows, filename is expected to be UTF-8
+            encoded if OGRE_CONFIG_FILESYSTEM_UNICODE is enabled.
         */
         static DataStreamPtr openFileStream(const String& filename,
                 const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
