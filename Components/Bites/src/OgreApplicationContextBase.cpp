@@ -337,14 +337,17 @@ void ApplicationContextBase::enableShaderCache() const
 
     // Load for a package version of the shaders.
     Ogre::String path = mFSLayer->getWritablePath(SHADER_CACHE_FILENAME);
-    std::ifstream inFile(path.c_str(), std::ios::binary);
-    if (!inFile.is_open())
+    Ogre::DataStreamPtr istream;
+    try
+    {
+        istream = Ogre::Root::openFileStream(path);
+    }
+    catch (const Ogre::FileNotFoundException&)
     {
         Ogre::LogManager::getSingleton().logWarning("Could not open '"+path+"'");
         return;
     }
     Ogre::LogManager::getSingleton().logMessage("Loading shader cache from '"+path+"'");
-    Ogre::DataStreamPtr istream(new Ogre::FileStreamDataStream(path, &inFile, false));
     Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
 }
 
@@ -625,16 +628,16 @@ void ApplicationContextBase::shutdown()
     if (gpuMgr.getSaveMicrocodesToCache() && gpuMgr.isCacheDirty())
     {
         Ogre::String path = mFSLayer->getWritablePath(SHADER_CACHE_FILENAME);
-        std::fstream outFile(path.c_str(), std::ios::out | std::ios::binary);
-
-        if (outFile.is_open())
+        try
         {
+            Ogre::DataStreamPtr ostream = Ogre::Root::createFileStream(path, Ogre::RGN_DEFAULT, true);
             Ogre::LogManager::getSingleton().logMessage("Writing shader cache to "+path);
-            Ogre::DataStreamPtr ostream(new Ogre::FileStreamDataStream(path, &outFile, false));
             gpuMgr.saveMicrocodeCache(ostream);
         }
-        else
+        catch (const Ogre::FileNotFoundException&)
+        {
             Ogre::LogManager::getSingleton().logWarning("Cannot open shader cache for writing "+path);
+        }
     }
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
