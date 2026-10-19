@@ -29,41 +29,82 @@
 #ifndef __OGRE_CPREPROCESSOR_H__
 #define __OGRE_CPREPROCESSOR_H__
 
-#include "OgrePlatform.h"
-#include <string.h>
+#include <cstddef>
 #include <cstring>
-#include <cstdint>
-#include <stdlib.h>
 #include <forward_list>
-#include <vector>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace Ogre {
 
     /**
-     * This is a simplistic C/C++-like preprocessor.
-     * It takes an non-zero-terminated string on input and outputs a
+     * A simplistic C/C++-like preprocessor.
+     * It takes a non-zero-terminated string on input and outputs a
      * non-zero-terminated string buffer.
      *
      * This preprocessor was designed specifically for GLSL shaders, so
      * if you want to use it for other purposes you might want to check
      * if the feature set it provides is enough for you.
      *
-     * Here's a list of supported features:
-     * - Fast memory allocation-less operation (mostly).
+     * Supported features:
+     * - Fast, (mostly) allocation-free operation: the source is parsed in situ,
+     *     tokens are views into it, and untouched input is returned as-is.
      * - Line continuation (backslash-newline) is swallowed.
      * - Line numeration is fully preserved by inserting empty lines where
-     *     required. This is crucial if, say, GLSL compiler reports you an error
-     *     with a line number.
-     * - @c \#define: Parametrized and non-parametrized macros. Invoking a macro with
-     *     less arguments than it takes assignes empty values to missing arguments.
-     * - @c \#undef: Forget defined macros
-     * - @c \#ifdef / @c \#ifndef / @c \#else / @c \#endif: Conditional suppression of parts of code.
-     * - @c \#if: Supports numeric expression of any complexity, also supports the
+     *     required, so compiler error line numbers stay valid.
+     * - @c \#define: parametrized and non-parametrized macros. Invoking a macro
+     *     with fewer arguments than it takes assigns empty values to the rest.
+     * - @c \#undef: forget defined macros
+     * - @c \#ifdef / @c \#ifndef / @c \#else / @c \#endif: conditional suppression.
+     * - @c \#if / @c \#elif: numeric expressions of any complexity, including the
      *     defined() pseudo-function.
+     *
+     * @par Lifetime (in-situ contract)
+     * Macros keep *views* into the memory they were defined from: both the
+     * strings passed to Define() and the source text passed to Parse() (for
+     * macros defined by \#define) must outlive every later use of this object.
      */
     class CPreprocessor
     {
+    public:
+        /// Create an empty preprocessor object
+        CPreprocessor() = default;
+        ~CPreprocessor() = default;
+
+        CPreprocessor(CPreprocessor&&) noexcept = default;
+        CPreprocessor& operator=(CPreprocessor&&) noexcept = default;
+
+        /**
+         * Define a macro with a value. The strings are not copied.
+         * @param iMacroName      The name of the defined macro
+         * @param iMacroNameLen   The length of the name
+         * @param iMacroValue     The value of the defined macro
+         * @param iMacroValueLen  The length of the value
+         */
+        void Define(const char* iMacroName, size_t iMacroNameLen, const char* iMacroValue,
+                    size_t iMacroValueLen);
+
+        /// Define a symbolical macro (no value). The name is not copied.
+        void Define(const char* iMacroName, size_t iMacroNameLen);
+
+        /// Undefine a macro; @return false if it did not exist.
+        bool Undef(const char* iMacroName, size_t iMacroNameLen);
+
+        /**
+         * Parse the input string and return a newly-allocated output string.
+         * @note The result is NOT zero-terminated (just like the input).
+         * @param iSource  The source text
+         * @param iLength  Its length in bytes
+         * @param oLength  Receives the length of the result
+         * @return The result, or NULL on error (errors are logged).
+         *     The result is allocated with malloc(), *except* when nothing had
+         *     to be changed: then it points *into* @a iSource. The caller must
+         *     free() it only if it does not lie inside the source buffer.
+         */
+        char* Parse(const char* iSource, size_t iLength, size_t& oLength);
+
+    private:
         /// Non-owning (pointer, length) pair. A NULL pointer means "no text at
         /// all", which is distinct from an empty string.
         struct StringView
@@ -304,431 +345,14 @@ namespace Ogre {
             std::vector<const Macro*> Pinned;
         };
 
-        /**
-         * Nesting state of #if/#elif/#else/#endif, packed into two 32 bit words
-         * (bit 0 is the innermost level).
-         *  - EnableOutput: the level currently emits output. A sentinel bit below
-         *    the outermost level makes an empty stack read as 1.
-         *  - EnableElif: no branch of the level has been taken yet.
-         */
-        class ConditionalStack
-        {
-        public:
-            bool IsEmpty() const { return EnableOutput == 1; }
-            bool IsFull() const { return (EnableOutput & (1u << 31)) != 0; }
-            /// True if all enclosing levels emit output
-            bool IsOutputEnabled() const { return (EnableOutput & (EnableOutput + 1)) == 0; }
+        /// Splits a Text into tokens, in situ. Defined in the implementation file.
+        class Lexer;
+        /// Handles directives, macro expansion and output. Defined in the
+        /// implementation file.
+        class Processor;
 
-            void Push(bool iValue)
-            {
-                EnableElif <<= 1;
-                EnableOutput <<= 1;
-                if (iValue)
-                    EnableOutput |= 1;
-                else
-                    EnableElif |= 1;
-            }
-
-            /// @return false on underflow (#endif without #if)
-            bool Pop()
-            {
-                EnableElif >>= 1;
-                EnableOutput >>= 1;
-                return EnableOutput != 0;
-            }
-
-            void Elif(bool iValue)
-            {
-                if (iValue && (EnableElif & 1))
-                {
-                    EnableOutput |= 1;
-                    EnableElif &= ~1u;
-                }
-                else
-                    EnableOutput &= ~1u;
-            }
-
-            void Else()
-            {
-                if ((EnableElif & 1) || (EnableOutput & 1))
-                    EnableOutput ^= 1;
-            }
-
-            /// Turns the innermost #ifdef into #ifndef
-            void Negate()
-            {
-                EnableOutput ^= 1;
-                EnableElif ^= 1;
-            }
-
-        private:
-            /// A stack of 32 booleans packed into one value :)
-            uint32_t EnableOutput = 1;
-            uint32_t EnableElif = 0;
-        };
-
-        enum class BinaryOp
-        {
-            None, LogicalOr, LogicalAnd, BitOr, BitXor, BitAnd, Equal, NotEqual, Less, LessEqual,
-            Greater, GreaterEqual, ShiftLeft, ShiftRight, Add, Subtract, Multiply, Divide, Modulo
-        };
-
-        /// Priority of the operators of the whole expression and of unary operators
-        static const int PRIO_PARENTHESIS = 1;
-        static const int PRIO_UNARY = 12;
-
-        static BinaryOp ParseBinaryOp (StringView iOp);
-        static int Priority (BinaryOp iOp);
-        /// @return false on division by zero
-        static bool Apply (BinaryOp iOp, long vlop, long vrop, long& oValue);
-
-        enum class DirectiveKind { Define, UnDef, IfDef, IfNDef, If, Elif, Else, EndIf, Unknown };
-
-        /// #define and #undef are only recognised in emitting regions; elsewhere
-        /// they are passed through like any unknown directive.
-        static DirectiveKind Classify (StringView iName, bool iOutputEnabled);
-
-        /// Splits a Text into tokens, in situ.
-        class Lexer
-        {
-        public:
-            Lexer() = default;
-            Lexer(const Text& iSource, int iLine);
-            bool AtEnd() const { return Source >= SourceEnd; }
-            int GetLine() const { return Line; }
-            const char* GetPosition() const { return Source; }
-            const char* GetEnd() const { return SourceEnd; }
-
-            /// Continue lexing at iPosition (used to un-read a token / a directive)
-            void Rewind(const char* iPosition, int iLine);
-
-            Token GetToken();
-
-        private:
-            /// Current character, or NUL past the end (inputs need not be terminated)
-            char Peek(size_t iAhead = 0) const;
-            Token Make(Token::Kind iType, const char* iBegin) const;
-            Token ReadNewline(const char* iBegin, char c);
-            Token ReadWhitespace(const char* iBegin);
-            Token ReadNumber(const char* iBegin, char iFirst);
-            Token ReadKeyword(const char* iBegin);
-            Token ReadString(const char* iBegin, char iQuote);
-            Token ReadLineComment(const char* iBegin);
-            Token ReadComment(const char* iBegin);
-            Token ReadDirective(const char* iBegin);
-            Token ReadLineCont(const char* iBegin);
-            Token ReadPunctuation(const char* iBegin, char c);
-
-            /// The current source text input (for the disabled ranges; may be NULL)
-            const Text* SourceToken = nullptr;
-            const char* Source = nullptr;
-            /// The end of the source text
-            const char* SourceEnd = nullptr;
-            /// Current line number
-            int Line = 0;
-            /// True if we are at beginning of line
-            bool BOL = true;
-        };
-
-        /// Are we expanding a macro?
-        bool SupplimentaryExpand = false;
-        /// State of the nested #if/#elif/#else/#endif directives
-        ConditionalStack Conditions;
-        /// The macros defined by this (root) preprocessor
-        MacroTable OwnMacros;
-        /// The list of macros defined so far (shared with sub-processors)
-        MacroTable& MacroList;
-        /// The tokenizer
-        Lexer Lex;
-
-        /**
-         * Private constructor of a sub-processor: it shares the macro table of
-         * the preprocessor it is created from.
-         */
-        explicit CPreprocessor (MacroTable& iMacros);
-        CPreprocessor (MacroTable& iMacros, const Token &iToken, int iLine);
-
-        /**
-         * Stateless tokenizer: Parse the input text and return the next token.
-         * @param iExpand
-         *     If true, macros will be expanded to their values
-         * @return
-         *     The next token from the input stream
-         */
-        Token GetToken (bool iExpand);
-
-        /**
-         * Collect the remaining part of the directive until EOL.
-         * @param oLast
-         *     Receives the token that ended the directive body.
-         * @return
-         *     The body of the directive (everything after the directive name).
-         */
-        Token GetDirectiveBody (Token &oLast);
-
-        /**
-         * Handle a preprocessor directive.
-         * @param iToken
-         *     The whole preprocessor directive line (until EOL)
-         * @param iLine
-         *     The line where the directive begins (for error reports)
-         * @return
-         *     The last input token that was not proceeded.
-         */
-        Token HandleDirective (Token &iToken, int iLine);
-
-        /**
-         * Handle a #define directive.
-         * @param iBody
-         *     The body of the directive (everything after the directive
-         *     until end of line).
-         * @param iLine
-         *     The line where the directive begins (for error reports)
-         * @return
-         *     true if everything went ok, false if not
-         */
-        bool HandleDefine (Token &iBody, int iLine);
-
-        /**
-         * Undefine a previously defined macro
-         * @param iBody
-         *     The body of the directive (everything after the directive
-         *     until end of line).
-         * @param iLine
-         *     The line where the directive begins (for error reports)
-         * @return
-         *     true if everything went ok, false if not
-         */
-        bool HandleUnDef (Token &iBody, int iLine);
-
-        /**
-         * Handle an #ifdef directive.
-         * @param iBody
-         *     The body of the directive (everything after the directive
-         *     until end of line).
-         * @param iLine
-         *     The line where the directive begins (for error reports)
-         * @return
-         *     true if everything went ok, false if not
-         */
-        bool HandleIfDef (Token &iBody, int iLine);
-
-        /**
-         * Handle an #if directive.
-         * @param iBody
-         *     The body of the directive (everything after the directive
-         *     until end of line).
-         * @param iLine
-         *     The line where the directive begins (for error reports)
-         * @return
-         *     true if everything went ok, false if not
-         */
-        bool HandleIf (Token &iBody, int iLine);
-
-        /// @overload
-        bool HandleIf(bool val, int iLine);
-
-        /**
-         * Handle an #elif directive.
-         * @param iBody
-         *     The body of the directive (everything after the directive
-         *     until end of line).
-         * @param iLine
-         *     The line where the directive begins (for error reports)
-         * @return
-         *     true if everything went ok, false if not
-         */
-        bool HandleElif (Token &iBody, int iLine);
-
-        /**
-         * Handle an #else directive.
-         * @param iBody
-         *     The body of the directive (everything after the directive
-         *     until end of line).
-         * @param iLine
-         *     The line where the directive begins (for error reports)
-         * @return
-         *     true if everything went ok, false if not
-         */
-        bool HandleElse (Token &iBody, int iLine);
-
-        /**
-         * Handle an #endif directive.
-         * @param iBody
-         *     The body of the directive (everything after the directive
-         *     until end of line).
-         * @param iLine
-         *     The line where the directive begins (for error reports)
-         * @return
-         *     true if everything went ok, false if not
-         */
-        bool HandleEndIf (Token &iBody, int iLine);
-
-        /**
-         * Get a single function argument until next ',' or ')'.
-         * @param oArg
-         *     The argument is returned in this variable.
-         * @param iExpand
-         *     If false, parameters are not expanded and no expressions are
-         *     allowed; only a single keyword is expected per argument.
-         * @param shouldAppendArg
-         *     When true, the argument will be appended the word word __arg_
-         *     e.g. #define myMacro(x) --> #define myMacro(x__arg_)
-         *     This workaround a bug where calling myMacro( x ) would cause
-         *     issues.
-         * @return
-         *     The first unhandled token after argument.
-         */
-        Token GetArgument (Token &oArg, bool iExpand, bool shouldAppendArg);
-
-        /**
-         * Get all the arguments of a macro: '(' arg1 { ',' arg2 { ',' ... }} ')'
-         * @param oArgs
-         *     This is set to a pointer to an array of parsed arguments.
-         * @param shouldAppendArg
-         *      See GetArgument.
-         * @param iExpand
-         *     If false, parameters are not expanded and no expressions are
-         *     allowed; only a single keyword is expected per argument.
-         */
-        Token GetArguments (std::vector<Token>& oArgs, bool iExpand, bool shouldAppendArg);
-
-        /**
-         * Parse an expression, compute it and return the result.
-         * @param oResult
-         *     A token containing the result of expression
-         * @param iLine
-         *     The line at which the expression starts (for error reports)
-         * @param iOpPriority
-         *     Operator priority (at which operator we will stop if
-         *     proceeding recursively -- used internally. Parser stops
-         *     when it encounters an operator with higher or equal priority).
-         * @return
-         *     The last unhandled token after the expression
-         */
-        Token GetExpression (Token &oResult, int iLine, int iOpPriority = 0);
-
-        /**
-         * Get the numeric value of a token.
-         * If the token was produced by expanding a macro, we will get
-         * an TEXT token which can contain a whole expression; in this
-         * case we will call GetExpression to parse it. Otherwise we
-         * just call the token's GetValue() method.
-         * @param iToken
-         *     The token to get the numeric value of
-         * @param oValue
-         *     The variable to put the value into
-         * @param iLine
-         *     The line where the directive begins (for error reports)
-         * @return
-         *     true if ok, false if not
-         */
-        bool GetValue (const Token &iToken, long &oValue, int iLine);
-
-        /// @overload
-        /// same as above, but considers the defined() function
-        bool GetValueDef(const Token &iToken, long &oValue, int iLine);
-
-        /**
-         * Expand the given macro, if it exists.
-         * If macro has arguments, they are collected from source stream.
-         * @param iToken
-         *     A KEYWORD token containing the (possible) macro name.
-         * @return
-         *     The expanded token or iToken if it is not a macro
-         */
-        Token ExpandMacro (Token iToken);
-        Token Expand (Macro& iMacro, const std::vector<Token>& iArgs);
-
-
-        /**
-         * The implementation of the defined() preprocessor function
-         * @param iArgs
-         *     The arguments themselves
-         * @return
-         *     The return value encapsulated in a token
-         */
-        Token ExpandDefined (const std::vector<Token>& iArgs);
-
-        /**
-         * Parse the input string and return a token containing the whole output.
-         * @param iSource
-         *     The source text enclosed in a token
-         * @return
-         *     The output text enclosed in a token
-         */
-        Token Parse (const Token &iSource);
-
-        /// Call the error handler
-        void Error (int iLine, const std::string& iError, const Token* iToken = nullptr) const;
-
-    public:
-        /// Create an empty preprocessor object
-        CPreprocessor();
-
-        CPreprocessor(const CPreprocessor&) = delete;
-        CPreprocessor& operator=(const CPreprocessor&) = delete;
-
-        /// Destroy the preprocessor object
-        virtual ~CPreprocessor ();
-
-        /**
-         * Define a macro without parameters.
-         * @param iMacroName
-         *     The name of the defined macro
-         * @param iMacroNameLen
-         *     The length of the name of the defined macro
-         * @param iMacroValue
-         *     The value of the defined macro
-         * @param iMacroValueLen
-         *     The length of the value of the defined macro
-         */
-        void Define (const char *iMacroName, size_t iMacroNameLen,
-                     const char *iMacroValue, size_t iMacroValueLen);
-
-        /**
-         * Define a symbolical macro.
-         * @param iMacroName
-         *     The name of the defined macro
-         * @param iMacroNameLen
-         *     The length of the name of the defined macro
-         */
-        void Define (const char *iMacroName, size_t iMacroNameLen);
-
-        /**
-         * Undefine a macro.
-         * @param iMacroName
-         *     The name of the macro to undefine
-         * @param iMacroNameLen
-         *     The length of the name of the macro to undefine
-         * @return
-         *     true if the macro has been undefined, false if macro doesn't exist
-         */
-        bool Undef (const char *iMacroName, size_t iMacroNameLen);
-
-        /**
-         * Parse the input string and return a newly-allocated output string.
-         * @note
-         *     The returned preprocessed string is NOT zero-terminated
-         *     (just like the input string).
-         * @param iSource
-         *     The source text
-         * @param iLength
-         *     The length of the source text in characters
-         * @param oLength
-         *     The length of the output string.
-         * @return
-         *     The output from preprocessor, allocated with malloc().
-         *     The parser can actually allocate more than needed for performance
-         *     reasons, but this should not be a problem unless you will want
-         *     to store the returned pointer for long time in which case you
-         *     might want to realloc() it.
-         *     If an error has been encountered, the function returns NULL.
-         *     In some cases the function may return an unallocated address
-         *     that's *inside* the source buffer. You must free() the result
-         *     string only if the returned address is not inside the source text.
-         */
-        char *Parse (const char *iSource, size_t iLength, size_t &oLength);
+        /// The list of macros defined so far
+        MacroTable MacroList;
     };
 
 } // namespace Ogre

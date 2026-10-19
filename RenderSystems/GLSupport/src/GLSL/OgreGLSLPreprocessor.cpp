@@ -29,33 +29,61 @@
 #include "OgreGLSLPreprocessor.h"
 #include "OgreLogManager.h"
 
-#include <stdio.h>
-#include <assert.h>
 #include <algorithm>
-#include <iterator>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <new>
+#include <string>
+#include <utility>
+#include <vector>
+
+/*
+ * Design notes
+ * ------------
+ * The preprocessor follows the "in-situ" philosophy known from pugixml:
+ *
+ *  - The Lexer never copies. A Token is a *view* (pointer + length) into the
+ *    source buffer, so scanning and passing tokens around allocates nothing.
+ *  - Text is only copied when it really changes (macro expansion, comment
+ *    removal, ...). A Text is therefore either a borrowed span of the source
+ *    or an owned malloc'ed buffer, and consecutive appends of adjacent source
+ *    spans simply extend the span. Untouched input is returned untouched.
+ *  - Small value types with explicit ownership (move-only Text/Token) replace
+ *    the original "copy steals the buffer" trick.
+ *  - Errors travel as a Token of type TK_ERROR plus one log message; there are
+ *    no exceptions on the parsing path.
+ *
+ * Layers (bottom to top): character classes -> StringView -> Text -> Token ->
+ * Lexer -> MacroTable -> Processor (directives, macro expansion, #if
+ * expressions) -> CPreprocessor (public facade).
+ */
 
 namespace Ogre {
 
     // Limit max number of macro arguments to this
-#define MAX_MACRO_ARGS 16
+    static const size_t MAX_MACRO_ARGS = 16;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined( __MINGW32__ )
-#define snprintf _snprintf
-#endif
+    /// Appended to macro parameter names to avoid clashes with argument text,
+    /// see Processor::GetArgument().
+    static const char ARG_SUFFIX[] = "__arg_";
+    static const size_t ARG_SUFFIX_LEN = sizeof(ARG_SUFFIX) - 1;
 
-    // Character classes with "C" locale semantics. The <ctype.h> functions
-    // depend on the global locale and are undefined for negative chars, which
-    // is what non-ASCII bytes are on most platforms.
-    static inline bool isSpace (char c) { return c == ' ' || (c >= '\t' && c <= '\r'); }
-    static inline bool isDigit (char c) { return c >= '0' && c <= '9'; }
-    static inline bool isXDigit (char c) { return isDigit (c) || ((c | 0x20) >= 'a' && (c | 0x20) <= 'f'); }
-    static inline bool isAlpha (char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
-    /// Can this character be part of a keyword (identifier)?
-    static inline bool isKeywordChar (char c) { return c == '_' || isAlpha (c) || isDigit (c); }
+    // -----------------------------------------------------------------------
+    // Character classes (locale independent, "C" locale semantics)
+    // -----------------------------------------------------------------------
 
-    /// Return closest power of two not smaller than given number
-    static size_t ClosestPow2 (size_t x)
+    static inline bool isSpace(char c) { return c == ' ' || (c >= '\t' && c <= '\r'); }
+    static inline bool isDigit(char c) { return c >= '0' && c <= '9'; }
+    static inline bool isXDigit(char c) { return isDigit(c) || ((c | 0x20) >= 'a' && (c | 0x20) <= 'f'); }
+    static inline bool isAlpha(char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
+    static inline bool isKeywordChar(char c) { return c == '_' || isAlpha(c) || isDigit(c); }
+
+    /// Return closest power of two not smaller than given number (0 stays 0)
+    static size_t ClosestPow2(size_t x)
     {
         if (!(x & (x - 1)))
             return x;
@@ -65,7 +93,7 @@ namespace Ogre {
     }
 
     /// Growth policy of owned buffers
-    static size_t CapacityFor (size_t iSize) { return std::max<size_t> (64, ClosestPow2 (iSize)); }
+    static size_t CapacityFor(size_t iSize) { return std::max<size_t>(64, ClosestPow2(iSize)); }
 
     /// Sets a flag for the lifetime of the object
     class ScopedFlag
@@ -81,179 +109,8 @@ namespace Ogre {
     };
 
     // -----------------------------------------------------------------------
-    // CPreprocessor::Lexer
+    // CPreprocessor::Text
     // -----------------------------------------------------------------------
-
-    CPreprocessor::Lexer::Lexer(const Text& iSource, int iLine) : SourceToken(&iSource), Line(iLine)
-    {
-        if (iSource.GetString())
-        {
-            Source = iSource.GetString();
-            SourceEnd = Source + iSource.GetLength();
-        }
-    }
-
-    void CPreprocessor::Lexer::Rewind(const char* iPosition, int iLine)
-    {
-        Source = iPosition;
-        Line = iLine;
-    }
-
-    char CPreprocessor::Lexer::Peek(size_t iAhead) const
-    {
-        return Source + iAhead < SourceEnd ? Source[iAhead] : '\0';
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::Make(Token::Kind iType, const char* iBegin) const
-    {
-        return Token(iType, iBegin, size_t(Source - iBegin));
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::GetToken()
-    {
-        if (AtEnd())
-            return Token(Token::TK_EOS);
-
-        const char* begin = Source;
-        const char c = *Source++;
-
-        if (c == '\n' || (c == '\r' && Peek() == '\n'))
-            return ReadNewline(begin, c);
-        if (isSpace(c))
-            return ReadWhitespace(begin);
-        if (isDigit(c))
-            return ReadNumber(begin, c);
-        if (isKeywordChar(c))
-            return ReadKeyword(begin);
-        if (c == '"' || c == '\'')
-            return ReadString(begin, c);
-        if (c == '/' && Peek() == '/')
-            return ReadLineComment(begin);
-        if (c == '/' && Peek() == '*')
-            return ReadComment(begin);
-        if (c == '#' && BOL)
-            return ReadDirective(begin);
-        if (c == '\\' && (Peek() == '\r' || Peek() == '\n'))
-            return ReadLineCont(begin);
-        return ReadPunctuation(begin, c);
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadNewline(const char* iBegin, char c)
-    {
-        Line++;
-        BOL = true;
-        if (c == '\r')
-            Source++;
-        return Make(Token::TK_NEWLINE, iBegin);
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadWhitespace(const char* iBegin)
-    {
-        while (Source < SourceEnd && *Source != '\r' && *Source != '\n' && isSpace(*Source))
-            Source++;
-        return Make(Token::TK_WHITESPACE, iBegin);
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadNumber(const char* iBegin, char iFirst)
-    {
-        BOL = false;
-        if (iFirst == '0' && Peek() == 'x') // hex numbers
-        {
-            Source++;
-            while (Source < SourceEnd && isXDigit(*Source))
-                Source++;
-        }
-        else
-            while (Source < SourceEnd && isDigit(*Source))
-                Source++;
-        return Make(Token::TK_NUMBER, iBegin);
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadKeyword(const char* iBegin)
-    {
-        BOL = false;
-        while (Source < SourceEnd && isKeywordChar(*Source))
-            Source++;
-        Token t = Make(Token::TK_KEYWORD, iBegin);
-        // A keyword inside a disabled range of the source stays disabled
-        if (SourceToken && SourceToken->HasDisabledMacros())
-            t.Str.InheritDisabled(*SourceToken, size_t(iBegin - SourceToken->GetString()), t.Length());
-        return t;
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadString(const char* iBegin, char iQuote)
-    {
-        BOL = false;
-        while (Source < SourceEnd && *Source != iQuote)
-        {
-            if (*Source == '\\' && ++Source >= SourceEnd)
-                break;
-            if (*Source == '\n')
-                Line++;
-            Source++;
-        }
-        if (Source < SourceEnd)
-            Source++;
-        return Make(Token::TK_STRING, iBegin);
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadLineComment(const char* iBegin)
-    {
-        BOL = false;
-        Source++; // second '/'
-        while (Source < SourceEnd && *Source != '\r' && *Source != '\n')
-            Source++;
-        return Make(Token::TK_LINECOMMENT, iBegin);
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadComment(const char* iBegin)
-    {
-        BOL = false;
-        Source++; // '*'
-        while (Source < SourceEnd && (Peek() != '*' || Peek(1) != '/'))
-        {
-            if (*Source == '\n')
-                Line++;
-            Source++;
-        }
-        if (Source < SourceEnd && *Source == '*')
-            Source++;
-        if (Source < SourceEnd && *Source == '/')
-            Source++;
-        return Make(Token::TK_COMMENT, iBegin);
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadDirective(const char* iBegin)
-    {
-        // '#', optional whitespace, then the directive name
-        while (Source < SourceEnd && isSpace(*Source))
-            Source++;
-        while (Source < SourceEnd && !isSpace(*Source))
-            Source++;
-        return Make(Token::TK_DIRECTIVE, iBegin);
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadLineCont(const char* iBegin)
-    {
-        if (Peek() == '\r')
-            Source++;
-        if (Peek() == '\n')
-            Source++;
-        Line++;
-        BOL = true;
-        return Make(Token::TK_LINECONT, iBegin);
-    }
-
-    CPreprocessor::Token CPreprocessor::Lexer::ReadPunctuation(const char* iBegin, char c)
-    {
-        BOL = false;
-        const char n = Peek();
-        // Handle double-char operators here
-        if (((c == '>' || c == '<') && (n == c || n == '=')) || ((c == '!' || c == '=') && n == '=') ||
-            ((c == '|' || c == '&' || c == '^') && n == c))
-            Source++;
-        return Make(Token::TK_PUNCTUATION, iBegin);
-    }
 
     CPreprocessor::Text::Text(Text&& iOther) noexcept
         : String(iOther.String), Length(iOther.Length), Allocated(iOther.Allocated),
@@ -575,134 +432,354 @@ namespace Ogre {
         return std::find(Pinned.begin(), Pinned.end(), &iMacro) != Pinned.end();
     }
 
-    CPreprocessor::Token CPreprocessor::Expand (Macro& iMacro, const std::vector<Token>& iArgs)
+    // -----------------------------------------------------------------------
+    // CPreprocessor::Lexer
+    // -----------------------------------------------------------------------
+
+    /// Stateless tokenizer: splits a Text into tokens, in situ. Does not
+    /// expand macros.
+    class CPreprocessor::Lexer
     {
-        ScopedFlag expanding(iMacro.Expanding);
-
-        // Expand with a sub-processor in which every parameter is a macro
-        CPreprocessor cpp(MacroList);
-        cpp.SupplimentaryExpand = true;
-
-        size_t i = 0;
-        for (; i < iArgs.size(); i++)
-            MacroList.Define (iMacro.Args [i].View (), iArgs [i].Str.Borrow ());
-        for (; i < iMacro.Args.size(); i++) // the rest arguments are empty
-            MacroList.Define (iMacro.Args [i].View (), Text ("", 0));
-
-        // Repeat until there is no more change between parses (an unchanged pass
-        // hands back its input untouched, so a pointer comparison detects that).
-        Token xt (Token::TK_TEXT, iMacro.Value.Str.Borrow ());
-        for (bool first = true;; first = false)
+    public:
+        Lexer() = default;
+        Lexer(const Text& iSource, int iLine) : SourceToken(&iSource), Line(iLine)
         {
-            Token new_xt = cpp.Parse (xt);
-
-            // The result may alias an argument or a slice of xt's buffer, both
-            // of which are about to go away: take a private copy.
-            if (!new_xt.Str.IsAllocated () && new_xt.String () && new_xt.String () != xt.String ())
-                new_xt.Str = new_xt.Str.Clone ();
-
-            // Remove the extra macros we have defined, only needed once
-            if (first)
-                for (size_t j = iMacro.Args.size (); j-- > 0;)
-                    MacroList.Undef (iMacro.Args [j].View ());
-
-            if (new_xt.String () == xt.String ())
-                break;
-            xt = std::move (new_xt);
-        }
-
-        // Rescans must not expand this macro again inside its own output
-        if (xt.Length ())
-            xt.Str.Disable (iMacro.Name);
-        return xt;
-    }
-
-    void CPreprocessor::Error(int iLine, const std::string& iError, const Token* iToken) const
-    {
-        String msg;
-        if (iToken)
-            msg = StringUtil::format("line %d: %s: `%.*s'\n", iLine, iError.c_str(), int(iToken->Length ()),
-                                     iToken->String () ? iToken->String () : "");
-        else
-            msg = StringUtil::format("line %d: %s\n", iLine, iError.c_str());
-        LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
-    }
-
-    CPreprocessor::CPreprocessor (MacroTable &iMacros) : MacroList (iMacros)
-    {
-    }
-
-    CPreprocessor::CPreprocessor (MacroTable &iMacros, const Token &iToken, int iLine)
-        : MacroList (iMacros), Lex (iToken.Str, iLine)
-    {
-    }
-
-    CPreprocessor::CPreprocessor() : MacroList (OwnMacros)
-    {
-    }
-
-    CPreprocessor::~CPreprocessor() {}
-
-    CPreprocessor::Token CPreprocessor::GetToken (bool iExpand)
-    {
-        Token t = Lex.GetToken ();
-        if (iExpand && t.Type == Token::TK_KEYWORD)
-            return ExpandMacro (std::move (t));
-        return t;
-    }
-
-
-    CPreprocessor::Token CPreprocessor::ExpandMacro (Token iToken)
-    {
-        Macro *cur = MacroList.IsDefined (iToken.View ());
-        if (!cur || cur->Expanding || iToken.Str.IsDisabled (cur->Name))
-            return iToken;
-        // #undef of this very macro can be run by its arguments or its expansion
-        MacroTable::Pin pin (MacroList, *cur);
-
-        std::vector<Token> args;
-        const int old_line = Lex.GetLine ();
-
-        if (!cur->Args.empty())
-        {
-            Token t = GetArguments (args, !cur->IsDefinedFunc, false);
-            if (t.Type == Token::TK_ERROR)
-                return t;
-
-            // Put the token back into the source pool; we'll handle it later
-            if (t.String ())
+            if (iSource.GetString())
             {
-                // Returned token should never be allocated on heap
-                assert (!t.Str.IsAllocated ());
-                Lex.Rewind (t.String (), Lex.GetLine () - t.CountNL ());
+                Source = iSource.GetString();
+                SourceEnd = Source + iSource.GetLength();
             }
-            // If a macro is defined with arguments but gets not "called" it
-            // should behave like normal text
-            if (args.empty () && !t.IsPunctuation ('('))
-                return iToken;
         }
 
-        if (args.size () > cur->Args.size ())
+        bool AtEnd() const { return Source >= SourceEnd; }
+        int GetLine() const { return Line; }
+        const char* GetPosition() const { return Source; }
+        const char* GetEnd() const { return SourceEnd; }
+
+        /// Continue lexing at iPosition (used to un-read a token / a directive)
+        void Rewind(const char* iPosition, int iLine)
         {
-            Error (old_line, "Macro `" + std::string (cur->Name.String, cur->Name.Length) + "' passed " +
-                                 std::to_string (args.size ()) + " arguments, but takes just " +
-                                 std::to_string (cur->Args.size ()));
-            return Token (Token::TK_ERROR);
+            Source = iPosition;
+            Line = iLine;
         }
 
-        Token t = cur->IsDefinedFunc ? ExpandDefined (args) : Expand (*cur, args);
-        t.Str.AppendNL (Lex.GetLine () - old_line - t.CountNL ());
-        return t;
-    }
+        Token GetToken()
+        {
+            if (AtEnd())
+                return Token(Token::TK_EOS);
 
+            const char* begin = Source;
+            const char c = *Source++;
+
+            if (c == '\n' || (c == '\r' && Peek() == '\n'))
+                return ReadNewline(begin, c);
+            if (isSpace(c))
+                return ReadWhitespace(begin);
+            if (isDigit(c))
+                return ReadNumber(begin, c);
+            if (isKeywordChar(c))
+                return ReadKeyword(begin);
+            if (c == '"' || c == '\'')
+                return ReadString(begin, c);
+            if (c == '/' && Peek() == '/')
+                return ReadLineComment(begin);
+            if (c == '/' && Peek() == '*')
+                return ReadComment(begin);
+            if (c == '#' && BOL)
+                return ReadDirective(begin);
+            if (c == '\\' && (Peek() == '\r' || Peek() == '\n'))
+                return ReadLineCont(begin);
+            return ReadPunctuation(begin, c);
+        }
+
+    private:
+        /// Current character, or NUL past the end (inputs need not be terminated)
+        char Peek(size_t iAhead = 0) const { return Source + iAhead < SourceEnd ? Source[iAhead] : '\0'; }
+
+        Token Make(Token::Kind iType, const char* iBegin) const
+        {
+            return Token(iType, iBegin, size_t(Source - iBegin));
+        }
+
+        Token ReadNewline(const char* iBegin, char c)
+        {
+            Line++;
+            BOL = true;
+            if (c == '\r')
+                Source++;
+            return Make(Token::TK_NEWLINE, iBegin);
+        }
+
+        Token ReadWhitespace(const char* iBegin)
+        {
+            while (Source < SourceEnd && *Source != '\r' && *Source != '\n' && isSpace(*Source))
+                Source++;
+            return Make(Token::TK_WHITESPACE, iBegin);
+        }
+
+        Token ReadNumber(const char* iBegin, char iFirst)
+        {
+            BOL = false;
+            if (iFirst == '0' && Peek() == 'x') // hex numbers
+            {
+                Source++;
+                while (Source < SourceEnd && isXDigit(*Source))
+                    Source++;
+            }
+            else
+                while (Source < SourceEnd && isDigit(*Source))
+                    Source++;
+            return Make(Token::TK_NUMBER, iBegin);
+        }
+
+        Token ReadKeyword(const char* iBegin)
+        {
+            BOL = false;
+            while (Source < SourceEnd && isKeywordChar(*Source))
+                Source++;
+            Token t = Make(Token::TK_KEYWORD, iBegin);
+            // A keyword inside a disabled range of the source stays disabled
+            if (SourceToken && SourceToken->HasDisabledMacros())
+                t.Str.InheritDisabled(*SourceToken, size_t(iBegin - SourceToken->GetString()), t.Length());
+            return t;
+        }
+
+        Token ReadString(const char* iBegin, char iQuote)
+        {
+            BOL = false;
+            while (Source < SourceEnd && *Source != iQuote)
+            {
+                if (*Source == '\\' && ++Source >= SourceEnd)
+                    break;
+                if (*Source == '\n')
+                    Line++;
+                Source++;
+            }
+            if (Source < SourceEnd)
+                Source++;
+            return Make(Token::TK_STRING, iBegin);
+        }
+
+        Token ReadLineComment(const char* iBegin)
+        {
+            BOL = false;
+            Source++; // second '/'
+            while (Source < SourceEnd && *Source != '\r' && *Source != '\n')
+                Source++;
+            return Make(Token::TK_LINECOMMENT, iBegin);
+        }
+
+        Token ReadComment(const char* iBegin)
+        {
+            BOL = false;
+            Source++; // '*'
+            while (Source < SourceEnd && (Peek() != '*' || Peek(1) != '/'))
+            {
+                if (*Source == '\n')
+                    Line++;
+                Source++;
+            }
+            if (Source < SourceEnd && *Source == '*')
+                Source++;
+            if (Source < SourceEnd && *Source == '/')
+                Source++;
+            return Make(Token::TK_COMMENT, iBegin);
+        }
+
+        Token ReadDirective(const char* iBegin)
+        {
+            // '#', optional whitespace, then the directive name
+            while (Source < SourceEnd && isSpace(*Source))
+                Source++;
+            while (Source < SourceEnd && !isSpace(*Source))
+                Source++;
+            return Make(Token::TK_DIRECTIVE, iBegin);
+        }
+
+        Token ReadLineCont(const char* iBegin)
+        {
+            if (Peek() == '\r')
+                Source++;
+            if (Peek() == '\n')
+                Source++;
+            Line++;
+            BOL = true;
+            return Make(Token::TK_LINECONT, iBegin);
+        }
+
+        Token ReadPunctuation(const char* iBegin, char c)
+        {
+            BOL = false;
+            const char n = Peek();
+            // Handle double-char operators here
+            if (((c == '>' || c == '<') && (n == c || n == '=')) || ((c == '!' || c == '=') && n == '=') ||
+                ((c == '|' || c == '&' || c == '^') && n == c))
+                Source++;
+            return Make(Token::TK_PUNCTUATION, iBegin);
+        }
+
+        /// The current source text input (for the disabled ranges; may be NULL)
+        const Text* SourceToken = nullptr;
+        const char* Source = nullptr;
+        /// The end of the source text
+        const char* SourceEnd = nullptr;
+        /// Current line number
+        int Line = 0;
+        /// True if we are at beginning of line
+        bool BOL = true;
+    };
+
+    // -----------------------------------------------------------------------
+    // CPreprocessor::Processor
+    // -----------------------------------------------------------------------
+
+    /**
+     * Preprocesses one Token: handles directives, expands macros and writes
+     * the output. Instances are cheap; sub-processors (for directive bodies,
+     * #if expressions and macro expansion) share the MacroTable.
+     */
+    class CPreprocessor::Processor
+    {
+    public:
+        explicit Processor(MacroTable& iMacroList) : MacroList(iMacroList) {}
+        Processor(MacroTable& iMacroList, const Token& iSource, int iLine)
+            : MacroList(iMacroList), Lex(iSource.Str, iLine)
+        {
+        }
+
+        /// Parse the input token and return a token containing the whole output,
+        /// or a token of type TK_ERROR.
+        Token Parse(const Token& iSource);
+
+    private:
+        /**
+         * Nesting state of #if/#elif/#else/#endif, packed into two 32 bit words
+         * (bit 0 is the innermost level).
+         *  - EnableOutput: the level currently emits output. A sentinel bit below
+         *    the outermost level makes an empty stack read as 1.
+         *  - EnableElif: no branch of the level has been taken yet.
+         */
+        class ConditionalStack
+        {
+        public:
+            bool IsEmpty() const { return EnableOutput == 1; }
+            bool IsFull() const { return (EnableOutput & (1u << 31)) != 0; }
+            /// True if all enclosing levels emit output
+            bool IsOutputEnabled() const { return (EnableOutput & (EnableOutput + 1)) == 0; }
+
+            void Push(bool iValue)
+            {
+                EnableElif <<= 1;
+                EnableOutput <<= 1;
+                if (iValue)
+                    EnableOutput |= 1;
+                else
+                    EnableElif |= 1;
+            }
+
+            /// @return false on underflow (#endif without #if)
+            bool Pop()
+            {
+                EnableElif >>= 1;
+                EnableOutput >>= 1;
+                return EnableOutput != 0;
+            }
+
+            void Elif(bool iValue)
+            {
+                if (iValue && (EnableElif & 1))
+                {
+                    EnableOutput |= 1;
+                    EnableElif &= ~1u;
+                }
+                else
+                    EnableOutput &= ~1u;
+            }
+
+            void Else()
+            {
+                if ((EnableElif & 1) || (EnableOutput & 1))
+                    EnableOutput ^= 1;
+            }
+
+            /// Turns the innermost #ifdef into #ifndef
+            void Negate()
+            {
+                EnableOutput ^= 1;
+                EnableElif ^= 1;
+            }
+
+        private:
+            /// A stack of 32 booleans packed into one value :)
+            uint32_t EnableOutput = 1;
+            uint32_t EnableElif = 0;
+        };
+
+        enum class BinaryOp
+        {
+            None, LogicalOr, LogicalAnd, BitOr, BitXor, BitAnd, Equal, NotEqual, Less, LessEqual,
+            Greater, GreaterEqual, ShiftLeft, ShiftRight, Add, Subtract, Multiply, Divide, Modulo
+        };
+
+        enum class DirectiveKind { Define, UnDef, IfDef, IfNDef, If, Elif, Else, EndIf, Unknown };
+
+        /// Priority of the operators of the whole expression and of unary operators
+        static const int PRIO_PARENTHESIS = 1;
+        static const int PRIO_UNARY = 12;
+
+        static BinaryOp ParseBinaryOp(StringView iOp);
+        static int Priority(BinaryOp iOp);
+        /// @return false on division by zero
+        static bool Apply(BinaryOp iOp, long vlop, long vrop, long& oValue);
+        /// #define and #undef are only recognised in emitting regions; elsewhere
+        /// they are passed through like any unknown directive.
+        static DirectiveKind Classify(StringView iName, bool iOutputEnabled);
+
+        // lexing and macro expansion
+        Token GetToken(bool iExpand);
+        Token ExpandMacro(Token iToken);
+        Token Expand(Macro& iMacro, const std::vector<Token>& iArgs);
+        Token ExpandDefined(const std::vector<Token>& iArgs);
+        Token GetArgument(Token& oArg, bool iExpand, bool shouldAppendArg);
+        Token GetArguments(std::vector<Token>& oArgs, bool iExpand, bool shouldAppendArg);
+
+        // #if expressions
+        Token GetExpression(Token& oResult, int iLine, int iOpPriority = 0);
+        bool GetValue(const Token& iToken, long& oValue, int iLine);
+        bool GetValueDef(const Token& iToken, long& oValue, int iLine);
+
+        // directives
+        Token HandleDirective(Token iToken, int iLine);
+        Token GetDirectiveBody(Token& oLast);
+        bool HandleDefine(Token iBody, int iLine);
+        bool HandleUnDef(const Token& iBody, int iLine);
+        bool HandleIfDef(const Token& iBody, int iLine);
+        bool HandleIf(const Token& iBody, int iLine);
+        bool HandleIf(bool iValue, int iLine);
+        bool HandleElif(const Token& iBody, int iLine);
+        bool HandleElse(const Token& iBody, int iLine);
+        bool HandleEndIf(const Token& iBody, int iLine);
+        bool WarnGarbage(Lexer& ioLex, int iLine);
+
+        /// Call the error handler
+        void Error(int iLine, const std::string& iError, const Token* iToken = nullptr) const;
+
+        /// The list of macros defined so far (shared with sub-processors)
+        MacroTable& MacroList;
+        Lexer Lex;
+        ConditionalStack Conditions;
+        /// True when processing macro expansion text: it is temporary (macros
+        /// defined in it must own their text) and a stray '#' is dropped.
+        bool SupplimentaryExpand = false;
+    };
 
     // --- operators --------------------------------------------------------
 
-    CPreprocessor::BinaryOp CPreprocessor::ParseBinaryOp (StringView iOp)
+    CPreprocessor::Processor::BinaryOp CPreprocessor::Processor::ParseBinaryOp(StringView iOp)
     {
         if (iOp.Length == 1)
         {
-            switch (iOp [0])
+            switch (iOp[0])
             {
             case '|': return BinaryOp::BitOr;
             case '^': return BinaryOp::BitXor;
@@ -718,7 +795,7 @@ namespace Ogre {
         }
         else if (iOp.Length == 2)
         {
-            const char a = iOp [0], b = iOp [1];
+            const char a = iOp[0], b = iOp[1];
             if (a == '|' && b == '|') return BinaryOp::LogicalOr;
             if (a == '&' && b == '&') return BinaryOp::LogicalAnd;
             if (a == '=' && b == '=') return BinaryOp::Equal;
@@ -731,7 +808,7 @@ namespace Ogre {
         return BinaryOp::None;
     }
 
-    int CPreprocessor::Priority (BinaryOp iOp)
+    int CPreprocessor::Processor::Priority(BinaryOp iOp)
     {
         switch (iOp)
         {
@@ -758,7 +835,7 @@ namespace Ogre {
         return 0;
     }
 
-    bool CPreprocessor::Apply (BinaryOp iOp, long vlop, long vrop, long& oValue)
+    bool CPreprocessor::Processor::Apply(BinaryOp iOp, long vlop, long vrop, long& oValue)
     {
         switch (iOp)
         {
@@ -789,8 +866,8 @@ namespace Ogre {
         return true;
     }
 
-    CPreprocessor::DirectiveKind
-    CPreprocessor::Classify (StringView iName, bool iOutputEnabled)
+    CPreprocessor::Processor::DirectiveKind
+    CPreprocessor::Processor::Classify(StringView iName, bool iOutputEnabled)
     {
         if (iName == "define") return iOutputEnabled ? DirectiveKind::Define : DirectiveKind::Unknown;
         if (iName == "undef") return iOutputEnabled ? DirectiveKind::UnDef : DirectiveKind::Unknown;
@@ -802,6 +879,375 @@ namespace Ogre {
         if (iName == "endif") return DirectiveKind::EndIf;
         return DirectiveKind::Unknown;
     }
+
+    void CPreprocessor::Processor::Error(int iLine, const std::string& iError, const Token* iToken) const
+    {
+        String msg;
+        if (iToken)
+            msg = StringUtil::format("line %d: %s: `%.*s'\n", iLine, iError.c_str(), int(iToken->Length()),
+                                     iToken->String() ? iToken->String() : "");
+        else
+            msg = StringUtil::format("line %d: %s\n", iLine, iError.c_str());
+        LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
+    }
+
+    CPreprocessor::Token CPreprocessor::Processor::GetToken(bool iExpand)
+    {
+        Token t = Lex.GetToken();
+        if (iExpand && t.Type == Token::TK_KEYWORD)
+            return ExpandMacro(std::move(t));
+        return t;
+    }
+
+    // --- main loop --------------------------------------------------------
+
+    CPreprocessor::Token CPreprocessor::Processor::Parse(const Token& iSource)
+    {
+        Lex = Lexer(iSource.Str, 1);
+        Conditions = ConditionalStack();
+
+        // Accumulate output into this token
+        Token output(Token::TK_TEXT);
+        int empty_lines = 0; // swallowed line continuations, re-added as newlines
+
+        // Enable output only if all embedded #if's were true
+        bool old_output_enabled = true;
+        bool output_enabled = true;
+        int output_disabled_line = 0;
+
+        while (!Lex.AtEnd())
+        {
+            const int old_line = Lex.GetLine();
+            Token t = GetToken(true);
+
+            if (t.Type == Token::TK_DIRECTIVE)
+            {
+                t = HandleDirective(std::move(t), old_line);
+
+                // Keep line numbers intact across suppressed regions
+                output_enabled = Conditions.IsOutputEnabled();
+                if (output_enabled != old_output_enabled)
+                {
+                    if (output_enabled)
+                        output.Str.AppendNL(old_line - output_disabled_line);
+                    else
+                        output_disabled_line = old_line;
+                    old_output_enabled = output_enabled;
+                }
+                if (output_enabled)
+                    output.Str.AppendNL(Lex.GetLine() - old_line - t.CountNL());
+            }
+
+            switch (t.Type)
+            {
+            case Token::TK_ERROR:
+                return t;
+
+            case Token::TK_EOS:
+                return output; // Force termination
+
+            case Token::TK_COMMENT:
+                // C comments are replaced with single spaces
+                if (output_enabled)
+                {
+                    output.Str.AppendCopy(" ");
+                    output.Str.AppendNL(Lex.GetLine() - old_line);
+                }
+                break;
+
+            case Token::TK_LINECOMMENT:
+                // C++ comments are ignored
+                break;
+
+            case Token::TK_LINECONT:
+                // Backslash-Newline sequences are deleted, no matter where
+                empty_lines++;
+                break;
+
+            case Token::TK_PUNCTUATION:
+                if (output_enabled && !(SupplimentaryExpand && t.IsPunctuation('#')))
+                    output.Str.Append(std::move(t.Str));
+                break;
+
+            default:
+                if (t.Type == Token::TK_NEWLINE && empty_lines)
+                {
+                    // Compensate for the backslash-newline combinations
+                    // we have encountered, otherwise line numeration is broken
+                    if (output_enabled)
+                        output.Str.AppendNL(empty_lines);
+                    empty_lines = 0;
+                }
+                // Passthrough all other tokens
+                if (output_enabled)
+                    output.Str.Append(std::move(t.Str));
+                break;
+            }
+        }
+
+        if (!Conditions.IsEmpty())
+        {
+            Error(Lex.GetLine(), "Unclosed #if at end of source");
+            return Token(Token::TK_ERROR);
+        }
+        return output;
+    }
+
+    // --- macro expansion --------------------------------------------------
+
+    CPreprocessor::Token CPreprocessor::Processor::ExpandMacro(Token iToken)
+    {
+        Macro* cur = MacroList.IsDefined(iToken.View());
+        if (!cur || cur->Expanding || iToken.Str.IsDisabled(cur->Name))
+            return iToken;
+        MacroTable::Pin pin(MacroList, *cur);
+
+        std::vector<Token> args;
+        const int old_line = Lex.GetLine();
+
+        if (!cur->Args.empty())
+        {
+            Token t = GetArguments(args, !cur->IsDefinedFunc, false);
+            if (t.Type == Token::TK_ERROR)
+                return t;
+
+            // Put the token back into the source pool; we'll handle it later
+            if (t.String())
+            {
+                // Returned token should never be allocated on heap
+                assert(!t.Str.IsAllocated());
+                Lex.Rewind(t.String(), Lex.GetLine() - t.CountNL());
+            }
+            // If a macro is defined with arguments but gets not "called" it
+            // should behave like normal text
+            if (args.empty() && !t.IsPunctuation('('))
+                return iToken;
+        }
+
+        if (args.size() > cur->Args.size())
+        {
+            Error(old_line, "Macro `" + std::string(cur->Name.String, cur->Name.Length) + "' passed " +
+                                std::to_string(args.size()) + " arguments, but takes just " +
+                                std::to_string(cur->Args.size()));
+            return Token(Token::TK_ERROR);
+        }
+
+        Token t = cur->IsDefinedFunc ? ExpandDefined(args) : Expand(*cur, args);
+        t.Str.AppendNL(Lex.GetLine() - old_line - t.CountNL());
+        return t;
+    }
+
+    CPreprocessor::Token CPreprocessor::Processor::Expand(Macro& iMacro, const std::vector<Token>& iArgs)
+    {
+        ScopedFlag expanding(iMacro.Expanding);
+
+        // Expand with a sub-processor in which every parameter is a macro
+        Processor cpp(MacroList);
+        cpp.SupplimentaryExpand = true;
+
+        size_t i = 0;
+        for (; i < iArgs.size(); i++)
+            MacroList.Define(iMacro.Args[i].View(), iArgs[i].Str.Borrow());
+        for (; i < iMacro.Args.size(); i++) // the rest arguments are empty
+            MacroList.Define(iMacro.Args[i].View(), Text("", 0));
+
+        // Repeat until there is no more change between parses (an unchanged pass
+        // hands back its input untouched, so a pointer comparison detects that).
+        Token xt(Token::TK_TEXT, iMacro.Value.Str.Borrow());
+        for (bool first = true;; first = false)
+        {
+            Token new_xt = cpp.Parse(xt);
+
+            // The result may alias an argument or a slice of xt's buffer, both
+            // of which are about to go away: take a private copy.
+            if (!new_xt.Str.IsAllocated() && new_xt.String() && new_xt.String() != xt.String())
+                new_xt.Str = new_xt.Str.Clone();
+
+            // Remove the extra macros we have defined, only needed once
+            if (first)
+                for (size_t j = iMacro.Args.size(); j-- > 0;)
+                    MacroList.Undef(iMacro.Args[j].View());
+
+            if (new_xt.String() == xt.String())
+                break;
+            xt = std::move(new_xt);
+        }
+
+        // Rescans must not expand this macro again inside its own output
+        if (xt.Length())
+            xt.Str.Disable(iMacro.Name);
+        return xt;
+    }
+
+    CPreprocessor::Token CPreprocessor::Processor::ExpandDefined(const std::vector<Token>& iArgs)
+    {
+        if (iArgs.size() != 1)
+        {
+            Error(Lex.GetLine(), "The defined() function takes exactly one argument");
+            return Token(Token::TK_ERROR);
+        }
+        return Token(Token::TK_NUMBER, MacroList.IsDefined(iArgs[0].View()) ? "1" : "0", 1);
+    }
+
+    CPreprocessor::Token CPreprocessor::Processor::GetArgument(Token& oArg, bool iExpand,
+                                                              bool shouldAppendArg)
+    {
+        do
+            oArg = GetToken(iExpand);
+        while (Token::IsBlankOrNewline(oArg.Type));
+
+        if (!iExpand)
+        {
+            // Parameter lists contain bare keywords only
+            if (oArg.Type == Token::TK_EOS)
+                return Token(Token::TK_EOS);
+            if (oArg.IsPunctuation(',') || oArg.IsPunctuation(')'))
+            {
+                Token t = std::move(oArg);
+                oArg = Token(Token::TK_TEXT, "", 0);
+                return t;
+            }
+            if (oArg.Type != Token::TK_KEYWORD)
+            {
+                Error(Lex.GetLine(), "Unexpected token", &oArg);
+                return Token(Token::TK_ERROR);
+            }
+        }
+
+        size_t braceCount = 0;
+        bool directive = oArg.Type == Token::TK_DIRECTIVE;
+        if (oArg.IsPunctuation('('))
+            ++braceCount;
+
+        size_t len = oArg.Length(); // length without trailing whitespace
+        for (;;)
+        {
+            // Rescan directives later, before expanding their operands
+            Token t = GetToken(iExpand && !directive);
+            switch (t.Type)
+            {
+            case Token::TK_EOS:
+                Error(Lex.GetLine(), "Unfinished list of arguments");
+                return Token(Token::TK_ERROR);
+
+            case Token::TK_ERROR:
+                return Token(Token::TK_ERROR);
+
+            case Token::TK_PUNCTUATION:
+            {
+                const char c = t.View()[0];
+                if (c == '(')
+                    ++braceCount;
+                else if (braceCount > 0)
+                {
+                    if (c == ')')
+                        --braceCount;
+                }
+                else if (c == ',' || c == ')')
+                {
+                    // Trim whitespaces at the end
+                    oArg.Str.Truncate(len);
+
+                    // Append "__arg_" to all macro arguments, otherwise if user does:
+                    //   #define mad( a, b, c ) fma( a, b, c )
+                    //   mad( x.s, y, a );
+                    // it will be translated to:
+                    //   fma( x.s, y, x.s );
+                    // instead of:
+                    //   fma( x.s, y, a );
+                    if (shouldAppendArg)
+                        oArg.Str.AppendCopy(StringView(ARG_SUFFIX, ARG_SUFFIX_LEN));
+                    return t;
+                }
+                break;
+            }
+
+            case Token::TK_DIRECTIVE:
+                if (iExpand && oArg.Length() && oArg.String()[oArg.Length() - 1] != '\n')
+                    oArg.Str.AppendCopy("\n");
+                directive = true;
+                break;
+
+            case Token::TK_NEWLINE:
+                if (iExpand && directive)
+                    oArg.Str.Append(std::move(t.Str));
+                directive = false;
+                continue;
+
+            case Token::TK_LINECONT:
+            case Token::TK_COMMENT:
+            case Token::TK_LINECOMMENT:
+                // ignore these tokens
+                continue;
+
+            default:
+                break;
+            }
+
+            if (!iExpand && t.Type != Token::TK_WHITESPACE)
+            {
+                Error(Lex.GetLine(), "Unexpected token", &oArg);
+                return Token(Token::TK_ERROR);
+            }
+
+            oArg.Str.Append(std::move(t.Str));
+            if (t.Type != Token::TK_WHITESPACE)
+                len = oArg.Length();
+        }
+    }
+
+    /**
+     * Get all the arguments of a macro: '(' arg1 { ',' arg2 { ',' ... }} ')'.
+     * Returns the first token after the list; if there is no list directly after
+     * the name, oArgs stays empty and the first non-blank token is returned.
+     *
+     * The lookahead tokens are lexed without expansion: they are put back by the
+     * caller and expanded when they are read for real.
+     */
+    CPreprocessor::Token CPreprocessor::Processor::GetArguments(std::vector<Token>& oArgs, bool iExpand,
+                                                               bool shouldAppendArg)
+    {
+        oArgs.clear();
+
+        Token t = GetToken(false);
+        const bool isFirstTokenAnOpenBrace = t.IsPunctuation('(');
+        while (Token::IsBlank(t.Type))
+            t = GetToken(false);
+        if (!isFirstTokenAnOpenBrace)
+            return t;
+
+        if (oArgs.capacity() == 0)
+            oArgs.reserve(4);
+
+        for (;;)
+        {
+            if (oArgs.size() == MAX_MACRO_ARGS)
+            {
+                Error(Lex.GetLine(), "Too many arguments to macro");
+                oArgs.clear();
+                return Token(Token::TK_ERROR);
+            }
+
+            oArgs.emplace_back();
+            t = GetArgument(oArgs.back(), iExpand, shouldAppendArg);
+
+            if (t.Type == Token::TK_EOS)
+                Error(Lex.GetLine(), "Unfinished list of arguments");
+            if (t.Type == Token::TK_EOS || t.Type == Token::TK_ERROR)
+            {
+                oArgs.clear();
+                return Token(Token::TK_ERROR);
+            }
+
+            if (t.Type != Token::TK_PUNCTUATION)
+                Error(Lex.GetLine(), "Unexpected token", &t);
+            else if (t.IsPunctuation(')'))
+                return GetToken(false);
+            // otherwise we've got a ',' : next argument
+        }
+    }
+
+    // --- #if expressions --------------------------------------------------
 
     /**
      * Parse an expression and return the first token that is not part of it.
@@ -816,576 +1262,196 @@ namespace Ogre {
      *  7: '==' '!='     8: '<' '<=' '>' '>='         9: '<<' '>>'
      * 10: '+' '-'      11: '*' '/' '%'              12: unary '+' '-' '!' '~'
      */
-    CPreprocessor::Token CPreprocessor::GetExpression (
-        Token &oResult, int iLine, int iOpPriority)
+    CPreprocessor::Token CPreprocessor::Processor::GetExpression(Token& oResult, int iLine, int iOpPriority)
     {
         do
-        {
-            oResult = GetToken (true);
-        } while (Token::IsBlankOrNewline (oResult.Type));
+            oResult = GetToken(true);
+        while (Token::IsBlankOrNewline(oResult.Type));
 
-        Token op (Token::TK_WHITESPACE, "", 0);
+        Token op(Token::TK_WHITESPACE, "", 0);
 
         // Handle unary operators here
-        if (oResult.Type == Token::TK_PUNCTUATION && oResult.Length () == 1)
+        if (oResult.Type == Token::TK_PUNCTUATION && oResult.Length() == 1)
         {
-            const char uop = oResult.View () [0];
+            const char uop = oResult.View()[0];
             if (uop == '+' || uop == '-' || uop == '!' || uop == '~')
             {
-                op = GetExpression (oResult, iLine, PRIO_UNARY);
+                op = GetExpression(oResult, iLine, PRIO_UNARY);
                 long val;
-                if (!GetValue (oResult, val, iLine))
+                if (!GetValue(oResult, val, iLine))
                 {
-                    Error (iLine, std::string ("Unary '") + uop + "' not applicable", &oResult);
-                    return Token (Token::TK_ERROR);
+                    Error(iLine, std::string("Unary '") + uop + "' not applicable", &oResult);
+                    return Token(Token::TK_ERROR);
                 }
-
                 if (uop == '-')
-                    oResult.SetValue (-val);
+                    oResult.SetValue(-val);
                 else if (uop == '!')
-                    oResult.SetValue (!val);
+                    oResult.SetValue(!val);
                 else if (uop == '~')
-                    oResult.SetValue (~val);
+                    oResult.SetValue(~val);
             }
             else if (uop == '(')
             {
-                op = GetExpression (oResult, iLine, PRIO_PARENTHESIS);
+                op = GetExpression(oResult, iLine, PRIO_PARENTHESIS);
                 if (op.Type == Token::TK_ERROR)
                     return op;
                 if (op.Type == Token::TK_EOS)
                 {
-                    Error (iLine, "Unclosed parenthesis in #if expression");
-                    return Token (Token::TK_ERROR);
+                    Error(iLine, "Unclosed parenthesis in #if expression");
+                    return Token(Token::TK_ERROR);
                 }
-
-                // op should be the closing ')'. Whatever follows a complete
-                // expression is skipped, as before; this must not assert,
-                // because it is the input that is malformed, not the program.
-                op = GetToken (true);
+                op = GetToken(true); // skip ')'
             }
         }
 
-        while (Token::IsBlankOrNewline (op.Type))
-            op = GetToken (true);
+        while (Token::IsBlankOrNewline(op.Type))
+            op = GetToken(true);
 
         for (;;)
         {
-            if (op.Type != Token::TK_PUNCTUATION || op.IsPunctuation (')'))
+            if (op.Type != Token::TK_PUNCTUATION || op.IsPunctuation(')'))
                 return op;
 
-            const BinaryOp binary = ParseBinaryOp (op.View ());
+            const BinaryOp binary = ParseBinaryOp(op.View());
             if (binary == BinaryOp::None)
             {
-                Error (iLine, "Expecting operator, got", &op);
-                return Token (Token::TK_ERROR);
+                Error(iLine, "Expecting operator, got", &op);
+                return Token(Token::TK_ERROR);
             }
 
-            const int prio = Priority (binary);
+            const int prio = Priority(binary);
             if (iOpPriority >= prio)
                 return op;
 
             Token rop;
-            Token nextop = GetExpression (rop, iLine, prio);
+            Token nextop = GetExpression(rop, iLine, prio);
 
-            const std::string opText (op.String (), op.Length ());
+            const std::string opText(op.String(), op.Length());
             long vlop, vrop, val;
-            if (!GetValue (oResult, vlop, iLine))
+            if (!GetValue(oResult, vlop, iLine))
             {
-                Error (iLine, "Left operand of '" + opText + "' is not a number", &oResult);
-                return Token (Token::TK_ERROR);
+                Error(iLine, "Left operand of '" + opText + "' is not a number", &oResult);
+                return Token(Token::TK_ERROR);
             }
-            if (!GetValue (rop, vrop, iLine))
+            if (!GetValue(rop, vrop, iLine))
             {
-                Error (iLine, "Right operand of '" + opText + "' is not a number", &rop);
-                return Token (Token::TK_ERROR);
+                Error(iLine, "Right operand of '" + opText + "' is not a number", &rop);
+                return Token(Token::TK_ERROR);
             }
-            if (!Apply (binary, vlop, vrop, val))
+            if (!Apply(binary, vlop, vrop, val))
             {
-                Error (iLine, "Division by zero");
-                return Token (Token::TK_ERROR);
+                Error(iLine, "Division by zero");
+                return Token(Token::TK_ERROR);
             }
-            oResult.SetValue (val);
+            oResult.SetValue(val);
 
-            op = std::move (nextop);
+            op = std::move(nextop);
         }
     }
 
-
-    bool CPreprocessor::GetValue (const Token &iToken, long &oValue, int iLine)
+    bool CPreprocessor::Processor::GetValue(const Token& iToken, long& oValue, int iLine)
     {
-        Token r;
-        const Token *vt = &iToken;
-
-        if ((vt->Type == Token::TK_KEYWORD ||
-             vt->Type == Token::TK_TEXT ||
-             vt->Type == Token::TK_NUMBER) &&
-            !vt->String ())
+        const bool hasText = iToken.Type == Token::TK_KEYWORD || iToken.Type == Token::TK_TEXT ||
+                             iToken.Type == Token::TK_NUMBER;
+        if (hasText && !iToken.String())
         {
-            Error (iLine, "Trying to evaluate an empty expression");
+            Error(iLine, "Trying to evaluate an empty expression");
             return false;
         }
 
-        if (vt->Type == Token::TK_TEXT)
+        switch (iToken.Type)
         {
-            CPreprocessor cpp (MacroList, iToken, iLine);
-
-            Token t = cpp.GetExpression (r, iLine);
-
+        case Token::TK_TEXT:
+        {
+            // Macro expansion yields text that may be a whole expression
+            Processor cpp(MacroList, iToken, iLine);
+            Token r;
+            Token t = cpp.GetExpression(r, iLine);
             if (t.Type == Token::TK_ERROR)
                 return false;
-
             if (t.Type != Token::TK_EOS)
             {
-                Error (iLine, "Garbage after expression", &t);
+                Error(iLine, "Garbage after expression", &t);
                 return false;
             }
-
-            // An expansion can still be text containing a suppressed identifier.
+            // An expansion can still be text containing a suppressed keyword.
             // Evaluate it with its rescan metadata instead of treating it as a number.
-            return GetValue (r, oValue, iLine);
+            return GetValue(r, oValue, iLine);
         }
 
-        Macro *m;
-        switch (vt->Type)
-        {
         case Token::TK_EOS:
         case Token::TK_ERROR:
             return false;
 
         case Token::TK_KEYWORD:
+        {
             // Try to expand the macro
-            if ((m = MacroList.IsDefined (vt->View ())) && !m->Expanding && !vt->Str.IsDisabled (m->Name))
+            Macro* m = MacroList.IsDefined(iToken.View());
+            if (m && !m->Expanding && !iToken.Str.IsDisabled(m->Name))
             {
-                MacroTable::Pin pin (MacroList, *m);
-                Token x = ExpandMacro (vt->Borrow ());
+                MacroTable::Pin pin(MacroList, *m);
+                Token x = ExpandMacro(iToken.Borrow());
                 ScopedFlag expanding(m->Expanding);
-                return GetValue (x, oValue, iLine);
+                return GetValue(x, oValue, iLine);
             }
-
             // Undefined macro, "expand" to 0 (mimic cpp behaviour)
             oValue = 0;
-            break;
+            return true;
+        }
 
-        case Token::TK_TEXT:
         case Token::TK_NUMBER:
-            if (!vt->GetValue (oValue))
+            if (!iToken.GetValue(oValue))
             {
-                Error (iLine, "Not a numeric expression", vt);
+                Error(iLine, "Not a numeric expression", &iToken);
                 return false;
             }
-            break;
+            return true;
 
         default:
-            Error (iLine, "Unexpected token", vt);
+            Error(iLine, "Unexpected token", &iToken);
             return false;
         }
-
-        return true;
     }
 
-
-    CPreprocessor::Token CPreprocessor::GetArgument (Token &oArg, bool iExpand,
-                                                     bool shouldAppendArg)
-    {
-        do
-        {
-            oArg = GetToken (iExpand);
-        } while (Token::IsBlankOrNewline (oArg.Type));
-
-        if (!iExpand)
-        {
-            if (oArg.Type == Token::TK_EOS)
-                return Token (Token::TK_EOS);
-            else if (oArg.Type == Token::TK_PUNCTUATION &&
-                     (oArg.String () [0] == ',' ||
-                      oArg.String () [0] == ')'))
-            {
-                Token t = std::move (oArg);
-                oArg = Token (Token::TK_TEXT, "", 0);
-                return t;
-            }
-            else if (oArg.Type != Token::TK_KEYWORD)
-            {
-                Error (Lex.GetLine (), "Unexpected token", &oArg);
-                return Token (Token::TK_ERROR);
-            }
-        }
-
-        size_t braceCount = 0;
-        bool directive = oArg.Type == Token::TK_DIRECTIVE;
-
-        if( oArg.Type == Token::TK_PUNCTUATION && oArg.String ()[0] == '(' )
-            ++braceCount;
-
-        size_t len = oArg.Length ();
-        while (true)
-        {
-            // Rescan directives later, before expanding their operands.
-            Token t = GetToken (iExpand && !directive);
-            switch (t.Type)
-            {
-            case Token::TK_EOS:
-                Error (Lex.GetLine (), "Unfinished list of arguments");
-                OGRE_FALLTHROUGH;
-            case Token::TK_ERROR:
-                return Token (Token::TK_ERROR);
-            case Token::TK_PUNCTUATION:
-                if( t.String () [0] == '(' )
-                {
-                    ++braceCount;
-                }
-                else if( !braceCount )
-                {
-                    if (t.String () [0] == ',' ||
-                        t.String () [0] == ')')
-                    {
-                        // Trim whitespaces at the end
-                        oArg.Str.Truncate (len);
-
-                        //Append "__arg_" to all macro arguments, otherwise if user does:
-                        //  #define mad( a, b, c ) fma( a, b, c )
-                        //  mad( x.s, y, a );
-                        //It will be translated to:
-                        //  fma( x.s, y, x.s );
-                        //instead of:
-                        //  fma( x.s, y, a );
-                        //This does not fix the problem by the root, but
-                        //typing "__arg_" by the user is extremely rare.
-                        if( shouldAppendArg )
-                            oArg.Str.AppendCopy ("__arg_");
-                        return t;
-                    }
-                }
-                else
-                {
-                    if( t.String () [0] == ')' )
-                        --braceCount;
-                }
-                break;
-            case Token::TK_DIRECTIVE:
-                if (iExpand && oArg.Length () && oArg.String ()[oArg.Length () - 1] != '\n')
-                    oArg.Str.AppendCopy ("\n");
-                directive = true;
-                break;
-            case Token::TK_NEWLINE:
-                if (iExpand && directive)
-                    oArg.Str.Append (std::move (t.Str));
-                directive = false;
-                continue;
-            case Token::TK_LINECONT:
-            case Token::TK_COMMENT:
-            case Token::TK_LINECOMMENT:
-                // ignore these tokens
-                continue;
-            default:
-                break;
-            }
-
-            if (!iExpand && t.Type != Token::TK_WHITESPACE)
-            {
-                Error (Lex.GetLine (), "Unexpected token", &oArg);
-                return Token (Token::TK_ERROR);
-            }
-
-            oArg.Str.Append (std::move (t.Str));
-
-            if (t.Type != Token::TK_WHITESPACE)
-                len = oArg.Length ();
-        }
-    }
-
-
-    /**
-     * Get all the arguments of a macro: '(' arg1 { ',' arg2 { ',' ... }} ')'.
-     * Returns the first token after the list; if there is no list directly after
-     * the name, oArgs stays empty and the first non-blank token is returned.
-     *
-     * The lookahead tokens are lexed without expansion: they are put back by the
-     * caller and expanded when they are read for real.
-     */
-    CPreprocessor::Token CPreprocessor::GetArguments (std::vector<Token>& oArgs,
-                                                      bool iExpand, bool shouldAppendArg)
-    {
-        oArgs.clear();
-
-        Token t = GetToken (false);
-        const bool isFirstTokenAnOpenBrace = t.IsPunctuation ('(');
-        while (Token::IsBlank (t.Type))
-            t = GetToken (false);
-        if (!isFirstTokenAnOpenBrace)
-            return t;
-
-        if (oArgs.capacity () == 0)
-            oArgs.reserve (4);
-
-        for (;;)
-        {
-            if (oArgs.size () == MAX_MACRO_ARGS)
-            {
-                Error (Lex.GetLine (), "Too many arguments to macro");
-                oArgs.clear ();
-                return Token (Token::TK_ERROR);
-            }
-
-            oArgs.emplace_back ();
-            t = GetArgument (oArgs.back (), iExpand, shouldAppendArg);
-
-            if (t.Type == Token::TK_EOS)
-                Error (Lex.GetLine (), "Unfinished list of arguments");
-            if (t.Type == Token::TK_EOS || t.Type == Token::TK_ERROR)
-            {
-                oArgs.clear ();
-                return Token (Token::TK_ERROR);
-            }
-
-            if (t.Type != Token::TK_PUNCTUATION)
-                Error (Lex.GetLine (), "Unexpected token", &t);
-            else if (t.IsPunctuation (')'))
-                return GetToken (false);
-            // otherwise we've got a ',' : next argument
-        }
-    }
-
-
-    bool CPreprocessor::HandleDefine (Token &iBody, int iLine)
-    {
-        // The text of a macro expansion is short-lived: a macro defined in it
-        // must not point into it
-        if (SupplimentaryExpand && !iBody.Str.IsAllocated ())
-            iBody.Str = iBody.Str.Clone ();
-
-        // Create an additional preprocessor to process macro body
-        CPreprocessor cpp (MacroList, iBody, iLine);
-
-        Token t = cpp.GetToken (false);
-        if (t.Type != Token::TK_KEYWORD)
-        {
-            Error (iLine, "Macro name expected after #define");
-            return false;
-        }
-
-        Macro m;
-        m.Name = t.View ();
-        t = cpp.GetArguments (m.Args, false, true);
-        while (t.Type == Token::TK_WHITESPACE)
-            t = cpp.GetToken (false);
-
-        switch (t.Type)
-        {
-        case Token::TK_NEWLINE:
-        case Token::TK_EOS:
-            // Assign "" to token
-            t = Token (Token::TK_TEXT, "", 0);
-            break;
-
-        case Token::TK_ERROR:
-            return false;
-
-        default:
-            t.Type = Token::TK_TEXT;
-            assert (t.String () + t.Length () == cpp.Lex.GetPosition ());
-            t.Str.ResizeBorrowed (size_t (cpp.Lex.GetEnd () - t.String ()));
-            break;
-        }
-
-        if( !m.Args.empty() )
-        {
-            //We need to convert:
-            //  #define mad( a__arg_, b__arg_, c__arg_ ) fma( a, b, c )
-            //into:
-            //  #define mad( a__arg_, b__arg_, c__arg_ ) fma( a__arg_, b__arg_, c__arg_ )
-            MacroTable renames;
-            for (const Token& arg : m.Args)
-            {
-                if (arg.Length () >= 6) // empty for "#define F()"
-                    renames.Define (StringView (arg.String (), arg.Length () - 6), arg.Str.Borrow ());
-            }
-
-            // Now run the macro expansion through the supplimentary preprocessor
-            CPreprocessor cpp2 (renames);
-            t = cpp2.Parse( t );
-        }
-
-        m.Value = std::move (t);
-        // The macro keeps the text that its name, arguments and value point into
-        m.Body = std::move (iBody);
-        MacroList.Define (std::move (m));
-        return true;
-    }
-
-
-    bool CPreprocessor::HandleUnDef (Token &iBody, int iLine)
-    {
-        CPreprocessor cpp (MacroList, iBody, iLine);
-
-        Token t = cpp.GetToken (false);
-
-        if (t.Type != Token::TK_KEYWORD)
-        {
-            Error (iLine, "Expecting a macro name after #undef, got", &t);
-            return false;
-        }
-
-        // Don't barf if macro does not exist - standard C behaviour
-        Undef (t.String (), t.Length ());
-
-        do
-        {
-            t = cpp.GetToken (false);
-        } while (Token::IsBlank (t.Type));
-
-        if (t.Type != Token::TK_EOS)
-            Error (iLine, "Warning: Ignoring garbage after directive", &t);
-
-        return true;
-    }
-
-    bool CPreprocessor::HandleIf(bool val, int iLine)
-    {
-        if (Conditions.IsFull())
-        {
-            Error (iLine, "Too many embedded #if directives");
-            return false;
-        }
-
-        Conditions.Push(val);
-
-        return true;
-    }
-
-    bool CPreprocessor::HandleIfDef (Token &iBody, int iLine)
-    {
-        CPreprocessor cpp (MacroList, iBody, iLine);
-
-        Token t = cpp.GetToken (false);
-
-        if (t.Type != Token::TK_KEYWORD)
-        {
-            Error (iLine, "Expecting a macro name after #ifdef, got", &t);
-            return false;
-        }
-
-        if (!HandleIf(MacroList.IsDefined (t.View ()) != NULL, iLine))
-            return false;
-
-        do
-        {
-            t = cpp.GetToken (false);
-        } while (Token::IsBlank (t.Type));
-
-        if (t.Type != Token::TK_EOS)
-            Error (iLine, "Warning: Ignoring garbage after directive", &t);
-
-        return true;
-    }
-
-
-    CPreprocessor::Token CPreprocessor::ExpandDefined (const std::vector<Token>& iArgs)
-    {
-        if (iArgs.size() != 1)
-        {
-            Error (Lex.GetLine (), "The defined() function takes exactly one argument");
-            return Token (Token::TK_ERROR);
-        }
-
-        const char *v = MacroList.IsDefined (iArgs [0].View ()) ? "1" : "0";
-        return Token (Token::TK_NUMBER, v, 1);
-    }
-
-    bool CPreprocessor::GetValueDef(const Token &iToken, long &oValue, int iLine)
+    /// Same as GetValue(), but considers the defined() function
+    bool CPreprocessor::Processor::GetValueDef(const Token& iToken, long& oValue, int iLine)
     {
         // Temporary add the defined() function to the macro list
         Macro defined;
-        defined.Name = StringView ("defined");
+        defined.Name = StringView("defined");
         defined.IsDefinedFunc = true;
         defined.Args.resize(1);
-        MacroList.Define (std::move (defined));
+        MacroList.Define(std::move(defined));
 
-        bool rc = GetValue (iToken, oValue, iLine);
+        const bool rc = GetValue(iToken, oValue, iLine);
 
         // Restore the macro list
-        MacroList.PopFront ();
-
+        MacroList.PopFront();
         return rc;
     }
 
-    bool CPreprocessor::HandleIf (Token &iBody, int iLine)
-    {
-        long val;
-        return GetValueDef(iBody, val, iLine) && HandleIf(val, iLine);
-    }
-
-    bool CPreprocessor::HandleElif (Token &iBody, int iLine)
-    {
-        if (Conditions.IsEmpty())
-        {
-            Error (iLine, "#elif without #if");
-            return false;
-        }
-
-        long val;
-        if (!GetValueDef(iBody, val, iLine))
-            return false;
-
-        Conditions.Elif(val != 0);
-
-        return true;
-    }
-
-
-    bool CPreprocessor::HandleElse (Token &iBody, int iLine)
-    {
-        if (Conditions.IsEmpty())
-        {
-            Error (iLine, "#else without #if");
-            return false;
-        }
-
-        // Negate the result of last #if
-        Conditions.Else();
-
-        if (iBody.Length ())
-            Error (iLine, "Warning: Ignoring garbage after #else", &iBody);
-
-        return true;
-    }
-
-
-    bool CPreprocessor::HandleEndIf (Token &iBody, int iLine)
-    {
-        if (!Conditions.Pop())
-        {
-            Error (iLine, "#endif without #if");
-            return false;
-        }
-
-        if (iBody.Length ())
-            Error (iLine, "Warning: Ignoring garbage after #endif", &iBody);
-
-        return true;
-    }
-
+    // --- directives -------------------------------------------------------
 
     /// Collect the remaining part of the directive until EOL (comments and line
     /// continuations removed). oLast receives the token that ended it.
-    CPreprocessor::Token CPreprocessor::GetDirectiveBody (Token& oLast)
+    CPreprocessor::Token CPreprocessor::Processor::GetDirectiveBody(Token& oLast)
     {
         Token t;
         do
         {
-            t = GetToken (false);
+            t = GetToken(false);
             if (t.Type == Token::TK_NEWLINE)
             {
                 // No directive arguments
-                oLast = t.Borrow ();
-                t.Str.Truncate (0);
+                oLast = t.Borrow();
+                t.Str.Truncate(0);
                 return t;
             }
-        } while (Token::IsBlankOrLineCont (t.Type));
+        } while (Token::IsBlankOrLineCont(t.Type));
 
         for (;;)
         {
-            oLast = GetToken (false);
+            oLast = GetToken(false);
             switch (oLast.Type)
             {
             case Token::TK_EOS: // can happen and is not an error
@@ -1399,175 +1465,244 @@ namespace Ogre {
             default:
                 break;
             }
-            t.Str.Append (oLast.Str);
+            t.Str.Append(oLast.Str);
             t.Type = Token::TK_TEXT;
         }
     }
 
-
-    CPreprocessor::Token CPreprocessor::HandleDirective (Token &iToken, int iLine)
+    CPreprocessor::Token CPreprocessor::Processor::HandleDirective(Token iToken, int iLine)
     {
         // Analyze preprocessor directive
-        const char *directive = iToken.String () + 1;
-        size_t dirlen = iToken.Length () - 1;
-        while (dirlen && isSpace (*directive))
+        const char* directive = iToken.String() + 1;
+        size_t dirlen = iToken.Length() - 1;
+        while (dirlen && isSpace(*directive))
             dirlen--, directive++;
 
-        const int old_line = Lex.GetLine ();
+        const int old_line = Lex.GetLine();
 
         Token last;
-        Token t = GetDirectiveBody (last);
+        Token t = GetDirectiveBody(last);
         if (last.Type == Token::TK_ERROR)
             return last;
 
         bool rc = false;
-        switch (Classify (StringView (directive, dirlen), Conditions.IsOutputEnabled ()))
+        switch (Classify(StringView(directive, dirlen), Conditions.IsOutputEnabled()))
         {
-        case DirectiveKind::Define: rc = HandleDefine (t, iLine); break;
-        case DirectiveKind::UnDef: rc = HandleUnDef (t, iLine); break;
-        case DirectiveKind::IfDef: rc = HandleIfDef (t, iLine); break;
+        case DirectiveKind::Define: rc = HandleDefine(std::move(t), iLine); break;
+        case DirectiveKind::UnDef: rc = HandleUnDef(t, iLine); break;
+        case DirectiveKind::IfDef: rc = HandleIfDef(t, iLine); break;
         case DirectiveKind::IfNDef:
-            rc = HandleIfDef (t, iLine);
+            rc = HandleIfDef(t, iLine);
             if (rc)
                 Conditions.Negate();
             break;
-        case DirectiveKind::If: rc = HandleIf (t, iLine); break;
-        case DirectiveKind::Elif: rc = HandleElif (t, iLine); break;
-        case DirectiveKind::Else: rc = HandleElse (t, iLine); break;
-        case DirectiveKind::EndIf: rc = HandleEndIf (t, iLine); break;
+        case DirectiveKind::If: rc = HandleIf(t, iLine); break;
+        case DirectiveKind::Elif: rc = HandleElif(t, iLine); break;
+        case DirectiveKind::Else: rc = HandleElse(t, iLine); break;
+        case DirectiveKind::EndIf: rc = HandleEndIf(t, iLine); break;
         case DirectiveKind::Unknown:
             // Unknown preprocessor directive, roll back and pass through
-            Lex.Rewind (iToken.String () + iToken.Length (), old_line);
+            Lex.Rewind(iToken.String() + iToken.Length(), old_line);
             iToken.Type = Token::TK_TEXT;
-            return std::move (iToken);
+            return iToken;
         }
 
-        return rc ? std::move (last) : Token (Token::TK_ERROR);
+        return rc ? std::move(last) : Token(Token::TK_ERROR);
     }
 
-
-    void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen,
-                                const char *iMacroValue, size_t iMacroValueLen)
+    bool CPreprocessor::Processor::WarnGarbage(Lexer& ioLex, int iLine)
     {
-        MacroList.Define (StringView (iMacroName, iMacroNameLen), Text (iMacroValue, iMacroValueLen));
+        Token t;
+        do
+            t = ioLex.GetToken();
+        while (Token::IsBlank(t.Type));
+        if (t.Type != Token::TK_EOS)
+            Error(iLine, "Warning: Ignoring garbage after directive", &t);
+        return true;
     }
 
-
-    void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen)
+    bool CPreprocessor::Processor::HandleDefine(Token iBody, int iLine)
     {
-        MacroList.Define (StringView (iMacroName, iMacroNameLen), Text ());
-    }
+        // The text of an expansion is short-lived; the macro must not point into it
+        if (SupplimentaryExpand && !iBody.Str.IsAllocated())
+            iBody.Str = iBody.Str.Clone();
 
+        // Create an additional preprocessor to process the macro body:
+        // name, [arguments], value
+        Processor cpp(MacroList, iBody, iLine);
 
-    bool CPreprocessor::Undef (const char *iMacroName, size_t iMacroNameLen)
-    {
-        return MacroList.Undef (StringView (iMacroName, iMacroNameLen));
-    }
-
-
-    CPreprocessor::Token CPreprocessor::Parse (const Token &iSource)
-    {
-        Lex = Lexer (iSource.Str, 1);
-        Conditions = ConditionalStack();
-
-        // Accumulate output into this token
-        Token output (Token::TK_TEXT);
-        int empty_lines = 0;
-
-        // Enable output only if all embedded #if's were true
-        bool old_output_enabled = true;
-        bool output_enabled = true;
-        int output_disabled_line = 0;
-
-        while (!Lex.AtEnd())
+        Token t = cpp.GetToken(false);
+        if (t.Type != Token::TK_KEYWORD)
         {
-            const int old_line = Lex.GetLine();
-            Token t = GetToken (true);
-
-            if (t.Type == Token::TK_DIRECTIVE)
-            {
-                // Handle preprocessor directives
-                t = HandleDirective (t, old_line);
-
-                output_enabled = Conditions.IsOutputEnabled();
-                if (output_enabled != old_output_enabled)
-                {
-                    if (output_enabled)
-                        output.Str.AppendNL (old_line - output_disabled_line);
-                    else
-                        output_disabled_line = old_line;
-                    old_output_enabled = output_enabled;
-                }
-
-                if (output_enabled)
-                    output.Str.AppendNL (Lex.GetLine() - old_line - t.CountNL ());
-            }
-
-            switch (t.Type)
-            {
-            case Token::TK_ERROR:
-                return t;
-
-            case Token::TK_EOS:
-                return output; // Force termination
-
-            case Token::TK_COMMENT:
-                // C comments are replaced with single spaces.
-                if (output_enabled)
-                {
-                    output.Str.AppendCopy (" ");
-                    output.Str.AppendNL (Lex.GetLine() - old_line);
-                }
-                break;
-
-            case Token::TK_LINECOMMENT:
-                // C++ comments are ignored
-                break;
-
-            case Token::TK_LINECONT:
-                // Backslash-Newline sequences are deleted, no matter where.
-                empty_lines++;
-                break;
-
-            case Token::TK_PUNCTUATION:
-                if (output_enabled && (!SupplimentaryExpand || t.String ()[0] != '#'))
-                    output.Str.Append (std::move (t.Str));
-                break;
-
-            default:
-                if (t.Type == Token::TK_NEWLINE && empty_lines)
-                {
-                    // Compensate for the backslash-newline combinations
-                    // we have encountered, otherwise line numeration is broken
-                    if (output_enabled)
-                        output.Str.AppendNL (empty_lines);
-                    empty_lines = 0;
-                }
-                // Passthrough all other tokens
-                if (output_enabled)
-                    output.Str.Append (std::move (t.Str));
-                break;
-            }
+            Error(iLine, "Macro name expected after #define");
+            return false;
         }
 
-        if (!Conditions.IsEmpty())
+        Macro m;
+        m.Name = t.View();
+        t = cpp.GetArguments(m.Args, false, true);
+        while (t.Type == Token::TK_WHITESPACE)
+            t = cpp.GetToken(false);
+
+        switch (t.Type)
         {
-            Error (Lex.GetLine(), "Unclosed #if at end of source");
-            return Token (Token::TK_ERROR);
+        case Token::TK_NEWLINE:
+        case Token::TK_EOS:
+            t = Token(Token::TK_TEXT, "", 0); // assign "" to token
+            break;
+        case Token::TK_ERROR:
+            return false;
+        default:
+            // The value is everything up to the end of the body
+            t.Type = Token::TK_TEXT;
+            assert(t.String() + t.Length() == cpp.Lex.GetPosition());
+            t.Str.ResizeBorrowed(size_t(cpp.Lex.GetEnd() - t.String()));
+            break;
         }
 
-        return output;
+        if (!m.Args.empty())
+        {
+            // We need to convert:
+            //   #define mad( a__arg_, b__arg_ ) fma( a, b )
+            // into:
+            //   #define mad( a__arg_, b__arg_ ) fma( a__arg_, b__arg_ )
+            MacroTable renames;
+            for (const Token& arg : m.Args)
+                if (arg.Length() >= ARG_SUFFIX_LEN) // empty for "#define F()"
+                    renames.Define(StringView(arg.String(), arg.Length() - ARG_SUFFIX_LEN),
+                                   arg.Str.Borrow());
+
+            // Now run the macro value through the supplimentary preprocessor
+            Processor cpp2(renames);
+            t = cpp2.Parse(t);
+        }
+
+        m.Value = std::move(t);
+        m.Body = std::move(iBody); // keeps alive what Name/Args/Value point into
+        MacroList.Define(std::move(m));
+        return true;
     }
 
-
-    char *CPreprocessor::Parse (const char *iSource, size_t iLength, size_t &oLength)
+    bool CPreprocessor::Processor::HandleUnDef(const Token& iBody, int iLine)
     {
-        Token retval = Parse (Token (Token::TK_TEXT, iSource, iLength));
+        Processor cpp(MacroList, iBody, iLine);
+
+        Token t = cpp.GetToken(false);
+        if (t.Type != Token::TK_KEYWORD)
+        {
+            Error(iLine, "Expecting a macro name after #undef, got", &t);
+            return false;
+        }
+
+        // Don't barf if macro does not exist - standard C behaviour
+        MacroList.Undef(t.View());
+        return WarnGarbage(cpp.Lex, iLine);
+    }
+
+    bool CPreprocessor::Processor::HandleIf(bool iValue, int iLine)
+    {
+        if (Conditions.IsFull())
+        {
+            Error(iLine, "Too many embedded #if directives");
+            return false;
+        }
+        Conditions.Push(iValue);
+        return true;
+    }
+
+    bool CPreprocessor::Processor::HandleIfDef(const Token& iBody, int iLine)
+    {
+        Processor cpp(MacroList, iBody, iLine);
+
+        Token t = cpp.GetToken(false);
+        if (t.Type != Token::TK_KEYWORD)
+        {
+            Error(iLine, "Expecting a macro name after #ifdef, got", &t);
+            return false;
+        }
+
+        if (!HandleIf(MacroList.IsDefined(t.View()) != nullptr, iLine))
+            return false;
+        return WarnGarbage(cpp.Lex, iLine);
+    }
+
+    bool CPreprocessor::Processor::HandleIf(const Token& iBody, int iLine)
+    {
+        long val;
+        return GetValueDef(iBody, val, iLine) && HandleIf(val != 0, iLine);
+    }
+
+    bool CPreprocessor::Processor::HandleElif(const Token& iBody, int iLine)
+    {
+        if (Conditions.IsEmpty())
+        {
+            Error(iLine, "#elif without #if");
+            return false;
+        }
+
+        long val;
+        if (!GetValueDef(iBody, val, iLine))
+            return false;
+        Conditions.Elif(val != 0);
+        return true;
+    }
+
+    bool CPreprocessor::Processor::HandleElse(const Token& iBody, int iLine)
+    {
+        if (Conditions.IsEmpty())
+        {
+            Error(iLine, "#else without #if");
+            return false;
+        }
+
+        // Negate the result of last #if
+        Conditions.Else();
+        if (iBody.Length())
+            Error(iLine, "Warning: Ignoring garbage after #else", &iBody);
+        return true;
+    }
+
+    bool CPreprocessor::Processor::HandleEndIf(const Token& iBody, int iLine)
+    {
+        if (!Conditions.Pop())
+        {
+            Error(iLine, "#endif without #if");
+            return false;
+        }
+        if (iBody.Length())
+            Error(iLine, "Warning: Ignoring garbage after #endif", &iBody);
+        return true;
+    }
+
+    // -----------------------------------------------------------------------
+    // CPreprocessor
+    // -----------------------------------------------------------------------
+
+    void CPreprocessor::Define(const char* iMacroName, size_t iMacroNameLen, const char* iMacroValue,
+                               size_t iMacroValueLen)
+    {
+        MacroList.Define(StringView(iMacroName, iMacroNameLen), Text(iMacroValue, iMacroValueLen));
+    }
+
+    void CPreprocessor::Define(const char* iMacroName, size_t iMacroNameLen)
+    {
+        MacroList.Define(StringView(iMacroName, iMacroNameLen), Text());
+    }
+
+    bool CPreprocessor::Undef(const char* iMacroName, size_t iMacroNameLen)
+    {
+        return MacroList.Undef(StringView(iMacroName, iMacroNameLen));
+    }
+
+    char* CPreprocessor::Parse(const char* iSource, size_t iLength, size_t& oLength)
+    {
+        Processor cpp(MacroList);
+        Token retval = cpp.Parse(Token(Token::TK_TEXT, iSource, iLength));
         if (retval.Type == Token::TK_ERROR)
-            return NULL;
+            return nullptr;
 
-        oLength = retval.Length ();
-        return retval.Str.Release ();
+        oLength = retval.Length();
+        return retval.Str.Release();
     }
 
 } // namespace Ogre
