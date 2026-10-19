@@ -80,6 +80,181 @@ namespace Ogre {
         bool& Flag;
     };
 
+    // -----------------------------------------------------------------------
+    // CPreprocessor::Lexer
+    // -----------------------------------------------------------------------
+
+    CPreprocessor::Lexer::Lexer(const Text& iSource, int iLine) : SourceToken(&iSource), Line(iLine)
+    {
+        if (iSource.GetString())
+        {
+            Source = iSource.GetString();
+            SourceEnd = Source + iSource.GetLength();
+        }
+    }
+
+    void CPreprocessor::Lexer::Rewind(const char* iPosition, int iLine)
+    {
+        Source = iPosition;
+        Line = iLine;
+    }
+
+    char CPreprocessor::Lexer::Peek(size_t iAhead) const
+    {
+        return Source + iAhead < SourceEnd ? Source[iAhead] : '\0';
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::Make(Token::Kind iType, const char* iBegin) const
+    {
+        return Token(iType, iBegin, size_t(Source - iBegin));
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::GetToken()
+    {
+        if (AtEnd())
+            return Token(Token::TK_EOS);
+
+        const char* begin = Source;
+        const char c = *Source++;
+
+        if (c == '\n' || (c == '\r' && Peek() == '\n'))
+            return ReadNewline(begin, c);
+        if (isSpace(c))
+            return ReadWhitespace(begin);
+        if (isDigit(c))
+            return ReadNumber(begin, c);
+        if (isKeywordChar(c))
+            return ReadKeyword(begin);
+        if (c == '"' || c == '\'')
+            return ReadString(begin, c);
+        if (c == '/' && Peek() == '/')
+            return ReadLineComment(begin);
+        if (c == '/' && Peek() == '*')
+            return ReadComment(begin);
+        if (c == '#' && BOL)
+            return ReadDirective(begin);
+        if (c == '\\' && (Peek() == '\r' || Peek() == '\n'))
+            return ReadLineCont(begin);
+        return ReadPunctuation(begin, c);
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadNewline(const char* iBegin, char c)
+    {
+        Line++;
+        BOL = true;
+        if (c == '\r')
+            Source++;
+        return Make(Token::TK_NEWLINE, iBegin);
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadWhitespace(const char* iBegin)
+    {
+        while (Source < SourceEnd && *Source != '\r' && *Source != '\n' && isSpace(*Source))
+            Source++;
+        return Make(Token::TK_WHITESPACE, iBegin);
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadNumber(const char* iBegin, char iFirst)
+    {
+        BOL = false;
+        if (iFirst == '0' && Peek() == 'x') // hex numbers
+        {
+            Source++;
+            while (Source < SourceEnd && isXDigit(*Source))
+                Source++;
+        }
+        else
+            while (Source < SourceEnd && isDigit(*Source))
+                Source++;
+        return Make(Token::TK_NUMBER, iBegin);
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadKeyword(const char* iBegin)
+    {
+        BOL = false;
+        while (Source < SourceEnd && isKeywordChar(*Source))
+            Source++;
+        Token t = Make(Token::TK_KEYWORD, iBegin);
+        // A keyword inside a disabled range of the source stays disabled
+        if (SourceToken && SourceToken->HasDisabledMacros())
+            t.Str.InheritDisabled(*SourceToken, size_t(iBegin - SourceToken->GetString()), t.Length());
+        return t;
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadString(const char* iBegin, char iQuote)
+    {
+        BOL = false;
+        while (Source < SourceEnd && *Source != iQuote)
+        {
+            if (*Source == '\\' && ++Source >= SourceEnd)
+                break;
+            if (*Source == '\n')
+                Line++;
+            Source++;
+        }
+        if (Source < SourceEnd)
+            Source++;
+        return Make(Token::TK_STRING, iBegin);
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadLineComment(const char* iBegin)
+    {
+        BOL = false;
+        Source++; // second '/'
+        while (Source < SourceEnd && *Source != '\r' && *Source != '\n')
+            Source++;
+        return Make(Token::TK_LINECOMMENT, iBegin);
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadComment(const char* iBegin)
+    {
+        BOL = false;
+        Source++; // '*'
+        while (Source < SourceEnd && (Peek() != '*' || Peek(1) != '/'))
+        {
+            if (*Source == '\n')
+                Line++;
+            Source++;
+        }
+        if (Source < SourceEnd && *Source == '*')
+            Source++;
+        if (Source < SourceEnd && *Source == '/')
+            Source++;
+        return Make(Token::TK_COMMENT, iBegin);
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadDirective(const char* iBegin)
+    {
+        // '#', optional whitespace, then the directive name
+        while (Source < SourceEnd && isSpace(*Source))
+            Source++;
+        while (Source < SourceEnd && !isSpace(*Source))
+            Source++;
+        return Make(Token::TK_DIRECTIVE, iBegin);
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadLineCont(const char* iBegin)
+    {
+        if (Peek() == '\r')
+            Source++;
+        if (Peek() == '\n')
+            Source++;
+        Line++;
+        BOL = true;
+        return Make(Token::TK_LINECONT, iBegin);
+    }
+
+    CPreprocessor::Token CPreprocessor::Lexer::ReadPunctuation(const char* iBegin, char c)
+    {
+        BOL = false;
+        const char n = Peek();
+        // Handle double-char operators here
+        if (((c == '>' || c == '<') && (n == c || n == '=')) || ((c == '!' || c == '=') && n == '=') ||
+            ((c == '|' || c == '&' || c == '^') && n == c))
+            Source++;
+        return Make(Token::TK_PUNCTUATION, iBegin);
+    }
+
     CPreprocessor::Text::Text(Text&& iOther) noexcept
         : String(iOther.String), Length(iOther.Length), Allocated(iOther.Allocated),
           DisabledMacros(std::move(iOther.DisabledMacros))
@@ -456,160 +631,22 @@ namespace Ogre {
         LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
     }
 
-    CPreprocessor::CPreprocessor (const Token &iToken, int iLine)
+    CPreprocessor::CPreprocessor (const Token &iToken, int iLine) : Lex (iToken.Str, iLine)
     {
-        SourceToken = &iToken;
-        Source = iToken.String ();
-        SourceEnd = iToken.String () + iToken.Length ();
-        Line = iLine;
-        BOL = true;
-        SupplimentaryExpand = false;
     }
 
     CPreprocessor::CPreprocessor()
     {
-        SourceToken = nullptr;
-        Source = 0;
-        SourceEnd = 0;
-        Line = 0;
-        BOL = true;
-        SupplimentaryExpand = false;
     }
 
     CPreprocessor::~CPreprocessor() {}
 
     CPreprocessor::Token CPreprocessor::GetToken (bool iExpand)
     {
-        if (Source >= SourceEnd)
-            return Token (Token::TK_EOS);
-
-        const char *begin = Source;
-        char c = *Source++;
-
-
-        if (c == '\n' || (c == '\r' && Peek () == '\n'))
-        {
-            Line++;
-            BOL = true;
-            if (c == '\r')
-                Source++;
-            return Token (Token::TK_NEWLINE, begin, Source - begin);
-        }
-        else if (isSpace (c))
-        {
-            while (Source < SourceEnd &&
-                   *Source != '\r' &&
-                   *Source != '\n' &&
-                   isSpace (*Source))
-                Source++;
-
-            return Token (Token::TK_WHITESPACE, begin, Source - begin);
-        }
-        else if (isDigit (c))
-        {
-            BOL = false;
-            if (c == '0' && Peek () == 'x') // hex numbers
-            {
-                Source++;
-                while (Source < SourceEnd && isXDigit (*Source))
-                    Source++;
-            }
-            else
-                while (Source < SourceEnd && isDigit (*Source))
-                    Source++;
-            return Token (Token::TK_NUMBER, begin, Source - begin);
-        }
-        else if (isKeywordChar (c))
-        {
-            BOL = false;
-            while (Source < SourceEnd && isKeywordChar (*Source))
-                Source++;
-            Token t (Token::TK_KEYWORD, begin, Source - begin);
-            if (SourceToken)
-                t.Str.InheritDisabled (SourceToken->Str, begin - SourceToken->String (), t.Length ());
-            if (iExpand)
-                return ExpandMacro (std::move (t));
-            return t;
-        }
-        else if (c == '"' || c == '\'')
-        {
-            BOL = false;
-            while (Source < SourceEnd && *Source != c)
-            {
-                if (*Source == '\\')
-                {
-                    Source++;
-                    if (Source >= SourceEnd)
-                        break;
-                }
-                if (*Source == '\n')
-                    Line++;
-                Source++;
-            }
-            if (Source < SourceEnd)
-                Source++;
-            return Token (Token::TK_STRING, begin, Source - begin);
-        }
-        else if (c == '/' && Peek () == '/')
-        {
-            BOL = false;
-            Source++;
-            while (Source < SourceEnd && *Source != '\r' && *Source != '\n')
-                Source++;
-            return Token (Token::TK_LINECOMMENT, begin, Source - begin);
-        }
-        else if (c == '/' && Peek () == '*')
-        {
-            BOL = false;
-            Source++;
-            while (Source < SourceEnd && (Peek () != '*' || Peek (1) != '/'))
-            {
-                if (*Source == '\n')
-                    Line++;
-                Source++;
-            }
-            if (Source < SourceEnd && *Source == '*')
-                Source++;
-            if (Source < SourceEnd && *Source == '/')
-                Source++;
-            return Token (Token::TK_COMMENT, begin, Source - begin);
-        }
-        else if (c == '#' && BOL)
-        {
-            // Skip all whitespaces after '#'
-            while (Source < SourceEnd && isSpace (*Source))
-                Source++;
-            while (Source < SourceEnd && !isSpace (*Source))
-                Source++;
-            return Token (Token::TK_DIRECTIVE, begin, Source - begin);
-        }
-        else if (c == '\\' && (Peek () == '\r' || Peek () == '\n'))
-        {
-            // Treat backslash-newline as a whole token
-            if (Peek () == '\r')
-                Source++;
-            if (Peek () == '\n')
-                Source++;
-            Line++;
-            BOL = true;
-            return Token (Token::TK_LINECONT, begin, Source - begin);
-        }
-        else
-        {
-            BOL = false;
-            // Handle double-char operators here
-            if (c == '>' && (Peek () == '>' || Peek () == '='))
-                Source++;
-            else if (c == '<' && (Peek () == '<' || Peek () == '='))
-                Source++;
-            else if (c == '!' && Peek () == '=')
-                Source++;
-            else if (c == '=' && Peek () == '=')
-                Source++;
-            else if ((c == '|' || c == '&' || c == '^') && Peek () == c)
-                Source++;
-            return Token (Token::TK_PUNCTUATION, begin, Source - begin);
-        }
+        Token t = Lex.GetToken ();
+        if (iExpand && t.Type == Token::TK_KEYWORD)
+            return ExpandMacro (std::move (t));
+        return t;
     }
 
 
@@ -622,7 +659,7 @@ namespace Ogre {
             MacroTable::Pin pin (MacroList, *cur);
 
             std::vector<Token> args;
-            int old_line = Line;
+            const int old_line = Lex.GetLine ();
 
             if (!cur->Args.empty())
             {
@@ -637,8 +674,7 @@ namespace Ogre {
                 {
                     // Returned token should never be allocated on heap
                     assert (!t.Str.IsAllocated ());
-                    Source = t.String ();
-                    Line -= t.CountNL ();
+                    Lex.Rewind (t.String (), Lex.GetLine () - t.CountNL ());
                 }
                 // If a macro is defined with arguments but gets not "called" it should behave like normal text
                 if (args.size() == 0 && (t.Type != Token::TK_PUNCTUATION || t.String () [0] != '('))
@@ -658,7 +694,7 @@ namespace Ogre {
             Token t = cur->ExpandFunc ?
                 cur->ExpandFunc (this, args) :
                 cur->Expand (args, MacroList);
-            t.Str.AppendNL (Line - old_line - t.CountNL ());
+            t.Str.AppendNL (Lex.GetLine () - old_line - t.CountNL ());
 
             return t;
         }
@@ -981,7 +1017,7 @@ namespace Ogre {
             }
             else if (oArg.Type != Token::TK_KEYWORD)
             {
-                Error (Line, "Unexpected token", &oArg);
+                Error (Lex.GetLine (), "Unexpected token", &oArg);
                 return Token (Token::TK_ERROR);
             }
         }
@@ -1000,7 +1036,7 @@ namespace Ogre {
             switch (t.Type)
             {
             case Token::TK_EOS:
-                Error (Line, "Unfinished list of arguments");
+                Error (Lex.GetLine (), "Unfinished list of arguments");
                 OGRE_FALLTHROUGH;
             case Token::TK_ERROR:
                 return Token (Token::TK_ERROR);
@@ -1058,7 +1094,7 @@ namespace Ogre {
 
             if (!iExpand && t.Type != Token::TK_WHITESPACE)
             {
-                Error (Line, "Unexpected token", &oArg);
+                Error (Lex.GetLine (), "Unexpected token", &oArg);
                 return Token (Token::TK_ERROR);
             }
 
@@ -1097,7 +1133,7 @@ namespace Ogre {
         {
             if (oArgs.size () == MAX_MACRO_ARGS)
             {
-                Error (Line, "Too many arguments to macro");
+                Error (Lex.GetLine (), "Too many arguments to macro");
                 oArgs.clear ();
                 return Token (Token::TK_ERROR);
             }
@@ -1106,7 +1142,7 @@ namespace Ogre {
             t = GetArgument (oArgs.back (), iExpand, shouldAppendArg);
 
             if (t.Type == Token::TK_EOS)
-                Error (Line, "Unfinished list of arguments");
+                Error (Lex.GetLine (), "Unfinished list of arguments");
             if (t.Type == Token::TK_EOS || t.Type == Token::TK_ERROR)
             {
                 oArgs.clear ();
@@ -1114,7 +1150,7 @@ namespace Ogre {
             }
 
             if (t.Type != Token::TK_PUNCTUATION)
-                Error (Line, "Unexpected token", &t);
+                Error (Lex.GetLine (), "Unexpected token", &t);
             else if (t.IsPunctuation (')'))
                 return GetToken (false);
             // otherwise we've got a ',' : next argument
@@ -1158,8 +1194,8 @@ namespace Ogre {
 
         default:
             t.Type = Token::TK_TEXT;
-            assert (t.String () + t.Length () == cpp.Source);
-            t.Str.ResizeBorrowed (cpp.SourceEnd - t.String ());
+            assert (t.String () + t.Length () == cpp.Lex.GetPosition ());
+            t.Str.ResizeBorrowed (size_t (cpp.Lex.GetEnd () - t.String ()));
             break;
         }
 
@@ -1260,7 +1296,7 @@ namespace Ogre {
     {
         if (iArgs.size() != 1)
         {
-            iParent->Error (iParent->Line, "The defined() function takes exactly one argument");
+            iParent->Error (iParent->Lex.GetLine (), "The defined() function takes exactly one argument");
             return Token (Token::TK_ERROR);
         }
 
@@ -1389,7 +1425,7 @@ namespace Ogre {
         while (dirlen && isSpace (*directive))
             dirlen--, directive++;
 
-        int old_line = Line;
+        const int old_line = Lex.GetLine ();
 
         Token last;
         Token t = GetDirectiveBody (last);
@@ -1413,8 +1449,7 @@ namespace Ogre {
         case DirectiveKind::EndIf: rc = HandleEndIf (t, iLine); break;
         case DirectiveKind::Unknown:
             // Unknown preprocessor directive, roll back and pass through
-            Line = old_line;
-            Source = iToken.String () + iToken.Length ();
+            Lex.Rewind (iToken.String () + iToken.Length (), old_line);
             iToken.Type = Token::TK_TEXT;
             return std::move (iToken);
         }
@@ -1444,11 +1479,7 @@ namespace Ogre {
 
     CPreprocessor::Token CPreprocessor::Parse (const Token &iSource)
     {
-        SourceToken = &iSource;
-        Source = iSource.String ();
-        SourceEnd = Source + iSource.Length ();
-        Line = 1;
-        BOL = true;
+        Lex = Lexer (iSource.Str, 1);
         Conditions = ConditionalStack();
 
         // Accumulate output into this token
@@ -1460,9 +1491,9 @@ namespace Ogre {
         bool output_enabled = true;
         int output_disabled_line = 0;
 
-        while (Source < SourceEnd)
+        while (!Lex.AtEnd())
         {
-            int old_line = Line;
+            const int old_line = Lex.GetLine();
             Token t = GetToken (true);
 
             if (t.Type == Token::TK_DIRECTIVE)
@@ -1481,7 +1512,7 @@ namespace Ogre {
                 }
 
                 if (output_enabled)
-                    output.Str.AppendNL (Line - old_line - t.CountNL ());
+                    output.Str.AppendNL (Lex.GetLine() - old_line - t.CountNL ());
             }
 
             switch (t.Type)
@@ -1497,7 +1528,7 @@ namespace Ogre {
                 if (output_enabled)
                 {
                     output.Str.AppendCopy (" ");
-                    output.Str.AppendNL (Line - old_line);
+                    output.Str.AppendNL (Lex.GetLine() - old_line);
                 }
                 break;
 
@@ -1533,7 +1564,7 @@ namespace Ogre {
 
         if (!Conditions.IsEmpty())
         {
-            Error (Line, "Unclosed #if at end of source");
+            Error (Lex.GetLine(), "Unclosed #if at end of source");
             return Token (Token::TK_ERROR);
         }
 
