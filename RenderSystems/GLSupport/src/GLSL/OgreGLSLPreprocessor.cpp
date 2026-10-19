@@ -899,9 +899,11 @@ namespace Ogre {
         bool isFirstTokenNotAnOpenBrace = false;
 
         Token t;
+        // The token after the macro name is only looked at: ExpandMacro() puts
+        // it back into the source, so it must not be expanded here (see below).
         do
         {
-            t = GetToken (iExpand);
+            t = GetToken (false);
 
             if( !isFirstTokenParsed &&
                 (t.Type != Token::TK_PUNCTUATION || t.String [0] != '(') )
@@ -940,7 +942,11 @@ namespace Ogre {
             case Token::TK_PUNCTUATION:
                 if (t.String [0] == ')')
                 {
-                    t = GetToken (iExpand);
+                    // Likewise, this is the lookahead token after the argument
+                    // list. If it were expanded, ExpandMacro() would "put back"
+                    // a pointer into the expansion instead of into the source
+                    // and the parser would continue reading from the wrong place.
+                    t = GetToken (false);
                     goto Done;
                 } // otherwise we've got a ','
                 break;
