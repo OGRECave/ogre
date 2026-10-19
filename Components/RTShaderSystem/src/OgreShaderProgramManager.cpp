@@ -204,28 +204,31 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
     {
         const String  programFullName = programName + "." + programWriter->getTargetLanguage();
         const String  programFileName = cachePath + programFullName;
-        std::ifstream programFile;
+        DataStreamPtr programFile;
 
         // Check if program file already exist.
-        programFile.open(programFileName.c_str());
+        try
+        {
+            programFile = Root::openFileStream(programFileName);
+        }
+        catch (const FileNotFoundException&) {}
 
         // Case we have to write the program to a file.
         if (!programFile)
         {
-            std::ofstream outFile(programFileName.c_str());
-
-            if (!outFile)
+            try
+            {
+                Root::createFileStream(programFileName, RGN_DEFAULT, true)->write(source.c_str(), source.size());
+            }
+            catch (const FileNotFoundException&)
+            {
                 return GpuProgramPtr();
-
-            outFile << source;
-            outFile.close();
+            }
         }
         else
         {
             // use program file version
-            StringStream buffer;
-            programFile >> buffer.rdbuf();
-            source = buffer.str();
+            source = programFile->getAsString();
         }
     }
 
