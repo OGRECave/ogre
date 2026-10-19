@@ -31,6 +31,7 @@
 
 #include "OgrePlatform.h"
 #include <string.h>
+#include <cstring>
 #include <stdlib.h>
 #include <forward_list>
 #include <vector>
@@ -62,134 +63,186 @@ namespace Ogre {
      */
     class CPreprocessor
     {
+        /// Non-owning (pointer, length) pair. A NULL pointer means "no text at
+        /// all", which is distinct from an empty string.
+        struct StringView
+        {
+            const char* String = nullptr;
+            size_t Length = 0;
+
+            StringView() = default;
+            StringView(const char* iString, size_t iLength) : String(iString), Length(iLength) {}
+            template <size_t N>
+            StringView(const char (&iLiteral)[N]) : String(iLiteral), Length(N - 1) {}
+
+            char operator[](size_t i) const { return String[i]; }
+
+            bool operator==(const StringView& iOther) const
+            {
+                return Length == iOther.Length &&
+                       (Length == 0 || std::memcmp(String, iOther.String, Length) == 0);
+            }
+        };
+
         /**
-         * A input token.
-         *
-         * For performance reasons most tokens will point to portions of the
-         * input stream, so no unneeded memory allocation is done. However,
-         * in some cases we must allocate different memory for token storage,
-         * in this case this is signalled by setting the Allocated member
-         * to non-zero in which case the destructor will know that it must
-         * free memory on object destruction.
+         * Inside text[Begin, End) the macro `Name` must not be expanded again.
+         * This is the "hide set" of the C rescan rule: it keeps a macro that is
+         * being expanded from re-expanding itself when its output is rescanned.
+         */
+        struct DisabledMacro
+        {
+            size_t Begin;
+            size_t End;
+            std::string Name;
+        };
+
+        /**
+         * A string that either borrows a span of some other buffer (usually the
+         * source) or owns a malloc'ed buffer. Move-only; an explicit Borrow() or
+         * Clone() is required to duplicate it.
          *
          * Again for performance reasons we use malloc/realloc/free here because
          * C++-style new[] lacks the realloc() counterpart.
          */
+        class Text
+        {
+        public:
+            Text() = default;
+            Text(const char* iString, size_t iLength) : String(iString), Length(iLength) {}
+            ~Text() { FreeStorage(); }
+
+            Text(Text&& iOther) noexcept;
+            Text& operator=(Text&& iOther) noexcept;
+
+            Text(const Text&) = delete;
+            Text& operator=(const Text&) = delete;
+
+            const char* GetString() const { return String; }
+            size_t GetLength() const { return Length; }
+            StringView View() const { return StringView(String, Length); }
+            bool IsNull() const { return String == nullptr; }
+            /// True if this text owns its buffer (and must free it)
+            bool IsAllocated() const { return Allocated != 0; }
+
+            /// Non-owning alias of the same characters (disabled ranges are copied)
+            Text Borrow() const;
+            /// Deep copy that owns its storage (disabled ranges are copied)
+            Text Clone() const;
+
+            /// Shorten the text (keeps capacity)
+            void Truncate(size_t iLength);
+            /// Change the length of a borrowed span, e.g. to extend it to the end of a line
+            void ResizeBorrowed(size_t iLength);
+            /// Replace the contents by an owned copy of the given characters
+            void Assign(const char* iString, size_t iLength);
+
+            /// Append characters that are known to live in a long-lived buffer:
+            /// adjacent spans are merged without copying, and appending to NULL
+            /// text just borrows.
+            void AppendView(StringView iString);
+            /// Append a copy of the characters; never borrows (for literals and
+            /// other short-lived memory)
+            void AppendCopy(StringView iString);
+            /// Append another text including its disabled ranges
+            void Append(const Text& iOther);
+            /// Like Append(const Text&), but may adopt iOther's buffer (zero copy)
+            /// when this text is still empty
+            void Append(Text&& iOther);
+            /// Append given number of newlines to this text
+            void AppendNL(int iCount);
+
+            /// Hand the buffer over to the caller; for borrowed text this is the
+            /// (const-cast) pointer into the original buffer.
+            char* Release();
+
+            // --- rescan suppression -------------------------------------
+
+            bool IsDisabled(StringView iMacroName) const;
+            /// Disable `iMacroName` in the whole text
+            void Disable(StringView iMacroName);
+            /// Add disabled ranges of iSource that cover [iOffset, iOffset + iLength)
+            void InheritDisabled(const Text& iSource, size_t iOffset, size_t iLength);
+            bool HasDisabledMacros() const { return !DisabledMacros.empty(); }
+
+        private:
+            char* Buffer() { return const_cast<char*>(String); }
+            void FreeStorage();
+            void AppendDisabled(const Text& iOther);
+            /// Make sure we own a buffer that can take `iExtra` more bytes
+            void EnsureAllocated(size_t iExtra);
+            /// Requires non-NULL text
+            void AppendChars(const char* iString, size_t iLength);
+
+            /// A pointer somewhere into the input buffer, or an owned buffer
+            const char* String = nullptr;
+            /// Text length in bytes
+            size_t Length = 0;
+            /// 0: borrowed; otherwise the size of the owned buffer
+            size_t Allocated = 0;
+            std::vector<DisabledMacro> DisabledMacros;
+        };
+
+        /// A token kind plus its text. Tokens from the Lexer are views into the source.
         class Token
         {
         public:
             enum Kind
             {
-                TK_EOS,          // End of input stream
-                TK_ERROR,        // An error has been encountered
-                TK_WHITESPACE,   // A whitespace span (but not newline)
-                TK_NEWLINE,      // A single newline (CR & LF)
-                TK_LINECONT,     // Line continuation ('\' followed by LF)
-                TK_NUMBER,       // A number
-                TK_KEYWORD,      // A keyword
-                TK_PUNCTUATION,  // A punctuation character
-                TK_DIRECTIVE,    // A preprocessor directive
-                TK_STRING,       // A string
-                TK_COMMENT,      // A block comment
-                TK_LINECOMMENT,  // A line comment
-                TK_TEXT          // An unparsed text (cannot be returned from GetToken())
+                TK_EOS,          ///< End of input stream
+                TK_ERROR,        ///< An error has been encountered
+                TK_WHITESPACE,   ///< A whitespace span (but not newline)
+                TK_NEWLINE,      ///< A single newline (LF or CR LF)
+                TK_LINECONT,     ///< Line continuation ('\' followed by a newline)
+                TK_NUMBER,       ///< A number
+                TK_KEYWORD,      ///< A keyword / identifier
+                TK_PUNCTUATION,  ///< A punctuation character
+                TK_DIRECTIVE,    ///< A preprocessor directive ('#' + name)
+                TK_STRING,       ///< A string
+                TK_COMMENT,      ///< A block comment
+                TK_LINECOMMENT,  ///< A line comment
+                TK_TEXT          ///< Unparsed text (never returned by the Lexer)
             };
 
             /// Token type
-            Kind Type;
-            /// True if string was allocated (and must be freed)
-            mutable size_t Allocated;
+            Kind Type = TK_EOS;
+            /// Token text
+            Text Str;
 
-            // Ranges whose identifiers must stay suppressed on later rescans.
-            struct DisabledMacro
-            {
-                size_t Begin;
-                size_t End;
-                std::string Name;
-            };
-            std::vector<DisabledMacro> DisabledMacros;
+            Token() = default;
+            explicit Token(Kind iType) : Type(iType) {}
+            Token(Kind iType, const char* iString, size_t iLength) : Type(iType), Str(iString, iLength) {}
+            Token(Kind iType, Text&& iText) : Type(iType), Str(std::move(iText)) {}
 
-            bool IsDisabled(const Token& name) const
+            Token(Token&&) = default;
+            Token& operator=(Token&&) = default;
+
+            const char* String() const { return Str.GetString(); }
+            size_t Length() const { return Str.GetLength(); }
+            StringView View() const { return Str.View(); }
+
+            /// Non-owning alias of this token
+            Token Borrow() const { return Token(Type, Str.Borrow()); }
+
+            bool IsPunctuation(char c) const { return Type == TK_PUNCTUATION && String()[0] == c; }
+
+            static bool IsBlank(Kind iType)
             {
-                for (const auto& disabled : DisabledMacros)
-                    if (disabled.Begin == 0 && disabled.End >= Length &&
-                        disabled.Name.size() == name.Length &&
-                        memcmp(disabled.Name.data(), name.String, name.Length) == 0)
-                        return true;
-                return false;
+                return iType == TK_WHITESPACE || iType == TK_COMMENT || iType == TK_LINECOMMENT;
             }
-
-            union
+            static bool IsBlankOrLineCont(Kind iType) { return IsBlank(iType) || iType == TK_LINECONT; }
+            static bool IsBlankOrNewline(Kind iType)
             {
-                /// A pointer somewhere into the input buffer
-                const char *String;
-                /// A memory-allocated string
-                char *Buffer;
-            };
-            /// Token length in bytes
-            size_t Length;
-
-            Token () : Allocated (0), String (NULL), Length(0)
-            { }
-
-            Token (Kind iType) : Type (iType), Allocated (0), String (NULL), Length(0)
-            { }
-
-            Token (Kind iType, const char *iString, size_t iLength) :
-            Type (iType), Allocated (0), String (iString), Length (iLength)
-            { }
-
-            Token (const Token &iOther)
-            {
-                DisabledMacros = iOther.DisabledMacros;
-                Type = iOther.Type;
-                Allocated = iOther.Allocated;
-                iOther.Allocated = 0; // !!! not quite correct but effective
-                String = iOther.String;
-                Length = iOther.Length;
+                return IsBlankOrLineCont(iType) || iType == TK_NEWLINE;
             }
-
-            ~Token ()
-            { if (Allocated) free (Buffer); }
-
-            /// Assignment operator
-            Token &operator = (const Token &iOther)
-                {
-                    if (Allocated) free (Buffer);
-                    DisabledMacros = iOther.DisabledMacros;
-                    Type = iOther.Type;
-                    Allocated = iOther.Allocated;
-                    iOther.Allocated = 0; // !!! not quite correct but effective
-                    String = iOther.String;
-                    Length = iOther.Length;
-                    return *this;
-                }
-
-            /// Append a string to this token
-            void Append (const char *iString, size_t iLength);
-
-            /// Append a token to this token
-            void Append (const Token &iOther);
-
-            /// Append given number of newlines to this token
-            void AppendNL (int iCount);
 
             /// Count number of newlines in this token
-            int CountNL ();
+            int CountNL() const;
 
-            /// Get the numeric value of the token
-            bool GetValue (long &oValue) const;
+            /// Get the numeric value of the token (decimal, octal or hex)
+            bool GetValue(long& oValue) const;
 
             /// Set the numeric value of the token
-            void SetValue (long iValue);
-
-            /// Test two tokens for equality
-            bool operator == (const Token &iOther) const
-            {
-                if (iOther.Length != Length)
-                    return false;
-                return (memcmp (String, iOther.String, Length) == 0);
-            }
+            void SetValue(long iValue);
         };
 
         /// A macro definition
@@ -209,9 +262,7 @@ namespace Ogre {
             /// true if macro expansion is in progress
             bool Expanding;
 
-            Macro(const Token& iName) : Name(iName), ExpandFunc(NULL), Expanding(false) {}
-
-            // Macro(Macro&&) = default; // TODO unsupported by VS2013
+            Macro(Token iName) : Name(std::move(iName)), ExpandFunc(NULL), Expanding(false) {}
 
             /// Expand the macro value (will not work for functions)
             Token Expand (const std::vector<Token>& iArgs, std::forward_list<Macro>& iMacros);
@@ -426,7 +477,7 @@ namespace Ogre {
          * @return
          *     The expanded token or iToken if it is not a macro
          */
-        Token ExpandMacro (const Token &iToken);
+        Token ExpandMacro (Token iToken);
 
         /**
          * Check if a macro is defined, and if so, return it
