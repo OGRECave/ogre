@@ -375,6 +375,21 @@ namespace Ogre {
             uint32_t EnableElif = 0;
         };
 
+        enum class BinaryOp
+        {
+            None, LogicalOr, LogicalAnd, BitOr, BitXor, BitAnd, Equal, NotEqual, Less, LessEqual,
+            Greater, GreaterEqual, ShiftLeft, ShiftRight, Add, Subtract, Multiply, Divide, Modulo
+        };
+
+        /// Priority of the operators of the whole expression and of unary operators
+        static const int PRIO_PARENTHESIS = 1;
+        static const int PRIO_UNARY = 12;
+
+        static BinaryOp ParseBinaryOp (StringView iOp);
+        static int Priority (BinaryOp iOp);
+        /// @return false on division by zero
+        static bool Apply (BinaryOp iOp, long vlop, long vrop, long& oValue);
+
         /// The current source text input
         const Token* SourceToken;
         const char *Source;

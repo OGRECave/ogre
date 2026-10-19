@@ -655,21 +655,111 @@ namespace Ogre {
     }
 
 
+    // --- operators --------------------------------------------------------
+
+    CPreprocessor::BinaryOp CPreprocessor::ParseBinaryOp (StringView iOp)
+    {
+        if (iOp.Length == 1)
+        {
+            switch (iOp [0])
+            {
+            case '|': return BinaryOp::BitOr;
+            case '^': return BinaryOp::BitXor;
+            case '&': return BinaryOp::BitAnd;
+            case '<': return BinaryOp::Less;
+            case '>': return BinaryOp::Greater;
+            case '+': return BinaryOp::Add;
+            case '-': return BinaryOp::Subtract;
+            case '*': return BinaryOp::Multiply;
+            case '/': return BinaryOp::Divide;
+            case '%': return BinaryOp::Modulo;
+            }
+        }
+        else if (iOp.Length == 2)
+        {
+            const char a = iOp [0], b = iOp [1];
+            if (a == '|' && b == '|') return BinaryOp::LogicalOr;
+            if (a == '&' && b == '&') return BinaryOp::LogicalAnd;
+            if (a == '=' && b == '=') return BinaryOp::Equal;
+            if (a == '!' && b == '=') return BinaryOp::NotEqual;
+            if (a == '<' && b == '=') return BinaryOp::LessEqual;
+            if (a == '<' && b == '<') return BinaryOp::ShiftLeft;
+            if (a == '>' && b == '=') return BinaryOp::GreaterEqual;
+            if (a == '>' && b == '>') return BinaryOp::ShiftRight;
+        }
+        return BinaryOp::None;
+    }
+
+    int CPreprocessor::Priority (BinaryOp iOp)
+    {
+        switch (iOp)
+        {
+        case BinaryOp::LogicalOr: return 2;
+        case BinaryOp::LogicalAnd: return 3;
+        case BinaryOp::BitOr: return 4;
+        case BinaryOp::BitXor: return 5;
+        case BinaryOp::BitAnd: return 6;
+        case BinaryOp::Equal:
+        case BinaryOp::NotEqual: return 7;
+        case BinaryOp::Less:
+        case BinaryOp::LessEqual:
+        case BinaryOp::Greater:
+        case BinaryOp::GreaterEqual: return 8;
+        case BinaryOp::ShiftLeft:
+        case BinaryOp::ShiftRight: return 9;
+        case BinaryOp::Add:
+        case BinaryOp::Subtract: return 10;
+        case BinaryOp::Multiply:
+        case BinaryOp::Divide:
+        case BinaryOp::Modulo: return 11;
+        case BinaryOp::None: break;
+        }
+        return 0;
+    }
+
+    bool CPreprocessor::Apply (BinaryOp iOp, long vlop, long vrop, long& oValue)
+    {
+        switch (iOp)
+        {
+        case BinaryOp::LogicalOr: oValue = vlop || vrop; break;
+        case BinaryOp::LogicalAnd: oValue = vlop && vrop; break;
+        case BinaryOp::BitOr: oValue = vlop | vrop; break;
+        case BinaryOp::BitXor: oValue = vlop ^ vrop; break;
+        case BinaryOp::BitAnd: oValue = vlop & vrop; break;
+        case BinaryOp::Equal: oValue = vlop == vrop; break;
+        case BinaryOp::NotEqual: oValue = vlop != vrop; break;
+        case BinaryOp::Less: oValue = vlop < vrop; break;
+        case BinaryOp::LessEqual: oValue = vlop <= vrop; break;
+        case BinaryOp::Greater: oValue = vlop > vrop; break;
+        case BinaryOp::GreaterEqual: oValue = vlop >= vrop; break;
+        case BinaryOp::ShiftLeft: oValue = vlop << (vrop & 63); break;
+        case BinaryOp::ShiftRight: oValue = vlop >> (vrop & 63); break;
+        case BinaryOp::Add: oValue = vlop + vrop; break;
+        case BinaryOp::Subtract: oValue = vlop - vrop; break;
+        case BinaryOp::Multiply: oValue = vlop * vrop; break;
+        case BinaryOp::Divide:
+        case BinaryOp::Modulo:
+            if (vrop == 0)
+                return false;
+            oValue = iOp == BinaryOp::Divide ? vlop / vrop : vlop % vrop;
+            break;
+        case BinaryOp::None: oValue = 0; break;
+        }
+        return true;
+    }
+
     /**
+     * Parse an expression and return the first token that is not part of it.
+     * The value of the (sub)expression is left in oResult, as a token: a number,
+     * a keyword or macro text that GetValue() evaluates. Operators of priority
+     * <= iOpPriority end the expression.
+     *
      * Operator priority:
      *  0: Whole expression
      *  1: '(' ')'
-     *  2: ||
-     *  3: &&
-     *  4: |
-     *  5: ^
-     *  6: &
-     *  7: '==' '!='
-     *  8: '<' '<=' '>' '>='
-     *  9: '<<' '>>'
-     * 10: '+' '-'
-     * 11: '*' '/' '%'
-     * 12: unary '+' '-' '!' '~'
+     *  2: ||            3: &&          4: |          5: ^         6: &
+     *  7: '==' '!='     8: '<' '<=' '>' '>='         9: '<<' '>>'
+     * 10: '+' '-'      11: '*' '/' '%'              12: unary '+' '-' '!' '~'
      */
     CPreprocessor::Token CPreprocessor::GetExpression (
         Token &oResult, int iLine, int iOpPriority)
@@ -684,17 +774,14 @@ namespace Ogre {
         // Handle unary operators here
         if (oResult.Type == Token::TK_PUNCTUATION && oResult.Length () == 1)
         {
-            // (strchr() would also match the terminating zero)
-            if (oResult.String () [0] == '+' || oResult.String () [0] == '-' ||
-                oResult.String () [0] == '!' || oResult.String () [0] == '~')
+            const char uop = oResult.View () [0];
+            if (uop == '+' || uop == '-' || uop == '!' || uop == '~')
             {
-                char uop = oResult.String () [0];
-                op = GetExpression (oResult, iLine, 12);
+                op = GetExpression (oResult, iLine, PRIO_UNARY);
                 long val;
                 if (!GetValue (oResult, val, iLine))
                 {
-                    std::string msg = std::string ("Unary '") + uop + "' not applicable";
-                    Error (iLine, msg.c_str (), &oResult);
+                    Error (iLine, (std::string ("Unary '") + uop + "' not applicable").c_str (), &oResult);
                     return Token (Token::TK_ERROR);
                 }
 
@@ -705,9 +792,9 @@ namespace Ogre {
                 else if (uop == '~')
                     oResult.SetValue (~val);
             }
-            else if (oResult.String () [0] == '(')
+            else if (uop == '(')
             {
-                op = GetExpression (oResult, iLine, 1);
+                op = GetExpression (oResult, iLine, PRIO_PARENTHESIS);
                 if (op.Type == Token::TK_ERROR)
                     return op;
                 if (op.Type == Token::TK_EOS)
@@ -726,124 +813,43 @@ namespace Ogre {
         while (Token::IsBlankOrNewline (op.Type))
             op = GetToken (true);
 
-        while (true)
+        for (;;)
         {
-            if (op.Type != Token::TK_PUNCTUATION)
+            if (op.Type != Token::TK_PUNCTUATION || op.IsPunctuation (')'))
                 return op;
 
-            int prio = 0;
-            if (op.Length () == 1)
-                switch (op.String () [0])
-                {
-                case ')': return op;
-                case '|': prio = 4; break;
-                case '^': prio = 5; break;
-                case '&': prio = 6; break;
-                case '<':
-                case '>': prio = 8; break;
-                case '+':
-                case '-': prio = 10; break;
-                case '*':
-                case '/':
-                case '%': prio = 11; break;
-                }
-            else if (op.Length () == 2)
-                switch (op.String () [0])
-                {
-                case '|': if (op.String () [1] == '|') prio = 2; break;
-                case '&': if (op.String () [1] == '&') prio = 3; break;
-                case '=': if (op.String () [1] == '=') prio = 7; break;
-                case '!': if (op.String () [1] == '=') prio = 7; break;
-                case '<':
-                    if (op.String () [1] == '=')
-                        prio = 8;
-                    else if (op.String () [1] == '<')
-                        prio = 9;
-                    break;
-                case '>':
-                    if (op.String () [1] == '=')
-                        prio = 8;
-                    else if (op.String () [1] == '>')
-                        prio = 9;
-                    break;
-                }
-
-            if (!prio)
+            const BinaryOp binary = ParseBinaryOp (op.View ());
+            if (binary == BinaryOp::None)
             {
                 Error (iLine, "Expecting operator, got", &op);
                 return Token (Token::TK_ERROR);
             }
 
+            const int prio = Priority (binary);
             if (iOpPriority >= prio)
                 return op;
 
             Token rop;
             Token nextop = GetExpression (rop, iLine, prio);
-            long vlop, vrop;
+
+            const std::string opText (op.String (), op.Length ());
+            long vlop, vrop, val;
             if (!GetValue (oResult, vlop, iLine))
             {
-                std::string msg = "Left operand of '" + std::string (op.String (), op.Length ()) +
-                    "' is not a number";
-                Error (iLine, msg.c_str (), &oResult);
+                Error (iLine, ("Left operand of '" + opText + "' is not a number").c_str (), &oResult);
                 return Token (Token::TK_ERROR);
             }
             if (!GetValue (rop, vrop, iLine))
             {
-                std::string msg = "Right operand of '" + std::string (op.String (), op.Length ()) +
-                    "' is not a number";
-                Error (iLine, msg.c_str (), &rop);
+                Error (iLine, ("Right operand of '" + opText + "' is not a number").c_str (), &rop);
                 return Token (Token::TK_ERROR);
             }
-
-            switch (op.String () [0])
+            if (!Apply (binary, vlop, vrop, val))
             {
-            case '|':
-                if (prio == 2)
-                    oResult.SetValue (vlop || vrop);
-                else
-                    oResult.SetValue (vlop | vrop);
-                break;
-            case '&':
-                if (prio == 3)
-                    oResult.SetValue (vlop && vrop);
-                else
-                    oResult.SetValue (vlop & vrop);
-                break;
-            case '<':
-                if (op.Length () == 1)
-                    oResult.SetValue (vlop < vrop);
-                else if (prio == 8)
-                    oResult.SetValue (vlop <= vrop);
-                else if (prio == 9)
-                    oResult.SetValue (vlop << (vrop & 63));
-                break;
-            case '>':
-                if (op.Length () == 1)
-                    oResult.SetValue (vlop > vrop);
-                else if (prio == 8)
-                    oResult.SetValue (vlop >= vrop);
-                else if (prio == 9)
-                    oResult.SetValue (vlop >> (vrop & 63));
-                break;
-            case '^': oResult.SetValue (vlop ^ vrop); break;
-            case '!': oResult.SetValue (vlop != vrop); break;
-            case '=': oResult.SetValue (vlop == vrop); break;
-            case '+': oResult.SetValue (vlop + vrop); break;
-            case '-': oResult.SetValue (vlop - vrop); break;
-            case '*': oResult.SetValue (vlop * vrop); break;
-            case '/':
-            case '%':
-                if (vrop == 0)
-                {
-                    Error (iLine, "Division by zero");
-                    return Token (Token::TK_ERROR);
-                }
-                if (op.String () [0] == '/')
-                    oResult.SetValue (vlop / vrop);
-                else
-                    oResult.SetValue (vlop % vrop);
-                break;
+                Error (iLine, "Division by zero");
+                return Token (Token::TK_ERROR);
             }
+            oResult.SetValue (val);
 
             op = std::move (nextop);
         }
