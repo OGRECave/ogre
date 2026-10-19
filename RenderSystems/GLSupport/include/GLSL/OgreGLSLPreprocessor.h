@@ -634,16 +634,8 @@ namespace Ogre {
          */
         Token Parse (const Token &iSource);
 
-        /**
-         * Call the error handler
-         * @param iLine
-         *     The line at which the error happened.
-         * @param iError
-         *     The error string.
-         * @param iToken
-         *     If not NULL contains the erroneous token
-         */
-        void Error (int iLine, const char *iError, const Token *iToken = NULL);
+        /// Call the error handler
+        void Error (int iLine, const std::string& iError, const Token* iToken = nullptr) const;
 
     public:
         /// Create an empty preprocessor object
