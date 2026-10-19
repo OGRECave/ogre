@@ -337,8 +337,58 @@ namespace Ogre {
         Type = TK_NUMBER;
     }
 
+    // -----------------------------------------------------------------------
+    // CPreprocessor::MacroTable
+    // -----------------------------------------------------------------------
+
+    CPreprocessor::Macro* CPreprocessor::MacroTable::IsDefined(StringView iName)
+    {
+        for (Macro& cur : Macros)
+            if (cur.Name == iName)
+                return &cur;
+        return nullptr;
+    }
+
+    CPreprocessor::Macro& CPreprocessor::MacroTable::Define(Macro&& iMacro)
+    {
+        Macros.push_front(std::move(iMacro));
+        return Macros.front();
+    }
+
+    CPreprocessor::Macro& CPreprocessor::MacroTable::Define(StringView iName, Text&& iValue)
+    {
+        Macro m;
+        m.Name = iName;
+        m.Value = Token(Token::TK_TEXT, std::move(iValue));
+        return Define(std::move(m));
+    }
+
+    void CPreprocessor::MacroTable::PopFront() { Macros.pop_front(); }
+
+    bool CPreprocessor::MacroTable::Undef(StringView iName)
+    {
+        for (auto prev = Macros.before_begin(), it = std::next(prev); it != Macros.end(); prev = it++)
+            if (it->Name == iName)
+            {
+                // Somebody up the call stack still holds a pointer to it (a
+                // macro can #undef itself from within its own expansion or
+                // arguments): keep it alive until the table dies.
+                if (IsPinned(*it))
+                    Retired.splice_after(Retired.before_begin(), Macros, prev);
+                else
+                    Macros.erase_after(prev);
+                return true;
+            }
+        return false;
+    }
+
+    bool CPreprocessor::MacroTable::IsPinned(const Macro& iMacro) const
+    {
+        return std::find(Pinned.begin(), Pinned.end(), &iMacro) != Pinned.end();
+    }
+
     CPreprocessor::Token CPreprocessor::Macro::Expand(const std::vector<Token>& iArgs,
-                                                      std::forward_list<Macro>& iMacros)
+                                                      MacroTable& iMacros)
     {
         Expanding = true;
 
@@ -349,14 +399,10 @@ namespace Ogre {
         // Define a new macro for every argument
         size_t i;
         for (i = 0; i < iArgs.size(); i++)
-        {
-            cpp.Define (Args [i].String (), Args [i].Length (),
-                        iArgs [i].String (), iArgs [i].Length ());
-            cpp.MacroList.front().Value.Str = iArgs [i].Str.Borrow ();
-        }
+            cpp.MacroList.Define (Args [i].View (), iArgs [i].Str.Borrow ());
         // The rest arguments are empty
         for (; i < Args.size(); i++)
-            cpp.Define (Args [i].String (), Args [i].Length (), "", 0);
+            cpp.MacroList.Define (Args [i].View (), Text ("", 0));
 
         Token xt;
         Token new_xt = Token (Token::TK_TEXT, Value.Str.Borrow ());
@@ -374,7 +420,7 @@ namespace Ogre {
             if (first) {
                 first = false;
                 for (int j = Args.size() - 1; j >= 0; j--)
-                    cpp.Undef (Args [j].String (), Args [j].Length ());
+                    cpp.MacroList.Undef (Args [j].View ());
             }
             // Repeat until there is no more change between parses
         } while (xt.String () != new_xt.String ());
@@ -383,7 +429,7 @@ namespace Ogre {
         std::swap(cpp.MacroList, iMacros);
 
         if (xt.Length ())
-            xt.Str.Disable (Name.View ());
+            xt.Str.Disable (Name);
         return xt;
     }
 
@@ -557,21 +603,14 @@ namespace Ogre {
     }
 
 
-    CPreprocessor::Macro *CPreprocessor::IsDefined (const Token &iToken)
-    {
-        for (Macro& cur : MacroList)
-            if (cur.Name.View () == iToken.View ())
-                return &cur;
-
-        return NULL;
-    }
-
-
     CPreprocessor::Token CPreprocessor::ExpandMacro (Token iToken)
     {
-        Macro *cur = IsDefined (iToken);
-        if (cur && !cur->Expanding && !iToken.Str.IsDisabled (cur->Name.View ()))
+        Macro *cur = MacroList.IsDefined (iToken.View ());
+        if (cur && !cur->Expanding && !iToken.Str.IsDisabled (cur->Name))
         {
+            // #undef of this very macro can be run by its arguments or expansion
+            MacroTable::Pin pin (MacroList, *cur);
+
             std::vector<Token> args;
             int old_line = Line;
 
@@ -600,7 +639,7 @@ namespace Ogre {
 
             if (args.size() > cur->Args.size())
             {
-                std::string msg = "Macro `" + std::string (cur->Name.String (), cur->Name.Length ()) +
+                std::string msg = "Macro `" + std::string (cur->Name.String, cur->Name.Length) +
                     "' passed " + std::to_string (args.size ()) +
                     " arguments, but takes just " + std::to_string (cur->Args.size ());
                 Error (old_line, msg.c_str ());
@@ -869,8 +908,9 @@ namespace Ogre {
 
         case Token::TK_KEYWORD:
             // Try to expand the macro
-            if ((m = IsDefined (*vt)) && !m->Expanding && !vt->Str.IsDisabled (m->Name.View ()))
+            if ((m = MacroList.IsDefined (vt->View ())) && !m->Expanding && !vt->Str.IsDisabled (m->Name))
             {
+                MacroTable::Pin pin (MacroList, *m);
                 Token x = ExpandMacro (vt->Borrow ());
                 m->Expanding = true;
                 bool rc = GetValue (x, oValue, iLine);
@@ -1094,6 +1134,11 @@ namespace Ogre {
 
     bool CPreprocessor::HandleDefine (Token &iBody, int iLine)
     {
+        // The text of a macro expansion is short-lived: a macro defined in it
+        // must not point into it
+        if (SupplimentaryExpand && !iBody.Str.IsAllocated ())
+            iBody.Str = iBody.Str.Clone ();
+
         // Create an additional preprocessor to process macro body
         CPreprocessor cpp (iBody, iLine);
 
@@ -1104,7 +1149,8 @@ namespace Ogre {
             return false;
         }
 
-        Macro m (t.Borrow ());
+        Macro m;
+        m.Name = t.View ();
         t = cpp.GetArguments (m.Args, false, true);
         while (t.Type == Token::TK_WHITESPACE)
             t = cpp.GetToken (false);
@@ -1149,7 +1195,7 @@ namespace Ogre {
         m.Value = std::move (t);
         // The macro keeps the text that its name, arguments and value point into
         m.Body = std::move (iBody);
-        MacroList.push_front(std::move(m));
+        MacroList.Define (std::move (m));
         return true;
     }
 
@@ -1212,7 +1258,7 @@ namespace Ogre {
             return false;
         }
 
-        if (!HandleIf(IsDefined(t), iLine))
+        if (!HandleIf(MacroList.IsDefined (t.View ()) != NULL, iLine))
             return false;
 
         do
@@ -1237,21 +1283,23 @@ namespace Ogre {
             return Token (Token::TK_ERROR);
         }
 
-        const char *v = iParent->IsDefined (iArgs [0]) ? "1" : "0";
+        const char *v = iParent->MacroList.IsDefined (iArgs [0].View ()) ? "1" : "0";
         return Token (Token::TK_NUMBER, v, 1);
     }
 
     bool CPreprocessor::GetValueDef(const Token &iToken, long &oValue, int iLine)
     {
         // Temporary add the defined() function to the macro list
-        MacroList.emplace_front(Token(Token::TK_KEYWORD, "defined", 7));
-        MacroList.front().ExpandFunc = ExpandDefined;
-        MacroList.front().Args.resize(1);
+        Macro defined;
+        defined.Name = StringView ("defined");
+        defined.ExpandFunc = ExpandDefined;
+        defined.Args.resize(1);
+        MacroList.Define (std::move (defined));
 
         bool rc = GetValue (iToken, oValue, iLine);
 
         // Restore the macro list
-        MacroList.pop_front();
+        MacroList.PopFront ();
 
         return rc;
     }
@@ -1434,34 +1482,19 @@ namespace Ogre {
     void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen,
                                 const char *iMacroValue, size_t iMacroValueLen)
     {
-        MacroList.emplace_front(Token(Token::TK_KEYWORD, iMacroName, iMacroNameLen));
-        MacroList.front().Value = Token(Token::TK_TEXT, iMacroValue, iMacroValueLen);
+        MacroList.Define (StringView (iMacroName, iMacroNameLen), Text (iMacroValue, iMacroValueLen));
     }
 
 
     void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen)
     {
-        MacroList.emplace_front(Token(Token::TK_KEYWORD, iMacroName, iMacroNameLen));
+        MacroList.Define (StringView (iMacroName, iMacroNameLen), Text ());
     }
 
 
     bool CPreprocessor::Undef (const char *iMacroName, size_t iMacroNameLen)
     {
-        Token name (Token::TK_KEYWORD, iMacroName, iMacroNameLen);
-
-        for (auto it = MacroList.before_begin();; ++it)
-        {
-            auto itpp = std::next(it);
-            if(itpp == MacroList.end()) break;
-
-            if (itpp->Name.View () == name.View ())
-            {
-                MacroList.erase_after(it);
-                return true;
-            }
-        }
-
-        return false;
+        return MacroList.Undef (StringView (iMacroName, iMacroNameLen));
     }
 
 

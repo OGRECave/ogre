@@ -245,27 +245,68 @@ namespace Ogre {
             void SetValue(long iValue);
         };
 
+        class MacroTable;
+
         /// A macro definition
         class Macro
         {
         public:
             /// Macro name
-            Token Name;
-            /// The names of the arguments
+            StringView Name;
+            /// The names of the arguments, each with "__arg_" appended
             std::vector<Token> Args;
             /// The macro value
             Token Value;
-            /// Unparsed macro body (keeps the whole raw unparsed macro body)
+            /// Unparsed macro body; owns the text Name/Args/Value may point into
             Token Body;
             /// A pointer to function implementation (if macro is really a func)
-            Token (*ExpandFunc) (CPreprocessor *iParent, const std::vector<Token>& iArgs);
-            /// true if macro expansion is in progress
-            bool Expanding;
-
-            Macro(Token iName) : Name(std::move(iName)), ExpandFunc(NULL), Expanding(false) {}
+            Token (*ExpandFunc) (CPreprocessor *iParent, const std::vector<Token>& iArgs) = nullptr;
+            /// true if macro expansion is in progress (blocks recursion)
+            bool Expanding = false;
 
             /// Expand the macro value (will not work for functions)
-            Token Expand (const std::vector<Token>& iArgs, std::forward_list<Macro>& iMacros);
+            Token Expand (const std::vector<Token>& iArgs, MacroTable& iMacros);
+        };
+
+        /// The macros defined so far; the most recent definition shadows older
+        /// ones of the same name.
+        class MacroTable
+        {
+        public:
+            /// Check if a macro is defined, and if so, return it
+            Macro* IsDefined(StringView iName);
+
+            Macro& Define(Macro&& iMacro);
+            /// Define a plain value macro
+            Macro& Define(StringView iName, Text&& iValue);
+
+            void PopFront();
+
+            /// Remove the most recent definition of iName
+            bool Undef(StringView iName);
+
+            /// Keeps a macro alive across calls that might #undef it
+            class Pin
+            {
+            public:
+                Pin(MacroTable& iTable, const Macro& iMacro) : Table(iTable)
+                {
+                    Table.Pinned.push_back(&iMacro);
+                }
+                ~Pin() { Table.Pinned.pop_back(); }
+                Pin(const Pin&) = delete;
+                Pin& operator=(const Pin&) = delete;
+
+            private:
+                MacroTable& Table;
+            };
+
+        private:
+            bool IsPinned(const Macro& iMacro) const;
+
+            std::forward_list<Macro> Macros;
+            std::forward_list<Macro> Retired;
+            std::vector<const Macro*> Pinned;
         };
 
         friend class CPreprocessor::Macro;
@@ -285,7 +326,7 @@ namespace Ogre {
         unsigned EnableOutput;
         unsigned EnableElif;
         /// The list of macros defined so far
-        std::forward_list<Macro> MacroList;
+        MacroTable MacroList;
 
         /// The character @a iAhead positions past Source, or zero at the end of
         /// the source (the source need not be zero-terminated)
@@ -479,14 +520,6 @@ namespace Ogre {
          */
         Token ExpandMacro (Token iToken);
 
-        /**
-         * Check if a macro is defined, and if so, return it
-         * @param iToken
-         *     Macro name
-         * @return
-         *     The macro object or NULL if a macro with this name does not exist
-         */
-        Macro *IsDefined (const Token &iToken);
 
         /**
          * The implementation of the defined() preprocessor function
