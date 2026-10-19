@@ -390,6 +390,12 @@ namespace Ogre {
         /// @return false on division by zero
         static bool Apply (BinaryOp iOp, long vlop, long vrop, long& oValue);
 
+        enum class DirectiveKind { Define, UnDef, IfDef, IfNDef, If, Elif, Else, EndIf, Unknown };
+
+        /// #define and #undef are only recognised in emitting regions; elsewhere
+        /// they are passed through like any unknown directive.
+        static DirectiveKind Classify (StringView iName, bool iOutputEnabled);
+
         /// The current source text input
         const Token* SourceToken;
         const char *Source;
