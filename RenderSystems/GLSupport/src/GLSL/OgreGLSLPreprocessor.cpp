@@ -1043,78 +1043,55 @@ namespace Ogre {
     }
 
 
+    /**
+     * Get all the arguments of a macro: '(' arg1 { ',' arg2 { ',' ... }} ')'.
+     * Returns the first token after the list; if there is no list directly after
+     * the name, oArgs stays empty and the first non-blank token is returned.
+     *
+     * The lookahead tokens are lexed without expansion: they are put back by the
+     * caller and expanded when they are read for real.
+     */
     CPreprocessor::Token CPreprocessor::GetArguments (std::vector<Token>& oArgs,
                                                       bool iExpand, bool shouldAppendArg)
     {
-        Token args [MAX_MACRO_ARGS];
-        int nargs = 0;
-
-        // Suppose we'll leave by the wrong path
         oArgs.clear();
 
-        bool isFirstTokenParsed = false;
-        bool isFirstTokenNotAnOpenBrace = false;
-
-        Token t;
-        // The token after the macro name is only looked at: ExpandMacro() puts
-        // it back into the source, so it must not be expanded here (see below).
-        do
-        {
+        Token t = GetToken (false);
+        const bool isFirstTokenAnOpenBrace = t.IsPunctuation ('(');
+        while (Token::IsBlank (t.Type))
             t = GetToken (false);
-
-            if( !isFirstTokenParsed &&
-                (t.Type != Token::TK_PUNCTUATION || t.String () [0] != '(') )
-            {
-                isFirstTokenNotAnOpenBrace = true;
-            }
-            isFirstTokenParsed = true;
-        } while (Token::IsBlank (t.Type));
-
-        if( isFirstTokenNotAnOpenBrace )
-        {
-            oArgs.clear();
+        if (!isFirstTokenAnOpenBrace)
             return t;
-        }
 
-        while (true)
+        if (oArgs.capacity () == 0)
+            oArgs.reserve (4);
+
+        for (;;)
         {
-            if (nargs == MAX_MACRO_ARGS)
+            if (oArgs.size () == MAX_MACRO_ARGS)
             {
                 Error (Line, "Too many arguments to macro");
+                oArgs.clear ();
                 return Token (Token::TK_ERROR);
             }
 
-            t = GetArgument (args [nargs++], iExpand, shouldAppendArg);
+            oArgs.emplace_back ();
+            t = GetArgument (oArgs.back (), iExpand, shouldAppendArg);
 
-            switch (t.Type)
-            {
-            case Token::TK_EOS:
+            if (t.Type == Token::TK_EOS)
                 Error (Line, "Unfinished list of arguments");
-                OGRE_FALLTHROUGH;
-            case Token::TK_ERROR:
+            if (t.Type == Token::TK_EOS || t.Type == Token::TK_ERROR)
+            {
+                oArgs.clear ();
                 return Token (Token::TK_ERROR);
-
-            case Token::TK_PUNCTUATION:
-                if (t.String () [0] == ')')
-                {
-                    // Likewise, this is the lookahead token after the argument
-                    // list. If it were expanded, ExpandMacro() would "put back"
-                    // a pointer into the expansion instead of into the source
-                    // and the parser would continue reading from the wrong place.
-                    t = GetToken (false);
-                    goto Done;
-                } // otherwise we've got a ','
-                break;
-
-            default:
-                Error (Line, "Unexpected token", &t);
-                break;
             }
-        }
 
-    Done:
-        oArgs.insert(oArgs.begin(), std::make_move_iterator (args), std::make_move_iterator (args + nargs));
-        return t;
+            if (t.Type != Token::TK_PUNCTUATION)
+                Error (Line, "Unexpected token", &t);
+            else if (t.IsPunctuation (')'))
+                return GetToken (false);
+            // otherwise we've got a ',' : next argument
+        }
     }
 
 
