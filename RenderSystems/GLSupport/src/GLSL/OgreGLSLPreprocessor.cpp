@@ -63,6 +63,14 @@ namespace Ogre {
 
     void CPreprocessor::Token::Append (const char *iString, size_t iLength)
     {
+        // The string is a literal or a temporary, not part of the source: it
+        // must be copied. Appending to a token without a string would make
+        // the token point to it instead.
+        if (!String)
+        {
+            String = "";
+            Length = 0;
+        }
         Token t (Token::TK_TEXT, iString, iLength);
         Append (t);
     }
@@ -163,7 +171,7 @@ namespace Ogre {
 
     void CPreprocessor::Token::SetValue (long iValue)
     {
-        static char tmp [21];
+        char tmp [24];
         int len = snprintf (tmp, sizeof (tmp), "%ld", iValue);
         Length = 0;
         Append (tmp, len);
