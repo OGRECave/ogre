@@ -921,12 +921,12 @@ namespace Ogre {
 
         // no path elements, try the resource system first
         DataStreamPtr stream;
-        if (path.empty())
+        auto rgm = ResourceGroupManager::getSingletonPtr();
+        if (path.empty() && rgm)
         {
             try
             {
-                stream = ResourceGroupManager::getSingleton().createResource(
-                    filename, groupName, overwrite, locationPattern);
+                stream = rgm->createResource(filename, groupName, overwrite, locationPattern);
             }
             catch (...) {}
 
