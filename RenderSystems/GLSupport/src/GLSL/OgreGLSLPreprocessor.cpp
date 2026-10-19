@@ -448,8 +448,6 @@ namespace Ogre {
         SourceToken = &iToken;
         Source = iToken.String ();
         SourceEnd = iToken.String () + iToken.Length ();
-        EnableOutput = 1;
-        EnableElif = 0;
         Line = iLine;
         BOL = true;
         SupplimentaryExpand = false;
@@ -460,7 +458,6 @@ namespace Ogre {
         SourceToken = nullptr;
         Source = 0;
         SourceEnd = 0;
-        EnableOutput = 1;
         Line = 0;
         BOL = true;
         SupplimentaryExpand = false;
@@ -1191,18 +1188,13 @@ namespace Ogre {
 
     bool CPreprocessor::HandleIf(bool val, int iLine)
     {
-        if (EnableOutput & (1u << 31))
+        if (Conditions.IsFull())
         {
             Error (iLine, "Too many embedded #if directives");
             return false;
         }
 
-        EnableElif <<= 1;
-        EnableOutput <<= 1;
-        if (val)
-            EnableOutput |= 1;
-        else
-            EnableElif |= 1;
+        Conditions.Push(val);
 
         return true;
     }
@@ -1271,7 +1263,7 @@ namespace Ogre {
 
     bool CPreprocessor::HandleElif (Token &iBody, int iLine)
     {
-        if (EnableOutput == 1)
+        if (Conditions.IsEmpty())
         {
             Error (iLine, "#elif without #if");
             return false;
@@ -1281,13 +1273,7 @@ namespace Ogre {
         if (!GetValueDef(iBody, val, iLine))
             return false;
 
-        if (val && (EnableElif & 1))
-        {
-            EnableOutput |= 1;
-            EnableElif &= ~1;
-        }
-        else
-            EnableOutput &= ~1;
+        Conditions.Elif(val != 0);
 
         return true;
     }
@@ -1295,15 +1281,14 @@ namespace Ogre {
 
     bool CPreprocessor::HandleElse (Token &iBody, int iLine)
     {
-        if (EnableOutput == 1)
+        if (Conditions.IsEmpty())
         {
             Error (iLine, "#else without #if");
             return false;
         }
 
         // Negate the result of last #if
-        if ((EnableElif & 1) || (EnableOutput & 1))
-            EnableOutput ^= 1;
+        Conditions.Else();
 
         if (iBody.Length ())
             Error (iLine, "Warning: Ignoring garbage after #else", &iBody);
@@ -1314,9 +1299,7 @@ namespace Ogre {
 
     bool CPreprocessor::HandleEndIf (Token &iBody, int iLine)
     {
-        EnableElif >>= 1;
-        EnableOutput >>= 1;
-        if (EnableOutput == 0)
+        if (!Conditions.Pop())
         {
             Error (iLine, "#endif without #if");
             return false;
@@ -1386,7 +1369,7 @@ namespace Ogre {
 #define IS_DIRECTIVE(s)                                                 \
         (dirlen == strlen(s) && (strncmp (directive, s, dirlen) == 0))
 
-        bool outputEnabled = ((EnableOutput & (EnableOutput + 1)) == 0);
+        bool outputEnabled = Conditions.IsOutputEnabled();
         bool rc;
 
         if (IS_DIRECTIVE ("define") && outputEnabled)
@@ -1399,10 +1382,7 @@ namespace Ogre {
         {
             rc = HandleIfDef (t, iLine);
             if (rc)
-            {
-                EnableOutput ^= 1;
-                EnableElif ^= 1;
-            }
+                Conditions.Negate();
         }
         else if (IS_DIRECTIVE ("if"))
             rc = HandleIf (t, iLine);
@@ -1459,8 +1439,7 @@ namespace Ogre {
         SourceEnd = Source + iSource.Length ();
         Line = 1;
         BOL = true;
-        EnableOutput = 1;
-        EnableElif = 0;
+        Conditions = ConditionalStack();
 
         // Accumulate output into this token
         Token output (Token::TK_TEXT);
@@ -1481,7 +1460,7 @@ namespace Ogre {
                 // Handle preprocessor directives
                 t = HandleDirective (t, old_line);
 
-                output_enabled = ((EnableOutput & (EnableOutput + 1)) == 0);
+                output_enabled = Conditions.IsOutputEnabled();
                 if (output_enabled != old_output_enabled)
                 {
                     if (output_enabled)
@@ -1542,7 +1521,7 @@ namespace Ogre {
             }
         }
 
-        if (EnableOutput != 1)
+        if (!Conditions.IsEmpty())
         {
             Error (Line, "Unclosed #if at end of source");
             return Token (Token::TK_ERROR);

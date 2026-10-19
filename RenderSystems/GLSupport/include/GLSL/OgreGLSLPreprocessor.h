@@ -32,6 +32,7 @@
 #include "OgrePlatform.h"
 #include <string.h>
 #include <cstring>
+#include <cstdint>
 #include <stdlib.h>
 #include <forward_list>
 #include <vector>
@@ -311,6 +312,69 @@ namespace Ogre {
 
         friend class CPreprocessor::Macro;
 
+        /**
+         * Nesting state of #if/#elif/#else/#endif, packed into two 32 bit words
+         * (bit 0 is the innermost level).
+         *  - EnableOutput: the level currently emits output. A sentinel bit below
+         *    the outermost level makes an empty stack read as 1.
+         *  - EnableElif: no branch of the level has been taken yet.
+         */
+        class ConditionalStack
+        {
+        public:
+            bool IsEmpty() const { return EnableOutput == 1; }
+            bool IsFull() const { return (EnableOutput & (1u << 31)) != 0; }
+            /// True if all enclosing levels emit output
+            bool IsOutputEnabled() const { return (EnableOutput & (EnableOutput + 1)) == 0; }
+
+            void Push(bool iValue)
+            {
+                EnableElif <<= 1;
+                EnableOutput <<= 1;
+                if (iValue)
+                    EnableOutput |= 1;
+                else
+                    EnableElif |= 1;
+            }
+
+            /// @return false on underflow (#endif without #if)
+            bool Pop()
+            {
+                EnableElif >>= 1;
+                EnableOutput >>= 1;
+                return EnableOutput != 0;
+            }
+
+            void Elif(bool iValue)
+            {
+                if (iValue && (EnableElif & 1))
+                {
+                    EnableOutput |= 1;
+                    EnableElif &= ~1u;
+                }
+                else
+                    EnableOutput &= ~1u;
+            }
+
+            void Else()
+            {
+                if ((EnableElif & 1) || (EnableOutput & 1))
+                    EnableOutput ^= 1;
+            }
+
+            /// Turns the innermost #ifdef into #ifndef
+            void Negate()
+            {
+                EnableOutput ^= 1;
+                EnableElif ^= 1;
+            }
+
+        private:
+            /// A stack of 32 booleans packed into one value :)
+            uint32_t EnableOutput = 1;
+            uint32_t EnableElif = 0;
+        };
+
         /// The current source text input
         const Token* SourceToken;
         const char *Source;
@@ -322,9 +386,8 @@ namespace Ogre {
         bool BOL;
         /// Are we expanding a macro?
         bool SupplimentaryExpand;
-        /// A stack of 32 booleans packed into one value :)
-        unsigned EnableOutput;
-        unsigned EnableElif;
+        /// State of the nested #if/#elif/#else/#endif directives
+        ConditionalStack Conditions;
         /// The list of macros defined so far
         MacroTable MacroList;
 
