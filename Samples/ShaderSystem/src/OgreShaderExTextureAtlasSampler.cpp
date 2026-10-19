@@ -25,6 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderExTextureAtlasSampler.h"
+#include "OgreRoot.h"
 
 #include <memory>
 
@@ -359,15 +360,7 @@ const String& TextureAtlasSamplerFactory::getType() const
 //-----------------------------------------------------------------------
 bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( const Ogre::String& filename, const TextureAtlasTablePtr& textureAtlasTable )
 {
-    std::ifstream inp;
-    inp.open(filename.c_str(), std::ios::in | std::ios::binary);
-    if(!inp)
-    {
-        OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", 
-            "TextureAtlasSamplerFactory::addTexutreAtlasDefinition" );
-    }
-    DataStreamPtr stream(OGRE_NEW FileStreamDataStream(filename, &inp, false));
-    return addTexutreAtlasDefinition(stream, textureAtlasTable);
+    return addTexutreAtlasDefinition(Root::openFileStream(filename), textureAtlasTable);
 
 }
 //-----------------------------------------------------------------------
