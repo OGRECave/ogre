@@ -348,6 +348,15 @@ namespace Ogre {
         Token GetToken (bool iExpand);
 
         /**
+         * Collect the remaining part of the directive until EOL.
+         * @param oLast
+         *     Receives the token that ended the directive body.
+         * @return
+         *     The body of the directive (everything after the directive name).
+         */
+        Token GetDirectiveBody (Token &oLast);
+
+        /**
          * Handle a preprocessor directive.
          * @param iToken
          *     The whole preprocessor directive line (until EOL)

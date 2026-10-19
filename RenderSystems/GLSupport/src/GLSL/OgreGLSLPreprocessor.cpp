@@ -1329,6 +1329,45 @@ namespace Ogre {
     }
 
 
+    /// Collect the remaining part of the directive until EOL (comments and line
+    /// continuations removed). oLast receives the token that ended it.
+    CPreprocessor::Token CPreprocessor::GetDirectiveBody (Token& oLast)
+    {
+        Token t;
+        do
+        {
+            t = GetToken (false);
+            if (t.Type == Token::TK_NEWLINE)
+            {
+                // No directive arguments
+                oLast = t.Borrow ();
+                t.Str.Truncate (0);
+                return t;
+            }
+        } while (Token::IsBlankOrLineCont (t.Type));
+
+        for (;;)
+        {
+            oLast = GetToken (false);
+            switch (oLast.Type)
+            {
+            case Token::TK_EOS: // can happen and is not an error
+            case Token::TK_NEWLINE:
+            case Token::TK_ERROR:
+                return t;
+            case Token::TK_LINECOMMENT:
+            case Token::TK_COMMENT:
+            case Token::TK_LINECONT:
+                continue;
+            default:
+                break;
+            }
+            t.Str.Append (oLast.Str);
+            t.Type = Token::TK_TEXT;
+        }
+    }
+
+
     CPreprocessor::Token CPreprocessor::HandleDirective (Token &iToken, int iLine)
     {
         // Analyze preprocessor directive
@@ -1339,51 +1378,10 @@ namespace Ogre {
 
         int old_line = Line;
 
-        // Collect the remaining part of the directive until EOL
-        Token t, last;
-        do
-        {
-            t = GetToken (false);
-            if (t.Type == Token::TK_NEWLINE)
-            {
-                // No directive arguments
-                last = t.Borrow ();
-                t.Str.Truncate (0);
-                goto Done;
-            }
-        } while (Token::IsBlankOrLineCont (t.Type));
-
-        for (;;)
-        {
-            last = GetToken (false);
-            switch (last.Type)
-            {
-            case Token::TK_EOS:
-                // Can happen and is not an error
-                goto Done;
-
-            case Token::TK_LINECOMMENT:
-            case Token::TK_COMMENT:
-                // Skip comments in macros
-                continue;
-
-            case Token::TK_ERROR:
-                return last;
-
-            case Token::TK_LINECONT:
-                continue;
-
-            case Token::TK_NEWLINE:
-                goto Done;
-
-            default:
-                break;
-            }
-
-            t.Str.Append (last.Str);
-            t.Type = Token::TK_TEXT;
-        }
-    Done:
+        Token last;
+        Token t = GetDirectiveBody (last);
+        if (last.Type == Token::TK_ERROR)
+            return last;
 
 #define IS_DIRECTIVE(s)                                                 \
         (dirlen == strlen(s) && (strncmp (directive, s, dirlen) == 0))
