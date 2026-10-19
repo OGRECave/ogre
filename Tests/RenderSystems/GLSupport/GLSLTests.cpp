@@ -30,9 +30,50 @@ THE SOFTWARE.
 #include "OgreString.h"
 
 #include <algorithm>
+#include <cstdlib>
+#include <cstring>
+#include <vector>
 #include <gtest/gtest.h>
 
 using namespace Ogre;
+
+namespace {
+/// Parse @p iSource from a buffer owned by this object and remember whether the
+/// result points into that buffer (the documented in-situ contract). The result
+/// is free()d on destruction only when it does not point into the source, so the
+/// free()-unless-inside-the-source rule is exercised on every test.
+class InSituParse
+{
+public:
+    InSituParse(CPreprocessor& iPreprocessor, const String& iSource)
+        : Source(iSource), Buffer(iSource.begin(), iSource.end())
+    {
+        Buffer.push_back('\0');
+        Output = iPreprocessor.Parse(Buffer.data(), Source.size(), Length);
+        InSource = Output && Output >= Buffer.data() && Output <= Buffer.data() + Source.size();
+    }
+
+    ~InSituParse()
+    {
+        if (Output && !InSource)
+            free(Output);
+    }
+
+    InSituParse(const InSituParse&) = delete;
+    InSituParse& operator=(const InSituParse&) = delete;
+
+    bool IsNull() const { return Output == nullptr; }
+    String Text() const { return Output ? String(Output, Length) : String(); }
+
+    /// The source (kept alive so that macros defined from it stay valid)
+    String Source;
+    /// The source buffer with an extra NUL byte beyond the passed length
+    std::vector<char> Buffer;
+    char* Output = nullptr;
+    size_t Length = 0;
+    bool InSource = false;
+};
+} // namespace
 
 TEST(CPreprocessorTests, MacroBraces)
 {
@@ -418,4 +459,239 @@ TEST(CPreprocessorTests, MacroRecursiveFreshInvocations)
     checkMacroExpansion("#define F(x) G(x)\n#define G(x) F(x)\n#define ALIAS F\n"
                         "#define WRAP(x) F(x) ALIAS(x)\nWRAP(3)\n",
                         "F(3) F(3)");
+}
+
+// ---------------------------------------------------------------------------
+// In-situ contract: text is copied only when it changes, unchanged input is
+// returned as a pointer *into* the source, and the caller frees the result only
+// when it does not lie inside the source buffer.
+// ---------------------------------------------------------------------------
+
+TEST(CPreprocessorTests, ParseKeepsUnchangedInputInSitu)
+{
+    CPreprocessor prep;
+    String src = "layout(location = 0) in vec3 position;\n"
+                 "void main() { gl_Position = vec4(position, 1.0); }\n";
+    InSituParse result(prep, src);
+    ASSERT_FALSE(result.IsNull());
+    EXPECT_TRUE(result.InSource);
+    EXPECT_EQ(result.Text(), src);
+}
+
+TEST(CPreprocessorTests, ParseKeepsBlankInputInSitu)
+{
+    CPreprocessor prep;
+    InSituParse result(prep, "\n\n\n");
+    ASSERT_FALSE(result.IsNull());
+    EXPECT_TRUE(result.InSource);
+    EXPECT_EQ(result.Text(), "\n\n\n");
+}
+
+TEST(CPreprocessorTests, ParseCopiesWhenTextChanges)
+{
+    CPreprocessor prep;
+    InSituParse result(prep, "/* comment */");
+    ASSERT_FALSE(result.IsNull());
+    EXPECT_FALSE(result.InSource);
+    EXPECT_EQ(result.Text(), " ");
+}
+
+TEST(CPreprocessorTests, ParseReturnsNullForEmptyInput)
+{
+    CPreprocessor prep;
+    InSituParse result(prep, "");
+    EXPECT_TRUE(result.IsNull());
+}
+
+TEST(CPreprocessorTests, ParseWithoutTrailingNewlineIsFreeable)
+{
+    // Regression: the original returned a pointer into a static newline table
+    // here, which the documented free()-unless-inside-the-source rule then freed.
+    CPreprocessor prep;
+    InSituParse result(prep, "#if 0\na\n#endif");
+    ASSERT_FALSE(result.IsNull());
+    EXPECT_FALSE(result.InSource);
+    EXPECT_EQ(result.Text(), "\n\n");
+}
+
+// ---------------------------------------------------------------------------
+// Object lifetime: switches and API state persist across Parse calls, and
+// macros defined from a source keep views into it.
+// ---------------------------------------------------------------------------
+
+TEST(CPreprocessorTests, DefineUndefAndObjectReuse)
+{
+    CPreprocessor prep;
+    const char* name = "ENABLE";
+    const char* value = "3";
+    const char* symbol = "SYM";
+    prep.Define(name, std::strlen(name), value, std::strlen(value));
+    prep.Define(symbol, std::strlen(symbol));
+
+    // Declared first, so it outlives the later parses that still reference LATER
+    InSituParse first(prep,
+        "#if ENABLE == 3 && defined(SYM)\n"
+        "yes ENABLE\n"
+        "#endif\n"
+        "#define LATER 9\n");
+    ASSERT_FALSE(first.IsNull());
+    EXPECT_EQ(first.Text(), "\nyes 3\n\n\n");
+
+    InSituParse second(prep, "LATER ENABLE\n");
+    ASSERT_FALSE(second.IsNull());
+    EXPECT_EQ(second.Text(), "9 3\n");
+
+    EXPECT_TRUE(prep.Undef(name, std::strlen(name)));
+    EXPECT_FALSE(prep.Undef(name, std::strlen(name)));
+    EXPECT_FALSE(prep.Undef("NOPE", 4));
+
+    InSituParse third(prep, "LATER ENABLE\n");
+    ASSERT_FALSE(third.IsNull());
+    EXPECT_EQ(third.Text(), "9 ENABLE\n");
+}
+
+// ---------------------------------------------------------------------------
+// Robustness limits and malformed input
+// ---------------------------------------------------------------------------
+
+TEST(CPreprocessorTests, MacroArgumentLimit)
+{
+    CPreprocessor prep;
+    InSituParse sixteen(prep,
+        "#define F(a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15) a0+a15\n"
+        "F(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)\n");
+    ASSERT_FALSE(sixteen.IsNull());
+    EXPECT_EQ(StringUtil::split(sixteen.Text()), StringUtil::split("1+16"));
+
+    CPreprocessor tooMany;
+    InSituParse seventeen(tooMany,
+        "#define F(a) a\n"
+        "F(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17)\n");
+    EXPECT_TRUE(seventeen.IsNull());
+}
+
+TEST(CPreprocessorTests, NestedIfLimit)
+{
+    String open, close;
+    for (int i = 0; i < 31; ++i)
+    {
+        open += "#if 1\n";
+        close += "#endif\n";
+    }
+
+    CPreprocessor prep;
+    InSituParse ok(prep, open + "x\n" + close);
+    ASSERT_FALSE(ok.IsNull());
+    EXPECT_NE(ok.Text().find('x'), String::npos);
+
+    String open32, close32;
+    for (int i = 0; i < 32; ++i)
+    {
+        open32 += "#if 1\n";
+        close32 += "#endif\n";
+    }
+
+    CPreprocessor tooDeep;
+    InSituParse overflow(tooDeep, open32 + "x\n" + close32);
+    EXPECT_TRUE(overflow.IsNull());
+}
+
+TEST(CPreprocessorTests, EmbeddedNulBytes)
+{
+    CPreprocessor prep;
+    String src("a\0b\n#define X 1\nX", 16);
+    src.append("\0X\n", 3);
+
+    InSituParse result(prep, src);
+    ASSERT_FALSE(result.IsNull());
+    EXPECT_FALSE(result.InSource);
+    // Embedded NULs are ordinary text; only the macro name after them expands.
+    const char expected[] = {'a', '\0', 'b', '\n', '\n', '\0', '1', '\n'};
+    EXPECT_EQ(result.Text(), String(expected, sizeof(expected)));
+}
+
+TEST(CPreprocessorTests, CrLfWithLineContinuation)
+{
+    CPreprocessor prep;
+    InSituParse result(prep, "#define A 1 \\\r\n + 2\r\nA\r\nx \\\r\ny\r\n");
+    ASSERT_FALSE(result.IsNull());
+    EXPECT_NE(result.Text().find("1  + 2"), String::npos);
+    EXPECT_NE(result.Text().find("x y"), String::npos);
+}
+
+TEST(CPreprocessorTests, UnterminatedStringIsPassedThrough)
+{
+    CPreprocessor prep;
+    InSituParse result(prep, "x \"abc\ny");
+    ASSERT_FALSE(result.IsNull());
+    EXPECT_TRUE(result.InSource);
+    EXPECT_EQ(result.Text(), "x \"abc\ny");
+}
+
+TEST(CPreprocessorTests, UnterminatedBlockCommentIsClosed)
+{
+    CPreprocessor prep;
+    InSituParse result(prep, "x /* abc\ny");
+    ASSERT_FALSE(result.IsNull());
+    EXPECT_EQ(result.Text(), "x  \n");
+}
+
+TEST(CPreprocessorTests, DirectiveAtEndWithoutNewline)
+{
+    CPreprocessor prep;
+    InSituParse result(prep, "#define A 1\nA\n#if 1");
+    ASSERT_FALSE(result.IsNull());
+    EXPECT_EQ(StringUtil::split(result.Text()), StringUtil::split("1"));
+}
+
+TEST(CPreprocessorTests, UnclosedIfAtEndOfSource)
+{
+    CPreprocessor prep;
+    InSituParse result(prep, "#if 1\nx\n");
+    EXPECT_TRUE(result.IsNull());
+}
+
+TEST(CPreprocessorTests, ShiftCountIsMasked)
+{
+    // Regression for the UB fix: shifting by at least the operand width is
+    // masked instead of invoking undefined behaviour.
+    checkMacroExpansion("#if 1 << 910\nyes\n#endif\n", "yes");
+}
+
+TEST(CPreprocessorTests, NegativeIntermediateIsRejected)
+{
+    // Preserved quirk: a negative intermediate #if result is not a valid number.
+    CPreprocessor prep;
+    InSituParse result(prep, "#if 1 - 2\nyes\n#else\nno\n#endif\n");
+    EXPECT_TRUE(result.IsNull());
+}
+
+TEST(CPreprocessorTests, DivisionByZeroIsRejected)
+{
+    CPreprocessor prep;
+    InSituParse result(prep, "#if 1/0\nyes\n#endif\n");
+    EXPECT_TRUE(result.IsNull());
+}
+
+TEST(CPreprocessorTests, IfExpressionHexOctalDefinedElif)
+{
+    checkMacroExpansion("#define V 0x10\n"
+                        "#if V == 16 && defined(V) && !defined(W)\n"
+                        "a\n"
+                        "#elif 010 == 8\n"
+                        "b\n"
+                        "#else\n"
+                        "c\n"
+                        "#endif\n",
+                        "a");
+}
+
+TEST(CPreprocessorTests, MutuallyRecursiveObjectMacros)
+{
+    checkMacroExpansion("#define A B\n#define B A\nA B\n", "A B");
+}
+
+TEST(CPreprocessorTests, SelfReferentialMacro)
+{
+    checkMacroExpansion("#define X X+1\nX\n", "X+1");
 }
