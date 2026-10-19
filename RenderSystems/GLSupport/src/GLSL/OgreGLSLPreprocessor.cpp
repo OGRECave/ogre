@@ -575,48 +575,45 @@ namespace Ogre {
         return std::find(Pinned.begin(), Pinned.end(), &iMacro) != Pinned.end();
     }
 
-    CPreprocessor::Token CPreprocessor::Macro::Expand(const std::vector<Token>& iArgs,
-                                                      MacroTable& iMacros)
+    CPreprocessor::Token CPreprocessor::Expand (Macro& iMacro, const std::vector<Token>& iArgs)
     {
-        ScopedFlag expanding(Expanding);
+        ScopedFlag expanding(iMacro.Expanding);
 
-        CPreprocessor cpp;
+        // Expand with a sub-processor in which every parameter is a macro
+        CPreprocessor cpp(MacroList);
         cpp.SupplimentaryExpand = true;
-        std::swap(cpp.MacroList, iMacros);
 
-        // Define a new macro for every argument
-        size_t i;
-        for (i = 0; i < iArgs.size(); i++)
-            cpp.MacroList.Define (Args [i].View (), iArgs [i].Str.Borrow ());
-        // The rest arguments are empty
-        for (; i < Args.size(); i++)
-            cpp.MacroList.Define (Args [i].View (), Text ("", 0));
+        size_t i = 0;
+        for (; i < iArgs.size(); i++)
+            MacroList.Define (iMacro.Args [i].View (), iArgs [i].Str.Borrow ());
+        for (; i < iMacro.Args.size(); i++) // the rest arguments are empty
+            MacroList.Define (iMacro.Args [i].View (), Text ("", 0));
 
-        Token xt;
-        Token new_xt = Token (Token::TK_TEXT, Value.Str.Borrow ());
-        bool first = true;
-        do {
-            xt = std::move (new_xt);
-            // Now run the macro expansion through the supplimentary preprocessor
-            new_xt = cpp.Parse (xt);
+        // Repeat until there is no more change between parses (an unchanged pass
+        // hands back its input untouched, so a pointer comparison detects that).
+        Token xt (Token::TK_TEXT, iMacro.Value.Str.Borrow ());
+        for (bool first = true;; first = false)
+        {
+            Token new_xt = cpp.Parse (xt);
 
-            // The result can borrow an argument or a slice of xt's buffer.
+            // The result may alias an argument or a slice of xt's buffer, both
+            // of which are about to go away: take a private copy.
             if (!new_xt.Str.IsAllocated () && new_xt.String () && new_xt.String () != xt.String ())
                 new_xt.Str = new_xt.Str.Clone ();
 
-            // Remove the extra macros we have defined, only needed once.
-            if (first) {
-                first = false;
-                for (int j = Args.size() - 1; j >= 0; j--)
-                    cpp.MacroList.Undef (Args [j].View ());
-            }
-            // Repeat until there is no more change between parses
-        } while (xt.String () != new_xt.String ());
+            // Remove the extra macros we have defined, only needed once
+            if (first)
+                for (size_t j = iMacro.Args.size (); j-- > 0;)
+                    MacroList.Undef (iMacro.Args [j].View ());
 
-        std::swap(cpp.MacroList, iMacros);
+            if (new_xt.String () == xt.String ())
+                break;
+            xt = std::move (new_xt);
+        }
 
+        // Rescans must not expand this macro again inside its own output
         if (xt.Length ())
-            xt.Str.Disable (Name);
+            xt.Str.Disable (iMacro.Name);
         return xt;
     }
 
@@ -631,11 +628,16 @@ namespace Ogre {
         LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
     }
 
-    CPreprocessor::CPreprocessor (const Token &iToken, int iLine) : Lex (iToken.Str, iLine)
+    CPreprocessor::CPreprocessor (MacroTable &iMacros) : MacroList (iMacros)
     {
     }
 
-    CPreprocessor::CPreprocessor()
+    CPreprocessor::CPreprocessor (MacroTable &iMacros, const Token &iToken, int iLine)
+        : MacroList (iMacros), Lex (iToken.Str, iLine)
+    {
+    }
+
+    CPreprocessor::CPreprocessor() : MacroList (OwnMacros)
     {
     }
 
@@ -653,53 +655,44 @@ namespace Ogre {
     CPreprocessor::Token CPreprocessor::ExpandMacro (Token iToken)
     {
         Macro *cur = MacroList.IsDefined (iToken.View ());
-        if (cur && !cur->Expanding && !iToken.Str.IsDisabled (cur->Name))
+        if (!cur || cur->Expanding || iToken.Str.IsDisabled (cur->Name))
+            return iToken;
+        // #undef of this very macro can be run by its arguments or its expansion
+        MacroTable::Pin pin (MacroList, *cur);
+
+        std::vector<Token> args;
+        const int old_line = Lex.GetLine ();
+
+        if (!cur->Args.empty())
         {
-            // #undef of this very macro can be run by its arguments or expansion
-            MacroTable::Pin pin (MacroList, *cur);
+            Token t = GetArguments (args, !cur->IsDefinedFunc, false);
+            if (t.Type == Token::TK_ERROR)
+                return t;
 
-            std::vector<Token> args;
-            const int old_line = Lex.GetLine ();
-
-            if (!cur->Args.empty())
+            // Put the token back into the source pool; we'll handle it later
+            if (t.String ())
             {
-                Token t = GetArguments (args, cur->ExpandFunc ? false : true, false);
-                if (t.Type == Token::TK_ERROR)
-                {
-                    return t;
-                }
-
-                // Put the token back into the source pool; we'll handle it later
-                if (t.String ())
-                {
-                    // Returned token should never be allocated on heap
-                    assert (!t.Str.IsAllocated ());
-                    Lex.Rewind (t.String (), Lex.GetLine () - t.CountNL ());
-                }
-                // If a macro is defined with arguments but gets not "called" it should behave like normal text
-                if (args.size() == 0 && (t.Type != Token::TK_PUNCTUATION || t.String () [0] != '('))
-                {
-                    return iToken;
-                }
+                // Returned token should never be allocated on heap
+                assert (!t.Str.IsAllocated ());
+                Lex.Rewind (t.String (), Lex.GetLine () - t.CountNL ());
             }
-
-            if (args.size() > cur->Args.size())
-            {
-                Error (old_line, "Macro `" + std::string (cur->Name.String, cur->Name.Length) + "' passed " +
-                                     std::to_string (args.size ()) + " arguments, but takes just " +
-                                     std::to_string (cur->Args.size ()));
-                return Token (Token::TK_ERROR);
-            }
-
-            Token t = cur->ExpandFunc ?
-                cur->ExpandFunc (this, args) :
-                cur->Expand (args, MacroList);
-            t.Str.AppendNL (Lex.GetLine () - old_line - t.CountNL ());
-
-            return t;
+            // If a macro is defined with arguments but gets not "called" it
+            // should behave like normal text
+            if (args.empty () && !t.IsPunctuation ('('))
+                return iToken;
         }
 
-        return iToken;
+        if (args.size () > cur->Args.size ())
+        {
+            Error (old_line, "Macro `" + std::string (cur->Name.String, cur->Name.Length) + "' passed " +
+                                 std::to_string (args.size ()) + " arguments, but takes just " +
+                                 std::to_string (cur->Args.size ()));
+            return Token (Token::TK_ERROR);
+        }
+
+        Token t = cur->IsDefinedFunc ? ExpandDefined (args) : Expand (*cur, args);
+        t.Str.AppendNL (Lex.GetLine () - old_line - t.CountNL ());
+        return t;
     }
 
 
@@ -934,13 +927,9 @@ namespace Ogre {
 
         if (vt->Type == Token::TK_TEXT)
         {
-            CPreprocessor cpp (iToken, iLine);
-            std::swap(cpp.MacroList, MacroList);
+            CPreprocessor cpp (MacroList, iToken, iLine);
 
-            Token t;
-            t = cpp.GetExpression (r, iLine);
-
-            std::swap(cpp.MacroList, MacroList);
+            Token t = cpp.GetExpression (r, iLine);
 
             if (t.Type == Token::TK_ERROR)
                 return false;
@@ -1166,7 +1155,7 @@ namespace Ogre {
             iBody.Str = iBody.Str.Clone ();
 
         // Create an additional preprocessor to process macro body
-        CPreprocessor cpp (iBody, iLine);
+        CPreprocessor cpp (MacroList, iBody, iLine);
 
         Token t = cpp.GetToken (false);
         if (t.Type != Token::TK_KEYWORD)
@@ -1201,21 +1190,20 @@ namespace Ogre {
 
         if( !m.Args.empty() )
         {
-            CPreprocessor cpp2;
-
             //We need to convert:
             //  #define mad( a__arg_, b__arg_, c__arg_ ) fma( a, b, c )
             //into:
             //  #define mad( a__arg_, b__arg_, c__arg_ ) fma( a__arg_, b__arg_, c__arg_ )
+            MacroTable renames;
             for (const Token& arg : m.Args)
             {
                 if (arg.Length () >= 6) // empty for "#define F()"
-                    cpp2.Define(arg.String (), arg.Length () - 6, arg.String (), arg.Length ());
+                    renames.Define (StringView (arg.String (), arg.Length () - 6), arg.Str.Borrow ());
             }
 
             // Now run the macro expansion through the supplimentary preprocessor
-            Token xt = cpp2.Parse( t );
-            t = std::move (xt);
+            CPreprocessor cpp2 (renames);
+            t = cpp2.Parse( t );
         }
 
         m.Value = std::move (t);
@@ -1228,7 +1216,7 @@ namespace Ogre {
 
     bool CPreprocessor::HandleUnDef (Token &iBody, int iLine)
     {
-        CPreprocessor cpp (iBody, iLine);
+        CPreprocessor cpp (MacroList, iBody, iLine);
 
         Token t = cpp.GetToken (false);
 
@@ -1267,7 +1255,7 @@ namespace Ogre {
 
     bool CPreprocessor::HandleIfDef (Token &iBody, int iLine)
     {
-        CPreprocessor cpp (iBody, iLine);
+        CPreprocessor cpp (MacroList, iBody, iLine);
 
         Token t = cpp.GetToken (false);
 
@@ -1292,15 +1280,15 @@ namespace Ogre {
     }
 
 
-    CPreprocessor::Token CPreprocessor::ExpandDefined (CPreprocessor *iParent, const std::vector<Token>& iArgs)
+    CPreprocessor::Token CPreprocessor::ExpandDefined (const std::vector<Token>& iArgs)
     {
         if (iArgs.size() != 1)
         {
-            iParent->Error (iParent->Lex.GetLine (), "The defined() function takes exactly one argument");
+            Error (Lex.GetLine (), "The defined() function takes exactly one argument");
             return Token (Token::TK_ERROR);
         }
 
-        const char *v = iParent->MacroList.IsDefined (iArgs [0].View ()) ? "1" : "0";
+        const char *v = MacroList.IsDefined (iArgs [0].View ()) ? "1" : "0";
         return Token (Token::TK_NUMBER, v, 1);
     }
 
@@ -1309,7 +1297,7 @@ namespace Ogre {
         // Temporary add the defined() function to the macro list
         Macro defined;
         defined.Name = StringView ("defined");
-        defined.ExpandFunc = ExpandDefined;
+        defined.IsDefinedFunc = true;
         defined.Args.resize(1);
         MacroList.Define (std::move (defined));
 

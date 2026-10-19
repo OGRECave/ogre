@@ -246,12 +246,9 @@ namespace Ogre {
             void SetValue(long iValue);
         };
 
-        class MacroTable;
-
         /// A macro definition
-        class Macro
+        struct Macro
         {
-        public:
             /// Macro name
             StringView Name;
             /// The names of the arguments, each with "__arg_" appended
@@ -260,13 +257,10 @@ namespace Ogre {
             Token Value;
             /// Unparsed macro body; owns the text Name/Args/Value may point into
             Token Body;
-            /// A pointer to function implementation (if macro is really a func)
-            Token (*ExpandFunc) (CPreprocessor *iParent, const std::vector<Token>& iArgs) = nullptr;
+            /// true if this macro is the built-in defined() function
+            bool IsDefinedFunc = false;
             /// true if macro expansion is in progress (blocks recursion)
             bool Expanding = false;
-
-            /// Expand the macro value (will not work for functions)
-            Token Expand (const std::vector<Token>& iArgs, MacroTable& iMacros);
         };
 
         /// The macros defined so far; the most recent definition shadows older
@@ -309,8 +303,6 @@ namespace Ogre {
             std::forward_list<Macro> Retired;
             std::vector<const Macro*> Pinned;
         };
-
-        friend class CPreprocessor::Macro;
 
         /**
          * Nesting state of #if/#elif/#else/#endif, packed into two 32 bit words
@@ -442,15 +434,19 @@ namespace Ogre {
         bool SupplimentaryExpand = false;
         /// State of the nested #if/#elif/#else/#endif directives
         ConditionalStack Conditions;
-        /// The list of macros defined so far
-        MacroTable MacroList;
+        /// The macros defined by this (root) preprocessor
+        MacroTable OwnMacros;
+        /// The list of macros defined so far (shared with sub-processors)
+        MacroTable& MacroList;
         /// The tokenizer
         Lexer Lex;
 
         /**
-         * Private constructor to re-parse a single token.
+         * Private constructor of a sub-processor: it shares the macro table of
+         * the preprocessor it is created from.
          */
-        CPreprocessor (const Token &iToken, int iLine);
+        explicit CPreprocessor (MacroTable& iMacros);
+        CPreprocessor (MacroTable& iMacros, const Token &iToken, int iLine);
 
         /**
          * Stateless tokenizer: Parse the input text and return the next token.
@@ -642,18 +638,17 @@ namespace Ogre {
          *     The expanded token or iToken if it is not a macro
          */
         Token ExpandMacro (Token iToken);
+        Token Expand (Macro& iMacro, const std::vector<Token>& iArgs);
 
 
         /**
          * The implementation of the defined() preprocessor function
-         * @param iParent
-         *     The parent preprocessor object
          * @param iArgs
          *     The arguments themselves
          * @return
          *     The return value encapsulated in a token
          */
-        static Token ExpandDefined (CPreprocessor *iParent, const std::vector<Token>& iArgs);
+        Token ExpandDefined (const std::vector<Token>& iArgs);
 
         /**
          * Parse the input string and return a token containing the whole output.
@@ -670,6 +665,9 @@ namespace Ogre {
     public:
         /// Create an empty preprocessor object
         CPreprocessor();
+
+        CPreprocessor(const CPreprocessor&) = delete;
+        CPreprocessor& operator=(const CPreprocessor&) = delete;
 
         /// Destroy the preprocessor object
         virtual ~CPreprocessor ();
