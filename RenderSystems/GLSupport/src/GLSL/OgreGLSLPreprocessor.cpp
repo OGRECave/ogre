@@ -1476,7 +1476,25 @@ namespace Ogre {
             int old_line = Line;
             Token t = GetToken (true);
 
-        NextToken:
+            if (t.Type == Token::TK_DIRECTIVE)
+            {
+                // Handle preprocessor directives
+                t = HandleDirective (t, old_line);
+
+                output_enabled = ((EnableOutput & (EnableOutput + 1)) == 0);
+                if (output_enabled != old_output_enabled)
+                {
+                    if (output_enabled)
+                        output.Str.AppendNL (old_line - output_disabled_line);
+                    else
+                        output_disabled_line = old_line;
+                    old_output_enabled = output_enabled;
+                }
+
+                if (output_enabled)
+                    output.Str.AppendNL (Line - old_line - t.CountNL ());
+            }
+
             switch (t.Type)
             {
             case Token::TK_ERROR:
@@ -1496,25 +1514,7 @@ namespace Ogre {
 
             case Token::TK_LINECOMMENT:
                 // C++ comments are ignored
-                continue;
-
-            case Token::TK_DIRECTIVE:
-                // Handle preprocessor directives
-                t = HandleDirective (t, old_line);
-
-                output_enabled = ((EnableOutput & (EnableOutput + 1)) == 0);
-                if (output_enabled != old_output_enabled)
-                {
-                    if (output_enabled)
-                        output.Str.AppendNL (old_line - output_disabled_line);
-                    else
-                        output_disabled_line = old_line;
-                    old_output_enabled = output_enabled;
-                }
-
-                if (output_enabled)
-                    output.Str.AppendNL (Line - old_line - t.CountNL ());
-                goto NextToken;
+                break;
 
             case Token::TK_LINECONT:
                 // Backslash-Newline sequences are deleted, no matter where.
@@ -1526,8 +1526,8 @@ namespace Ogre {
                     output.Str.Append (std::move (t.Str));
                 break;
 
-            case Token::TK_NEWLINE:
-                if (empty_lines)
+            default:
+                if (t.Type == Token::TK_NEWLINE && empty_lines)
                 {
                     // Compensate for the backslash-newline combinations
                     // we have encountered, otherwise line numeration is broken
@@ -1535,10 +1535,6 @@ namespace Ogre {
                         output.Str.AppendNL (empty_lines);
                     empty_lines = 0;
                 }
-                OGRE_FALLTHROUGH; // to default
-            case Token::TK_WHITESPACE:
-                // Fallthrough to default
-            default:
                 // Passthrough all other tokens
                 if (output_enabled)
                     output.Str.Append (std::move (t.Str));
