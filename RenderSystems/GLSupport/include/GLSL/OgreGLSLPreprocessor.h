@@ -396,26 +396,56 @@ namespace Ogre {
         /// they are passed through like any unknown directive.
         static DirectiveKind Classify (StringView iName, bool iOutputEnabled);
 
-        /// The current source text input
-        const Token* SourceToken;
-        const char *Source;
-        /// The end of the source text
-        const char *SourceEnd;
-        /// Current line number
-        int Line;
-        /// True if we are at beginning of line
-        bool BOL;
+        /// Splits a Text into tokens, in situ.
+        class Lexer
+        {
+        public:
+            Lexer() = default;
+            Lexer(const Text& iSource, int iLine);
+            bool AtEnd() const { return Source >= SourceEnd; }
+            int GetLine() const { return Line; }
+            const char* GetPosition() const { return Source; }
+            const char* GetEnd() const { return SourceEnd; }
+
+            /// Continue lexing at iPosition (used to un-read a token / a directive)
+            void Rewind(const char* iPosition, int iLine);
+
+            Token GetToken();
+
+        private:
+            /// Current character, or NUL past the end (inputs need not be terminated)
+            char Peek(size_t iAhead = 0) const;
+            Token Make(Token::Kind iType, const char* iBegin) const;
+            Token ReadNewline(const char* iBegin, char c);
+            Token ReadWhitespace(const char* iBegin);
+            Token ReadNumber(const char* iBegin, char iFirst);
+            Token ReadKeyword(const char* iBegin);
+            Token ReadString(const char* iBegin, char iQuote);
+            Token ReadLineComment(const char* iBegin);
+            Token ReadComment(const char* iBegin);
+            Token ReadDirective(const char* iBegin);
+            Token ReadLineCont(const char* iBegin);
+            Token ReadPunctuation(const char* iBegin, char c);
+
+            /// The current source text input (for the disabled ranges; may be NULL)
+            const Text* SourceToken = nullptr;
+            const char* Source = nullptr;
+            /// The end of the source text
+            const char* SourceEnd = nullptr;
+            /// Current line number
+            int Line = 0;
+            /// True if we are at beginning of line
+            bool BOL = true;
+        };
+
         /// Are we expanding a macro?
-        bool SupplimentaryExpand;
+        bool SupplimentaryExpand = false;
         /// State of the nested #if/#elif/#else/#endif directives
         ConditionalStack Conditions;
         /// The list of macros defined so far
         MacroTable MacroList;
-
-        /// The character @a iAhead positions past Source, or zero at the end of
-        /// the source (the source need not be zero-terminated)
-        char Peek (size_t iAhead = 0) const
-        { return Source + iAhead < SourceEnd ? Source [iAhead] : '\0'; }
+        /// The tokenizer
+        Lexer Lex;
 
         /**
          * Private constructor to re-parse a single token.
