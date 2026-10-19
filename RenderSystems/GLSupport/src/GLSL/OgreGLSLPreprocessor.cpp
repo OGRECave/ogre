@@ -680,11 +680,7 @@ namespace Ogre {
         do
         {
             oResult = GetToken (true);
-        } while (oResult.Type == Token::TK_WHITESPACE ||
-                 oResult.Type == Token::TK_NEWLINE ||
-                 oResult.Type == Token::TK_COMMENT ||
-                 oResult.Type == Token::TK_LINECOMMENT ||
-                 oResult.Type == Token::TK_LINECONT);
+        } while (Token::IsBlankOrNewline (oResult.Type));
 
         Token op (Token::TK_WHITESPACE, "", 0);
 
@@ -730,11 +726,7 @@ namespace Ogre {
             }
         }
 
-        while (op.Type == Token::TK_WHITESPACE ||
-               op.Type == Token::TK_NEWLINE ||
-               op.Type == Token::TK_COMMENT ||
-               op.Type == Token::TK_LINECOMMENT ||
-               op.Type == Token::TK_LINECONT)
+        while (Token::IsBlankOrNewline (op.Type))
             op = GetToken (true);
 
         while (true)
@@ -946,11 +938,7 @@ namespace Ogre {
         do
         {
             oArg = GetToken (iExpand);
-        } while (oArg.Type == Token::TK_WHITESPACE ||
-                 oArg.Type == Token::TK_NEWLINE ||
-                 oArg.Type == Token::TK_COMMENT ||
-                 oArg.Type == Token::TK_LINECOMMENT ||
-                 oArg.Type == Token::TK_LINECONT);
+        } while (Token::IsBlankOrNewline (oArg.Type));
 
         if (!iExpand)
         {
@@ -1080,9 +1068,7 @@ namespace Ogre {
                 isFirstTokenNotAnOpenBrace = true;
             }
             isFirstTokenParsed = true;
-        } while (t.Type == Token::TK_WHITESPACE ||
-                 t.Type == Token::TK_COMMENT ||
-                 t.Type == Token::TK_LINECOMMENT);
+        } while (Token::IsBlank (t.Type));
 
         if( isFirstTokenNotAnOpenBrace )
         {
@@ -1218,9 +1204,7 @@ namespace Ogre {
         do
         {
             t = cpp.GetToken (false);
-        } while (t.Type == Token::TK_WHITESPACE ||
-                 t.Type == Token::TK_COMMENT ||
-                 t.Type == Token::TK_LINECOMMENT);
+        } while (Token::IsBlank (t.Type));
 
         if (t.Type != Token::TK_EOS)
             Error (iLine, "Warning: Ignoring garbage after directive", &t);
@@ -1264,9 +1248,7 @@ namespace Ogre {
         do
         {
             t = cpp.GetToken (false);
-        } while (t.Type == Token::TK_WHITESPACE ||
-                 t.Type == Token::TK_COMMENT ||
-                 t.Type == Token::TK_LINECOMMENT);
+        } while (Token::IsBlank (t.Type));
 
         if (t.Type != Token::TK_EOS)
             Error (iLine, "Warning: Ignoring garbage after directive", &t);
@@ -1392,10 +1374,7 @@ namespace Ogre {
                 t.Str.Truncate (0);
                 goto Done;
             }
-        } while (t.Type == Token::TK_WHITESPACE ||
-                 t.Type == Token::TK_LINECONT ||
-                 t.Type == Token::TK_COMMENT ||
-                 t.Type == Token::TK_LINECOMMENT);
+        } while (Token::IsBlankOrLineCont (t.Type));
 
         for (;;)
         {
