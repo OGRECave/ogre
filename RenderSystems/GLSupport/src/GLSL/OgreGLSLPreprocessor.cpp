@@ -748,6 +748,20 @@ namespace Ogre {
         return true;
     }
 
+    CPreprocessor::DirectiveKind
+    CPreprocessor::Classify (StringView iName, bool iOutputEnabled)
+    {
+        if (iName == "define") return iOutputEnabled ? DirectiveKind::Define : DirectiveKind::Unknown;
+        if (iName == "undef") return iOutputEnabled ? DirectiveKind::UnDef : DirectiveKind::Unknown;
+        if (iName == "ifdef") return DirectiveKind::IfDef;
+        if (iName == "ifndef") return DirectiveKind::IfNDef;
+        if (iName == "if") return DirectiveKind::If;
+        if (iName == "elif") return DirectiveKind::Elif;
+        if (iName == "else") return DirectiveKind::Else;
+        if (iName == "endif") return DirectiveKind::EndIf;
+        return DirectiveKind::Unknown;
+    }
+
     /**
      * Parse an expression and return the first token that is not part of it.
      * The value of the (sub)expression is left in oResult, as a token: a number,
@@ -1372,38 +1386,22 @@ namespace Ogre {
         if (last.Type == Token::TK_ERROR)
             return last;
 
-#define IS_DIRECTIVE(s)                                                 \
-        (dirlen == strlen(s) && (strncmp (directive, s, dirlen) == 0))
-
-        bool outputEnabled = Conditions.IsOutputEnabled();
-        bool rc;
-
-        if (IS_DIRECTIVE ("define") && outputEnabled)
-            rc = HandleDefine (t, iLine);
-        else if (IS_DIRECTIVE ("undef") && outputEnabled)
-            rc = HandleUnDef (t, iLine);
-        else if (IS_DIRECTIVE ("ifdef"))
-            rc = HandleIfDef (t, iLine);
-        else if (IS_DIRECTIVE ("ifndef"))
+        bool rc = false;
+        switch (Classify (StringView (directive, dirlen), Conditions.IsOutputEnabled ()))
         {
+        case DirectiveKind::Define: rc = HandleDefine (t, iLine); break;
+        case DirectiveKind::UnDef: rc = HandleUnDef (t, iLine); break;
+        case DirectiveKind::IfDef: rc = HandleIfDef (t, iLine); break;
+        case DirectiveKind::IfNDef:
             rc = HandleIfDef (t, iLine);
             if (rc)
                 Conditions.Negate();
-        }
-        else if (IS_DIRECTIVE ("if"))
-            rc = HandleIf (t, iLine);
-        else if (IS_DIRECTIVE ("elif"))
-            rc = HandleElif (t, iLine);
-
-        else if (IS_DIRECTIVE ("else"))
-            rc = HandleElse (t, iLine);
-        else if (IS_DIRECTIVE ("endif"))
-            rc = HandleEndIf (t, iLine);
-        else
-        {
-            //Error (iLine, "Unknown preprocessor directive", &iToken);
-            //return Token (Token::TK_ERROR);
-
+            break;
+        case DirectiveKind::If: rc = HandleIf (t, iLine); break;
+        case DirectiveKind::Elif: rc = HandleElif (t, iLine); break;
+        case DirectiveKind::Else: rc = HandleElse (t, iLine); break;
+        case DirectiveKind::EndIf: rc = HandleEndIf (t, iLine); break;
+        case DirectiveKind::Unknown:
             // Unknown preprocessor directive, roll back and pass through
             Line = old_line;
             Source = iToken.String () + iToken.Length ();
@@ -1411,11 +1409,7 @@ namespace Ogre {
             return std::move (iToken);
         }
 
-#undef IS_DIRECTIVE
-
-        if (!rc)
-            return Token (Token::TK_ERROR);
-        return last;
+        return rc ? std::move (last) : Token (Token::TK_ERROR);
     }
 
 
