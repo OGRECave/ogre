@@ -540,7 +540,9 @@ namespace Ogre {
         // Handle unary operators here
         if (oResult.Type == Token::TK_PUNCTUATION && oResult.Length == 1)
         {
-            if (strchr ("+-!~", oResult.String [0]))
+            // (strchr() would also match the terminating zero)
+            if (oResult.String [0] == '+' || oResult.String [0] == '-' ||
+                oResult.String [0] == '!' || oResult.String [0] == '~')
             {
                 char uop = oResult.String [0];
                 op = GetExpression (oResult, iLine, 12);
@@ -570,9 +572,9 @@ namespace Ogre {
                     return Token (Token::TK_ERROR);
                 }
 
-                assert (op.Type == Token::TK_PUNCTUATION &&
-                        op.Length == 1 &&
-                        op.String [0] == ')');
+                // op should be the closing ')'. Whatever follows a complete
+                // expression is skipped, as before; this must not assert,
+                // because it is the input that is malformed, not the program.
                 op = GetToken (true);
             }
         }
@@ -673,7 +675,7 @@ namespace Ogre {
                 else if (prio == 8)
                     oResult.SetValue (vlop <= vrop);
                 else if (prio == 9)
-                    oResult.SetValue (vlop << vrop);
+                    oResult.SetValue (vlop << (vrop & 63));
                 break;
             case '>':
                 if (op.Length == 1)
@@ -681,7 +683,7 @@ namespace Ogre {
                 else if (prio == 8)
                     oResult.SetValue (vlop >= vrop);
                 else if (prio == 9)
-                    oResult.SetValue (vlop >> vrop);
+                    oResult.SetValue (vlop >> (vrop & 63));
                 break;
             case '^': oResult.SetValue (vlop ^ vrop); break;
             case '!': oResult.SetValue (vlop != vrop); break;
@@ -1068,7 +1070,7 @@ namespace Ogre {
 
     bool CPreprocessor::HandleIf(bool val, int iLine)
     {
-        if (EnableOutput & (1 << 31))
+        if (EnableOutput & (1u << 31))
         {
             Error (iLine, "Too many embedded #if directives");
             return false;
