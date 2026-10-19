@@ -296,7 +296,7 @@ namespace Ogre {
         char c = *Source++;
 
 
-        if (c == '\n' || (c == '\r' && *Source == '\n'))
+        if (c == '\n' || (c == '\r' && Peek () == '\n'))
         {
             Line++;
             BOL = true;
@@ -317,7 +317,7 @@ namespace Ogre {
         else if (isdigit (c))
         {
             BOL = false;
-            if (c == '0' && Source < SourceEnd && Source [0] == 'x') // hex numbers
+            if (c == '0' && Peek () == 'x') // hex numbers
             {
                 Source++;
                 while (Source < SourceEnd && isxdigit (*Source))
@@ -364,7 +364,7 @@ namespace Ogre {
                 Source++;
             return Token (Token::TK_STRING, begin, Source - begin);
         }
-        else if (c == '/' && *Source == '/')
+        else if (c == '/' && Peek () == '/')
         {
             BOL = false;
             Source++;
@@ -372,11 +372,11 @@ namespace Ogre {
                 Source++;
             return Token (Token::TK_LINECOMMENT, begin, Source - begin);
         }
-        else if (c == '/' && *Source == '*')
+        else if (c == '/' && Peek () == '*')
         {
             BOL = false;
             Source++;
-            while (Source < SourceEnd && (Source [0] != '*' || Source [1] != '/'))
+            while (Source < SourceEnd && (Peek () != '*' || Peek (1) != '/'))
             {
                 if (*Source == '\n')
                     Line++;
@@ -397,12 +397,12 @@ namespace Ogre {
                 Source++;
             return Token (Token::TK_DIRECTIVE, begin, Source - begin);
         }
-        else if (c == '\\' && Source < SourceEnd && (*Source == '\r' || *Source == '\n'))
+        else if (c == '\\' && (Peek () == '\r' || Peek () == '\n'))
         {
             // Treat backslash-newline as a whole token
-            if (*Source == '\r')
+            if (Peek () == '\r')
                 Source++;
-            if (*Source == '\n')
+            if (Peek () == '\n')
                 Source++;
             Line++;
             BOL = true;
@@ -412,15 +412,15 @@ namespace Ogre {
         {
             BOL = false;
             // Handle double-char operators here
-            if (c == '>' && (*Source == '>' || *Source == '='))
+            if (c == '>' && (Peek () == '>' || Peek () == '='))
                 Source++;
-            else if (c == '<' && (*Source == '<' || *Source == '='))
+            else if (c == '<' && (Peek () == '<' || Peek () == '='))
                 Source++;
-            else if (c == '!' && *Source == '=')
+            else if (c == '!' && Peek () == '=')
                 Source++;
-            else if (c == '=' && *Source == '=')
+            else if (c == '=' && Peek () == '=')
                 Source++;
-            else if ((c == '|' || c == '&' || c == '^') && *Source == c)
+            else if ((c == '|' || c == '&' || c == '^') && Peek () == c)
                 Source++;
             return Token (Token::TK_PUNCTUATION, begin, Source - begin);
         }

@@ -236,6 +236,11 @@ namespace Ogre {
         /// The list of macros defined so far
         std::forward_list<Macro> MacroList;
 
+        /// The character @a iAhead positions past Source, or zero at the end of
+        /// the source (the source need not be zero-terminated)
+        char Peek (size_t iAhead = 0) const
+        { return Source + iAhead < SourceEnd ? Source [iAhead] : '\0'; }
+
         /**
          * Private constructor to re-parse a single token.
          */
