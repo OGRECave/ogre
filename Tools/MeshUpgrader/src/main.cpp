@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreLodConfig.h"
 
 #include <iostream>
-#include <sys/stat.h>
 
 using namespace std;
 using namespace Ogre;
@@ -507,20 +506,22 @@ int main(int numargs, char** args)
         MeshManager::getSingleton().setBoundsPaddingFactor(0.0f);
 
         // Load the mesh
-        struct stat tagStat;
-
-        FILE* pFile = fopen( source.c_str(), "rb" );
-        if (!pFile) {
+        DataStreamPtr pFile;
+        try
+        {
+            pFile = Root::openFileStream(source, "");
+        }
+        catch (const Exception&)
+        {
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
                 "File " + source + " not found.", "OgreMeshUpgrader");
         }
-        stat( source.c_str(), &tagStat );
-        MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
-        size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
-        if (result != size_t(tagStat.st_size))
+        MemoryDataStream* memstream = new MemoryDataStream(source, pFile->size(), true);
+        size_t result = pFile->read( (void*)memstream->getPtr(), pFile->size() );
+        if (result != pFile->size())
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                 "Unexpected error while reading file " + source, "OgreMeshUpgrader");
-        fclose( pFile );
+        pFile->close();
 
         MeshPtr meshPtr = MeshManager::getSingleton().createManual("TmpConversionMesh", RGN_DEFAULT);
         Mesh* mesh = meshPtr.get();
