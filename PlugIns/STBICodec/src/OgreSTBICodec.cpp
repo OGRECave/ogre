@@ -33,6 +33,7 @@ THE SOFTWARE.
 
 #include "OgrePlatformInformation.h"
 #include "OgreString.h"
+#include "OgreRoot.h"
 
 #if __OGRE_HAVE_NEON
 #define STBI_NEON
@@ -156,14 +157,10 @@ namespace Ogre {
     {
 #if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         MemoryDataStreamPtr data = static_pointer_cast<MemoryDataStream>(encode(input));
-        std::ofstream f(outFileName.c_str(), std::ios::out | std::ios::binary);
+        DataStreamPtr f = Root::createFileStream(outFileName, "", true);
 
-        if (!f.is_open())
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "could not open file " + outFileName);
-        }
-
-        f.write((char*)data->getPtr(), data->size());
+        f->write(data->getPtr(), data->size());
+        f->close();
 #endif
     }
     //---------------------------------------------------------------------

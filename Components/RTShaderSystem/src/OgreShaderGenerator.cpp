@@ -1158,18 +1158,19 @@ void ShaderGenerator::setShaderCachePath( const String& cachePath )
         {
             // Make sure this is a valid writable path.
             String outTestFileName(mShaderCachePath + "ShaderGenerator.tst");
-            std::ofstream outFile(outTestFileName.c_str());
-
-            if (!outFile)
+            try
+            {
+                Root::createFileStream(outTestFileName, "", true)->close();
+            }
+            catch (const Exception&)
             {
                 OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
                     "Could not create output files in the given shader cache path '" + mShaderCachePath,
                     "ShaderGenerator::setShaderCachePath");
             }
 
-            // Close and remove the test file.
-            outFile.close();
-            remove(outTestFileName.c_str());
+            // Remove the test file.
+            FileSystemLayer::removeFile(outTestFileName);
         }
     }
 }
