@@ -885,19 +885,14 @@ namespace Ogre
                 auto metalBuffer = mCurrentIndexBuffer->indexBuffer->_getImpl<MetalHardwareBufferCommon>();
                 __unsafe_unretained id<MTLBuffer> indexBuffer = metalBuffer->getBufferName( offsetStart );
 
+                // On iOS indexBufferOffset must be a multiple of 4 bytes.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 OgreAssertDbg( ((mCurrentIndexBuffer->indexStart * bytesPerIndexElement) & 0x03) == 0
                             ,"Index Buffer must be aligned to 4 bytes. If you're messing with "
                             "IndexBuffer::indexStart, you've entered an invalid "
                             "indexStart; not supported by the Metal API." );
+#endif
 
-                [mActiveRenderEncoder drawIndexedPrimitives:mCurrentPrimType
-                           indexCount:mCurrentIndexBuffer->indexCount
-                            indexType:indexType
-                          indexBuffer:indexBuffer
-                    indexBufferOffset:mCurrentIndexBuffer->indexStart * bytesPerIndexElement + offsetStart
-                        instanceCount:numberOfInstances];
-#else
                 [mActiveRenderEncoder drawIndexedPrimitives:mCurrentPrimType
                            indexCount:mCurrentIndexBuffer->indexCount
                             indexType:indexType
@@ -906,7 +901,6 @@ namespace Ogre
                         instanceCount:numberOfInstances
                            baseVertex:mCurrentVertexBuffer->vertexStart
                          baseInstance:0];
-#endif
             } while (updatePassIterationRenderState());
         }
         else
@@ -923,11 +917,7 @@ namespace Ogre
                                                  clamp:0.0f];
                 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                const uint32 vertexStart = 0;
-#else
                 const uint32 vertexStart = static_cast<uint32>( mCurrentVertexBuffer->vertexStart );
-#endif
 
                 if (numberOfInstances > 1)
                 {
