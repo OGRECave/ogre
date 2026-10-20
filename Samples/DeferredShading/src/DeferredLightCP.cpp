@@ -49,9 +49,8 @@ DLight* DeferredLightRenderOperation::createDLight(Ogre::Light* light)
 //-----------------------------------------------------------------------
 static void injectTechnique(SceneManager* sm, Technique* tech, Renderable* rend, const Ogre::LightList* lightList)
 {
-    for(unsigned short i=0; i<tech->getNumPasses(); ++i)
+    for (auto* pass : tech->getPasses())
     {
-        Ogre::Pass* pass = tech->getPass(i);
         if (lightList != 0)
         {
             sm->_injectRenderWithPass(pass, rend, false, false, lightList);

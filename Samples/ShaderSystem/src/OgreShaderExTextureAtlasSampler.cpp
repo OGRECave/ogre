@@ -411,12 +411,10 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( const DataStreamPtr&
 
         //place the information in the main texture
         size_t maxTextureCount = 0;
-        TextureAtlasMap::const_iterator it = tmpMap.begin();
-        TextureAtlasMap::const_iterator itEnd = tmpMap.end();
-        for(;it != itEnd; ++it)
+        for (const auto& entry : tmpMap)
         {
-            setTextureAtlasTable(it->first, it->second);
-            maxTextureCount = std::max<size_t>(maxTextureCount, it->second->size());
+            setTextureAtlasTable(entry.first, entry.second);
+            maxTextureCount = std::max<size_t>(maxTextureCount, entry.second->size());
         }
 
         if (maxTextureCount > TAS_MAX_SAFE_ATLASED_TEXTURES)

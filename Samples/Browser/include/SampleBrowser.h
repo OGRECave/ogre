@@ -331,9 +331,9 @@ namespace OgreBites
 #endif
                 mTrayMgr->moveWidgetToTray("Back", TL_RIGHT);
 
-                for (unsigned int i = 0; i < mThumbs.size(); i++)
+                for (auto* thumb : mThumbs)
                 {
-                    mThumbs[i]->hide();
+                    thumb->hide();
                 }
 
                 while (mTrayMgr->getTrayContainer(TL_CENTER)->isVisible())
@@ -414,10 +414,10 @@ namespace OgreBites
         {
             if (menu == mCategoryMenu)      // category changed, so update the sample menu, carousel, and slider
             {
-                for (unsigned int i = 0; i < mThumbs.size(); i++)    // destroy all thumbnails in carousel
+                for (auto* thumb : mThumbs)    // destroy all thumbnails in carousel
                 {
-                    Ogre::MaterialManager::getSingleton().remove(mThumbs[i]->getName(), "Essential");
-                    Widget::nukeOverlayElement(mThumbs[i]);
+                    Ogre::MaterialManager::getSingleton().remove(thumb->getName(), "Essential");
+                    Widget::nukeOverlayElement(thumb);
                 }
                 mThumbs.clear();
 
@@ -807,9 +807,9 @@ namespace OgreBites
             Ogre::String startupSampleTitle;
             Ogre::StringVector sampleList;
 #ifdef OGRE_STATIC_LIB
-            for(auto it = mPluginNameMap.begin(); it != mPluginNameMap.end(); ++it)
+            for (const auto& plugin : mPluginNameMap)
             {
-                sampleList.push_back(it->first);
+                sampleList.push_back(plugin.first);
             }
 #else
             Ogre::ConfigFile cfg;
@@ -894,9 +894,9 @@ namespace OgreBites
             {
                 Ogre::String message = "These requested sample plugins were either missing, corrupt or invalid:";
 
-                for (unsigned int i = 0; i < unloadedSamplePlugins.size(); i++)
+                for (const auto& plugin : unloadedSamplePlugins)
                 {
-                    message += "\n- " + unloadedSamplePlugins[i];
+                    message += "\n- " + plugin;
                 }
 
                 mTrayMgr->showOkDialog("Error!", message);
@@ -911,10 +911,10 @@ namespace OgreBites
         virtual void unloadSamples()
         {
 #ifndef OGRE_STATIC_LIB
-            for (unsigned int i = 0; i < mLoadedSamplePlugins.size(); i++)
+            for (const auto& plugin : mLoadedSamplePlugins)
             {
                 if(!mRoot) break;
-                mRoot->unloadPlugin(mLoadedSamplePlugins[i]);
+                mRoot->unloadPlugin(plugin);
             }
 #endif
 

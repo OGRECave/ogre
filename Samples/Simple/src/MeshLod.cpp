@@ -83,11 +83,8 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
 
     // Add all meshes from popular:
     StringVectorPtr meshes = ResourceGroupManager::getSingleton().findResourceNames("General", "*.mesh");
-    StringVector::iterator it, itEnd;
-    it = meshes->begin();
-    itEnd = meshes->end();
-    for(; it != itEnd; it++){
-        models->addItem(*it);
+    for (const auto& mesh : *meshes) {
+        models->addItem(mesh);
     }
 
 
@@ -452,12 +449,9 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
     String name = mesh->getName();
     Ogre::FileInfo* info = NULL;
     FileInfoListPtr locPtr = resourceGroupMgr.listResourceFileInfo(group);
-    FileInfoList::iterator it, itEnd;
-    it = locPtr->begin();
-    itEnd = locPtr->end();
-    for (; it != itEnd; it++) {
-        if (StringUtil::startsWith(name, it->filename)) {
-            info = &*it;
+    for (auto& fileInfo : *locPtr) {
+        if (StringUtil::startsWith(name, fileInfo.filename)) {
+            info = &fileInfo;
             break;
         }
     }

@@ -109,9 +109,9 @@ void Context::destroyMaterials( const Ogre::String& resourceGroupID )
             }
         }
 
-        for( size_t i = 0; i < materialNamesToRemove.size(); ++i )
+        for( const auto& materialName : materialNamesToRemove )
         {
-            materialManager->remove( materialNamesToRemove[i], resourceGroupID );
+            materialManager->remove( materialName, resourceGroupID );
         }
         materialManager->removeUnreferencedResources();
     }
@@ -143,9 +143,9 @@ void Context::destroyTextures( const Ogre::String& resourceGroupID )
             }
         }
 
-        for( size_t i = 0; i < textureNamesToRemove.size(); ++i )
+        for( const auto& textureName : textureNamesToRemove )
         {
-            textureManager->remove( textureNamesToRemove[i], resourceGroupID );
+            textureManager->remove( textureName, resourceGroupID );
         }
     }
     catch( ... )

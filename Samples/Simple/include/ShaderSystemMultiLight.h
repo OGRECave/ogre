@@ -33,9 +33,9 @@ public:
     bool frameRenderingQueued(const FrameEvent& evt) override
     {
         // Move the lights along their paths
-        for(size_t i = 0 ; i < mLights.size() ; ++i)
+        for (auto& light : mLights)
         {
-            mLights[i].animState->addTime(evt.timeSinceLastFrame);
+            light.animState->addTime(evt.timeSinceLastFrame);
         }
 
         return SdkSample::frameRenderingQueued(evt);   // don't forget the parent class updates!
