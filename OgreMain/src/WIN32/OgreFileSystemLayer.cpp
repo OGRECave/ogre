@@ -34,76 +34,51 @@
 #endif
 #include <io.h>
 #include <direct.h>
+#include <stdio.h>
+#include <cerrno>
+
+#include "OgreFileSystemUtil.h"
 
 namespace Ogre
 {
-    static bool widePathToOgreString(String& dest, const WCHAR* wpath)
-    {
-        // need to convert to narrow (OEM or ANSI) codepage so that fstream can use it 
-        // properly on international systems.
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        // Note, that on legacy CRT versions codepage for narrow CRT file functions can be changed using 
-        // SetFileApisANSI/OEM, but on modern runtimes narrow pathes are always widened using ANSI codepage.
-        // We suppose that on such runtimes file APIs codepage is left in default, ANSI state.
-        UINT codepage = AreFileApisANSI() ? CP_ACP : CP_OEMCP;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        // Runtime is modern, narrow calls are widened inside CRT using CP_ACP codepage.
-        UINT codepage = CP_ACP;
-#endif
-        const int wlength = static_cast<int>(wcslen(wpath));
-        const int length = WideCharToMultiByte(codepage, 0 /* Use default flags */, wpath, wlength, NULL, 0, NULL, NULL);
-        if(length <= 0)
-        {
-            dest.clear();
-            return false;
-        }
-
-        // success
-        dest.resize(length);
-        WideCharToMultiByte(codepage, 0 /* Use default flags */, wpath, wlength, &dest[0], (int)dest.size(), NULL, NULL);
-        return true;
-    }
-
     static String getModulePath(bool dllpath)
     {
         HMODULE hm = NULL;
 
         // get path of this DLL
-        if (dllpath && !GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                                              GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                                          (LPCSTR)&getModulePath, &hm))
+        if (dllpath && !GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                                               GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                                           (LPCWSTR)&getModulePath, &hm))
         {
             return "";
         }
 
         DWORD bufsize = 256;
-        char* resolved = 0;
+        std::wstring resolved;
         do
         {
-            char* buf = OGRE_ALLOC_T(char, bufsize, Ogre::MEMCATEGORY_GENERAL);
-            DWORD retval = GetModuleFileName(hm, buf, bufsize);
+            std::wstring buf(bufsize, L'\0');
+            DWORD retval = GetModuleFileNameW(hm, &buf[0], bufsize);
             if (retval == 0)
-            {
-                // failed
-                OGRE_FREE(buf, Ogre::MEMCATEGORY_GENERAL);
                 break;
-            }
 
             if (retval < bufsize)
             {
-                // operation was successful.
-                resolved = buf;
+                // operation was successful
+                buf.resize(retval);
+                resolved.swap(buf);
             }
             else
             {
                 // buffer was too small, grow buffer and try again
-                OGRE_FREE(buf, Ogre::MEMCATEGORY_GENERAL);
                 bufsize <<= 1;
             }
-        } while (!resolved);
+        } while (resolved.empty());
 
-        String ret = resolved;
-        OGRE_FREE(resolved, Ogre::MEMCATEGORY_GENERAL);
+        if (resolved.empty())
+            return "";
+
+        String ret = FileSystemUtil::fromWide(resolved);
 
         // need to strip the module filename from the path
         String::size_type pos = ret.rfind('\\');
@@ -123,8 +98,8 @@ namespace Ogre
         // try to determine the application's path
         String appPath = getModulePath(false);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        Ogre::String appPath;
-        widePathToOgreString(appPath, Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data());
+        Ogre::String appPath =
+            FileSystemUtil::fromWide(Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data());
 #endif
 
         // use application path as config search path
@@ -142,9 +117,9 @@ namespace Ogre
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         WCHAR wpath[MAX_PATH];
         if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, wpath)))
-            widePathToOgreString(mHomePath, wpath);
+            mHomePath = FileSystemUtil::fromWide(wpath);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        widePathToOgreString(mHomePath, Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
+        mHomePath = FileSystemUtil::fromWide(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
 #endif
 
         if(!mHomePath.empty())
@@ -161,28 +136,48 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool FileSystemLayer::fileExists(const Ogre::String& path)
     {
-        return _access(path.c_str(), 04) == 0; // Use CRT API rather than GetFileAttributesExA to pass Windows Store validation
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+        return ::_waccess(FileSystemUtil::toWide(path).c_str(), 0) == 0;
+#else
+        return ::_access(path.c_str(), 0) == 0;
+#endif
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::createDirectory(const Ogre::String& path)
     {
-        return !_mkdir(path.c_str()) || errno == EEXIST; // Use CRT API rather than CreateDirectoryA to pass Windows Store validation
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+        return ::_wmkdir(FileSystemUtil::toWide(path).c_str()) == 0 || errno == EEXIST;
+#else
+        return ::_mkdir(path.c_str()) == 0 || errno == EEXIST;
+#endif
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::removeDirectory(const Ogre::String& path)
     {
-        return !_rmdir(path.c_str()) || errno == ENOENT; // Use CRT API to pass Windows Store validation
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+        return ::_wrmdir(FileSystemUtil::toWide(path).c_str()) == 0 || errno == ENOENT;
+#else
+        return ::_rmdir(path.c_str()) == 0 || errno == ENOENT;
+#endif
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::removeFile(const Ogre::String& path)
     {
-        return !_unlink(path.c_str()) || errno == ENOENT; // Use CRT API to pass Windows Store validation
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+        return ::_wremove(FileSystemUtil::toWide(path).c_str()) == 0 || errno == ENOENT;
+#else
+        return ::remove(path.c_str()) == 0 || errno == ENOENT;
+#endif
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::renameFile(const Ogre::String& oldname, const Ogre::String& newname)
     {
         if(fileExists(oldname) && fileExists(newname))
             removeFile(newname);
-        return !rename(oldname.c_str(), newname.c_str()); // Use CRT API to pass Windows Store validation
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+        return ::_wrename(FileSystemUtil::toWide(oldname).c_str(), FileSystemUtil::toWide(newname).c_str()) == 0;
+#else
+        return ::rename(oldname.c_str(), newname.c_str()) == 0;
+#endif
     }
 }
