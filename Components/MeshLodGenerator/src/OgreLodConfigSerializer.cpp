@@ -39,15 +39,19 @@ namespace Ogre
 
     void LodConfigSerializer::importLodConfig(Ogre::LodConfig* config, const Ogre::String& filename)
     {
-        std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-        f->open(filename.c_str(), std::ios::binary | std::ios::in);
-        if(f->is_open()){
-            Ogre::DataStreamPtr stream(OGRE_NEW Ogre::FileStreamDataStream(f));
-
-            importLodConfig(config, stream);
-
-            stream->close();
+        Ogre::DataStreamPtr stream;
+        try
+        {
+            stream = Ogre::Root::openFileStream(filename, "");
         }
+        catch (const Ogre::Exception&)
+        {
+            return;
+        }
+
+        importLodConfig(config, stream);
+
+        stream->close();
     }
 
     void LodConfigSerializer::importLodConfig(Ogre::LodConfig* config, DataStreamPtr& stream)
@@ -161,9 +165,7 @@ namespace Ogre
 
     void LodConfigSerializer::exportLodConfig(Ogre::LodConfig& config, const Ogre::String& filename, Endian endianMode /*= ENDIAN_NATIVE*/ )
     {
-        std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-        f->open(filename.c_str(), std::ios::binary | std::ios::out);
-        Ogre::DataStreamPtr stream(OGRE_NEW Ogre::FileStreamDataStream(f));
+        Ogre::DataStreamPtr stream = Ogre::Root::createFileStream(filename, "", true);
 
         exportLodConfig(config, stream, endianMode);
 

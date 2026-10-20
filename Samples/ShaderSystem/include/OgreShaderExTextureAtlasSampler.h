@@ -263,8 +263,6 @@ public:
             parameter will be filled only if it is not null. The system factory keeps a copy of this
             information in any case.
     */
-    bool addTexutreAtlasDefinition( const Ogre::String& filename, const TextureAtlasTablePtr& textureAtlasTable = TextureAtlasTablePtr());
-    /// @overload
     bool addTexutreAtlasDefinition( const DataStreamPtr& stream, const TextureAtlasTablePtr& textureAtlasTable = TextureAtlasTablePtr());
 
     /**
