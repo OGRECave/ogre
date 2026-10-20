@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreDDSCodec.h"
 #include "OgreImage.h"
+#include "OgreRoot.h"
 
 #include <climits>
 
@@ -426,18 +427,17 @@ namespace {
         try
         {
             // Write the file
-            std::ofstream of;
-            of.open(outFileName.c_str(), std::ios_base::binary | std::ios_base::out);
+            DataStreamPtr of = Root::createFileStream(outFileName, "", true);
 
             const size_t buffSize = 4096;
             char buffer[buffSize];
 
             while (!strm->eof()) {
                 size_t bytesRead = strm->read(buffer, buffSize);
-                of.write(buffer, bytesRead);
+                of->write(buffer, bytesRead);
             }
 
-            of.close();
+            of->close();
         }
         catch(...)
         {

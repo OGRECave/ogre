@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #if OGRE_NO_ZIP_ARCHIVE == 0
 #include <zip.h>
+#include "OgreFileSystemUtil.h"
 
 namespace Ogre {
 namespace {
@@ -303,18 +304,7 @@ namespace {
     {
         // Zziplib doesn't yet support getting the modification time of individual files
         // so just check the mod time of the zip itself
-        struct stat tagStat;
-        bool ret = (stat(mName.c_str(), &tagStat) == 0);
-
-        if (ret)
-        {
-            return tagStat.st_mtime;
-        }
-        else
-        {
-            return 0;
-        }
-
+        return FileSystemUtil::getFileModifiedTime(mName);
     }
     //-----------------------------------------------------------------------
     //  ZipArchiveFactory

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
 #include "OgreRenderSystemCapabilities.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -102,11 +103,13 @@ namespace Ogre
     {
         using namespace std;
 
-        ofstream file(filename.c_str());
+        stringstream stream;
+        write(caps, name, stream);
+        const String contents = stream.str();
 
-        write(caps, name, file);
-
-        file.close();
+        DataStreamPtr file = Root::createFileStream(filename, "", true);
+        file->write(contents.c_str(), contents.size());
+        file->close();
     }
     
     //-----------------------------------------------------------------------

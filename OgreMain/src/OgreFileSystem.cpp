@@ -45,9 +45,9 @@ THE SOFTWARE.
 #  include <windows.h>
 #  include <direct.h>
 #  include <io.h>
-//#  define _OGRE_FILESYSTEM_ARCHIVE_UNICODE // base path and resources subpathes expected to be in UTF-8 and wchar_t file IO routines are used
 #endif
 
+#include "OgreFileSystemLayer.h"
 #include "OgreFileSystemUtil.h"
 
 namespace Ogre {
@@ -140,13 +140,10 @@ namespace {
 
     }
     //-----------------------------------------------------------------------
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-    static bool is_reserved_dir (const wchar_t *fn)
-#else
-    static bool is_reserved_dir (const char *fn)
-#endif
+    template <typename CharT>
+    static bool is_reserved_dir (const CharT *fn)
     {
-        return (fn [0] == '.' && (fn [1] == 0 || (fn [1] == '.' && fn [2] == 0)));
+        return (fn [0] == CharT('.') && (fn [1] == 0 || (fn [1] == CharT('.') && fn [2] == 0)));
     }
     //-----------------------------------------------------------------------
     static bool is_absolute_path(const char* path)
@@ -165,39 +162,12 @@ namespace {
         else
             return base + '/' + name;
     }
-	//-----------------------------------------------------------------------
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-	static std::wstring to_wpath(const String& text, unsigned codepage = CP_UTF8)
-	{
-		const int utf16Length = ::MultiByteToWideChar(codepage, 0, text.c_str(), (int)text.size(), NULL, 0);
-		if(utf16Length > 0)
-		{
-			std::wstring wt;
-			wt.resize(utf16Length);
-			if(0 != ::MultiByteToWideChar(codepage, 0, text.c_str(), (int)text.size(), &wt[0], (int)wt.size()))
-				return wt;
-		}
-		return L"";
-	}
-	static String from_wpath(const std::wstring& text, unsigned codepage = CP_UTF8)
-	{
-		const int length = ::WideCharToMultiByte(codepage, 0, text.c_str(), (int)text.size(), NULL, 0, NULL, NULL);
-		if(length > 0)
-		{
-			String str;
-			str.resize(length);
-			if(0 != ::WideCharToMultiByte(codepage, 0, text.c_str(), (int)text.size(), &str[0], (int)str.size(), NULL, NULL))
-				return str;
-		}
-		return "";
-	}
-#endif
     //-----------------------------------------------------------------------
     void FileSystemArchive::findFiles(const String& pattern, bool recursive, 
         bool dirs, StringVector* simpleList, FileInfoList* detailList) const
     {
         intptr_t lHandle, res;
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+#if OGRE_FILESYSTEM_USE_WIDECHAR
         struct _wfinddata_t tagData;
 #else
         struct _finddata_t tagData;
@@ -214,8 +184,8 @@ namespace {
 
         String full_pattern = concatenate_path(mName, pattern);
 
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-        lHandle = _wfindfirst(to_wpath(full_pattern).c_str(), &tagData);
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+        lHandle = _wfindfirst(FileSystemUtil::toWide(full_pattern).c_str(), &tagData);
 #else
         lHandle = _findfirst(full_pattern.c_str(), &tagData);
 #endif
@@ -228,8 +198,8 @@ namespace {
             {
                 if (simpleList)
                 {
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-                    simpleList->push_back(directory + from_wpath(tagData.name));
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+                    simpleList->push_back(directory + FileSystemUtil::fromWide(tagData.name));
 #else
                     simpleList->push_back(directory + tagData.name);
 #endif
@@ -238,9 +208,9 @@ namespace {
                 {
                     FileInfo fi;
                     fi.archive = this;
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-                    fi.filename = directory + from_wpath(tagData.name);
-                    fi.basename = from_wpath(tagData.name);
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+                    fi.filename = directory + FileSystemUtil::fromWide(tagData.name);
+                    fi.basename = FileSystemUtil::fromWide(tagData.name);
 #else
                     fi.filename = directory + tagData.name;
                     fi.basename = tagData.name;
@@ -251,7 +221,7 @@ namespace {
                     detailList->push_back(fi);
                 }
             }
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+#if OGRE_FILESYSTEM_USE_WIDECHAR
             res = _wfindnext( lHandle, &tagData );
 #else
             res = _findnext( lHandle, &tagData );
@@ -280,8 +250,8 @@ namespace {
             else
                 mask.append (pattern);
 
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-            lHandle = _wfindfirst(to_wpath(base_dir).c_str(), &tagData);
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+            lHandle = _wfindfirst(FileSystemUtil::toWide(base_dir).c_str(), &tagData);
 #else
             lHandle = _findfirst(base_dir.c_str (), &tagData);
 #endif
@@ -294,14 +264,14 @@ namespace {
                 {
                     // recurse
                     base_dir = directory;
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-                    base_dir.append (from_wpath(tagData.name)).append (mask);
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+                    base_dir.append (FileSystemUtil::fromWide(tagData.name)).append (mask);
 #else
                     base_dir.append (tagData.name).append (mask);
 #endif
                     findFiles(base_dir, recursive, dirs, simpleList, detailList);
                 }
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
+#if OGRE_FILESYSTEM_USE_WIDECHAR
                 res = _wfindnext( lHandle, &tagData );
 #else
                 res = _findnext( lHandle, &tagData );
@@ -347,14 +317,7 @@ namespace {
     {
         // Use filesystem to determine size 
         // (quicker than streaming to the end and back)
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-		struct _stat64i32 tagStat;
-		int ret = _wstat(to_wpath(full_path).c_str(), &tagStat);
-#else
-        struct stat tagStat;
-        int ret = stat(full_path.c_str(), &tagStat);
-#endif
-        size_t st_size = ret == 0 ? tagStat.st_size : 0;
+        size_t st_size = FileSystemUtil::getFileSize(full_path);
 
         std::istream* baseStream = 0;
         std::ifstream* roStream = 0;
@@ -363,21 +326,13 @@ namespace {
         if (mode & std::ios::out)
         {
             rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-			rwStream->open(to_wpath(full_path).c_str(), mode);
-#else
-            rwStream->open(full_path.c_str(), mode);
-#endif
+            FileSystemUtil::openInputOutputFile(*rwStream, full_path, mode);
             baseStream = rwStream;
         }
         else
         {
             roStream = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL)();
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-			roStream->open(to_wpath(full_path).c_str(), mode);
-#else
-            roStream->open(full_path.c_str(), mode);
-#endif
+            FileSystemUtil::openInputFile(*roStream, full_path, mode);
             baseStream = roStream;
         }
 
@@ -400,7 +355,6 @@ namespace {
         }
         else
         {
-            OgreAssertDbg(ret == 0, "Problem getting file size");
             // read-only stream
             stream = OGRE_NEW FileStreamDataStream(streamname, roStream, st_size);
         }
@@ -420,11 +374,7 @@ namespace {
         // Also, always include reading
         std::ios::openmode mode = std::ios::out | std::ios::binary;
         std::fstream* rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-		rwStream->open(to_wpath(full_path).c_str(), mode);
-#else
-        rwStream->open(full_path.c_str(), mode);
-#endif
+        FileSystemUtil::openInputOutputFile(*rwStream, full_path, mode);
 
         // Should check ensure open succeeded, in case fail for some reason.
         if (rwStream->fail())
@@ -447,11 +397,7 @@ namespace {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot remove a file from a read-only archive");
         }
         String full_path = concatenate_path(mName, filename);
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-		::_wremove(to_wpath(full_path).c_str());
-#else
-        ::remove(full_path.c_str());
-#endif
+        FileSystemLayer::removeFile(full_path);
     }
     //-----------------------------------------------------------------------
     StringVectorPtr FileSystemArchive::list(bool recursive, bool dirs) const
@@ -501,16 +447,10 @@ namespace {
 
         String full_path = concatenate_path(mName, filename);
 
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-        struct _stat64i32 tagStat;
-        bool ret = (_wstat(to_wpath(full_path).c_str(), &tagStat) == 0);
-#else
-        struct stat tagStat;
-        bool ret = (stat(full_path.c_str(), &tagStat) == 0);
-#endif
+        bool ret = FileSystemLayer::fileExists(full_path);
 
-        // stat will return true if the filename is absolute, but we need to check
-        // the file is actually in this archive
+        // the lookup will return true if the filename is absolute, but we need to
+        // check the file is actually in this archive
         if (ret && is_absolute_path(filename.c_str()))
         {
             // only valid if full path starts with our base
@@ -532,23 +472,7 @@ namespace {
     {
         String full_path = concatenate_path(mName, filename);
 
-#ifdef _OGRE_FILESYSTEM_ARCHIVE_UNICODE
-		struct _stat64i32 tagStat;
-		bool ret = (_wstat(to_wpath(full_path).c_str(), &tagStat) == 0);
-#else
-        struct stat tagStat;
-        bool ret = (stat(full_path.c_str(), &tagStat) == 0);
-#endif
-
-        if (ret)
-        {
-            return tagStat.st_mtime;
-        }
-        else
-        {
-            return 0;
-        }
-
+        return FileSystemUtil::getFileModifiedTime(full_path);
     }
     //-----------------------------------------------------------------------
     const String& FileSystemArchiveFactory::getType(void) const

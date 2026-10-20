@@ -33,6 +33,9 @@
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
 #endif
+#include "OgreFileSystemLayer.h"
+#include "OgreFileSystemUtil.h"
+#include "OgreRoot.h"
 
 #define MINIZ_HEADER_FILE_ONLY
 #include <miniz.h>
@@ -155,6 +158,22 @@ namespace Ogre
             {
                 // Write to temp file
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#  if OGRE_FILESYSTEM_USE_WIDECHAR
+                // _tempnam returns a name in the ANSI code page, which cannot
+                // represent every directory. Use the wide variant and store the
+                // result as UTF-8, like every other Ogre path.
+                wchar_t* wtmpname = _wtempnam(FileSystemUtil::toWide(".").c_str(), L"ogre");
+                if (!wtmpname)
+                {
+                    // Having no file name here will cause various problems later.
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Temporary file name generation failed.", "DeflateStream::init");
+                }
+                else
+                {
+                    mTempFileName = FileSystemUtil::fromWide(wtmpname);
+                    free(wtmpname);
+                }
+#  else
                 char* tmpname = _tempnam(".", "ogre");
                 if (!tmpname)
                 {
@@ -166,6 +185,7 @@ namespace Ogre
                     mTempFileName = tmpname;
                     free(tmpname);
                 }
+#  endif
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
                 mTempFileName = macTempFileName();
 #else
@@ -306,21 +326,20 @@ namespace Ogre
                         "DeflateStream::init");
         }
         
-        std::ifstream inFile;
-        inFile.open(mTempFileName.c_str(), std::ios::in | std::ios::binary);
+        DataStreamPtr inFile = Root::openFileStream(mTempFileName, "");
         
         do 
         {
-            inFile.read(in, OGRE_DEFLATE_TMP_SIZE);
-            mZStream->avail_in = (uInt)inFile.gcount();
-            if (inFile.bad()) 
+            size_t read = inFile->read(in, OGRE_DEFLATE_TMP_SIZE);
+            if (read < OGRE_DEFLATE_TMP_SIZE && !inFile->eof())
             {
                 deflateEnd(mZStream);
                 OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
                             "Error reading temp uncompressed stream!",
                             "DeflateStream::init");
             }
-            flush = inFile.eof() ? Z_FINISH : Z_NO_FLUSH;
+            mZStream->avail_in = (uInt)read;
+            flush = inFile->eof() ? Z_FINISH : Z_NO_FLUSH;
             mZStream->next_in = (Bytef*)in;
             
             /* run deflate() on input until output buffer not full, finish
@@ -342,8 +361,8 @@ namespace Ogre
                 (void)ret;
         deflateEnd(mZStream);
 
-        inFile.close();
-        remove(mTempFileName.c_str());
+        inFile->close();
+        FileSystemLayer::removeFile(mTempFileName);
                         
     }
     //---------------------------------------------------------------------
