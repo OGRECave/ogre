@@ -64,7 +64,7 @@ WaterMesh::WaterMesh(const String& inMeshName, Real planeSize, int inComplexity)
          HardwareBufferManager::getSingleton().createVertexBuffer(
             3*sizeof(float),
             numVertices,
-            HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
+            HBU_CPU_TO_GPU);
     vbind->setBinding(0, posVertexBuffer);
 
     // Prepare buffer for normals - write only
@@ -72,7 +72,7 @@ WaterMesh::WaterMesh(const String& inMeshName, Real planeSize, int inComplexity)
          HardwareBufferManager::getSingleton().createVertexBuffer(
             3*sizeof(float),
             numVertices,
-            HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
+            HBU_CPU_TO_GPU);
     vbind->setBinding(1, normVertexBuffer);
 
     // Prepare texture coords buffer - static one
@@ -88,7 +88,7 @@ WaterMesh::WaterMesh(const String& inMeshName, Real planeSize, int inComplexity)
          HardwareBufferManager::getSingleton().createVertexBuffer(
             2*sizeof(float),
             numVertices,
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+            HBU_GPU_ONLY);
     texcoordsVertexBuffer->writeData(0,
         texcoordsVertexBuffer->getSizeInBytes(),
         texcoordsBufData,
@@ -101,7 +101,7 @@ WaterMesh::WaterMesh(const String& inMeshName, Real planeSize, int inComplexity)
         HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT,
             3*numFaces,
-            HardwareBuffer::HBU_STATIC, true);
+            HBU_GPU_TO_CPU, true);
     unsigned short *faceVertexIndices = (unsigned short*)
         indexBuffer->lock(0, numFaces*3*2, HardwareBuffer::HBL_DISCARD);
     for(y=0 ; y<complexity ; y++) {

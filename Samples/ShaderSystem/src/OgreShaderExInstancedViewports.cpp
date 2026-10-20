@@ -230,7 +230,7 @@ void ShaderExInstancedViewports::setMonitorsCount( const Vector2 monitorCount )
 
     Ogre::HardwareVertexBufferSharedPtr vbuf =
         Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-        vertexDeclaration->getVertexSize(0), monitorCount.x * monitorCount.y, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        vertexDeclaration->getVertexSize(0), monitorCount.x * monitorCount.y, Ogre::HBU_GPU_ONLY);
     vbuf->setInstanceDataStepRate(1);
     vbuf->setIsInstanceData(true);
 

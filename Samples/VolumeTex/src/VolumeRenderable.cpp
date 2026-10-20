@@ -156,7 +156,7 @@ void VolumeRenderable::initialise()
 
     HardwareVertexBufferSharedPtr vbuf = 
     HardwareBufferManager::getSingleton().createVertexBuffer(
-        offset, nvertices, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        offset, nvertices, HBU_GPU_ONLY);
 
     bind->setBinding(0, vbuf);
 
@@ -166,7 +166,7 @@ void VolumeRenderable::initialise()
         createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 
             mSlices*6, 
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+            HBU_GPU_ONLY);
 
     idata->indexBuffer = ibuf;
     idata->indexCount = mSlices*6;

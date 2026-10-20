@@ -258,8 +258,8 @@ void Sample_ShaderSystem::setupContent()
     {
         MeshPtr pMesh = MeshManager::getSingleton().load(curMeshName,
             RGN_DEFAULT,
-            HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, 
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HBU_CPU_TO_GPU,
+            HBU_GPU_ONLY,
             true, true); //so we can still read it
 
         // Build tangent vectors, all our meshes use only 1 texture coordset 

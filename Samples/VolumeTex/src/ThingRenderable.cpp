@@ -93,7 +93,7 @@ void ThingRenderable::initialise()
 
     vbuf = 
     HardwareBufferManager::getSingleton().createVertexBuffer(
-        offset, nvertices, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+        offset, nvertices, HBU_CPU_TO_GPU);
 
     bind->setBinding(0, vbuf);
 
@@ -103,7 +103,7 @@ void ThingRenderable::initialise()
         createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 
             mCount*6, 
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+            HBU_GPU_ONLY);
 
     idata->indexBuffer = ibuf;
     idata->indexCount = mCount*6;

@@ -76,14 +76,14 @@ void GeomUtils::createSphere(VertexData*& vertexData, IndexData*& indexData
 
     // allocate the vertex buffer
     vertexData->vertexCount = (nRings + 1) * (nSegments+1);
-    HardwareVertexBufferSharedPtr vBuf = HardwareBufferManager::getSingleton().createVertexBuffer(vertexDecl->getVertexSize(0), vertexData->vertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+    HardwareVertexBufferSharedPtr vBuf = HardwareBufferManager::getSingleton().createVertexBuffer(vertexDecl->getVertexSize(0), vertexData->vertexCount, HBU_GPU_ONLY, false);
     VertexBufferBinding* binding = vertexData->vertexBufferBinding;
     binding->setBinding(0, vBuf);
     float* pVertex = static_cast<float*>(vBuf->lock(HardwareBuffer::HBL_DISCARD));
 
     // allocate index buffer
     indexData->indexCount = 6 * nRings * (nSegments + 1);
-    indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexData->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+    indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexData->indexCount, HBU_GPU_ONLY, false);
     HardwareIndexBufferSharedPtr iBuf = indexData->indexBuffer;
     unsigned short* pIndices = static_cast<unsigned short*>(iBuf->lock(HardwareBuffer::HBL_DISCARD));
 
@@ -154,7 +154,7 @@ void GeomUtils::createQuad(VertexData*& vertexData)
         HardwareBufferManager::getSingleton().createVertexBuffer(
         vertexDecl->getVertexSize(0),
         vertexData->vertexCount,
-        HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        HBU_GPU_ONLY);
 
     // Bind buffer
     bind->setBinding(0, vbuf);
@@ -204,14 +204,14 @@ void GeomUtils::createCone(Ogre::VertexData*& vertexData, Ogre::IndexData*& inde
     
     // allocate the vertex buffer
     vertexData->vertexCount = nVerticesInBase + 1;
-    HardwareVertexBufferSharedPtr vBuf = HardwareBufferManager::getSingleton().createVertexBuffer(vertexDecl->getVertexSize(0), vertexData->vertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+    HardwareVertexBufferSharedPtr vBuf = HardwareBufferManager::getSingleton().createVertexBuffer(vertexDecl->getVertexSize(0), vertexData->vertexCount, HBU_GPU_ONLY, false);
     VertexBufferBinding* binding = vertexData->vertexBufferBinding;
     binding->setBinding(0, vBuf);
     float* pVertex = static_cast<float*>(vBuf->lock(HardwareBuffer::HBL_DISCARD));
 
     // allocate index buffer - cone and base
     indexData->indexCount = (3 * nVerticesInBase) + (3 * (nVerticesInBase - 2));
-    indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexData->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+    indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexData->indexCount, HBU_GPU_ONLY, false);
     HardwareIndexBufferSharedPtr iBuf = indexData->indexBuffer;
     unsigned short* pIndices = static_cast<unsigned short*>(iBuf->lock(HardwareBuffer::HBL_DISCARD));
 
