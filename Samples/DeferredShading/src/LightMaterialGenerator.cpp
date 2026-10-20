@@ -190,13 +190,11 @@ public:
                 { "farClipDistance",    GpuProgramParameters::ACT_FAR_CLIP_DISTANCE },
                 { "shadowViewProjMat",  GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX }
             };
-            int numParams = sizeof(AUTO_PARAMS) / sizeof(AutoParamPair);
-
-            for (int i=0; i<numParams; i++)
+            for (const auto& param : AUTO_PARAMS)
             {
-                if (params->_findNamedConstantDefinition(AUTO_PARAMS[i].name))
+                if (params->_findNamedConstantDefinition(param.name))
                 {
-                    params->setNamedAutoConstant(AUTO_PARAMS[i].name, AUTO_PARAMS[i].type);
+                    params->setNamedAutoConstant(param.name, param.type);
                 }
             }
         }
@@ -371,13 +369,11 @@ protected:
             { "farClipDistance",    GpuProgramParameters::ACT_FAR_CLIP_DISTANCE },
             { "shadowViewProjMat",  GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX }
         };
-        int numParams = sizeof(AUTO_PARAMS) / sizeof(AutoParamPair);
-        
-        for (int i=0; i<numParams; i++)
+        for (const auto& param : AUTO_PARAMS)
         {
-            if (params->_findNamedConstantDefinition(AUTO_PARAMS[i].name))
+            if (params->_findNamedConstantDefinition(param.name))
             {
-                params->setNamedAutoConstant(AUTO_PARAMS[i].name, AUTO_PARAMS[i].type);
+                params->setNamedAutoConstant(param.name, param.type);
             }
         }
     }

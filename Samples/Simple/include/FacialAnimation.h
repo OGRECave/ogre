@@ -124,19 +124,19 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
         mManualAnimState->setEnabled(!play);
 
         // toggle expression controls
-        for (unsigned int i = 0; i < mExpressions.size(); i++)
+        for (auto* expression : mExpressions)
         {
-            mTrayMgr->moveWidgetToTray(mExpressions[i], play ? TL_NONE : TL_TOPLEFT);
-            if (play) mExpressions[i]->hide();
-            else mExpressions[i]->show();
+            mTrayMgr->moveWidgetToTray(expression, play ? TL_NONE : TL_TOPLEFT);
+            if (play) expression->hide();
+            else expression->show();
         }
 
         // toggle mouth shape controls
-        for (unsigned int i = 0; i < mMouthShapes.size(); i++)
+        for (auto* mouthShape : mMouthShapes)
         {
-            mTrayMgr->moveWidgetToTray(mMouthShapes[i], play ? TL_NONE : TL_TOPRIGHT);
-            if (play) mMouthShapes[i]->hide();
-            else mMouthShapes[i]->show();
+            mTrayMgr->moveWidgetToTray(mouthShape, play ? TL_NONE : TL_TOPRIGHT);
+            if (play) mouthShape->hide();
+            else mouthShape->show();
         }
     }
 

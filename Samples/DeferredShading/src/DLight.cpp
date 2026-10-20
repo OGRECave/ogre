@@ -301,9 +301,8 @@ void DLight::updateFromCamera(Ogre::Camera* camera)
     Ogre::Technique* tech = mat->getBestTechnique();
     Ogre::Vector3 farCorner = camera->getViewMatrix(true) * camera->getWorldSpaceCorners()[4];
 
-    for (unsigned short i=0; i<tech->getNumPasses(); i++) 
+    for (auto* pass : tech->getPasses())
     {
-        Ogre::Pass* pass = tech->getPass(i);
         // get the vertex shader parameters
         Ogre::GpuProgramParametersSharedPtr params = pass->getVertexProgramParameters();
         // set the camera's far-top-right corner

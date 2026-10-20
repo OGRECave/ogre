@@ -149,9 +149,9 @@ void Sample_Ocean::setupGUI(void)
     SelectMenu* selectMenu = mTrayMgr->createLongSelectMenu(
         TL_TOPLEFT, "MaterialSelectMenu", "Material", 300, 200, 5);
     
-    for (size_t i=0; i<mMaterialControlsContainer.size(); i++)
+    for (const auto& control : mMaterialControlsContainer)
     {
-        selectMenu->addItem(mMaterialControlsContainer[i].getDisplayName());
+        selectMenu->addItem(control.getDisplayName());
     }
 
     mTrayMgr->createCheckBox(TL_TOPLEFT, "SpinLightButton", "Spin Light", 175)->setChecked(true);

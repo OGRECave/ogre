@@ -146,11 +146,11 @@ void TimeEventDispatcher::dispatchForwardInclusive(float lastTime, float thisTim
 {
     for (const TimeEventList * events : mEventLists)
     {
-        for (auto ie = events->begin(); ie != events->end(); ++ie)
+        for (const auto& event : *events)
         {
-            if (ie->first >= lastTime && ie->first <= thisTime)
+            if (event.first >= lastTime && event.first <= thisTime)
             {
-                dispatchEvent(ie->second, TED_FORWARD);
+                dispatchEvent(event.second, TED_FORWARD);
             }
         }
     }
@@ -160,11 +160,11 @@ void TimeEventDispatcher::dispatchForwardExclusive(float lastTime, float thisTim
 {
     for (const TimeEventList * events : mEventLists)
     {
-        for (auto ie = events->begin(); ie != events->end(); ++ie)
+        for (const auto& event : *events)
         {
-            if (ie->first >= lastTime && ie->first < thisTime)
+            if (event.first >= lastTime && event.first < thisTime)
             {
-                dispatchEvent(ie->second, TED_FORWARD);
+                dispatchEvent(event.second, TED_FORWARD);
             }
         }
     }

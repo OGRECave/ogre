@@ -331,10 +331,8 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
             {
                 const CompositionTechnique::TextureDefinitions& defs =
                     instance->getTechnique()->getTextureDefinitions();
-                CompositionTechnique::TextureDefinitions::const_iterator defIter;
-                for (defIter = defs.begin(); defIter != defs.end(); ++defIter)
+                for (auto* texDef : defs)
                 {
-                    CompositionTechnique::TextureDefinition* texDef = *defIter;
                     size_t numTextures = texDef->formatList.size();
                     if (numTextures > 1)
                     {

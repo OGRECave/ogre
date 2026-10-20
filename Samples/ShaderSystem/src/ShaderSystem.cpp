@@ -542,9 +542,8 @@ static void setNormalMap(Pass* pass, const String& normalMapName)
 
 void Sample_ShaderSystem::generateShaders(Entity* entity)
 {
-    for (unsigned int i=0; i < entity->getNumSubEntities(); ++i)
+    for (auto* curSubEntity : entity->getSubEntities())
     {
-        SubEntity* curSubEntity = entity->getSubEntity(i);
         MaterialPtr curMaterial = curSubEntity->getMaterial();
         bool success;
 
@@ -978,12 +977,9 @@ void Sample_ShaderSystem::pickTargetObject( const MouseButtonEvent &evt )
     mRayQuery->setRay(mouseRay);
 
     RaySceneQueryResult &result = mRayQuery->execute();
-    RaySceneQueryResult::iterator it = result.begin();
-    RaySceneQueryResult::iterator itEnd = result.end();
 
-    for (; it != itEnd; ++it)
+    for (auto& curEntry : result)
     {
-        RaySceneQueryResultEntry& curEntry = *it;
         
         if (mTargetObj != NULL)
         {
@@ -1019,10 +1015,8 @@ void Sample_ShaderSystem::updateTargetObjInfo()
         {
             Technique* shaderGeneratedTech = NULL;
 
-            for (unsigned int i=0; i < matMainEnt->getNumTechniques(); ++i)
+            for (auto* curTech : matMainEnt->getTechniques())
             {
-                Technique* curTech = matMainEnt->getTechnique(i);
-
                 if (curTech->getSchemeName() == MSN_SHADERGEN)
                 {
                     shaderGeneratedTech = curTech;

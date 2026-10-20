@@ -77,10 +77,9 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
         // Go through all sections & controls in the file
         Ogre::String secName, typeName, materialName, dataString;
 
-        Ogre::ConfigFile::SettingsBySection_::const_iterator seci;
-        for(seci = cf.getSettingsBySection().begin(); seci != cf.getSettingsBySection().end(); ++seci) {
-            secName = seci->first;
-            const Ogre::ConfigFile::SettingsMultiMap& settings = seci->second;
+        for (const auto& section : cf.getSettingsBySection()) {
+            secName = section.first;
+            const Ogre::ConfigFile::SettingsMultiMap& settings = section.second;
             if (!secName.empty())
             {
                 materialName = cf.getSetting("material", secName);
@@ -98,12 +97,10 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
 
                 size_t idx = controlsContainer.size() - 1;
 
-                Ogre::ConfigFile::SettingsMultiMap::const_iterator i;
-
-                for (i = settings.begin(); i != settings.end(); ++i)
+                for (const auto& setting : settings)
                 {
-                    typeName = i->first;
-                    dataString = i->second;
+                    typeName = setting.first;
+                    dataString = setting.second;
                     if (typeName == "control")
                         controlsContainer[idx].addControl(dataString);
                 }
