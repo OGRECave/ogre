@@ -42,7 +42,11 @@ namespace Ogre
         In order to still be able to store graphics settings and log
         output and for the user to overwrite the default Ogre config files,
         this class tries to create a folder inside the user's home directory.
-      */
+
+        @note All paths returned by this class are encoded as UTF-8, even on
+        Windows, and can be passed to Root::openFileStream,
+        Root::createFileStream and the static file operations below.
+    */
     class _OgreExport FileSystemLayer : public FileSystemLayerAlloc
     {
     public:

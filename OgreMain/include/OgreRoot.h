@@ -528,6 +528,11 @@ namespace Ogre
             the file will be created in the normal filesystem using that specification.
             If it doesn't, then the method will look for a writeable resource location
             via ResourceGroupManager::createResource using the other params provided.
+        @note This is the preferred way to create files. On Windows, paths are
+            expected to be UTF-8 encoded and this method performs the required
+            conversion to the wide character API. Do not pass an Ogre::String
+            directly to std::ofstream or fopen, as those interpret it using the
+            ANSI code page and fail for non-ASCII paths.
         @param filename The name of the file to create. If it includes path separators,
             the filesystem will be accessed direct. If no path separators are
             present the resource system is used, falling back on the raw filesystem after.
@@ -550,6 +555,12 @@ namespace Ogre
             This is a high-level utility method which you can use to find a place to
             open a file more easily. It checks the resource system first, and if
             that fails falls back on accessing the file system directly.
+
+            @note This is the preferred way to open files. On Windows, paths are
+            expected to be UTF-8 encoded and this method performs the required
+            conversion to the wide character API. Do not pass an Ogre::String
+            directly to std::ifstream or fopen, as those interpret it using the
+            ANSI code page and fail for non-ASCII paths.
         @param filename The name of the file to open.
         @param groupName The name of the group in which to create the file, if the
             resource system is used
