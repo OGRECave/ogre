@@ -29,6 +29,8 @@
 
 #include "OgreComponents.h"
 
+#include <memory>
+
 #include "AtomicCounters.h"
 #include "BezierPatch.h"
 #include "BSP.h"
@@ -189,20 +191,20 @@ DefaultSamplesPlugin::~DefaultSamplesPlugin()
 }
 
 #ifndef OGRE_STATIC_LIB
-static SamplePlugin* sp;
+static std::unique_ptr<SamplePlugin> sp;
 
 extern "C" void _OgreSampleExport dllStartPlugin(void);
 extern "C" void _OgreSampleExport dllStopPlugin(void);
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
-    sp = new DefaultSamplesPlugin();
-    Root::getSingleton().installPlugin(sp);
+    sp = std::make_unique<DefaultSamplesPlugin>();
+    Root::getSingleton().installPlugin(sp.get());
 }
 
 extern "C" _OgreSampleExport void dllStopPlugin()
 {
-    Root::getSingleton().uninstallPlugin(sp);
-    delete sp;
+    Root::getSingleton().uninstallPlugin(sp.get());
+    sp.reset();
 }
 #endif

@@ -42,6 +42,8 @@
 #include "OgreArchiveManager.h"
 #include "SdkSample.h"
 
+#include <memory>
+
 #define ENABLE_SHADERS_CACHE 1
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
@@ -75,7 +77,7 @@ namespace OgreBites
     class SampleBrowser : public SampleContext, public TrayListener, public Ogre::RenderTargetListener
     {
 #ifdef OGRE_STATIC_LIB
-        typedef std::map<Ogre::String, SamplePlugin*> PluginMap;
+        typedef std::map<Ogre::String, std::unique_ptr<SamplePlugin>> PluginMap;
         PluginMap mPluginNameMap;                      // A structure to map plugin names to class types
 #endif
     public:
@@ -84,7 +86,7 @@ namespace OgreBites
     : SampleContext("OGRE Sample Browser"), mGrabInput(!nograb)
         {
             mIsShuttingDown = false;
-            mTrayMgr = 0;
+            mTrayMgr.reset();
             mLastViewCategory = 0;
             mLastViewTitle = 0;
             mLastSampleIndex = -1;
@@ -320,7 +322,7 @@ namespace OgreBites
                 }
 
                 mWindow->addListener(this);
-                mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {this, mTrayMgr, getImGuiInputListener()});
+                mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {this, mTrayMgr.get(), getImGuiInputListener()});
 
                 mTrayMgr->removeWidgetFromTray("StartStop");
                 mTrayMgr->removeWidgetFromTray("Configure");
@@ -355,7 +357,7 @@ namespace OgreBites
                 else
                     Ogre::ImGuiOverlay::NewFrame(); // clear dialog
 
-                mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {this, mTrayMgr});
+                mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {this, mTrayMgr.get()});
                 mWindow->removeListener(this);
 
                 while (!mTrayMgr->getWidgets(TL_NONE).empty())
@@ -700,14 +702,14 @@ namespace OgreBites
             ApplicationContext::setup();
             mWindow = getRenderWindow();
 
-            mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {this, mTrayMgr});
+            mInputListenerChain = TouchAgnosticInputListenerChain(mWindow, {this, mTrayMgr.get()});
             addInputListener(&mInputListenerChain);
             if(mGrabInput) setWindowGrab();
             else mTrayMgr->hideCursor();
 #ifdef OGRE_STATIC_LIB
-            mPluginNameMap["DefaultSamples"] = new DefaultSamplesPlugin();
+            mPluginNameMap["DefaultSamples"] = std::make_unique<DefaultSamplesPlugin>();
 #   ifdef SAMPLES_INCLUDE_PLAYPEN
-            mPluginNameMap["PlaypenTests"] = new  PlaypenTestPlugin();
+            mPluginNameMap["PlaypenTests"] = std::make_unique<PlaypenTestPlugin>();
 #   endif
 #endif
 
@@ -780,7 +782,7 @@ namespace OgreBites
 #endif
 
             Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
-            mTrayMgr = new TrayManager("BrowserControls", getRenderWindow(), this);
+            mTrayMgr = std::make_unique<TrayManager>("BrowserControls", getRenderWindow(), this);
             mTrayMgr->showBackdrop("SdkTrays/Bands");
             mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
@@ -872,7 +874,7 @@ namespace OgreBites
 
                 mLoadedSamplePlugins.push_back(sampleDir + s);   // add to records
 #else
-                SamplePlugin* sp = mPluginNameMap[s];
+                SamplePlugin* sp = mPluginNameMap[s].get();
 #endif
 
                 // go through every sample in the plugin...
@@ -1048,11 +1050,7 @@ namespace OgreBites
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             [mGestureView release];
 #endif
-            if (mTrayMgr)
-            {
-                delete mTrayMgr;
-                mTrayMgr = 0;
-            }
+            mTrayMgr.reset();
 
             if (!mCurrentSample && mRoot->getRenderSystem() != NULL) destroyDummyScene();
 
@@ -1107,7 +1105,7 @@ namespace OgreBites
             mHiddenOverlays.clear();
         }
 
-        TrayManager* mTrayMgr;                      // SDK tray interface
+        std::unique_ptr<TrayManager> mTrayMgr;      // SDK tray interface
         Ogre::StringVector mLoadedSamplePlugins;       // loaded sample plugins
         std::set<Ogre::String> mSampleCategories;      // sample categories
         SampleSet mLoadedSamples;                      // loaded samples

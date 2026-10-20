@@ -30,7 +30,7 @@ public:
 protected:
     Ogre::GpuProgramParametersSharedPtr fpParams;
     float start, end, curr;
-    Ogre::Timer *timer;
+    Ogre::Timer timer;
 };
 //---------------------------------------------------------------------------
 class HDRListener: public Ogre::CompositorInstance::Listener
@@ -71,11 +71,11 @@ public:
 //---------------------------------------------------------------------------
 Ogre::CompositorInstance::Listener* HDRLogic::createListener(Ogre::CompositorInstance* instance)
 {
-    HDRListener* listener = new HDRListener;
+    auto listener = std::make_unique<HDRListener>();
     Ogre::Viewport* vp = instance->getChain()->getViewport();
     listener->notifyViewportSize(vp->getActualWidth(), vp->getActualHeight());
     listener->notifyCompositor(instance);
-    return listener;
+    return listener.release();
 }
 //---------------------------------------------------------------------------
 Ogre::CompositorInstance::Listener* HeatVisionLogic::createListener(Ogre::CompositorInstance* instance)
@@ -85,10 +85,10 @@ Ogre::CompositorInstance::Listener* HeatVisionLogic::createListener(Ogre::Compos
 //---------------------------------------------------------------------------
 Ogre::CompositorInstance::Listener* GaussianBlurLogic::createListener(Ogre::CompositorInstance* instance)
 {
-    GaussianListener* listener = new GaussianListener;
+    auto listener = std::make_unique<GaussianListener>();
     Ogre::Viewport* vp = instance->getChain()->getViewport();
     listener->notifyViewportSize(vp->getActualWidth(), vp->getActualHeight());
-    return listener;
+    return listener.release();
 }
 /*************************************************************************
                         HeatVisionListener Methods
@@ -96,20 +96,16 @@ Ogre::CompositorInstance::Listener* GaussianBlurLogic::createListener(Ogre::Comp
 //---------------------------------------------------------------------------
 HeatVisionListener::HeatVisionListener()
 {
-    timer = new Ogre::Timer();
     start = end = curr = 0.0f;
 }
 //---------------------------------------------------------------------------
-HeatVisionListener::~HeatVisionListener()
-{
-   delete timer;
-}
+HeatVisionListener::~HeatVisionListener() = default;
 //---------------------------------------------------------------------------
 void HeatVisionListener::notifyMaterialSetup(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat)
 {
     if(pass_id == 0xDEADBABE)
     {
-        timer->reset();
+        timer.reset();
         fpParams =
             mat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
     }
@@ -123,7 +119,7 @@ void HeatVisionListener::notifyMaterialRender(Ogre::uint32 pass_id, Ogre::Materi
         fpParams->setNamedConstant("random_fractions", Ogre::Vector4(Ogre::Math::RangeRandom(0.0, 1.0), Ogre::Math::RangeRandom(0, 1.0), 0, 0));
 
         // "depth_modulator" parameter
-        float inc = ((float)timer->getMilliseconds())/1000.0f;
+        float inc = ((float)timer.getMilliseconds())/1000.0f;
         if ( (std::fabs(curr-end) <= 0.001) ) {
             // take a new value to reach
             end = Ogre::Math::RangeRandom(0.95, 1.0);
@@ -132,7 +128,7 @@ void HeatVisionListener::notifyMaterialRender(Ogre::uint32 pass_id, Ogre::Materi
             if (curr > end) curr -= inc;
             else curr += inc;
         }
-        timer->reset();
+        timer.reset();
 
         fpParams->setNamedConstant("depth_modulator", Ogre::Vector4(curr, 0, 0, 0));
     }

@@ -17,6 +17,8 @@ same license as the rest of the engine.
 
 #include "OgreSimpleRenderable.h"
 
+#include <memory>
+
 // Renderable for rendering Ambient component and also to
 // establish the depths
 
@@ -46,6 +48,7 @@ public:
 
     void updateFromCamera(Ogre::Camera* camera);
 protected:
+    std::unique_ptr<Ogre::VertexData> mVertexData;
     Ogre::Real mRadius;
     Ogre::MaterialPtr mMatPtr;
 };

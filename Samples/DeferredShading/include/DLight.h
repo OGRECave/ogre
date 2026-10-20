@@ -18,6 +18,8 @@ same license as the rest of the engine.
 #include "OgreSimpleRenderable.h"
 #include "MaterialGenerator.h"
 
+#include <memory>
+
 /** Deferred light geometry. Each instance matches a normal light.
     Should not be created by the user.
     XXX support other types of light other than point lights.
@@ -78,6 +80,8 @@ protected:
      */
     void setSpecularColour(const Ogre::ColourValue &col);
 
+    std::unique_ptr<Ogre::IndexData> mIndexData;
+    std::unique_ptr<Ogre::VertexData> mVertexData;
     /// The light that this DLight renders
     Ogre::Light* mParentLight;
     /// Mode to ignore world orientation/position

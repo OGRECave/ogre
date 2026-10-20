@@ -48,7 +48,7 @@ struct FireworkParticle
 
     void Sample_ParticleGS::createProceduralParticleSystem()
     {
-        mParticleSystem = new ProceduralManualObject();
+        mParticleSystem = std::make_unique<ProceduralManualObject>();
         mParticleSystem->_notifyManager(mSceneMgr);
         MaterialPtr mat = MaterialManager::getSingleton().getByName("Ogre/ParticleGS/Display", "General");
         mParticleSystem->setMaterial(mat);
@@ -114,7 +114,7 @@ struct FireworkParticle
         mSceneMgr->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
 
         createProceduralParticleSystem();
-        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mParticleSystem);
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mParticleSystem.get());
         // mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mParticleSystem->getManualObject());
 
         // Add an ogre head to the scene.
@@ -139,8 +139,7 @@ struct FireworkParticle
 
     void Sample_ParticleGS::cleanupContent()
     {
-        delete mParticleSystem;
-        mParticleSystem = 0;
+        mParticleSystem.reset();
 
         MeshManager::getSingleton().remove("Myplane", RGN_DEFAULT);
     }

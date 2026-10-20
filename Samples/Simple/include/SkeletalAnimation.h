@@ -186,7 +186,7 @@ public:
 
     void setUseRootMotion(Entity* entity, NodeAnimationTrack* track)
     {
-        mRootMotionApplier.reset(new RootMotionApplier(mAnimationState, entity, track));
+        mRootMotionApplier = std::make_unique<RootMotionApplier>(mAnimationState, entity, track);
     }
 
     RootMotionApplier * getRootMotionApplier() { return mRootMotionApplier.get(); }
@@ -197,7 +197,7 @@ public:
         {
             if (!mTimeEventDispatcher)
             {
-                mTimeEventDispatcher.reset(new TimeEventDispatcher);
+                mTimeEventDispatcher = std::make_unique<TimeEventDispatcher>();
             }
         }
         else

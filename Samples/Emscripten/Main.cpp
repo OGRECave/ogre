@@ -28,17 +28,18 @@
 
 #include "Context.h"
 
-static Context* sampleInst = NULL;
+#include <memory>
+
+static std::unique_ptr<Context> sampleInst;
 
 int main( int argc, const char* argv[] ) {
     try
     {
-        sampleInst = new Context();
+        sampleInst = std::make_unique<Context>();
         sampleInst->initApp();
-        emscripten_set_main_loop_arg(Context::_mainLoop, sampleInst, 0, 1);
+        emscripten_set_main_loop_arg(Context::_mainLoop, sampleInst.get(), 0, 1);
         sampleInst->closeApp();
-        delete sampleInst;
-        sampleInst = NULL;
+        sampleInst.reset();
     }
     catch ( std::exception& e )
     {

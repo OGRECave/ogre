@@ -73,7 +73,7 @@ static void prepareCircleMaterial()
 class _OgreSampleClassExport Sample_Water : public SdkSample
 {
 public:
-    Sample_Water(): waterMesh(0)
+    Sample_Water()
     {
         mInfo["Title"] = "Water";
         mInfo["Description"] = "A demo of a simple water effect.";
@@ -82,7 +82,7 @@ public:
     }
     
 protected:
-    WaterMesh *waterMesh ;
+    std::unique_ptr<WaterMesh> waterMesh ;
     Entity *waterEntity ;
     AnimationState* mAnimState;
     SceneNode *headNode ;
@@ -103,7 +103,7 @@ protected:
         Light* l = mSceneMgr->createLight("MainLight");
         
         // Create water mesh and entity
-        waterMesh = new WaterMesh(MESH_NAME, PLANE_SIZE, COMPLEXITY);
+        waterMesh = std::make_unique<WaterMesh>(MESH_NAME, PLANE_SIZE, COMPLEXITY);
         waterEntity = mSceneMgr->createEntity(ENTITY_NAME,
                                               MESH_NAME);
         //~ waterEntity->setMaterialName(MATERIAL_NAME);
@@ -208,8 +208,7 @@ protected:
     
     void cleanupContent() override
     {
-        delete waterMesh;
-        waterMesh = 0;
+        waterMesh.reset();
     }
     
 protected:

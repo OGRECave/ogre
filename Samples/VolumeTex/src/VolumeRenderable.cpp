@@ -23,6 +23,9 @@ same license as the rest of the engine.
 #include "OgreTextureUnitState.h"
 #include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
+
+#include <vector>
+
 using namespace Ogre;
 
 VolumeRenderable::VolumeRenderable(size_t nSlices, float size, const String &texture):
@@ -42,10 +45,6 @@ VolumeRenderable::~VolumeRenderable()
 {
     // Remove private material
     MaterialManager::getSingleton().remove(mTexture, "VolumeRenderable");
-    // need to release IndexData and vertexData created for renderable
-    delete mRenderOp.indexData;
-    delete mRenderOp.vertexData;
-
 }
 
 void VolumeRenderable::_notifyCurrentCamera( Camera* cam )
@@ -98,11 +97,13 @@ void VolumeRenderable::initialise()
     size_t elemsize = 3*3;
     size_t dsize = elemsize*nvertices;
     
-    Ogre::IndexData *idata = new Ogre::IndexData();
-    Ogre::VertexData *vdata = new Ogre::VertexData();
+    mIndexData = std::make_unique<Ogre::IndexData>();
+    mVertexData = std::make_unique<Ogre::VertexData>();
+    Ogre::IndexData *idata = mIndexData.get();
+    Ogre::VertexData *vdata = mVertexData.get();
     
     // Create  structures
-    float *vertices = new float[dsize];
+    std::vector<float> vertices(dsize);
     
     float coords[4][2] = {
         {0.0f, 0.0f},
@@ -132,7 +133,7 @@ void VolumeRenderable::initialise()
             vertices[x*4*elemsize+y*elemsize+8] = zcoord*sqrtf(3.0f);
         } 
     }
-    unsigned short *faces = new unsigned short[mSlices*6];
+    std::vector<unsigned short> faces(mSlices * 6);
     for(uint16 x=0; x<uint16(mSlices); x++)
     {
         faces[x*6+0] = x*4+0;
@@ -160,7 +161,7 @@ void VolumeRenderable::initialise()
 
     bind->setBinding(0, vbuf);
 
-    vbuf->writeData(0, vbuf->getSizeInBytes(), vertices, true);
+    vbuf->writeData(0, vbuf->getSizeInBytes(), vertices.data(), true);
     
     HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
         createIndexBuffer(
@@ -171,12 +172,8 @@ void VolumeRenderable::initialise()
     idata->indexBuffer = ibuf;
     idata->indexCount = mSlices*6;
     idata->indexStart = 0;
-    ibuf->writeData(0, ibuf->getSizeInBytes(), faces, true);
+    ibuf->writeData(0, ibuf->getSizeInBytes(), faces.data(), true);
 
-    // Delete temporary buffers
-    delete [] vertices;
-    delete [] faces;
-    
     // Now make the render operation
     mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
     mRenderOp.indexData = idata;

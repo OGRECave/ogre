@@ -32,19 +32,20 @@ DeferredLightRenderOperation::DeferredLightRenderOperation(
     mTexName1 = instance->getTextureInstanceName(input1.name, input1.mrtIndex);
 
     // Create lights material generator
-    mLightMaterialGenerator = new LightMaterialGenerator();
+    mLightMaterialGenerator = std::make_unique<LightMaterialGenerator>();
 
     // Create the ambient light
-    mAmbientLight = new AmbientLight();
+    mAmbientLight = std::make_unique<AmbientLight>();
     const MaterialPtr& mat = mAmbientLight->getMaterial();
     mat->load();
 }
 //-----------------------------------------------------------------------
 DLight* DeferredLightRenderOperation::createDLight(Ogre::Light* light)
 {
-    DLight *rv = new DLight(mLightMaterialGenerator,light);
-    mLights[light] = rv;
-    return rv;
+    auto rv = std::make_unique<DLight>(mLightMaterialGenerator.get(), light);
+    DLight* dLight = rv.get();
+    mLights[light] = std::move(rv);
+    return dLight;
 }
 //-----------------------------------------------------------------------
 static void injectTechnique(SceneManager* sm, Technique* tech, Renderable* rend, const Ogre::LightList* lightList)
@@ -69,7 +70,7 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
 
     mAmbientLight->updateFromCamera(cam);
     Technique* tech = mAmbientLight->getMaterial()->getBestTechnique();
-    injectTechnique(sm, tech, mAmbientLight, 0);
+    injectTechnique(sm, tech, mAmbientLight.get(), 0);
 
     const LightList& lightList = sm->_getLightsAffectingFrustum();
     for (auto *l : lightList)
@@ -89,7 +90,7 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
         }
         else
         {
-            dLight = dLightIt->second;
+            dLight = dLightIt->second.get();
             dLight->updateFromParent();
         }
         dLight->updateFromCamera(cam);
@@ -119,15 +120,5 @@ void DeferredLightRenderOperation::execute(SceneManager *sm, RenderSystem *rs)
 }
 //! [execute]
 //-----------------------------------------------------------------------
-DeferredLightRenderOperation::~DeferredLightRenderOperation()
-{
-    for (const auto& l : mLights)
-    {
-        delete l.second;
-    }
-    mLights.clear();
-
-    delete mAmbientLight;
-    delete mLightMaterialGenerator;
-}
+DeferredLightRenderOperation::~DeferredLightRenderOperation() = default;
 //-----------------------------------------------------------------------

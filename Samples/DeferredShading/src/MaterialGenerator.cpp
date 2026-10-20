@@ -29,7 +29,7 @@ same license as the rest of the engine.
 using namespace Ogre;
 
 MaterialGenerator::MaterialGenerator():
-    vsMask(0), fsMask(0), matMask(0), mImpl(0)
+    vsMask(0), fsMask(0), matMask(0)
 {
 }
 MaterialGenerator::~MaterialGenerator()
@@ -42,8 +42,6 @@ MaterialGenerator::~MaterialGenerator()
     for(const auto& m : mMaterials) {
         MaterialManager::getSingleton().remove(m.second);
     }
-
-    delete mImpl;
 }
 
 const MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)

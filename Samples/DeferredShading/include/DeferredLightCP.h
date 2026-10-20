@@ -45,14 +45,14 @@ private:
     Ogre::String mTexName1;
 
     //The material generator for the light geometry
-    MaterialGenerator* mLightMaterialGenerator;
+    std::unique_ptr<MaterialGenerator> mLightMaterialGenerator;
 
     //The map of deferred light geometries already constructed
-    typedef std::map<Ogre::Light*, DLight*> LightsMap;
+    typedef std::map<Ogre::Light*, std::unique_ptr<DLight>> LightsMap;
     LightsMap mLights;
 
     //The ambient light used to render the scene
-    AmbientLight* mAmbientLight;
+    std::unique_ptr<AmbientLight> mAmbientLight;
 
     //The viewport that we are rendering to
     Ogre::Viewport* mViewport;

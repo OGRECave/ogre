@@ -25,8 +25,8 @@ same license as the rest of the engine.
 #include "Julia.h"
 
 namespace {
-SimpleRenderable *vrend;
-SimpleRenderable *trend;
+std::unique_ptr<VolumeRenderable> vrend;
+std::unique_ptr<ThingRenderable> trend;
 SceneNode *snode,*fnode;
 }
 
@@ -55,13 +55,13 @@ void Sample_VolumeTex::setupContent()
     // Create volume renderable
     snode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));
 
-    vrend = new VolumeRenderable(32, 750.0f, "DynaTex");
-    snode->attachObject( vrend );
+    vrend = std::make_unique<VolumeRenderable>(32, 750.0f, "DynaTex");
+    snode->attachObject(vrend.get());
 
-    trend = new ThingRenderable(90.0f, 32, 7.5f);
+    trend = std::make_unique<ThingRenderable>(90.0f, 32, 7.5f);
     MaterialPtr mat = MaterialManager::getSingleton().getByName("Examples/VTDarkStuff", "General");
     trend->setMaterial(mat);
-    snode->attachObject(trend);
+    snode->attachObject(trend.get());
 
     // Ogre head node
     fnode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));
@@ -108,15 +108,15 @@ bool Sample_VolumeTex::frameRenderingQueued(const FrameEvent &evt)
 {
     //snode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
     //fnode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
-    static_cast<ThingRenderable*>(trend)->addTime(evt.timeSinceLastFrame * 0.05f);
+    trend->addTime(evt.timeSinceLastFrame * 0.05f);
     return SdkSample::frameRenderingQueued(evt);
 }
 
 void Sample_VolumeTex::cleanupContent()
 {
     TextureManager::getSingleton().remove("DynaTex", "VolumeRenderable");
-    delete vrend;
-    delete trend;
+    vrend.reset();
+    trend.reset();
 }
 
 void Sample_VolumeTex::generate()

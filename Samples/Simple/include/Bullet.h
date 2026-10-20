@@ -52,8 +52,8 @@ public:
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(level);
 
         // Physics world and debug drawing
-        mDynWorld.reset(new Bullet::DynamicsWorld(Vector3(0, -9.8, 0)));
-        mDbgDraw.reset(new Bullet::DebugDrawer(mSceneMgr->getRootSceneNode(), mDynWorld->getBtWorld()));
+        mDynWorld = std::make_unique<Bullet::DynamicsWorld>(Vector3(0, -9.8, 0));
+        mDbgDraw = std::make_unique<Bullet::DebugDrawer>(mSceneMgr->getRootSceneNode(), mDynWorld->getBtWorld());
 
         mDynWorld->addRigidBody(5, player, Bullet::CT_SPHERE);
         mDynWorld->addRigidBody(0, level, Bullet::CT_TRIMESH);

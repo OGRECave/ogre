@@ -18,6 +18,7 @@ conditions of the standard open source license.
 #include "OgreCompositorInstance.h"
 #include "OgreCompositorLogic.h"
 #include <map>
+#include <memory>
 
 //The simple types of compositor logics will all do the same thing -
 //Attach a listener to the created compositor
@@ -26,23 +27,26 @@ class ListenerFactoryLogic : public Ogre::CompositorLogic
 public:
     void compositorInstanceCreated(Ogre::CompositorInstance* newInstance) override
     {
-        Ogre::CompositorInstance::Listener* listener = createListener(newInstance);
+        auto* listener = createListener(newInstance);
         newInstance->addListener(listener);
-        mListeners[newInstance] = listener;
+        mListeners[newInstance].reset(listener);
     }
 
     void compositorInstanceDestroyed(Ogre::CompositorInstance* destroyedInstance) override
     {
-        destroyedInstance->removeListener(mListeners[destroyedInstance]);
-        delete mListeners[destroyedInstance];
-        mListeners.erase(destroyedInstance);
+        auto it = mListeners.find(destroyedInstance);
+        if (it == mListeners.end())
+            return;
+
+        destroyedInstance->removeListener(it->second.get());
+        mListeners.erase(it);
     }
 
 protected:
     //This is the method that implementers will need to create
     virtual Ogre::CompositorInstance::Listener* createListener(Ogre::CompositorInstance* instance) = 0;
 private:
-    typedef std::map<Ogre::CompositorInstance*, Ogre::CompositorInstance::Listener*> ListenerMap;
+    typedef std::map<Ogre::CompositorInstance*, std::unique_ptr<Ogre::CompositorInstance::Listener>> ListenerMap;
     ListenerMap mListeners;
 
 };
