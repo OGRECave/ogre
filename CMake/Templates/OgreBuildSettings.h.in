@@ -105,4 +105,9 @@ WARNING: Disabling this will make the samples unusable.
 
 #cmakedefine01 OGRE_NO_LOCALE_STRCONVERT
 
+/** If set to 1, all file system paths are expected to be UTF-8 encoded and
+    the wide character (wchar_t) file system routines are used on Windows.
+*/
+#cmakedefine01 OGRE_CONFIG_FILESYSTEM_UNICODE
+
 #endif

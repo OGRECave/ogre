@@ -47,6 +47,11 @@ namespace Ogre
         return false;
     }
     //---------------------------------------------------------------------
+    bool FileSystemLayer::createDirectory(const Ogre::String& path)
+    {
+        return false;
+    }
+    //---------------------------------------------------------------------
     bool FileSystemLayer::removeDirectory(const Ogre::String& path)
     {
         return false;

@@ -48,6 +48,8 @@ THE SOFTWARE.
 //#  define _OGRE_FILESYSTEM_ARCHIVE_UNICODE // base path and resources subpathes expected to be in UTF-8 and wchar_t file IO routines are used
 #endif
 
+#include "OgreFileSystemUtil.h"
+
 namespace Ogre {
 
 namespace {
@@ -569,4 +571,66 @@ namespace {
     {
         return gIgnoreHidden;
     }
+    //-----------------------------------------------------------------------
+    namespace FileSystemUtil {
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+    std::wstring toWide(const String& path)
+    {
+        const UINT codepage = OGRE_FILESYSTEM_USE_WIDECHAR ? CP_UTF8 : CP_ACP;
+        const int length = ::MultiByteToWideChar(codepage, 0, path.c_str(), (int)path.size(), NULL, 0);
+        if (length <= 0)
+            return std::wstring();
+
+        std::wstring ret;
+        ret.resize(length);
+        if (0 == ::MultiByteToWideChar(codepage, 0, path.c_str(), (int)path.size(), &ret[0], length))
+            return std::wstring();
+        return ret;
+    }
+    //-----------------------------------------------------------------------
+    String fromWide(const std::wstring& wide)
+    {
+        const UINT codepage = OGRE_FILESYSTEM_USE_WIDECHAR ? CP_UTF8 : CP_ACP;
+        const int length = ::WideCharToMultiByte(codepage, 0, wide.c_str(), (int)wide.size(), NULL, 0, NULL, NULL);
+        if (length <= 0)
+            return String();
+
+        String ret;
+        ret.resize(length);
+        if (0 == ::WideCharToMultiByte(codepage, 0, wide.c_str(), (int)wide.size(), &ret[0], length, NULL, NULL))
+            return String();
+        return ret;
+    }
+#endif
+    //-----------------------------------------------------------------------
+    size_t getFileSize(const String& path)
+    {
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+        struct _stat64i32 tagStat;
+        if (_wstat(toWide(path).c_str(), &tagStat) != 0)
+            return 0;
+#else
+        struct stat tagStat;
+        if (stat(path.c_str(), &tagStat) != 0)
+            return 0;
+#endif
+        return tagStat.st_size;
+    }
+    //-----------------------------------------------------------------------
+    time_t getFileModifiedTime(const String& path)
+    {
+#if OGRE_FILESYSTEM_USE_WIDECHAR
+        struct _stat64i32 tagStat;
+        if (_wstat(toWide(path).c_str(), &tagStat) != 0)
+            return 0;
+#else
+        struct stat tagStat;
+        if (stat(path.c_str(), &tagStat) != 0)
+            return 0;
+#endif
+        return tagStat.st_mtime;
+    }
+
+    } // namespace FileSystemUtil
 }

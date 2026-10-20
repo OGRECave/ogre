@@ -29,6 +29,9 @@
 #include "macUtils.h"
 #import <Foundation/NSPathUtilities.h>
 #import <Foundation/NSFileManager.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 namespace Ogre
 {
@@ -75,16 +78,16 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool FileSystemLayer::removeDirectory(const Ogre::String& path)
     {
-        return false;
+        return !rmdir(path.c_str()) || errno == ENOENT;
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::removeFile(const Ogre::String& path)
     {
-        return false;
+        return !unlink(path.c_str()) || errno == ENOENT;
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::renameFile(const Ogre::String& oldname, const Ogre::String& newname)
     {
-        return false;
+        return !rename(oldname.c_str(), newname.c_str());
     }
 }
