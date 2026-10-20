@@ -243,7 +243,7 @@ void Sample_ShaderSystem::setupContent()
     mSceneMgr->setSkyBox(true, "Examples/SceneSkyBox2");
 
     MeshManager::getSingleton().createPlane("Myplane",
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Plane(Vector3::UNIT_Y, 0),
+        RGN_DEFAULT, Plane(Vector3::UNIT_Y, 0),
         1500,1500,25,25,true,1,60,60,Vector3::UNIT_Z);
 
     Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
@@ -257,7 +257,7 @@ void Sample_ShaderSystem::setupContent()
     for (const auto & curMeshName : MESH_ARRAY)
     {
         MeshPtr pMesh = MeshManager::getSingleton().load(curMeshName,
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,    
+            RGN_DEFAULT,
             HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, 
             HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
             true, true); //so we can still read it
@@ -453,13 +453,13 @@ void Sample_ShaderSystem::cleanupContent()
     // UnLoad sample meshes and generate tangent vectors.
     for (const auto & curMeshName : MESH_ARRAY)
     {
-        MeshManager::getSingleton().unload(curMeshName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().unload(curMeshName, RGN_DEFAULT);
     }
     
-    MeshManager::getSingleton().remove(MAIN_ENTITY_MESH, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    MeshManager::getSingleton().remove(MAIN_ENTITY_MESH, RGN_DEFAULT);
     mTargetEntities.clear();
 
-    MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    MeshManager::getSingleton().remove("Myplane", RGN_DEFAULT);
 
     mSceneMgr->destroyQuery(mRayQuery);
 }
@@ -736,7 +736,7 @@ void Sample_ShaderSystem::addModelToScene(const String &  modelName)
         mLotsOfModelsNodes.push_back(childNode);
         childNode->setPosition(mNumberOfModelsAdded * scaleFactor, 15,  i * scaleFactor);
         childNode->attachObject(entity);
-        MeshPtr modelMesh = MeshManager::getSingleton().getByName(modelName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshPtr modelMesh = MeshManager::getSingleton().getByName(modelName, RGN_DEFAULT);
         Vector3 modelSize = modelMesh->getBounds().getSize();
         childNode->scale(1 / modelSize.x * scaleFactor, 
                          1 / modelSize.y * scaleFactor, 
@@ -1149,9 +1149,9 @@ void Sample_ShaderSystem::createInstancedViewports()
 void Sample_ShaderSystem::createMaterialForTexture( const String & texName, bool isTextureAtlasTexture )
 {
     MaterialManager * matMgr = MaterialManager::getSingletonPtr();
-    if ( !matMgr->resourceExists(texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME) )
+    if ( !matMgr->resourceExists(texName, RGN_DEFAULT) )
     {
-        MaterialPtr newMat = matMgr->create(texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MaterialPtr newMat = matMgr->create(texName, RGN_DEFAULT);
         newMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
         TextureUnitState* pState = newMat->getTechnique(0)->getPass(0)->createTextureUnitState(texName);
         if(isTextureAtlasTexture) 

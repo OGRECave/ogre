@@ -72,7 +72,7 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
     try
     {
 
-        cf.loadFromResourceSystem(filename, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "\t;=", true);
+        cf.loadFromResourceSystem(filename, Ogre::RGN_DEFAULT, "\t;=", true);
 
         // Go through all sections & controls in the file
         Ogre::String secName, typeName, materialName, dataString;

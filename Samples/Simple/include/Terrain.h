@@ -460,7 +460,7 @@ protected:
           {
           terrain->setGlobalColourMapEnabled(true);
           Image colourMap;
-          colourMap.load("testcolourmap.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+          colourMap.load("testcolourmap.jpg", RGN_DEFAULT);
           terrain->getGlobalColourMap()->loadImage(colourMap);
           }
         */

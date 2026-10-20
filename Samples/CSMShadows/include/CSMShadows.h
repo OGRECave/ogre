@@ -100,7 +100,7 @@ private:
         plane->normal = Vector3::UNIT_Y;
         plane->d = 107 * scale;
         MeshManager::getSingleton().createPlane(
-            "MyPlane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, *plane, 6000, 6000, 50, 50, true,
+            "MyPlane", RGN_DEFAULT, *plane, 6000, 6000, 50, 50, true,
             1, 25.0f / scale, 25.0f / scale, Vector3::UNIT_Z);
         Entity* pPlaneEnt = mSceneMgr->createEntity("plane", "MyPlane");
         pPlaneEnt->setMaterialName("CSMShadows/Rockwall");

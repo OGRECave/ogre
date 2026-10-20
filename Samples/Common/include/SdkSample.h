@@ -251,11 +251,11 @@ namespace OgreBites
             // Create material
             String matName = "Ogre/DebugTexture" + StringConverter::toString(i);
             MaterialPtr debugMat = MaterialManager::getSingleton().getByName(
-                matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                matName, RGN_DEFAULT);
             if (!debugMat)
             {
                 debugMat = MaterialManager::getSingleton().create(matName,
-                                                                  ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                                                                  RGN_DEFAULT);
             }
             Pass* p = debugMat->getTechnique(0)->getPass(0);
             p->removeAllTextureUnitStates();

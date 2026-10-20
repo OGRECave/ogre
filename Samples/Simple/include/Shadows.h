@@ -278,7 +278,7 @@ protected:
         mPlane->normal = Vector3::UNIT_Y;
         mPlane->d = 107;
         MeshManager::getSingleton().createPlane("Myplane",
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, *mPlane,
+            RGN_DEFAULT, *mPlane,
             1500,1500,50,50,true,1,5,5,Vector3::UNIT_Z);
         pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
         pPlaneEnt->setMaterialName(BASIC_ROCKWALL_MATERIAL);
@@ -303,7 +303,7 @@ protected:
     {
         ControllerManager::getSingleton().destroyController(mController);
 
-        MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().remove("Myplane", RGN_DEFAULT);
 
         pColumns.clear();
     }

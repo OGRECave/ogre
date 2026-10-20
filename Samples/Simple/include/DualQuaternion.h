@@ -94,7 +94,7 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
         bbs->createBillboard(pos)->setColour(l->getDiffuseColour());
 
         // Create a floor mesh resource.
-        MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        MeshManager::getSingleton().createPlane("floor", RGN_DEFAULT,
                                                 Plane(Vector3::UNIT_Y, -1), 250, 250, 25, 25, true, 1, 15, 15, Vector3::UNIT_Z);
 
         // Add a floor to our scene using the floor mesh we created.
@@ -170,7 +170,7 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 
     void cleanupContent() override
     {
-        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().remove("floor", RGN_DEFAULT);
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(MSN_SHADERGEN);

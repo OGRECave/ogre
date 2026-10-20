@@ -64,7 +64,7 @@ class _OgreSampleClassExport Sample_BSP : public SdkSample
         // unload the map so we don't interfere with subsequent samples
         ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
         rgm.clearResourceGroup(rgm.getWorldResourceGroupName());
-        rgm.setWorldResourceGroupName(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        rgm.setWorldResourceGroupName(RGN_DEFAULT);
     }
 
     void setupContent() override

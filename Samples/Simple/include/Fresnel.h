@@ -93,7 +93,7 @@ protected:
         mCamera->setAutoAspectRatio(true);
         // create our water plane mesh
         mWaterPlane = Plane(Vector3::UNIT_Y, 0);
-        MeshManager::getSingleton().createPlane("water", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        MeshManager::getSingleton().createPlane("water", RGN_DEFAULT,
             mWaterPlane, 700, 1300, 10, 10, true, 1, 3, 5, Vector3::UNIT_Z);
 
         // create a water entity using our mesh, give it the shader material, and attach it to the origin
@@ -212,7 +212,7 @@ protected:
         mFishAnimStates.clear();
         mFishSplines.clear();
 
-        MeshManager::getSingleton().remove("water", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().remove("water", RGN_DEFAULT);
         MaterialManager::getSingleton().unload("Examples/FresnelReflectionRefraction", RGN_DEFAULT);
     }
 

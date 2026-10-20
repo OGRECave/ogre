@@ -79,7 +79,7 @@ protected:
 
         // create a patch mesh using vertices and declaration
         mPatch = MeshManager::getSingleton().createBezierPatch("patch",
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, (float*)verts, mDecl, 3, 3, 5, 5, PatchSurface::VS_BOTH);
+            RGN_DEFAULT, (float*)verts, mDecl, 3, 3, 5, 5, PatchSurface::VS_BOTH);
 
         mPatch->setSubdivision(0);   // start at 0 detail
 

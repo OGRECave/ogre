@@ -248,7 +248,7 @@ void Sample_Compositor::cleanupContent(void)
         ++itor;
     }
     mCompositorLogics.clear();
-    MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    MeshManager::getSingleton().remove("Myplane", RGN_DEFAULT);
 }
 
 
@@ -433,7 +433,7 @@ void Sample_Compositor::setupScene(void)
     plane.normal = Ogre::Vector3::UNIT_Y;
     plane.d = 100;
     Ogre::MeshManager::getSingleton().createPlane("Myplane",
-                                                  Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+                                                  Ogre::RGN_DEFAULT, plane,
                                                   1500, 1500, 10, 10, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
     Ogre::Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
     pPlaneEnt->setMaterialName("Examples/Rockwall");
@@ -457,7 +457,7 @@ void Sample_Compositor::createEffects(void)
 {
     /// Motion blur effect
     Ogre::CompositorPtr comp3 = Ogre::CompositorManager::getSingleton().create(
-        "Motion Blur", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
+        "Motion Blur", Ogre::RGN_DEFAULT
     );
     {
         Ogre::CompositionTechnique *t = comp3->createTechnique();
@@ -525,7 +525,7 @@ void Sample_Compositor::createEffects(void)
     }
     /// Heat vision effect
     Ogre::CompositorPtr comp4 = Ogre::CompositorManager::getSingleton().create(
-        "Heat Vision", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME
+        "Heat Vision", Ogre::RGN_DEFAULT
     );
     {
         Ogre::CompositionTechnique *t = comp4->createTechnique();

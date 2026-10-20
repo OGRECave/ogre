@@ -43,7 +43,7 @@ WaterMesh::WaterMesh(const String& inMeshName, Real planeSize, int inComplexity)
 
     // create mesh and submesh
     mesh = MeshManager::getSingleton().createManual(meshName,
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        RGN_DEFAULT);
     subMesh = mesh->createSubMesh();
 
     // Vertex buffers
@@ -164,7 +164,7 @@ WaterMesh::~WaterMesh ()
 
     delete[] vNormals;
 
-    MeshManager::getSingleton().remove(meshName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    MeshManager::getSingleton().remove(meshName, RGN_DEFAULT);
 }
 /* ========================================================================= */
 void WaterMesh::push(Real x, Real y, Real depth, bool absolute)
