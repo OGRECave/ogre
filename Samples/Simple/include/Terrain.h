@@ -563,14 +563,15 @@ protected:
             if (!mPSSMSetup)
             {
                 // shadow camera setup
-                PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
-                pssmSetup->setSplitPadding(mCamera->getNearClipDistance() * 2);
-                pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
-                pssmSetup->setOptimalAdjustFactor(0, 2);
-                pssmSetup->setOptimalAdjustFactor(1, 1);
-                pssmSetup->setOptimalAdjustFactor(2, 0.5);
+                auto pssmSetup = PSSMShadowCameraSetup::create();
+                auto* pssm = static_cast<PSSMShadowCameraSetup*>(pssmSetup.get());
+                pssm->setSplitPadding(mCamera->getNearClipDistance() * 2);
+                pssm->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
+                pssm->setOptimalAdjustFactor(0, 2);
+                pssm->setOptimalAdjustFactor(1, 1);
+                pssm->setOptimalAdjustFactor(2, 0.5);
 
-                mPSSMSetup.reset(pssmSetup);
+                mPSSMSetup = pssmSetup;
             }
             mSceneMgr->setShadowCameraSetup(mPSSMSetup);
 

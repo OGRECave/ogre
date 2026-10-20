@@ -18,6 +18,8 @@ same license as the rest of the engine.
 #include "OgreMaterial.h"
 #include "OgreStringVector.h"
 
+#include <memory>
+
 /** Caching, on-the-fly material generator. This is a class that automatically 
     generates and stores different permutations of a material, and its shaders. 
     It can be used if you have a material that has lots of slightly different 
@@ -70,7 +72,7 @@ protected:
     /// Mask of permutation bits that influence template material choice
     Perm matMask;
     /// Generator
-    Impl *mImpl;
+    std::unique_ptr<Impl> mImpl;
 
     typedef std::map<Perm, Ogre::GpuProgramPtr> ProgramMap;
     typedef std::map<Perm, Ogre::MaterialPtr> MaterialMap;

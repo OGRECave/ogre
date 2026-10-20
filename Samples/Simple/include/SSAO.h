@@ -97,7 +97,7 @@ private:
     String mCurrentPost;
     String mCurrentModulateScheme;
 
-    SSAOGBufferSchemeHandler* mGBufSchemeHandler;
+    std::unique_ptr<SSAOGBufferSchemeHandler> mGBufSchemeHandler;
     Light* mLight;
 
 public:
@@ -129,15 +129,14 @@ public:
         mCurrentCompositor = mCompositorNames[0];
         mCurrentPost = mPostNames[0];
 
-        mGBufSchemeHandler = NULL;
+        mGBufSchemeHandler.reset();
         mLight = NULL;
     }
     
     void cleanupContent() override
     {
-        MaterialManager::getSingleton().removeListener(mGBufSchemeHandler, "GBuffer");
-        delete mGBufSchemeHandler;
-        mGBufSchemeHandler = NULL;
+        MaterialManager::getSingleton().removeListener(mGBufSchemeHandler.get(), "GBuffer");
+        mGBufSchemeHandler.reset();
 
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, false);
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, false);
@@ -439,8 +438,8 @@ protected:
         changeCompositor(mCompositorNames[0]);
         changePost(mPostNames[0]);
 
-        mGBufSchemeHandler = new SSAOGBufferSchemeHandler();
-        MaterialManager::getSingleton().addListener(mGBufSchemeHandler, "GBuffer");
+        mGBufSchemeHandler = std::make_unique<SSAOGBufferSchemeHandler>();
+        MaterialManager::getSingleton().addListener(mGBufSchemeHandler.get(), "GBuffer");
     }
     
     /**

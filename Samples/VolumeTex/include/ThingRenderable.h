@@ -19,6 +19,8 @@ same license as the rest of the engine.
 #include "OgreQuaternion.h"
 #include "OgreVector.h"
 
+#include <memory>
+
 /** Quad fragments that rotate around origin (0,0,0) in a random orbit, always oriented to 0,0,0.
     @author W.J. van der Laan
 */
@@ -43,6 +45,8 @@ protected:
     void fillBuffer();
 
     Ogre::HardwareVertexBufferSharedPtr vbuf;// Our vertex buffer
+    std::unique_ptr<Ogre::IndexData> mIndexData;
+    std::unique_ptr<Ogre::VertexData> mVertexData;
     float mRadius;
     size_t mCount;
     float mQSize;

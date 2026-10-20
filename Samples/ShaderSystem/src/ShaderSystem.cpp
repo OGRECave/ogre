@@ -219,10 +219,12 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()
 {
+    // TextureAtlasSamplerFactory is a Singleton; use the base-class deleter to avoid
+    // instantiating Singleton<T>::~Singleton() in this translation unit.
     mTextureAtlasFactory.reset(new TextureAtlasSamplerFactory);
     mShaderGenerator->addSubRenderStateFactory(mTextureAtlasFactory.get());
 
-    mInstancedViewportsFactory.reset(new ShaderExInstancedViewportsFactory);
+    mInstancedViewportsFactory = std::make_unique<ShaderExInstancedViewportsFactory>();
     mShaderGenerator->addSubRenderStateFactory(mInstancedViewportsFactory.get());
 
     // Setup default effects values.
@@ -894,18 +896,19 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
         mDirLightCheckBox->hide();
 
         // shadow camera setup
-        PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
-        pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
-        pssmSetup->setSplitPadding(mCamera->getNearClipDistance()*2);
-        pssmSetup->setOptimalAdjustFactor(0, 2);
-        pssmSetup->setOptimalAdjustFactor(1, 1);
-        pssmSetup->setOptimalAdjustFactor(2, 0.5);
+        auto pssmSetup = PSSMShadowCameraSetup::create();
+        auto* pssm = static_cast<PSSMShadowCameraSetup*>(pssmSetup.get());
+        pssm->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
+        pssm->setSplitPadding(mCamera->getNearClipDistance()*2);
+        pssm->setOptimalAdjustFactor(0, 2);
+        pssm->setOptimalAdjustFactor(1, 1);
+        pssm->setOptimalAdjustFactor(2, 0.5);
 
-        mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(pssmSetup));
+        mSceneMgr->setShadowCameraSetup(pssmSetup);
 
     
         auto subRenderState = mShaderGenerator->createSubRenderState(SRS_SHADOW_MAPPING);
-        subRenderState->setParameter("split_points", pssmSetup->getSplitPoints());
+        subRenderState->setParameter("split_points", pssm->getSplitPoints());
         subRenderState->setParameter("debug", menuIndex == 2);
         subRenderState->setParameter("array_texture", menuIndex == 3);
 
@@ -1161,7 +1164,7 @@ ManualObject* Sample_ShaderSystem::createTextureAtlasObject()
 {
     TextureAtlasSamplerFactory * textureAtlasSamplerFactory = 
         static_cast<TextureAtlasSamplerFactory *>(mShaderGenerator->getSubRenderStateFactory(TextureAtlasSampler::Type));
-    TextureAtlasTablePtr textureAtlasTable(new TextureAtlasTable);
+    auto textureAtlasTable = std::make_shared<TextureAtlasTable>();
 
     DataStreamPtr taiFile = Ogre::ResourceGroupManager::getSingleton().openResource("TextureAtlasSampleWrap.tai");
 

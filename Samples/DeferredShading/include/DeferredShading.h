@@ -41,6 +41,8 @@ The wiki article explaining this demo can be found here :
 #include "OgreRenderTargetListener.h"
 #include "GeomUtils.h"
 
+#include <memory>
+
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -100,7 +102,7 @@ protected:
     bool mSSAO;
 
     //Used to unregister compositor logics and free memory
-    typedef std::map<String, CompositorLogic*> CompositorLogicMap;
+    typedef std::map<String, std::unique_ptr<CompositorLogic>> CompositorLogicMap;
     CompositorLogicMap mCompositorLogics;
 
     void createResources();

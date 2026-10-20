@@ -15,7 +15,7 @@ using namespace OgreBites;
 class CSMShadows : public SdkSample
 {
 public:
-    CSMShadows() : mGpuConstants(0)
+    CSMShadows()
     {
         mInfo["Title"] = "CSM Shadows";
         mInfo["Description"] = "A demonstration of a custom shadow camera implementation";
@@ -25,8 +25,8 @@ public:
 
     void cleanupContent() override
     {
-        mSceneMgr->removeShadowTextureListener(mGpuConstants);
-        delete mGpuConstants;
+        mSceneMgr->removeShadowTextureListener(mGpuConstants.get());
+        mGpuConstants.reset();
     }
 
     enum {
@@ -96,11 +96,11 @@ private:
         mSceneMgr->setSkyBox(true, "Examples/StormySkyBox");
 
         // Floor plane (use POSM plane def)
-        Plane* plane = new MovablePlane("*mPlane");
-        plane->normal = Vector3::UNIT_Y;
-        plane->d = 107 * scale;
+        MovablePlane plane("*mPlane");
+        plane.normal = Vector3::UNIT_Y;
+        plane.d = 107 * scale;
         MeshManager::getSingleton().createPlane(
-            "MyPlane", RGN_DEFAULT, *plane, 6000, 6000, 50, 50, true,
+            "MyPlane", RGN_DEFAULT, plane, 6000, 6000, 50, 50, true,
             1, 25.0f / scale, 25.0f / scale, Vector3::UNIT_Z);
         Entity* pPlaneEnt = mSceneMgr->createEntity("plane", "MyPlane");
         pPlaneEnt->setMaterialName("CSMShadows/Rockwall");
@@ -130,8 +130,8 @@ private:
         mSceneMgr->setShadowTextureCount(NUM_CASCADES);
         mSceneMgr->setShadowTextureCountPerLightType(Light::LT_DIRECTIONAL, NUM_CASCADES);
 
-        mGpuConstants = new CSMGpuConstants(NUM_CASCADES);
-        mSceneMgr->addShadowTextureListener(mGpuConstants);
+        mGpuConstants = std::make_unique<CSMGpuConstants>(NUM_CASCADES);
+        mSceneMgr->addShadowTextureListener(mGpuConstants.get());
 
         for (int i = 0; i < NUM_CASCADES; i++)
             mSceneMgr->setShadowTextureConfig(i, 1024, 1024, PF_FLOAT32_R);
@@ -139,7 +139,7 @@ private:
         float farClip = 5000.0f;
 
         // Create the CSM shadow setup
-        StableCSMShadowCameraSetup* shadowSetup = new StableCSMShadowCameraSetup();
+        auto shadowSetup = std::make_shared<StableCSMShadowCameraSetup>();
 
         float lambda = 0.93f; // lower lamdba means more uniform, higher lambda means more logarithmic
         float firstSplitDist = 50.0f;
@@ -151,8 +151,8 @@ private:
         shadowSetup->setSplitPoints(points);
         float splitPadding = 1.0f;
         shadowSetup->setSplitPadding(splitPadding);
-        mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(shadowSetup));
+        mSceneMgr->setShadowCameraSetup(shadowSetup);
     }
 
-    CSMGpuConstants* mGpuConstants;
+    std::unique_ptr<CSMGpuConstants> mGpuConstants;
 };

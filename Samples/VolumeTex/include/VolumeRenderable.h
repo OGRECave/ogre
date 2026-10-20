@@ -16,6 +16,8 @@ same license as the rest of the engine.
 #include "OgrePrerequisites.h"
 #include "OgreSimpleRenderable.h"
 
+#include <memory>
+
 /** Direct Volume Rendering.
     TODO: LOD: reduce number of slices in distance
     TODO: option to generate normals for lighting
@@ -39,6 +41,9 @@ public:
     Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const override;
 protected:
     void initialise();
+
+    std::unique_ptr<Ogre::IndexData> mIndexData;
+    std::unique_ptr<Ogre::VertexData> mVertexData;
 
     size_t mSlices;
     float mSize;

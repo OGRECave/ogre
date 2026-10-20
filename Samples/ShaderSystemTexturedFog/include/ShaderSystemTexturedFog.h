@@ -18,7 +18,6 @@ class _OgreSampleClassExport Sample_ShaderSystemTexturedFog : public SdkSample
 public:
 
     Sample_ShaderSystemTexturedFog() :
-        mSRSTextureFogFactory(NULL),
             mEntityNameGen("Head")
     {
         mInfo["Title"] = "Shader System - Textured Fog";
@@ -41,9 +40,8 @@ public:
         if (mSRSTextureFogFactory)
         {
             RTShader::ShaderGenerator::getSingleton().removeAllShaderBasedTechniques();
-            RTShader::ShaderGenerator::getSingleton().removeSubRenderStateFactory(mSRSTextureFogFactory);
-            delete mSRSTextureFogFactory;
-            mSRSTextureFogFactory = NULL;
+            RTShader::ShaderGenerator::getSingleton().removeSubRenderStateFactory(mSRSTextureFogFactory.get());
+            mSRSTextureFogFactory.reset();
         }
 
         SdkSample::_shutdown();
@@ -113,8 +111,8 @@ protected:
             mGen->createOrRetrieveRenderState(MSN_SHADERGEN).first;
         pMainRenderState->resetToBuiltinSubRenderStates();
 
-        mSRSTextureFogFactory = new RTShaderSRSTexturedFogFactory;
-        mGen->addSubRenderStateFactory(mSRSTextureFogFactory);
+        mSRSTextureFogFactory = std::make_unique<RTShaderSRSTexturedFogFactory>();
+        mGen->addSubRenderStateFactory(mSRSTextureFogFactory.get());
         pMainRenderState->addTemplateSubRenderState(mGen->createSubRenderState<RTShaderSRSTexturedFog>());
 
         mSRSTextureFogFactory->setBackgroundTextureName("early_morning.jpg");
@@ -215,7 +213,7 @@ protected:
     }
 
 private:
-    RTShaderSRSTexturedFogFactory* mSRSTextureFogFactory;
+    std::unique_ptr<RTShaderSRSTexturedFogFactory> mSRSTextureFogFactory;
 
     NameGenerator mEntityNameGen;
 

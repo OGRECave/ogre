@@ -389,9 +389,9 @@ LightMaterialGenerator::LightMaterialGenerator()
     materialBaseName = "DeferredShading/LightMaterial/";
     if ((GpuProgramManager::getSingleton().isSyntaxSupported("glsl") || GpuProgramManager::getSingleton().isSyntaxSupported("glsles")) &&
         !(GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_x") ||GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1")))
-        mImpl = new LightMaterialGeneratorGLSL("DeferredShading/LightMaterial/");
+        mImpl = std::make_unique<LightMaterialGeneratorGLSL>("DeferredShading/LightMaterial/");
     else
-        mImpl = new LightMaterialGeneratorCG("DeferredShading/LightMaterial/");
+        mImpl = std::make_unique<LightMaterialGeneratorCG>("DeferredShading/LightMaterial/");
 }
 
 LightMaterialGenerator::~LightMaterialGenerator()

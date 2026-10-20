@@ -120,7 +120,7 @@ protected:
 
     ShadowCameraSetupPtr mCurrentShadowCameraSetup;
     /// Plane that defines plane-optimal shadow mapping basis
-    MovablePlane* mPlane;
+    std::unique_ptr<MovablePlane> mPlane;
 public:
     Sample_Shadows()
         : mLightNode(0)
@@ -130,7 +130,7 @@ public:
         , mMinFlareSize(40)
         , mMaxFlareSize(80)
         , mController(0)
-        , mPlane(0)
+        , mPlane(nullptr)
     {
         mInfo["Title"] = "Shadows";
         mInfo["Description"] = "A demonstration of ogre's various shadowing techniques.";
@@ -274,7 +274,7 @@ protected:
         mSceneMgr->setSkyBox(true, "Examples/StormySkyBox");
 
         // Floor plane (use POSM plane def)
-        mPlane = new MovablePlane("*mPlane");
+        mPlane = std::make_unique<MovablePlane>("*mPlane");
         mPlane->normal = Vector3::UNIT_Y;
         mPlane->d = 107;
         MeshManager::getSingleton().createPlane("Myplane",
@@ -487,7 +487,7 @@ protected:
                 mCurrentShadowCameraSetup = LiSPSMShadowCameraSetup::create();
                 break;
             case PLANE_OPTIMAL:
-                mCurrentShadowCameraSetup = PlaneOptimalShadowCameraSetup::create(mPlane);
+                mCurrentShadowCameraSetup = PlaneOptimalShadowCameraSetup::create(mPlane.get());
                 break;
 
             };

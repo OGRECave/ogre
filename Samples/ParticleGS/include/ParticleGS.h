@@ -26,7 +26,7 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
 #ifdef LOG_GENERATED_BUFFER
     bool frameEnded(const FrameEvent& evt);
 #endif
-    ProceduralManualObject* mParticleSystem;
+    std::unique_ptr<ProceduralManualObject> mParticleSystem;
 };
 }
 #endif

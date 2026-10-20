@@ -19,6 +19,8 @@ same license as the rest of the engine.
 #include "OgrePlatform.h"
 #include "Ogre.h"
 
+#include <vector>
+
 using namespace Ogre ;
 
 class WaterMesh
@@ -26,13 +28,13 @@ class WaterMesh
 private:
     MeshPtr mesh ;
     SubMesh *subMesh ; 
-    float *vertexBuffers[3] ; // we need 3 vertex buffers
+    std::vector<float> vertexBuffers[3] ; // we need 3 vertex buffers
     int currentBuffNumber ;
     int complexity ;
     String meshName ;
     int numFaces ;
     int numVertices ;
-    Vector3* vNormals ;
+    std::vector<Vector3> vNormals ;
 
     HardwareVertexBufferSharedPtr posVertexBuffer ;
     HardwareVertexBufferSharedPtr normVertexBuffer ;

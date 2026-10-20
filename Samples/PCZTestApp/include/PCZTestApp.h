@@ -28,10 +28,10 @@ class Sample_PCZTest : public SdkSample
 {
     SceneNode * buildingNode;
     Vector3 buildingTranslate;
-    RaySceneQuery* raySceneQuery;
+    std::unique_ptr<RaySceneQuery> raySceneQuery;
     MovableObject* targetMO;
 public:
-    Sample_PCZTest() : raySceneQuery(0), targetMO(0)
+    Sample_PCZTest() : targetMO(0)
     {
         mInfo["Title"] = "PCZTest";
         mInfo["Description"] = "Demonstrates use of the Portal Connected Zone(PCZ) Scene Manager Plugin.";
@@ -44,7 +44,7 @@ public:
 
     void cleanupContent() override
     {
-        delete raySceneQuery;
+        raySceneQuery.reset();
     }
 
     void createSceneManager(void) override
@@ -260,8 +260,8 @@ public:
         mCameraNode->_updateBounds();
 
         // create the ray scene query
-        raySceneQuery = mSceneMgr->createRayQuery(
-            Ray(mCamera->getParentNode()->getPosition(), Vector3::NEGATIVE_UNIT_Z));
+        raySceneQuery.reset(mSceneMgr->createRayQuery(
+            Ray(mCamera->getParentNode()->getPosition(), Vector3::NEGATIVE_UNIT_Z)));
         raySceneQuery->setSortByDistance(true, 5);
 
     }
@@ -293,8 +293,8 @@ public:
         updateRay.setDirection(mCamera->getParentSceneNode()->getOrientation()*Vector3::NEGATIVE_UNIT_Z);
         raySceneQuery->setRay(updateRay);
         PCZone * zone = ((PCZSceneNode*)(mCamera->getParentSceneNode()))->getHomeZone();
-        ((PCZRaySceneQuery*)raySceneQuery)->setStartZone(zone);
-        ((PCZRaySceneQuery*)raySceneQuery)->setExcludeNode(mCamera->getParentSceneNode());
+        static_cast<PCZRaySceneQuery*>(raySceneQuery.get())->setStartZone(zone);
+        static_cast<PCZRaySceneQuery*>(raySceneQuery.get())->setExcludeNode(mCamera->getParentSceneNode());
         RaySceneQueryResult& qryResult = raySceneQuery->execute();
         RaySceneQueryResult::iterator i = qryResult.begin();
         if (i != qryResult.end())

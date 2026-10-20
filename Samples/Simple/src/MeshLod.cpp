@@ -482,8 +482,8 @@ void Sample_MeshLod::addToProfile( Real cost )
     config.advanced.preventPunchingHoles = PREVENT_HOLES_BREAKS;
     config.advanced.preventBreakingLines = PREVENT_HOLES_BREAKS;
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
-    LodCollapserPtr collapser(new LodCollapser());
-    LodDataPtr data(new LodData());
+    auto collapser = std::make_shared<LodCollapser>();
+    auto data = std::make_shared<LodData>();
     gen.generateLodLevels(config, LodCollapseCostPtr(), data, LodInputProviderPtr(), LodOutputProviderPtr(), collapser);
     
     ProfiledEdge pv;

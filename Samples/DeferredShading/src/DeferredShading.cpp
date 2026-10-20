@@ -77,13 +77,9 @@ DeferredShadingSystem::~DeferredShadingSystem()
     CompositorManager::getSingleton().removeCompositorChain(mViewport);
 
     Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
-    CompositorLogicMap::const_iterator itor = mCompositorLogics.begin();
-    CompositorLogicMap::const_iterator end  = mCompositorLogics.end();
-    while( itor != end )
+    for (const auto& logic : mCompositorLogics)
     {
-        compMgr.unregisterCompositorLogic( itor->first );
-        delete itor->second;
-        ++itor;
+        compMgr.unregisterCompositorLogic(logic.first);
     }
     mCompositorLogics.clear();
 }
@@ -177,8 +173,8 @@ void DeferredShadingSystem::createResources(void)
     subRenderState->setParameter("target_buffers", StringVector{"diffuse_specular", "normal_viewdepth"});
     schemRenderState->addTemplateSubRenderState(subRenderState);
 
-    mCompositorLogics["SSAOLogic"] = new SSAOLogic;
-    compMan.registerCompositorLogic("SSAOLogic", mCompositorLogics["SSAOLogic"]);
+    mCompositorLogics["SSAOLogic"] = std::make_unique<SSAOLogic>();
+    compMan.registerCompositorLogic("SSAOLogic", mCompositorLogics["SSAOLogic"].get());
 
     // Create the main GBuffer compositor
     mGBufferInstance = compMan.addCompositor(mViewport, "DeferredShading/GBuffer");
