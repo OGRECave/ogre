@@ -68,6 +68,7 @@ ImGuiOverlay::ImGuiOverlay() : Overlay("ImGuiOverlay")
     ImGuiIO& io = ImGui::GetIO();
 
     io.BackendPlatformName = "OGRE";
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
 #if IMGUI_VERSION_NUM >= 19200
     io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 #endif
@@ -302,7 +303,7 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
     TextureUnitState* tu = mMaterial->getBestTechnique()->getPass(0)->getTextureUnitState(0);
 
     mRenderOp.indexData->indexStart = 0;
-    mRenderOp.vertexData->vertexStart = 0;
+    size_t vtxOffset = 0;
 
     ImDrawData* draw_data = ImGui::GetDrawData();
     for (const ImDrawList* draw_list : draw_data->CmdLists)
@@ -313,6 +314,8 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
         {
             // Create a renderable and fill it's buffers
             const ImDrawCmd* drawCmd = &draw_list->CmdBuffer[j];
+
+            mRenderOp.vertexData->vertexStart = vtxOffset + drawCmd->VtxOffset;
 
             // Set scissoring
             Rect scissor(drawCmd->ClipRect.x, drawCmd->ClipRect.y, drawCmd->ClipRect.z,
@@ -346,7 +349,7 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
             // Update counts
             mRenderOp.indexData->indexStart += drawCmd->ElemCount;
         }
-        mRenderOp.vertexData->vertexStart += draw_list->VtxBuffer.size();
+        vtxOffset += draw_list->VtxBuffer.size();
     }
     rsys->setScissorTest(false);
     return false;
@@ -437,7 +440,8 @@ void ImGuiOverlay::ImGUIRenderable::updateVertexData(ImDrawData* draw_data)
         mRenderOp.indexData->indexBuffer->getNumIndexes() < size_t(draw_data->TotalIdxCount))
     {
         mRenderOp.indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
-            HardwareIndexBuffer::IT_16BIT, draw_data->TotalIdxCount, HBU_CPU_TO_GPU);
+            sizeof(ImDrawIdx) == 2 ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
+            draw_data->TotalIdxCount, HBU_CPU_TO_GPU);
     }
 
     // Copy all vertices
