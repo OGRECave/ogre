@@ -455,7 +455,16 @@ void GLSLangProgram::prepareImpl()
 
     auto intermediate = program.getIntermediate(stage);
     glslang::SpvOptions opts;
-    glslang::GlslangToSpv(*intermediate, mAssembly, &opts);
+    opts.disableOptimizer = false;
+    // glslang only runs the SPIR-V optimizer for GLSL when optimizeSize is set
+    opts.optimizeSize = true;
+
+    spv::SpvBuildLogger logger;
+    glslang::GlslangToSpv(*intermediate, mAssembly, &logger, &opts);
+
+    const auto messages = logger.getAllMessages();
+    if (!messages.empty())
+        LogManager::getSingleton().logWarning("GLSLang SPIR-V messages for " + mName + ":\n" + messages);
 
     getConstantDefinitions();
     program.buildReflection();
