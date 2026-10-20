@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgreDynLib.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#    define DYNLIB_LOAD( a ) LoadLibraryEx( a, NULL, 0 ) // we can not use LOAD_WITH_ALTERED_SEARCH_PATH with relative paths
+#    define DYNLIB_LOAD( a ) dynLibLoad( a ) // we can not use LOAD_WITH_ALTERED_SEARCH_PATH with relative paths
 #    define DYNLIB_GETSYM( a, b ) GetProcAddress( a, b )
 #    define DYNLIB_UNLOAD( a ) !FreeLibrary( a )
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
@@ -68,6 +68,15 @@ static std::wstring stringToWstring(const std::string& s)
 	wchar_t* pWSBuf = const_cast<wchar_t*>(ws.c_str());
 	MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, pWSBuf, len);
 	return ws;
+}
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#  include "OgreFileSystemUtil.h"
+static HMODULE dynLibLoad(const char* name)
+{
+    const std::wstring wname = Ogre::FileSystemUtil::toWide(name);
+    return LoadLibraryExW(wname.c_str(), NULL, 0);
 }
 #endif
 

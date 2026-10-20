@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -63,33 +64,25 @@ namespace Ogre
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Queue is empty !", "MaterialSerializer::exportQueued");
 
         LogManager::getSingleton().logMessage("MaterialSerializer : writing material(s) to material script : " + fileName, LML_NORMAL);
-        FILE *fp;
-        fp = fopen(fileName.c_str(), "w");
-        if (!fp)
-            OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "Cannot create material file.",
-            "MaterialSerializer::export");
+        DataStreamPtr fp = Root::createFileStream(fileName, "", true);
 
         // output gpu program definitions to material script file if includeProgDef is true
         if (includeProgDef && !mGpuProgramBuffer.empty())
         {
-            fputs(mGpuProgramBuffer.c_str(), fp);
+            fp->write(mGpuProgramBuffer.c_str(), mGpuProgramBuffer.size());
         }
 
         // output main buffer holding material script
-        fputs(mBuffer.c_str(), fp);
-        fclose(fp);
+        fp->write(mBuffer.c_str(), mBuffer.size());
+        fp->close();
 
         // write program script if program filename and program definitions
         // were not included in material script
         if (!includeProgDef && !mGpuProgramBuffer.empty() && !programFilename.empty())
         {
-            FILE *locFp;
-            locFp = fopen(programFilename.c_str(), "w");
-            if (!locFp)
-                OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "Cannot create program material file.",
-                "MaterialSerializer::export");
-            fputs(mGpuProgramBuffer.c_str(), locFp);
-            fclose(locFp);
+            DataStreamPtr locFp = Root::createFileStream(programFilename, "", true);
+            locFp->write(mGpuProgramBuffer.c_str(), mGpuProgramBuffer.size());
+            locFp->close();
         }
 
         LogManager::getSingleton().logMessage("MaterialSerializer : done.", LML_NORMAL);
