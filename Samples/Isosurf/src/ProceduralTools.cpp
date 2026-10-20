@@ -70,12 +70,12 @@ MeshPtr ProceduralTools::generateTetrahedra()
     HardwareVertexBufferSharedPtr vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
         tetrahedraSubMesh->vertexData->vertexDeclaration->getVertexSize(0), 
         nPointsTotal, 
-        HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        HBU_GPU_ONLY);
 
     HardwareIndexBufferSharedPtr indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
         HardwareIndexBuffer::IT_32BIT, 
         CELLS_COUNT * sizeof(Ogre::uint) * 24, 
-        HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        HBU_GPU_ONLY);
         
     tetrahedraSubMesh->vertexData->vertexBufferBinding->setBinding(0, vertexBuffer);
     tetrahedraSubMesh->vertexData->vertexCount = nPointsTotal;

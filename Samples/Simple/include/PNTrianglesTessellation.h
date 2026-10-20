@@ -152,7 +152,7 @@ protected:
         {
             // load each mesh with non-default hardware buffer usage options
             MeshPtr mesh = MeshManager::getSingleton().load(p.first, RGN_DEFAULT,
-                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+                HBU_CPU_TO_GPU);
 
             // build tangent vectors for our mesh
             mesh->buildTangentVectors();
