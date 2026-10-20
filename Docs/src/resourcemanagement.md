@@ -31,6 +31,29 @@ Resource files need to be loaded from specific locations. By calling Ogre::Resou
 
 Locations can be folders, compressed archives, even perhaps remote locations. Facilities for loading from different locations are provided by plugins which provide implementations of the Ogre::Archive class. All the application user has to do is specify a 'loctype' string in order to indicate the type of location, which should map onto one of the provided plugins. %Ogre comes configured with the @c FileSystem (folders) and @c Zip (archive compressed with the pkzip / WinZip etc utilities) types. 
 
+## File access and Unicode paths {#Resource-FileAccess}
+
+All paths handled by %Ogre are encoded as UTF-8, on every platform. On Windows
+the filesystem APIs instead expect UTF-16 and the C/C++ stream interfaces
+interpret their argument using the ANSI code page, which cannot represent most
+non-ASCII paths. %Ogre performs the conversion internally, but only for its own
+file access functions.
+
+To open a file, use Ogre::Root::openFileStream (reading) or
+Ogre::Root::createFileStream (writing). To test, create, rename or delete files
+and directories, use the static methods of Ogre::FileSystemLayer
+(e.g. Ogre::FileSystemLayer::fileExists, Ogre::FileSystemLayer::removeFile).
+Accessing files through the resource system (Ogre::ResourceGroupManager,
+Ogre::Archive) works as well.
+
+Both functions consult the resource system first and then fall back on the
+filesystem.
+
+Do not pass an Ogre::String directly to `std::ifstream`, `std::ofstream`,
+`fopen` or the Win32 `...A` functions. Doing so bypasses the conversion and
+fails as soon as the path contains characters outside the current ANSI code
+page (e.g. a user name or project directory with CJK characters).
+
 # Groups {#Resource-Groups}
 
 Resource Locations are organized in Groups. A resource group allows you to define a set of resources that can be loaded / unloaded as a unit. For example, it might be all the resources used for the level of a game.
