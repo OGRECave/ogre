@@ -28,7 +28,7 @@ void GeomUtils::createSphere(  const String& strName
                              , bool bNormals
                              , bool bTexCoords)
 {
-    MeshPtr pSphere = MeshManager::getSingleton().createManual(strName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    MeshPtr pSphere = MeshManager::getSingleton().createManual(strName, RGN_DEFAULT);
     SubMesh *pSphereVertex = pSphere->createSubMesh();
     pSphere->createVertexData();
 
@@ -169,7 +169,7 @@ void GeomUtils::createQuad(VertexData*& vertexData)
 
 void GeomUtils::createCone(const Ogre::String& strName , float radius , float height, int nVerticesInBase)
 {
-    MeshPtr pCone = MeshManager::getSingleton().createManual(strName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    MeshPtr pCone = MeshManager::getSingleton().createManual(strName, RGN_DEFAULT);
     SubMesh *pConeVertex = pCone->createSubMesh();
     pCone->createVertexData();
 

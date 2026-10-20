@@ -332,7 +332,7 @@ protected:
 		void define(TerrainGroup* terrainGroup, long x, long y) override
 		{
 			Image img;
-			img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			img.load("terrain.png", RGN_DEFAULT);
 			if (x % 2)
 				img.flipAroundY();
 			if (y % 2)

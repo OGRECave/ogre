@@ -40,7 +40,7 @@ protected:
         mTrayMgr->showCursor();
 
         // create a floor mesh resource
-        MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        MeshManager::getSingleton().createPlane("floor", RGN_DEFAULT,
             Plane(Vector3::UNIT_Y, -30), 1000, 1000, 10, 10, true, 1, 8, 8, Vector3::UNIT_Z);
 
         // create a floor entity, give it a material, and place it at the origin
@@ -64,7 +64,7 @@ protected:
 
     void cleanupContent() override
     {
-        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().remove("floor", RGN_DEFAULT);
     }
 
     Slider* mCurvatureSlider;

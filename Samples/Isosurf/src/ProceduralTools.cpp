@@ -50,7 +50,7 @@ static void UnSwizzle(Ogre::uint index, Ogre::uint sizeLog2[3], Ogre::uint * pPo
 MeshPtr ProceduralTools::generateTetrahedra()
 {
     MeshPtr tetrahedraMesh = Ogre::MeshManager::getSingleton().createManual
-        ("TetrahedraMesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        ("TetrahedraMesh", Ogre::RGN_DEFAULT);
 
     SubMesh* tetrahedraSubMesh = tetrahedraMesh->createSubMesh();
     tetrahedraSubMesh->operationType = RenderOperation::OT_LINE_LIST_ADJ;

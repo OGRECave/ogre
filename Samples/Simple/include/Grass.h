@@ -103,7 +103,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
 
      // create a mesh for our ground
-     MeshManager::getSingleton().createPlane("ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+     MeshManager::getSingleton().createPlane("ground", RGN_DEFAULT,
                                              Plane(Vector3::UNIT_Y, 0), 1000, 1000, 20, 20, true, 1, 6, 6, Vector3::UNIT_Z);
 
      // create a ground entity from our mesh and attach it to the origin
@@ -141,7 +141,7 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
      //! [grass_field]
 
      // build tangent vectors for the ogre head mesh
-     MeshPtr headMesh = MeshManager::getSingleton().load("ogrehead.mesh", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+     MeshPtr headMesh = MeshManager::getSingleton().load("ogrehead.mesh", RGN_DEFAULT);
      headMesh->buildTangentVectors();
 
      // put an ogre head in the middle of the field
@@ -307,8 +307,8 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
  void cleanupContent() override
  {
      ControllerManager::getSingleton().destroyController(mLightController);
-     MeshManager::getSingleton().remove("ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-     MeshManager::getSingleton().remove("grass", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+     MeshManager::getSingleton().remove("ground", RGN_DEFAULT);
+     MeshManager::getSingleton().remove("grass", RGN_DEFAULT);
  }
 
  StaticGeometry* mField;

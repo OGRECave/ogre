@@ -364,7 +364,7 @@ protected:
             ent = mSceneMgr->createEntity(l->getName()+"v", "PointLightMesh");
             String matname = l->getName()+"m";
             // Create coloured material
-            MaterialPtr mat = MaterialManager::getSingleton().create(matname, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            MaterialPtr mat = MaterialManager::getSingleton().create(matname, RGN_DEFAULT);
             Pass* pass = mat->getTechnique(0)->getPass(0);
             pass->setDiffuse(0.0f,0.0f,0.0f,1.0f);
             pass->setAmbient(0.0f,0.0f,0.0f);

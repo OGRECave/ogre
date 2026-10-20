@@ -150,7 +150,7 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
         mSceneMgr->destroyEntity(mMeshEntity);
         mMeshEntity = 0;
     }
-    mLodConfig.mesh = MeshManager::getSingleton().load(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    mLodConfig.mesh = MeshManager::getSingleton().load(name, RGN_DEFAULT);
     if(mLodConfig.mesh->getBounds().isNull() || mLodConfig.mesh->getBoundingSphereRadius() == 0.0){
         mTrayMgr->showOkDialog("Error", "Failed to load mesh!");
         return;

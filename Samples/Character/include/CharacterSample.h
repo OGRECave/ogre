@@ -67,7 +67,7 @@ protected:
         light->setSpecularColour(ColourValue::White);
 
         // create a floor mesh resource
-        MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        MeshManager::getSingleton().createPlane("floor", RGN_DEFAULT,
             Plane(Vector3::UNIT_Y, 0), 100, 100, 10, 10, true, 1, 10, 10, Vector3::UNIT_Z);
 
         // create a floor entity, give it a material, and place it at the origin
@@ -96,7 +96,7 @@ protected:
 
     void cleanupContent() override
     {
-        MeshManager::getSingleton().remove("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().remove("floor", RGN_DEFAULT);
     }
 
     std::unique_ptr<SinbadCharacterController> mChara;

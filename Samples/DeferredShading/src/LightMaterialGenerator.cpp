@@ -65,7 +65,7 @@ public:
         }
 
         GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(
-            programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            programName, RGN_DEFAULT);
         OgreAssert(ptr, "vertex shader is NULL");
         return ptr;
     }
@@ -77,7 +77,7 @@ public:
         {
             DataStreamPtr ptrMasterSource = ResourceGroupManager::getSingleton().openResource(
                  "LightMaterial_ps.cg"
-                , ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                , RGN_DEFAULT);
             assert(ptrMasterSource);
             mMasterSource = ptrMasterSource->getAsString();
         }
@@ -89,7 +89,7 @@ public:
 
         // Create shader object
         HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(
-            name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            name, RGN_DEFAULT,
             "hlsl", GPT_FRAGMENT_PROGRAM);
         ptrProgram->setSource(mMasterSource);
         ptrProgram->setParameter("entry_point","main");
@@ -231,7 +231,7 @@ public:
         }
 
         GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(
-            programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            programName, RGN_DEFAULT);
         OgreAssert(ptr, "vertex shader is NULL");
         return ptr;
     }
@@ -257,12 +257,12 @@ public:
         HighLevelGpuProgramPtr ptrProgram;
         if(GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
         {
-            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name, RGN_DEFAULT,
                                                                                   "glsles", GPT_FRAGMENT_PROGRAM);
         }
         else
         {
-            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name, RGN_DEFAULT,
                                                                                   "glsl", GPT_FRAGMENT_PROGRAM);
         }
         ptrProgram->setSource(mMasterSource);

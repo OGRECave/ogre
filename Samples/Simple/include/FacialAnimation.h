@@ -49,7 +49,7 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
             ->attachObject(mSceneMgr->createLight());
 
         // pre-load the mesh so that we can tweak it with a manual animation
-        mHeadMesh = MeshManager::getSingleton().load("facial.mesh", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        mHeadMesh = MeshManager::getSingleton().load("facial.mesh", RGN_DEFAULT);
 
         // create a manual animation, create a pose track for it, and create a keyframe in that track
         mManualKeyFrame = mHeadMesh->createAnimation("Manual", 0)->createVertexTrack(4, VAT_POSE)->createVertexPoseKeyFrame(0);

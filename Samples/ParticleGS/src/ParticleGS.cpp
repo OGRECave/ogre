@@ -129,7 +129,7 @@ struct FireworkParticle
         plane.normal = Vector3::UNIT_Y;
         plane.d = 100;
         MeshManager::getSingleton().createPlane("Myplane",
-                                                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+                                                RGN_DEFAULT, plane,
                                                 1500,1500,20,20,true,1,60,60,Vector3::UNIT_Z);
         Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
         pPlaneEnt->setMaterialName("Examples/Rockwall");
@@ -142,7 +142,7 @@ struct FireworkParticle
         delete mParticleSystem;
         mParticleSystem = 0;
 
-        MeshManager::getSingleton().remove("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        MeshManager::getSingleton().remove("Myplane", RGN_DEFAULT);
     }
 
 #ifdef LOG_GENERATED_BUFFER

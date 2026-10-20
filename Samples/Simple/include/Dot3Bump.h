@@ -129,7 +129,7 @@ protected:
         for (const auto& p : mPossibilities)
         {
             // load each mesh with non-default hardware buffer usage options
-            MeshPtr mesh = MeshManager::getSingleton().load(p.first, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            MeshPtr mesh = MeshManager::getSingleton().load(p.first, RGN_DEFAULT,
                 HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
 
             // build tangent vectors for our mesh
