@@ -809,6 +809,7 @@ void AssimpLoader::createBonesFromNode(const aiScene* mScene, const aiNode* pNod
             aiM.Decompose(scale, rot, pos);
             bone->setPosition(pos.x, pos.y, pos.z);
             bone->setOrientation(rot.w, rot.x, rot.y, rot.z);
+            bone->setScale(scale.x, scale.y, scale.z);
         }
 
         if (!mQuietMode)
