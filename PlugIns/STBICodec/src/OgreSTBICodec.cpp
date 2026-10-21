@@ -170,8 +170,15 @@ namespace Ogre {
         String contents = input->getAsString();
 
         int width, height, components;
-        stbi_uc* pixelData = stbi_load_from_memory((const uchar*)contents.data(),
-                static_cast<int>(contents.size()), &width, &height, &components, 0);
+        const int size = static_cast<int>(contents.size());
+        const bool is16Bit = stbi_is_16_bit_from_memory((const uchar*)contents.data(), size) != 0;
+
+        // stb_image always decodes to 8 bits unless explicitly asked for 16 bits
+        void* pixelData = is16Bit
+            ? static_cast<void*>(stbi_load_16_from_memory((const uchar*)contents.data(), size,
+                                                          &width, &height, &components, 0))
+            : static_cast<void*>(stbi_load_from_memory((const uchar*)contents.data(), size,
+                                                       &width, &height, &components, 0));
 
         if (!pixelData)
         {
@@ -191,16 +198,17 @@ namespace Ogre {
         switch( components )
         {
             case 1:
-                format = PF_BYTE_L;
+                format = is16Bit ? PF_L16 : PF_BYTE_L;
                 break;
             case 2:
-                format = PF_BYTE_LA;
+                // no dedicated 16-bit luminance-alpha format, use the 2-channel short format
+                format = is16Bit ? PF_SHORT_GR : PF_BYTE_LA;
                 break;
             case 3:
-                format = PF_BYTE_RGB;
+                format = is16Bit ? PF_SHORT_RGB : PF_BYTE_RGB;
                 break;
             case 4:
-                format = PF_BYTE_RGBA;
+                format = is16Bit ? PF_SHORT_RGBA : PF_BYTE_RGBA;
                 break;
             default:
                 stbi_image_free(pixelData);
@@ -208,7 +216,7 @@ namespace Ogre {
                 break;
         }
         
-        image->loadDynamicImage(pixelData, width, height, 1, format, true);
+        image->loadDynamicImage(static_cast<uchar*>(pixelData), width, height, 1, format, true);
     }
     //---------------------------------------------------------------------    
     String STBIImageCodec::getType() const
