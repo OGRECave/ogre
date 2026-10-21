@@ -29,6 +29,8 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreTerrain.h"
+#include "OgreTerrainQuadTreeNode.h"
+#include "OgreRay.h"
 #include "OgreFileSystemLayer.h"
 
 #include "OgreBuildSettings.h"
@@ -93,6 +95,40 @@ void TerrainTests::TearDown()
     OGRE_DELETE mRoot;
 }
 //--------------------------------------------------------------------------
+TEST_F(TerrainTests, rayIntersectsAllAlignments)
+{
+    const Terrain::Alignment aligns[] = {
+        Terrain::ALIGN_X_Z, Terrain::ALIGN_X_Y, Terrain::ALIGN_Y_Z};
+    const Vector3 ups[] = {Vector3::UNIT_Y, Vector3::UNIT_Z, Vector3::UNIT_X};
+
+    for (size_t i = 0; i < 3; ++i)
+    {
+        Terrain t(mSceneMgr);
+
+        Terrain::ImportData imp;
+        imp.terrainAlign = aligns[i];
+        imp.terrainSize = 17;
+        imp.maxBatchSize = 9;
+        imp.minBatchSize = 5;
+        imp.worldSize = 100;
+        imp.constantHeight = 0;
+        imp.pos = Vector3(10, 20, 30);
+        ASSERT_TRUE(t.prepare(imp));
+
+        Vector3 localPoint;
+        t.getPoint(8, 8, &localPoint);
+        const Vector3 worldPoint = localPoint + t.getPosition();
+        const Vector3& up = ups[i];
+
+        Ray ray(worldPoint + up * 50.0f, -up);
+        std::pair<bool, Vector3> hit = t.rayIntersects(ray);
+        ASSERT_TRUE(hit.first);
+        EXPECT_NEAR(hit.second.x, worldPoint.x, 0.01f);
+        EXPECT_NEAR(hit.second.y, worldPoint.y, 0.01f);
+        EXPECT_NEAR(hit.second.z, worldPoint.z, 0.01f);
+    }
+}
+
 TEST_F(TerrainTests, create)
 {
     Terrain* t = OGRE_NEW Terrain(mSceneMgr);
