@@ -373,8 +373,8 @@ namespace Ogre
         stbtt_fontinfo* font = static_cast<stbtt_fontinfo*>(context);
         stbtt_InitFont(font, ttfchunk.getPtr(), 0);
 
-        // 64 gives the same texture resolution as freetype.
-        float scale = stbtt_ScaleForPixelHeight(font, vpScale * mTtfSize * mTtfResolution / 64);
+        // FT_Set_Char_Size below makes the em size `points * dpi / 72` pixels.
+        float scale = stbtt_ScaleForMappingEmToPixels(font, vpScale * mTtfSize * mTtfResolution / 72);
         for (const CodePointRange& range : mCodePointRangeList)
         {
             glyphCount += range.second - range.first + 1;
@@ -406,7 +406,7 @@ namespace Ogre
 #else
         float vpScale = OverlayManager::getSingleton().getPixelRatio();
         stbtt_fontinfo* font = static_cast<stbtt_fontinfo*>(_face);
-        float scale = stbtt_ScaleForPixelHeight(font, vpScale * mTtfSize * mTtfResolution / 64);
+        float scale = stbtt_ScaleForMappingEmToPixels(font, vpScale * mTtfSize * mTtfResolution / 72);
 #endif
 
         for (const CodePointRange& range : mCodePointRangeList)
@@ -456,8 +456,9 @@ namespace Ogre
                 int y_bearing = mTtfMaxBearingY + r.top;
                 buffer = stbtt_GetGlyphBitmap(font, scale, scale, idx, &buffer_pitch, &buffer_h, nullptr, nullptr);
 
-                // match FreeType, which truncates the 26.6 metrics to whole pixels
-                int advance = static_cast<int>(std::floor(advance_units * scale));
+                // FreeType's hinted bearings are truncated to whole pixels; stb has no
+                // hinting, so round advances like FreeType's hinted integral advances.
+                int advance = static_cast<int>(std::lround(advance_units * scale));
                 int x_bearing = static_cast<int>(std::floor(bearing_units * scale));
 #endif
                 // If at end of row
