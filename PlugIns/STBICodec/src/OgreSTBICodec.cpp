@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreString.h"
 #include "OgreRoot.h"
 
+#include <vector>
+
 #if __OGRE_HAVE_NEON
 #define STBI_NEON
 #endif
@@ -70,6 +72,16 @@ static Ogre::uchar* custom_zlib_compress(Ogre::uchar* data, int data_len, int* o
 #include "stbi/stb_image_write.h"
 
 namespace Ogre {
+
+    namespace
+    {
+        void appendToVector(void* context, void* data, int size)
+        {
+            auto* out = static_cast<std::vector<uchar>*>(context);
+            auto* bytes = static_cast<uchar*>(data);
+            out->insert(out->end(), bytes, bytes + size);
+        }
+    }
 
     STBIImageCodec::RegisteredCodecList STBIImageCodec::msCodecList;
     //---------------------------------------------------------------------
@@ -110,9 +122,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     DataStreamPtr STBIImageCodec::encode(const Any& input) const
     {
-        if(mType != "png") {
+        if(mType != "png" && mType != "jpeg" && mType != "jpg") {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                        "currently only encoding to PNG supported",
+                        "currently only encoding to PNG and JPEG supported",
                         "STBIImageCodec::encode" ) ;
         }
 
@@ -134,23 +146,48 @@ namespace Ogre {
             inputData = tempData;
         }
 
-        // Save to PNG
-        int channels = PixelUtil::getComponentCount(format);
-        int len;
-        uchar* data = stbi_write_png_to_mem(inputData, image->getRowSpan(), image->getWidth(), image->getHeight(), channels, &len);
+        const int channels = PixelUtil::getComponentCount(format);
+
+        if (mType == "png")
+        {
+            int len;
+            uchar* data = stbi_write_png_to_mem(inputData, image->getRowSpan(), image->getWidth(),
+                                                image->getHeight(), channels, &len);
+
+            if(tempData)
+            {
+                OGRE_FREE(tempData, MEMCATEGORY_GENERAL);
+            }
+
+            if (!data) {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                    "Error encoding image: " + String(stbi_failure_reason()),
+                    "STBIImageCodec::encode");
+            }
+
+            return DataStreamPtr(new MemoryDataStream(data, len, true));
+        }
+
+        // Save to JPEG. JPEG has no alpha channel, so it is discarded by stb_image_write.
+        static const int quality = 90;
+        std::vector<uchar> data;
+        const bool success = stbi_write_jpg_to_func(appendToVector, &data, image->getWidth(),
+                                                    image->getHeight(), channels, inputData, quality);
 
         if(tempData)
         {
             OGRE_FREE(tempData, MEMCATEGORY_GENERAL);
         }
 
-        if (!data) {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Error encoding image: " + String(stbi_failure_reason()),
-                "STBIImageCodec::encode");
+        if (!success)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Error encoding image as JPEG",
+                        "STBIImageCodec::encode");
         }
 
-        return DataStreamPtr(new MemoryDataStream(data, len, true));
+        auto stream = std::make_shared<MemoryDataStream>(data.size());
+        memcpy(stream->getPtr(), data.data(), data.size());
+        return stream;
     }
     //---------------------------------------------------------------------
     void STBIImageCodec::encodeToFile(const Any& input, const String& outFileName) const
