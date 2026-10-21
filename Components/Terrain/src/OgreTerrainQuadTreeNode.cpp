@@ -349,7 +349,11 @@ namespace Ogre
                 // Apply the delta to all LODs equal or lower detail to lod
                 LodLevelList::iterator i = mLodLevels.begin();
                 std::advance(i, lod - mBaseLod);
-                (*i)->calcMaxHeightDelta = std::max((*i)->calcMaxHeightDelta, delta);
+                // The stored delta is signed so it can morph vertices in either
+                // direction. The LOD error metric however is a magnitude: a
+                // coarse triangle that lies below a hill produces negative
+                // deltas and must still constrain the LOD choice.
+                (*i)->calcMaxHeightDelta = std::max((*i)->calcMaxHeightDelta, Math::Abs(delta));
             }
 
             // pass on to children
