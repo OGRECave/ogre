@@ -2668,6 +2668,9 @@ namespace Ogre {
     {
         // Version number
         mVersion = "[MeshSerializer_v1.8]";
+        // v1.8 and older had broken chunk size bookkeeping (see readMeshLodLevel) and several
+        // third party exporters wrote incorrect sizes, too. tolerate them on reading.
+        mReportChunkErrors = false;
     }
     //---------------------------------------------------------------------
     MeshSerializerImpl_v1_8::~MeshSerializerImpl_v1_8()
