@@ -222,7 +222,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    static int getRequiredLayers(const Terrain* terrain, bool pssm)
+    static int getRequiredLayers(const Terrain* terrain, uint8 numShadowTextures)
     {
         int layers = terrain->getLayerCount(); // layer diffusespec
         if (!terrain->getLayerTextureName(0, 1).empty())
@@ -232,8 +232,9 @@ namespace Ogre
         layers += bool(terrain->getLightmap());
         layers += terrain->getBlendTextures().size();
 
-        if(pssm)
-            layers += 3; // 3 shadow textures
+        // PSSM uses one texture unit per split. This must match the count
+        // used by SM2Profile::getMaxLayers().
+        layers += numShadowTextures;
 
         return layers;
     }
@@ -257,7 +258,14 @@ namespace Ogre
         // Automatically disable normal & parallax mapping if card cannot handle it
         // We do this rather than having a specific technique for it since it's simpler
         auto rsc = Root::getSingletonPtr()->getRenderSystem()->getCapabilities();
-        if (getRequiredLayers(terrain, mPSSM) > rsc->getNumTextureUnits())
+        uint8 numShadowTextures = 0;
+        if (isShadowingEnabled(HIGH_LOD, terrain))
+        {
+            numShadowTextures = 1;
+            if (mPSSM)
+                numShadowTextures = static_cast<uint8>(mPSSM->getSplitCount());
+        }
+        if (getRequiredLayers(terrain, numShadowTextures) > rsc->getNumTextureUnits())
         {
             setLayerNormalMappingEnabled(false);
             setLayerParallaxMappingEnabled(false);
