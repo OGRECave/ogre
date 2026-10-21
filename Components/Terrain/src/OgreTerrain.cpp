@@ -2273,14 +2273,16 @@ namespace Ogre
             std::swap(rayDirection.y, rayDirection.z);
             break;
         case ALIGN_Y_Z:
-            // x = z, z = y, y = -x
-            tmp.x = rayOrigin.z; 
-            tmp.z = rayOrigin.y; 
-            tmp.y = -rayOrigin.x; 
+            // Terrain plane is Y/Z and height is along X. Convert to the
+            // canonical heightfield space used below, where x/z are the
+            // plane axes and y is the height.
+            tmp.x = -rayOrigin.z;
+            tmp.y = rayOrigin.x;
+            tmp.z = rayOrigin.y;
             rayOrigin = tmp;
-            tmp.x = rayDirection.z; 
-            tmp.z = rayDirection.y; 
-            tmp.y = -rayDirection.x; 
+            tmp.x = -rayDirection.z;
+            tmp.y = rayDirection.x;
+            tmp.z = rayDirection.y;
             rayDirection = tmp;
             break;
         case ALIGN_X_Z:
@@ -2372,11 +2374,12 @@ namespace Ogre
                 std::swap(result.second.y, result.second.z);
                 break;
             case ALIGN_Y_Z:
-                // z = x, y = z, x = -y
-                tmp.x = -rayOrigin.y; 
-                tmp.y = rayOrigin.z; 
-                tmp.z = rayOrigin.x; 
-                rayOrigin = tmp;
+                // canonical (x/z = plane, y = height) -> world:
+                // world.x = height, world.y = z, world.z = -x
+                tmp.x = result.second.y;
+                tmp.y = result.second.z;
+                tmp.z = -result.second.x;
+                result.second = tmp;
                 break;
             case ALIGN_X_Z:
                 result.second.z = -result.second.z;
