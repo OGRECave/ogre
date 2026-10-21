@@ -39,6 +39,8 @@ THE SOFTWARE
 #include "OgreBillboardSet.h"
 #include "OgreBillboard.h"
 
+#include <cmath>
+
 #ifdef HAVE_FREETYPE
 #define generic _generic    // keyword for C++/CX
 #include <ft2build.h>
@@ -443,21 +445,20 @@ namespace Ogre
                     continue;
                 }
 
-                if(cp == ' ') // should figure out how advance works for stbtt..
-                    idx = stbtt_FindGlyphIndex(font, '0');
-
                 TRect<int> r;
                 stbtt_GetGlyphBitmapBox(font, idx, scale, scale, &r.left, &r.top, &r.right, &r.bottom);
+
+                int advance_units, bearing_units;
+                stbtt_GetGlyphHMetrics(font, idx, &advance_units, &bearing_units);
 
                 uint width = r.width();
 
                 int y_bearing = mTtfMaxBearingY + r.top;
-                int xoff = 0, yoff = 0;
-                buffer = stbtt_GetCodepointBitmap(font, scale, scale, cp, &buffer_pitch, &buffer_h, &xoff, &yoff);
+                buffer = stbtt_GetGlyphBitmap(font, scale, scale, idx, &buffer_pitch, &buffer_h, nullptr, nullptr);
 
-                int advance = xoff + width, x_bearing = xoff;
-                // should be multiplied with scale, but still does not seem to do the right thing
-                // stbtt_GetGlyphHMetrics(font, cp, &advance, &x_bearing);
+                // match FreeType, which truncates the 26.6 metrics to whole pixels
+                int advance = static_cast<int>(std::floor(advance_units * scale));
+                int x_bearing = static_cast<int>(std::floor(bearing_units * scale));
 #endif
                 // If at end of row
                 if( finalWidth - 1 < l + width )
