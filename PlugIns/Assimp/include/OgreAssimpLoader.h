@@ -113,6 +113,10 @@ private:
     void markAllChildNodesAsNeeded(const aiNode* pNode);
     void flagNodeAsNeeded(const char* name);
     bool isNodeNeeded(const char* name);
+    /// nearest ancestor of pNode that belongs to the skeleton, if any
+    const aiNode* findSkeletonParent(const aiNode* pNode) const;
+    /// bind-pose world transform of a bone (offset matrix if available, else node rest pose)
+    Affine3 getBoneBindWorld(const String& name) const;
     void parseAnimation(const aiScene* mScene, int index, aiAnimation* anim);
     typedef std::map<String, bool> boneMapType;
     boneMapType boneMap;
@@ -129,6 +133,10 @@ private:
 
     typedef std::map<String, Affine3> NodeTransformMap;
     NodeTransformMap mNodeDerivedTransformByName;
+    /// bind-pose world transforms implied by aiBone::mOffsetMatrix
+    NodeTransformMap mBoneBindWorldByName;
+    /// maps a bone node's local space into the space of its nearest skeleton ancestor
+    NodeTransformMap mBoneParentSpaceByName;
 
     SkeletonPtr mSkeleton;
 

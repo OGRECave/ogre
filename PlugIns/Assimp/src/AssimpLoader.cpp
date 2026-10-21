@@ -424,14 +424,15 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
 
     mQuietMode = mLoaderParams & LP_QUIET_MODE;
     mNodeDerivedTransformByName.clear();
+    mBoneBindWorldByName.clear();
+    mBoneParentSpaceByName.clear();
 
     String basename, extension;
     StringUtil::splitBaseFilename(mesh->getName(), basename, extension);
 
     grabNodeNamesFromNode(scene, scene->mRootNode);
-    grabBoneNamesFromNode(scene, scene->mRootNode);
-
     computeNodesDerivedTransform(scene, scene->mRootNode, scene->mRootNode->mTransformation);
+    grabBoneNamesFromNode(scene, scene->mRootNode);
 
     if (mBonesByName.size())
     {
@@ -521,6 +522,8 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
     mBonesByName.clear();
     mBoneNodesByName.clear();
     boneMap.clear();
+    mBoneBindWorldByName.clear();
+    mBoneParentSpaceByName.clear();
     mSkeleton.reset();
 
     mCustomAnimationName = "";
@@ -646,6 +649,23 @@ void AssimpLoader::parseAnimation(const aiScene* mScene, int index, aiAnimation*
         {
             Bone* bone = mSkeleton->getBone(boneName);
 
+            // Animation channels are relative to the node's direct parent. If
+            // the skeleton skips non-bone nodes, parentSpace maps the node-local
+            // transform into the space of the nearest skeleton ancestor.
+            Affine3 parentSpace = Affine3::IDENTITY;
+            auto parentSpaceIt = mBoneParentSpaceByName.find(boneName);
+            if (parentSpaceIt != mBoneParentSpaceByName.end())
+                parentSpace = parentSpaceIt->second;
+
+            // Components without keys keep the node's rest value. This must not
+            // be the bone's bind value: with offset matrices the two can differ.
+            aiVector3D restPos(0, 0, 0);
+            aiVector3D restScale(1, 1, 1);
+            aiQuaternion restRot;
+            auto boneNodeIt = mBoneNodesByName.find(boneName);
+            if (boneNodeIt != mBoneNodesByName.end() && boneNodeIt->second)
+                boneNodeIt->second->mTransformation.Decompose(restScale, restRot, restPos);
+
             NodeAnimationTrack* track = animation->createNodeTrack(bone->getHandle(), bone);
 
             // Ogre needs translate rotate and scale for each keyframe in the track
@@ -707,24 +727,24 @@ void AssimpLoader::parseAnimation(const aiScene* mScene, int index, aiAnimation*
                     aiVector3D aiScale = getScale(node_anim, keyframes, it, mTicksPerSecond);
                     Vector3 scale(aiScale.x, aiScale.y, aiScale.z);
 
-                    // A component whose channel carries NO keys at all must fall
-                    // back to the bone's BIND-pose value, not the getX helpers'
-                    // neutral (0,0,0)/identity/(1,1,1): a neutral placeholder
-                    // bakes the binding pose in as drift (missing tracks would
-                    // collapse the bone to the origin and sink its descendants).
+                    // A component whose channel carries NO keys keeps the node's
+                    // rest value. Using the bone's bind value here would be
+                    // wrong when the offset matrices describe a different bind
+                    // pose than the node hierarchy.
                     if (node_anim->mNumPositionKeys == 0)
-                        trans = bone->getPosition();
+                        trans = Vector3(restPos.x, restPos.y, restPos.z);
                     if (node_anim->mNumRotationKeys == 0)
-                        rot = bone->getOrientation();
+                        rot = Quaternion(restRot.w, restRot.x, restRot.y, restRot.z);
                     if (node_anim->mNumScalingKeys == 0)
-                        scale = bone->getScale();
+                        scale = Vector3(restScale.x, restScale.y, restScale.z);
 
                     Affine3 fullTransform;
                     fullTransform.makeTransform(trans, scale, rot);
+                    Affine3 targetTransform = parentSpace * fullTransform;
 
                     Vector3 targetTrans, targetScale;
                     Quaternion targetRot;
-                    fullTransform.decomposition(targetTrans, targetScale, targetRot);
+                    targetTransform.decomposition(targetTrans, targetScale, targetRot);
 
                     keyframe = track->createNodeKeyFrame(Real(it->first));
 
@@ -792,30 +812,88 @@ void AssimpLoader::computeNodesDerivedTransform(const aiScene* mScene, const aiN
     }
 }
 
+const aiNode* AssimpLoader::findSkeletonParent(const aiNode* pNode) const
+{
+    const aiNode* parent = pNode->mParent;
+    while (parent)
+    {
+        auto it = boneMap.find(String(parent->mName.data));
+        if (it != boneMap.end() && it->second)
+            return parent;
+        parent = parent->mParent;
+    }
+    return nullptr;
+}
+
+Affine3 AssimpLoader::getBoneBindWorld(const String& name) const
+{
+    auto bindIt = mBoneBindWorldByName.find(name);
+    if (bindIt != mBoneBindWorldByName.end())
+        return bindIt->second;
+
+    auto nodeIt = mNodeDerivedTransformByName.find(name);
+    if (nodeIt != mNodeDerivedTransformByName.end())
+        return nodeIt->second;
+
+    return Affine3::IDENTITY;
+}
+
 void AssimpLoader::createBonesFromNode(const aiScene* mScene, const aiNode* pNode)
 {
     if (isNodeNeeded(pNode->mName.data))
     {
-        Bone* bone = mSkeleton->createBone(String(pNode->mName.data));
+        const String boneName(pNode->mName.data);
+        Bone* bone = mSkeleton->createBone(boneName);
 
-        aiQuaternion rot;
-        aiVector3D pos;
-        aiVector3D scale;
-
-        const aiMatrix4x4& aiM = pNode->mTransformation;
-
-        if (!aiM.IsIdentity())
+        // The skeleton may skip nodes that are not bones.  Reconstruct the
+        // bone's transform relative to the nearest skeleton ancestor, and
+        // remember the rest transform of the skipped segment so animation
+        // channels, which are relative to the direct node parent, can be
+        // mapped into the same space.
+        const aiNode* skeletonParent = findSkeletonParent(pNode);
+        Affine3 ancestorRestWorld = Affine3::IDENTITY;
+        if (skeletonParent)
         {
-            aiM.Decompose(scale, rot, pos);
-            bone->setPosition(pos.x, pos.y, pos.z);
-            bone->setOrientation(rot.w, rot.x, rot.y, rot.z);
-            bone->setScale(scale.x, scale.y, scale.z);
+            auto it = mNodeDerivedTransformByName.find(skeletonParent->mName.data);
+            if (it != mNodeDerivedTransformByName.end())
+                ancestorRestWorld = it->second;
         }
+
+        Affine3 parentSpace = Affine3::IDENTITY;
+        if (pNode->mParent)
+        {
+            auto it = mNodeDerivedTransformByName.find(pNode->mParent->mName.data);
+            if (it != mNodeDerivedTransformByName.end())
+                parentSpace = ancestorRestWorld.inverse() * it->second;
+        }
+        mBoneParentSpaceByName[boneName] = parentSpace;
+
+        // Prefer the bind pose described by aiBone::mOffsetMatrix.  Nodes that
+        // are only part of the hierarchy (not weighted) fall back to their node
+        // rest transform.
+        Affine3 bindWorld = getBoneBindWorld(boneName);
+
+        // The local bind pose is relative to the ancestor's bind pose, not to
+        // its rest pose: the ancestor may itself be bound using an offset
+        // matrix that differs from its node transform.
+        Affine3 ancestorBindWorld = Affine3::IDENTITY;
+        if (skeletonParent)
+            ancestorBindWorld = getBoneBindWorld(skeletonParent->mName.data);
+
+        Affine3 localBind = ancestorBindWorld.inverse() * bindWorld;
+
+        Vector3 pos = Vector3::ZERO;
+        Vector3 scale = Vector3::UNIT_SCALE;
+        Quaternion rot = Quaternion::IDENTITY;
+        localBind.decomposition(pos, scale, rot);
+        bone->setPosition(pos);
+        bone->setOrientation(rot);
+        bone->setScale(scale);
 
         if (!mQuietMode)
         {
             LogManager::getSingleton().logMessage(StringConverter::toString(bone->getHandle()) +
-                                                  ") Creating bone '" + String(pNode->mName.data) + "'");
+                                                  ") Creating bone '" + boneName + "'");
         }
     }
     // Traverse all child nodes of the current node instance
@@ -830,14 +908,16 @@ void AssimpLoader::createBoneHiearchy(const aiScene* mScene, const aiNode* pNode
 {
     if (isNodeNeeded(pNode->mName.data))
     {
-        Bone* parent = 0;
         Bone* child = 0;
-        if (pNode->mParent)
+        Bone* parent = 0;
+
+        // Attach to the nearest skeleton ancestor, skipping nodes that are not
+        // represented by a bone (their transforms are folded into the local
+        // bind transform above).
+        const aiNode* skeletonParent = findSkeletonParent(pNode);
+        if (skeletonParent && mSkeleton->hasBone(skeletonParent->mName.data))
         {
-            if (mSkeleton->hasBone(pNode->mParent->mName.data))
-            {
-                parent = mSkeleton->getBone(pNode->mParent->mName.data);
-            }
+            parent = mSkeleton->getBone(skeletonParent->mName.data);
         }
         if (mSkeleton->hasBone(pNode->mName.data))
         {
@@ -885,12 +965,36 @@ void AssimpLoader::grabBoneNamesFromNode(const aiScene* mScene, const aiNode* pN
 
             if (pAIMesh->HasBones())
             {
+                // Some importers (e.g. ASE) create aiBones but never fill in
+                // mOffsetMatrix, leaving it at identity.  Only trust the offset
+                // matrices if at least one of them was actually set.
+                bool hasBindPose = false;
+                for (uint32 i = 0; i < pAIMesh->mNumBones && !hasBindPose; ++i)
+                    hasBindPose = pAIMesh->mBones[i] && !pAIMesh->mBones[i]->mOffsetMatrix.IsIdentity();
+
                 for (uint32 i = 0; i < pAIMesh->mNumBones; ++i)
                 {
                     aiBone* pAIBone = pAIMesh->mBones[i];
                     if (NULL != pAIBone)
                     {
-                        mBonesByName[pAIBone->mName.data] = pAIBone;
+                        const String boneName(pAIBone->mName.data);
+                        mBonesByName[boneName] = pAIBone;
+
+                        // mOffsetMatrix maps vertices from mesh space into this
+                        // bone's space in bind pose. Vertices are loaded in world
+                        // space (see computeNodesDerivedTransform), so the bind
+                        // pose in that space is meshWorld * offset^-1.  This is
+                        // authoritative: node rest transforms are not guaranteed
+                        // to match the bind pose stored by the file (e.g. glTF
+                        // inverseBindMatrices).
+                        auto meshWorld = mNodeDerivedTransformByName.find(pNode->mName.data);
+                        if (hasBindPose && meshWorld != mNodeDerivedTransformByName.end() &&
+                            mBoneBindWorldByName.find(boneName) == mBoneBindWorldByName.end())
+                        {
+                            Affine3 offset(pAIBone->mOffsetMatrix[0]);
+                            if (Math::Abs(offset.linear().determinant()) > 1e-12f)
+                                mBoneBindWorldByName[boneName] = meshWorld->second * offset.inverse();
+                        }
 
                         if (!mQuietMode)
                         {
