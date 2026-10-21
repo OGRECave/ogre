@@ -112,6 +112,8 @@ namespace Ogre {
         // OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
         typedef std::vector<size_t> ChunkSizeStack;
         ChunkSizeStack mChunkSizeStack;
+        /// Report chunk size mismatches. when false, over-long chunk sizes are clamped to the
+        /// end of the stream instead of being rejected, as done for legacy formats.
         bool mReportChunkErrors;
 
         void pushInnerChunk(const DataStreamPtr& stream);

@@ -34,10 +34,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Serializer::Serializer() :
         mVersion("[Serializer_v1.00]"), // Version number
-        mFlipEndian(false)
-#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
-        , mReportChunkErrors(true)
-#endif
+        mFlipEndian(false),
+        mReportChunkErrors(true)
     {
     }
 
@@ -269,8 +267,21 @@ namespace Ogre {
         if (!stream->eof())
         {
             // chunk size cant be smaller than the header size, and must fit within the stream
-            if (mCurrentstreamLen < calcChunkHeaderSize() || pos + mCurrentstreamLen > stream->size())
+            if (mCurrentstreamLen < calcChunkHeaderSize())
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Corrupt chunk length");
+
+            if (pos + mCurrentstreamLen > stream->size())
+            {
+                if (mReportChunkErrors)
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Corrupt chunk length");
+
+                // legacy exporters wrote chunk sizes that do not match the data they wrote.
+                // all reads are still bounded by the stream, so just clamp the chunk end.
+                LogManager::getSingleton().stream(LML_WARNING)
+                    << "Chunk " << id << " in '" << stream->getName()
+                    << "' extends past the end of the stream, clamping to stream size";
+                mCurrentstreamLen = static_cast<uint32>(stream->size() - pos);
+            }
         }
 
 #if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
