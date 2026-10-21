@@ -339,6 +339,14 @@ String ReplaceSpaces(const String& s)
 
     return res;
 }
+
+/// component-wise division, leaving the numerator untouched on a zero denominator
+Vector3 componentwiseDivide(const Vector3& num, const Vector3& den)
+{
+    return Vector3(den.x != 0 ? num.x / den.x : num.x,
+                   den.y != 0 ? num.y / den.y : num.y,
+                   den.z != 0 ? num.z / den.z : num.z);
+}
 } // namespace
 
 AssimpLoader::AssimpLoader()
@@ -637,9 +645,6 @@ void AssimpLoader::parseAnimation(const aiScene* mScene, int index, aiAnimation*
         if (mSkeleton->hasBone(boneName))
         {
             Bone* bone = mSkeleton->getBone(boneName);
-            Affine3 defBonePoseInv;
-            defBonePoseInv.makeInverseTransform(bone->getPosition(), bone->getScale(),
-                                                bone->getOrientation());
 
             NodeAnimationTrack* track = animation->createNodeTrack(bone->getHandle(), bone);
 
@@ -702,13 +707,11 @@ void AssimpLoader::parseAnimation(const aiScene* mScene, int index, aiAnimation*
                     aiVector3D aiScale = getScale(node_anim, keyframes, it, mTicksPerSecond);
                     Vector3 scale(aiScale.x, aiScale.y, aiScale.z);
 
-                    // Each keyframe is composed into a full local transform and
-                    // premultiplied by the inverse bind pose, so a component
-                    // whose channel carries NO keys at all must fall back to the
-                    // bone's BIND-pose value, not the getX helpers' neutral
-                    // (0,0,0)/identity/(1,1,1): a neutral placeholder bakes the
-                    // inverse bind in as drift (missing tracks would collapse the
-                    // bone to the origin and sink its descendants).
+                    // A component whose channel carries NO keys at all must fall
+                    // back to the bone's BIND-pose value, not the getX helpers'
+                    // neutral (0,0,0)/identity/(1,1,1): a neutral placeholder
+                    // bakes the binding pose in as drift (missing tracks would
+                    // collapse the bone to the origin and sink its descendants).
                     if (node_anim->mNumPositionKeys == 0)
                         trans = bone->getPosition();
                     if (node_anim->mNumRotationKeys == 0)
@@ -716,25 +719,27 @@ void AssimpLoader::parseAnimation(const aiScene* mScene, int index, aiAnimation*
                     if (node_anim->mNumScalingKeys == 0)
                         scale = bone->getScale();
 
-                    Vector3 transCopy = trans;
-
                     Affine3 fullTransform;
                     fullTransform.makeTransform(trans, scale, rot);
 
-                    Affine3 poseTokey = defBonePoseInv * fullTransform;
-                    poseTokey.decomposition(trans, scale, rot);
+                    Vector3 targetTrans, targetScale;
+                    Quaternion targetRot;
+                    fullTransform.decomposition(targetTrans, targetScale, targetRot);
 
                     keyframe = track->createNodeKeyFrame(Real(it->first));
 
-                    // weirdness with the root bone, But this seems to work
-                    if (mSkeleton->getRootBones()[0]->getName() == boneName)
-                    {
-                        trans = transCopy - bone->getPosition();
-                    }
-
-                    keyframe->setTranslate(trans);
-                    keyframe->setRotation(rot);
-                    keyframe->setScale(scale);
+                    // Ogre applies keyframes as deltas to the bone's binding pose:
+                    // translation is added in parent space, while rotation and
+                    // scale are composed in bone-local space (see
+                    // NodeAnimationTrack::applyToNode).  Do NOT decompose
+                    // defBonePose.Inverse() * fullTransform: that yields a
+                    // translation expressed in bind-bone axes, which makes Ogre
+                    // rotate animated translations by the inverse bind
+                    // orientation.  The old code worked around this for the first
+                    // root bone only.
+                    keyframe->setTranslate(targetTrans - bone->getPosition());
+                    keyframe->setRotation(bone->getOrientation().Inverse() * targetRot);
+                    keyframe->setScale(componentwiseDivide(targetScale, bone->getScale()));
                 }
             }
 
