@@ -87,7 +87,9 @@ if (OGRE_BUILD_SAMPLES)
   endif()
 
   ## Add browser last
-  add_subdirectory(Browser)
+  if (NOT (WINDOWS_STORE OR WINDOWS_PHONE))
+    add_subdirectory(Browser)
+  endif()
 endif ()
 		
 if (MSVC AND OGRE_BUILD_SAMPLES)
@@ -110,6 +112,8 @@ if (MSVC AND OGRE_BUILD_SAMPLES)
       COMMENT "Building demo installer" VERBATIM
     )
 	# Make sure we build samples first
-	add_dependencies(demo_installer SampleBrowser)
+	if (TARGET SampleBrowser)
+	  add_dependencies(demo_installer SampleBrowser)
+	endif()
   endif()
 endif()

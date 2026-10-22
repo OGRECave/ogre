@@ -39,21 +39,6 @@
 
 #include "SampleBrowser.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-// short version of SDL_winrt_main_NonXAML.cpp
-#include <wrl.h>
-#pragma warning(disable:4447)
-#pragma comment(lib, "runtimeobject.lib")
-INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
-{
-	if(FAILED(Windows::Foundation::Initialize(RO_INIT_MULTITHREADED))) {
-		return 1;
-	}
-	SDL_WinRTRunApp(main, NULL);
-	return 0;
-}
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR cmdLine, INT) {
     int argc = __argc;

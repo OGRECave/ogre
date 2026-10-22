@@ -114,7 +114,6 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_CameraTrack);
     addSample(new Sample_Character);
     addSample(new CSMShadows);
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
     addSample(new Sample_DynTex);
     addSample(new Sample_FacialAnimation);
     addSample(new Sample_Grass);
@@ -145,7 +144,6 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
 #endif
     addSample(new Sample_ParticleGS);
     addSample(new Sample_Smoke);
-#endif // OGRE_PLATFORM_WINRT
     addSample(new Sample_SkeletalAnimation);
     addSample(new Sample_SkyBox);
     addSample(new Sample_SkyDome);
@@ -159,7 +157,7 @@ DefaultSamplesPlugin::DefaultSamplesPlugin() : SamplePlugin("DefaultSamplesPlugi
     addSample(new Sample_PBR);
     addSample(new Sample_RectLight);
     addSample(new Sample_GaussianSplatting);
-#if defined(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM) && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+#if defined(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     addSample(new Sample_ShaderSystem);
     addSample(new Sample_ShaderSystemTexturedFog);
     addSample(new Sample_ShaderSystemMultiLight);

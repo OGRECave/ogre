@@ -46,19 +46,6 @@
 
 #define ENABLE_SHADERS_CACHE 1
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#    include <sdkddkver.h>
-#    if defined(_WIN32_WINNT) && _WIN32_WINNT == _WIN32_WINNT_WIN8
-//      For WinRT 8.0 we only support running from the cache file.
-#       undef ENABLE_SHADERS_CACHE
-#       define ENABLE_SHADERS_CACHE 1
-#    endif
-#endif
-
-#ifndef __OGRE_WINRT_PHONE
-#define __OGRE_WINRT_PHONE 0
-#endif
-
 #ifdef OGRE_STATIC_LIB
 #include "DefaultSamplesPlugin.h"
 #   ifdef SAMPLES_INCLUDE_PLAYPEN
@@ -514,18 +501,6 @@ namespace OgreBites
 
             if (key == SDLK_ESCAPE)
             {
-#if __OGRE_WINRT_PHONE
-                // If there is a quit button, assume that we intended to press it via 'ESC'.
-                if (mTrayMgr->areTraysVisible())
-                {
-                    Widget *pWidget = mTrayMgr->getWidget("Quit");
-                    if (pWidget)
-                    {
-                        buttonHit((Button*)pWidget);  // on phone, quit entirely.
-                        return false;  // now act as if we didn't handle the button to get AppModel to exit.
-                    }
-                }
-#endif // __OGRE_WINRT_PHONE
                 if (mTitleLabel->getTrayLocation() != TL_NONE)
                 {
                     // if we're in the main screen and a sample's running, toggle sample pause state
@@ -836,7 +811,7 @@ namespace OgreBites
             char lastChar = sampleDir[sampleDir.length() - 1];
             if (lastChar != '/' && lastChar != '\\')
             {
-#   if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
+#   if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
                 sampleDir += "\\";
 #   else
                 sampleDir += "/";
@@ -937,10 +912,10 @@ namespace OgreBites
             mTrayMgr->createSeparator(TL_RIGHT, "LogoSep");
             mTrayMgr->createButton(TL_RIGHT, "StartStop", "Start Sample", 120);
 
-#if (OGRE_PLATFORM != OGRE_PLATFORM_WINRT) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
             mTrayMgr->createButton(TL_RIGHT, "UnloadReload", mLoadedSamples.empty() ? "Reload Samples" : "Unload Samples");
 #endif
-#if (OGRE_PLATFORM != OGRE_PLATFORM_WINRT) && defined(HAVE_IMGUI)
+#if defined(HAVE_IMGUI)
             mTrayMgr->createButton(TL_RIGHT, "Configure", "Configure");
 #endif
 #if (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)

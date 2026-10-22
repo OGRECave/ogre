@@ -243,36 +243,16 @@ identifier of a valid developer certificate if you are building for devices.
 WinRT / UWP
 ------------------------------
 
-You need Windows 8.0 or later, Windows 10 is recommended.
-
-Visual Studio 2015 is recommended as it is bundled with Universal 10.0.240.0, WinStore 8.0/8.1 and WinPhone 8.0/8.1 SDKs.
+OgreMain and the Direct3D 11 render system support Windows 10 UWP. The
+SampleBrowser is not built for UWP; use your own application entry point.
 
 Dependencies for Win32 and for WinRT must be located in
 separate folders. Cg is not supported.
 
     cmake.exe -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0 ..
 
-Select SampleBrowser as the start up project and run.
-
 @par Notes
 
 1. The code and generated CMake solution should be on local NTFS drive,
 and can't be on a network drive, including VMWare shared folders - or
 you will get a errors when you will try to compile/link/run resulting exe.
-
-2. Ogre uses d3dcompiler_xx.dll to compile shaders, and WinStore and
-WinPhone 8.1 projects can use it without restriction as it is part of OS.
-But WinStore and WinPhone 8.0 applications should load already compiled
-shaders from cache, as d3dcompiler_xx.dll is available to them only during
-development. Therefore to avoid necessity to deploy d3dcompiler_xx.dll
-during development (additional configurations with d3dcompiler_xx.dll)
-and generation of such cache - use version 8.1 of these platforms.
-
-3. Running WinPhone emulator in OS running under VMware:
-We were able to run the emulation and debug without an issue by using two
-steps: (a) Under the settings of the VM > CPU, make sure you have the
-option to pass-through the Intel VT-x/EPT feature, (b) Edit the config
-file .vmx and add the parameter: hypervisor.cpuid.v0 = "FALSE"
-All versions of Visual Studio 2012 have a window refresh issue when running
-in VMware and the window is maximized, the solution is just to change the
-size of the Visual Studio window to be less the the screen width and height.
