@@ -32,64 +32,6 @@ endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 
-if (WINDOWS_STORE OR WINDOWS_PHONE)
-
-    # Inspired by http://cmakems.codeplex.com/SourceControl/latest#Tests/VSWinStorePhone/CMakeLists.txt
-
-    # Generate manifest.
-    set(EXE_NAME SampleBrowser)
-    set(SHORT_NAME ${EXE_NAME})
-    set(PACKAGE_GUID "ef31484f-4f23-4b9f-8748-af5482696ae5")
-    set(APP_MANIFEST_NAME Package.appxmanifest)
-    configure_file(
-        ${OGRE_TEMPLATES_DIR}/Package_vc1900.WindowsStore.appxmanifest.in
-        ${CMAKE_CURRENT_BINARY_DIR}/${APP_MANIFEST_NAME}
-        @ONLY)
-
-    # Make symlink to Media folder
-    if( NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/Media")
-        # Get OS dependent path to use in `execute_process`
-        file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/Media" link)
-        file(TO_NATIVE_PATH "${PROJECT_SOURCE_DIR}/Samples/Media" target)
-        execute_process( COMMAND cmd.exe /c mklink /J ${link} ${target})
-    endif()
-
-    # Copy other resources
-    file(COPY
-	    ${SDL2_BINARY}
-
-        ${PROJECT_BINARY_DIR}/inst/bin/resources.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/plugins.cfg
-        ${PROJECT_BINARY_DIR}/inst/bin/samples.cfg
-
-        ${PROJECT_SOURCE_DIR}/Samples/Common/misc.winrt/Logo.png
-        ${PROJECT_SOURCE_DIR}/Samples/Common/misc.winrt/SmallLogo.png
-        ${PROJECT_SOURCE_DIR}/Samples/Common/misc.winrt/StoreLogo.png
-        ${PROJECT_SOURCE_DIR}/Samples/Common/misc.winrt/SplashScreen.png
-
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-    )
-
-    # Mark resources as deployment content, so that it would be packaged
-    set(CONTENT_FILES ${CONTENT_FILES}
-        ${CMAKE_CURRENT_BINARY_DIR}/${APP_MANIFEST_NAME}
-	${CMAKE_CURRENT_BINARY_DIR}/SDL2.dll
-        ${CMAKE_CURRENT_BINARY_DIR}/Media
-        ${CMAKE_CURRENT_BINARY_DIR}/Logo.png
-        ${CMAKE_CURRENT_BINARY_DIR}/SmallLogo.png
-        ${CMAKE_CURRENT_BINARY_DIR}/StoreLogo.png
-        ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.png
-        ${CMAKE_CURRENT_BINARY_DIR}/resources.cfg
-        ${CMAKE_CURRENT_BINARY_DIR}/plugins.cfg
-        ${CMAKE_CURRENT_BINARY_DIR}/samples.cfg
-    )
-    set_property(SOURCE ${CONTENT_FILES} PROPERTY VS_DEPLOYMENT_CONTENT 1)
-
-    set(RESOURCE_FILES ${CONTENT_FILES})
-    source_group("Resource Files" FILES ${RESOURCE_FILES})
-
-endif()
-
 if (OGRE_BUILD_TESTS)
 	add_definitions(-DSAMPLES_INCLUDE_PLAYPEN)
 	include_directories(${PROJECT_SOURCE_DIR}/Tests/PlayPen/include
@@ -153,13 +95,9 @@ endif ()
 ogre_config_common(SampleBrowser)
 
 # append _d for debug builds
-if (WIN32 AND NOT (WINDOWS_STORE OR WINDOWS_PHONE))
+if (WIN32)
 	set_property(TARGET SampleBrowser APPEND PROPERTY DEBUG_POSTFIX "_d")
 endif ()
-
-if (WINDOWS_STORE OR WINDOWS_PHONE)
-	set_target_properties(SampleBrowser PROPERTIES VS_WINRT_COMPONENT "true")
-endif()
 
 if (APPLE)
 	set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
