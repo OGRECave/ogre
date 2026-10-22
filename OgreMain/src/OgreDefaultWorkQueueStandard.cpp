@@ -41,7 +41,20 @@ static void set_current_thread_name(std::string name)
 #if defined(_WIN32)
     // Windows 10 1607+ / Server 2016+; visible in debuggers and ETW traces.
     std::wstring w(name.begin(), name.end()); // ASCII names only
-    ::SetThreadDescription(::GetCurrentThread(), w.c_str());
+
+    // Look it up at runtime: older Windows versions don't provide it, and some
+    // MinGW headers do not declare it at all.
+    typedef HRESULT (WINAPI *SetThreadDescriptionFn)(HANDLE, PCWSTR);
+    static SetThreadDescriptionFn pSetThreadDescription = []() -> SetThreadDescriptionFn
+    {
+        HMODULE kernel32 = ::GetModuleHandleW(L"kernel32.dll");
+        return kernel32 ? reinterpret_cast<SetThreadDescriptionFn>(
+                              ::GetProcAddress(kernel32, "SetThreadDescription"))
+                        : nullptr;
+    }();
+
+    if (pSetThreadDescription)
+        pSetThreadDescription(::GetCurrentThread(), w.c_str());
 
 #elif defined(__APPLE__)
     pthread_setname_np(name.c_str()); // current thread only
