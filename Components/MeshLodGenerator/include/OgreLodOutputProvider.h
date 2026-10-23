@@ -82,9 +82,9 @@ protected:
     // TODO: remove implementation and make pure virtual. These are just to make the compressed version work.
     virtual size_t getSubMeshCount() { return 0; } // = 0;
 
-    HardwareIndexBufferPtr createIndexBuffer(size_t indexCount);
+    HardwareIndexBufferPtr createIndexBuffer(HardwareIndexBuffer::IndexType indexType, size_t indexCount);
     // TODO: remove implementation and make pure virtual. These are just to make the compressed version work.
-    virtual HardwareIndexBufferPtr createIndexBufferImpl(size_t indexCount) { return nullptr; } // = 0;
+    virtual HardwareIndexBufferPtr createIndexBufferImpl(HardwareIndexBuffer::IndexType indexType, size_t indexCount) { return nullptr; } // = 0;
 
     // TODO: remove implementation and make pure virtual. These are just to make the compressed version work.
     virtual void createSubMeshLodIndexData(size_t subMeshIndex, int lodIndex, const HardwareIndexBufferPtr & indexBuffer, size_t indexStart, size_t indexCount) {} // = 0;
