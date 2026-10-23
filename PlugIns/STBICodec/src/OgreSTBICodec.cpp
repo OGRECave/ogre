@@ -129,35 +129,27 @@ namespace Ogre {
         }
 
         Image* image = any_cast<Image*>(input);
-        PixelFormat format = image->getFormat();
-        uchar* inputData = image->getData();
 
         // Convert image data to ABGR format for STBI (unless it's already compatible)
-        uchar* tempData = 0;
-        if(format != Ogre::PF_A8B8G8R8 && format != PF_B8G8R8 && format != PF_BYTE_LA && 
-            format != PF_L8 && format != PF_R8)
-        {   
-            format = Ogre::PF_A8B8G8R8;
-            size_t tempDataSize = PixelUtil::getMemorySize(image->getWidth(), image->getHeight(), 1, format);
-            tempData = OGRE_ALLOC_T(unsigned char, tempDataSize, Ogre::MEMCATEGORY_GENERAL);
-            Ogre::PixelBox pbOut(image->getPixelBox(), format, tempData);
-            PixelUtil::bulkPixelConversion(image->getPixelBox(), pbOut);
-
-            inputData = tempData;
+        Image converted;
+        const Image* source = image;
+        if (image->getFormat() != Ogre::PF_A8B8G8R8 && image->getFormat() != PF_B8G8R8 &&
+            image->getFormat() != PF_BYTE_LA && image->getFormat() != PF_L8 &&
+            image->getFormat() != PF_R8)
+        {
+            converted.create(PF_A8B8G8R8, image->getWidth(), image->getHeight());
+            PixelUtil::bulkPixelConversion(image->getPixelBox(), converted.getPixelBox());
+            source = &converted;
         }
 
-        const int channels = PixelUtil::getComponentCount(format);
+        const int channels = PixelUtil::getComponentCount(source->getFormat());
 
         if (mType == "png")
         {
             int len;
-            uchar* data = stbi_write_png_to_mem(inputData, image->getRowSpan(), image->getWidth(),
-                                                image->getHeight(), channels, &len);
-
-            if(tempData)
-            {
-                OGRE_FREE(tempData, MEMCATEGORY_GENERAL);
-            }
+            uchar* data = stbi_write_png_to_mem(source->getData(), source->getRowSpan(),
+                                                source->getWidth(), source->getHeight(), channels,
+                                                &len);
 
             if (!data) {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -171,13 +163,9 @@ namespace Ogre {
         // Save to JPEG. JPEG has no alpha channel, so it is discarded by stb_image_write.
         static const int quality = 90;
         std::vector<uchar> data;
-        const bool success = stbi_write_jpg_to_func(appendToVector, &data, image->getWidth(),
-                                                    image->getHeight(), channels, inputData, quality);
-
-        if(tempData)
-        {
-            OGRE_FREE(tempData, MEMCATEGORY_GENERAL);
-        }
+        const bool success = stbi_write_jpg_to_func(appendToVector, &data, source->getWidth(),
+                                                    source->getHeight(), channels, source->getData(),
+                                                    quality);
 
         if (!success)
         {
