@@ -790,3 +790,58 @@ TEST(ParticleEmitter, AngleAbove180EmitsInAllDirections)
 
     Math::SetRandomValueProvider(NULL);
 }
+
+// The static constants of these classes are defined with these constructors.
+// Being constexpr, the definitions are constant-initialized, so the constants
+// are already set when another translation unit reads them during its dynamic
+// initialization (no static initialization order fiasco).
+constexpr Matrix3 gMatrix3(1, 2, 3, 4, 5, 6, 7, 8, 9);
+constexpr Matrix4 gMatrix4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+constexpr Affine3 gAffine3(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+constexpr Quaternion gQuaternion(1, 2, 3, 4);
+constexpr AxisAlignedBox gBoxNull;
+constexpr AxisAlignedBox gBoxInfinite(AxisAlignedBox::EXTENT_INFINITE);
+
+TEST(Math, ConstexprConstructors)
+{
+    for (int r = 0; r < 3; r++)
+        for (int c = 0; c < 3; c++)
+            EXPECT_EQ(gMatrix3[r][c], r * 3 + c + 1);
+
+    for (int r = 0; r < 4; r++)
+        for (int c = 0; c < 4; c++)
+            EXPECT_EQ(gMatrix4[r][c], r * 4 + c + 1);
+
+    for (int r = 0; r < 3; r++)
+        for (int c = 0; c < 4; c++)
+            EXPECT_EQ(gAffine3[r][c], r * 4 + c + 1);
+    EXPECT_EQ(gAffine3[3][0], 0);
+    EXPECT_EQ(gAffine3[3][1], 0);
+    EXPECT_EQ(gAffine3[3][2], 0);
+    EXPECT_EQ(gAffine3[3][3], 1);
+
+    EXPECT_EQ(gQuaternion.w, 1);
+    EXPECT_EQ(gQuaternion.x, 2);
+    EXPECT_EQ(gQuaternion.y, 3);
+    EXPECT_EQ(gQuaternion.z, 4);
+
+    EXPECT_TRUE(gBoxNull.isNull());
+    EXPECT_EQ(gBoxNull.getMinimum(), Vector3(-0.5));
+    EXPECT_EQ(gBoxNull.getMaximum(), Vector3(0.5));
+    EXPECT_TRUE(gBoxInfinite.isInfinite());
+}
+
+TEST(Math, StaticConstants)
+{
+    EXPECT_EQ(Matrix3::ZERO, Matrix3(0, 0, 0, 0, 0, 0, 0, 0, 0));
+    EXPECT_EQ(Matrix3::IDENTITY, Matrix3(1, 0, 0, 0, 1, 0, 0, 0, 1));
+    EXPECT_EQ(Matrix4::ZERO, Matrix4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+    EXPECT_EQ(Matrix4::IDENTITY, Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
+    EXPECT_EQ(Matrix4::CLIPSPACE2DTOIMAGESPACE, Matrix4(0.5, 0, 0, 0.5, 0, -0.5, 0, 0.5, 0, 0, 1, 0, 0, 0, 0, 1));
+    EXPECT_EQ(Affine3::ZERO, Affine3(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+    EXPECT_EQ(Affine3::IDENTITY, Affine3(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0));
+    EXPECT_EQ(Quaternion::ZERO, Quaternion(0, 0, 0, 0));
+    EXPECT_EQ(Quaternion::IDENTITY, Quaternion(1, 0, 0, 0));
+    EXPECT_TRUE(AxisAlignedBox::BOX_NULL.isNull());
+    EXPECT_TRUE(AxisAlignedBox::BOX_INFINITE.isInfinite());
+}

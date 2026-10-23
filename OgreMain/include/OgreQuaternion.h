@@ -66,7 +66,7 @@ namespace Ogre {
             : w(rhs.w), x(rhs.x), y(rhs.y), z(rhs.z)
         {}
         /// Construct from an explicit list of values
-        inline Quaternion (
+        constexpr Quaternion (
             Real fW,
             Real fX, Real fY, Real fZ)
             : w(fW), x(fX), y(fY), z(fZ)

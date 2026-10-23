@@ -97,6 +97,17 @@ namespace Ogre
         template<typename U>
         explicit TransformBase(const TransformBase<rows, U>& o) : TransformBase(o[0]) {}
 
+    protected:
+        /// Initialise every entry, so that constants can be constant-initialized
+        constexpr TransformBase(T m00, T m01, T m02, T m03, T m10, T m11, T m12, T m13, T m20,
+                                T m21, T m22, T m23, T m30, T m31, T m32, T m33)
+            : m{{m00, m01, m02, m03}, {m10, m11, m12, m13}, {m20, m21, m22, m23}, {m30, m31, m32, m33}}
+        {
+            static_assert(rows == 4, "must have 4 rows");
+        }
+
+    public:
+
         T* operator[](size_t iRow)
         {
             assert(iRow < rows);
@@ -162,6 +173,15 @@ namespace Ogre
         TransformBaseReal() {}
         template<typename U>
         explicit TransformBaseReal(const U* ptr) : TransformBase(ptr) {}
+    protected:
+        constexpr TransformBaseReal(Real m00, Real m01, Real m02, Real m03, Real m10, Real m11,
+                                    Real m12, Real m13, Real m20, Real m21, Real m22, Real m23,
+                                    Real m30, Real m31, Real m32, Real m33)
+            : TransformBase(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32,
+                            m33)
+        {
+        }
+    public:
         /** Builds a translation matrix
         */
         void makeTrans( const Vector3& v )
@@ -225,16 +245,16 @@ namespace Ogre
         /// Do <b>NOT</b> initialize the matrix for efficiency.
         Matrix4() {}
 
-        Matrix4(
+        constexpr Matrix4(
             Real m00, Real m01, Real m02, Real m03,
             Real m10, Real m11, Real m12, Real m13,
             Real m20, Real m21, Real m22, Real m23,
             Real m30, Real m31, Real m32, Real m33 )
+            : TransformBaseReal(m00, m01, m02, m03,
+                                m10, m11, m12, m13,
+                                m20, m21, m22, m23,
+                                m30, m31, m32, m33)
         {
-            m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
-            m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
-            m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
-            m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
         }
 
         template<typename U>
@@ -344,15 +364,15 @@ namespace Ogre
             m[3][0] = 0, m[3][1] = 0, m[3][2] = 0, m[3][3] = 1;
         }
 
-        Affine3(
+        constexpr Affine3(
             Real m00, Real m01, Real m02, Real m03,
             Real m10, Real m11, Real m12, Real m13,
             Real m20, Real m21, Real m22, Real m23)
+            : TransformBaseReal(m00, m01, m02, m03,
+                                m10, m11, m12, m13,
+                                m20, m21, m22, m23,
+                                0,   0,   0,   1)
         {
-            m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
-            m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
-            m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
-            m[3][0] = 0;   m[3][1] = 0;   m[3][2] = 0;   m[3][3] = 1;
         }
 
         /// extract the Affine part of a Matrix4
