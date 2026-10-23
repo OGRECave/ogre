@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreVulkanRenderSystem.h"
 
+#include <algorithm>
 #include <numeric>
 
 #include "OgreGpuProgramManager.h"
@@ -37,7 +38,6 @@ THE SOFTWARE.
 #include "OgreVulkanDevice.h"
 #include "OgreVulkanMappings.h"
 #include "OgreVulkanProgram.h"
-#include "OgreVulkanRenderPassDescriptor.h"
 #include "OgreVulkanTextureGpuManager.h"
 #include "OgreVulkanUtils.h"
 #include "OgreVulkanWindow.h"
@@ -49,7 +49,6 @@ THE SOFTWARE.
 #include "OgreDepthBuffer.h"
 #include "OgreRoot.h"
 
-#include "OgreVulkanWindow.h"
 #include "OgrePixelFormat.h"
 
 #define VULKAN_MAX_TEXTURE_UNITS 16
@@ -125,6 +124,12 @@ namespace Ogre
         mUBOInfo{},
         mUBODynOffsets{},
         mImageInfos{},
+        mComputeImageInfo{},
+        mStorageImageInfos{},
+        mStorageTextures{},
+        mStorageImageViews{},
+        mBoundComputeProfile( Compute ),
+        mBoundGraphicsProfile( Graphics ),
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
         mScissorRect{},
@@ -141,6 +146,12 @@ namespace Ogre
         pipelineCi.pViewportState = &viewportStateCi;
         pipelineCi.pStages = shaderStages.data();
         pipelineCi.stageCount = 2; // vertex+fragment
+
+        for(auto& p : mProfiles)
+        {
+            p.layout = VK_NULL_HANDLE;
+            p.pipelineLayout = VK_NULL_HANDLE;
+        }
 
         inputAssemblyCi.primitiveRestartEnable = false;
 
@@ -161,38 +172,8 @@ namespace Ogre
         viewportStateCi.viewportCount = 1u;
         viewportStateCi.scissorCount = 1u;
 
-        // use a single descriptor set for all shaders
-        mDescriptorSetBindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
-        mDescriptorSetBindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
-        for(uint32 i = 0; i < VULKAN_MAX_TEXTURE_UNITS; ++i)
-            mDescriptorSetBindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
-
-        // one descriptor will have at most OGRE_MAX_TEXTURE_LAYERS and one UBO per shader type (for now)
-        mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
-        mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VULKAN_MAX_TEXTURE_UNITS});
-
-        // silence validation layer, when unused
-        mUBOInfo[0].range = 1;
-        mUBOInfo[1].range = 1;
-
-        mDescriptorWrites.resize(VULKAN_MAX_TEXTURE_UNITS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
-        mDescriptorWrites[0].dstBinding = 0;
-        mDescriptorWrites[0].descriptorCount = 1;
-        mDescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        mDescriptorWrites[0].pBufferInfo = mUBOInfo.data();
-
-        mDescriptorWrites[1].dstBinding = 1;
-        mDescriptorWrites[1].descriptorCount = 1;
-        mDescriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        mDescriptorWrites[1].pBufferInfo = mUBOInfo.data() + 1;
-
-        for(int i = 0; i < VULKAN_MAX_TEXTURE_UNITS; i++)
-        {
-            mDescriptorWrites[i + 2].dstBinding = 2 + i;
-            mDescriptorWrites[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            mDescriptorWrites[i + 2].pImageInfo = mImageInfos.data() + i;
-            mDescriptorWrites[i + 2].descriptorCount = 1;
-        }
+        initGraphicsDescriptorSetProfile();
+        initComputeDescriptorSetProfile();
 
         if(volkInitialize() != VK_SUCCESS)
         {
@@ -291,15 +272,21 @@ namespace Ogre
         OGRE_DELETE mSPIRVProgramFactory;
         mSPIRVProgramFactory = 0;
 
-        vkDestroyPipelineLayout(mDevice->mDevice, mLayout, 0);
-        vkDestroyDescriptorSetLayout(mDevice->mDevice, mDescriptorSetLayout, 0);
+        clearStorageTextureBindings();
+
+        for(auto& p : mProfiles)
+        {
+            if(p.pipelineLayout)
+                vkDestroyPipelineLayout(mDevice->mDevice, p.pipelineLayout, 0);
+            if(p.layout)
+                vkDestroyDescriptorSetLayout(mDevice->mDevice, p.layout, 0);
+            p.pool.reset();
+        }
 
         for(auto it : mRenderPassCache)
         {
             vkDestroyRenderPass(mDevice->mDevice, it.second, 0);
         }
-
-        mDescriptorPool.reset();
 
         clearPipelineCache();
 
@@ -314,6 +301,13 @@ namespace Ogre
         }
 
         mPipelineCache.clear();
+
+        for( auto it : mComputePipelineCache )
+        {
+            vkDestroyPipeline( mDevice->mDevice, it.second, 0 );
+        }
+
+        mComputePipelineCache.clear();
     }
     //-------------------------------------------------------------------------
     const String &VulkanRenderSystem::getName( void ) const
@@ -392,15 +386,6 @@ namespace Ogre
                 "Debug reporting won't be available" );
             return;
         }
-        // DebugReportMessage =
-        //    (PFN_vkDebugReportMessageEXT)vkGetInstanceProcAddr( mVkInstance, "vkDebugReportMessageEXT"
-        //    );
-        // if( !DebugReportMessage )
-        //{
-        //    LogManager::getSingleton().logMessage(
-        //        "[Vulkan] GetProcAddr: Unable to find DebugReportMessage. "
-        //        "Debug reporting won't be available" );
-        //}
 
         VkDebugReportCallbackCreateInfoEXT dbgCreateInfo = {VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT};
         PFN_vkDebugReportCallbackEXT callback;
@@ -410,6 +395,62 @@ namespace Ogre
                               VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
         OGRE_VK_CHECK(
             CreateDebugReportCallback( mVkInstance, &dbgCreateInfo, 0, &mDebugReportCallback ));
+    }
+    //-------------------------------------------------------------------------
+    void VulkanRenderSystem::initGraphicsDescriptorSetProfile( void )
+    {
+        // single descriptor set for most shaders
+        auto& graphics = mProfiles[Graphics];
+        graphics.bindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        graphics.bindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        for(uint32 i = 0; i < VULKAN_MAX_TEXTURE_UNITS; ++i)
+            graphics.bindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        graphics.numTextureUnits = VULKAN_MAX_TEXTURE_UNITS;
+
+        graphics.poolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
+        graphics.poolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VULKAN_MAX_TEXTURE_UNITS});
+        // silence validation layer, when unused
+        mUBOInfo[0].range = 1;
+        mUBOInfo[1].range = 1;
+
+        graphics.writes.resize(VULKAN_MAX_TEXTURE_UNITS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
+        graphics.writes[0].dstBinding = 0;
+        graphics.writes[0].descriptorCount = 1;
+        graphics.writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        graphics.writes[0].pBufferInfo = mUBOInfo.data();
+
+        graphics.writes[1].dstBinding = 1;
+        graphics.writes[1].descriptorCount = 1;
+        graphics.writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        graphics.writes[1].pBufferInfo = mUBOInfo.data() + 1;
+
+        for(int i = 0; i < VULKAN_MAX_TEXTURE_UNITS; i++)
+        {
+            graphics.writes[i + 2].dstBinding = 2 + i;
+            graphics.writes[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            graphics.writes[i + 2].pImageInfo = mImageInfos.data() + i;
+            graphics.writes[i + 2].descriptorCount = 1;
+        }
+    }
+    //-------------------------------------------------------------------------
+    void VulkanRenderSystem::initComputeDescriptorSetProfile( void )
+    {
+        // Minimal compute profile for image write + dynamic UBO.
+        auto &compute = mProfiles[Compute];
+        compute.bindings.push_back( {0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT} );
+        compute.bindings.push_back(
+            {1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_COMPUTE_BIT} );
+        compute.poolSizes.push_back( {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u} );
+        compute.poolSizes.push_back( {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1u} );
+        compute.writes.resize( 2u, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET} );
+        compute.writes[0].dstBinding = 0;
+        compute.writes[0].descriptorCount = 1;
+        compute.writes[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        compute.writes[0].pImageInfo = &mComputeImageInfo;
+        compute.writes[1].dstBinding = 1;
+        compute.writes[1].descriptorCount = 1;
+        compute.writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        compute.writes[1].pBufferInfo = mUBOInfo.data() + 1;
     }
     //-------------------------------------------------------------------------
     HardwareOcclusionQuery *VulkanRenderSystem::createHardwareOcclusionQuery( void )
@@ -522,6 +563,7 @@ namespace Ogre
             if( props.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT )
                 rsc->setCapability( RSC_TEXTURE_COMPRESSION_ASTC );
         }
+        rsc->setCapability( RSC_COMPUTE_PROGRAM );
 
         const VkPhysicalDeviceLimits &deviceLimits = mDevice->mDeviceProperties.limits;
         //rsc->setMaximumResolutions( deviceLimits.maxImageDimension2D, deviceLimits.maxImageDimension3D,
@@ -631,7 +673,52 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::resetAllBindings( void )
     {
+        for( auto &imgInfo : mImageInfos )
+            imgInfo = {};
 
+        for( auto &imgInfo : mStorageImageInfos )
+            imgInfo = {};
+
+        mStorageTextures.fill( nullptr );
+        mStorageImageViews.fill( VK_NULL_HANDLE );
+        mComputeImageInfo = {};
+        mBoundComputeProfile = Compute;
+        mBoundGraphicsProfile = Graphics;
+        mUBODynOffsets = {0u, 0u};
+    }
+
+    void VulkanRenderSystem::setStorageTexture( size_t texUnit, VulkanTextureGpu *texture, int mipmapLevel )
+    {
+        if( texUnit >= OGRE_MAX_TEXTURE_LAYERS )
+            return;
+
+        mStorageImageViews[texUnit] = VK_NULL_HANDLE;
+        mStorageTextures[texUnit] = texture;
+        mStorageImageInfos[texUnit] = {};
+
+        if( !texture )
+            return;
+
+        VkImageView imageView = texture->getStorageImageView( mipmapLevel );
+
+        mStorageImageViews[texUnit] = imageView;
+
+        mStorageImageInfos[texUnit].sampler = VK_NULL_HANDLE;
+        mStorageImageInfos[texUnit].imageView = imageView;
+        mStorageImageInfos[texUnit].imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+
+        // After setting the new view, clear stale cache entries
+        mProfiles[Compute].cache.clear();
+    }
+    //-------------------------------------------------------------------------
+    void VulkanRenderSystem::clearStorageTextureBindings()
+    {
+        for( size_t i = 0u; i < mStorageImageViews.size(); ++i )
+        {
+            mStorageImageViews[i] = VK_NULL_HANDLE;
+            mStorageTextures[i] = nullptr;
+            mStorageImageInfos[i] = {};
+        }
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::initializeVkInstance( void )
@@ -769,7 +856,8 @@ namespace Ogre
                         deviceExtensions.push_back( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
                         mRealCapabilities->setCapability(RSC_MESH_PROGRAM);
 
-                        mDescriptorSetBindings[0].stageFlags |= VK_SHADER_STAGE_MESH_BIT_NV;
+                        for( auto &binding : mProfiles[Graphics].bindings )
+                            binding.stageFlags |= VK_SHADER_STAGE_MESH_BIT_NV;
                     }
 #endif
                 }
@@ -796,15 +884,24 @@ namespace Ogre
             mTextureManager = new VulkanTextureGpuManager(this, mDevice, bCanRestrictImageViewUsage);
             mTextureManager->_getWarningTexture(); // preload warning texture, so does not interrupt render pass
 
-            VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCi = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
-            descriptorSetLayoutCi.bindingCount = mDescriptorSetBindings.size();
-            descriptorSetLayoutCi.pBindings = mDescriptorSetBindings.data();
-            OGRE_VK_CHECK(vkCreateDescriptorSetLayout(mActiveDevice->mDevice, &descriptorSetLayoutCi, nullptr,
-                                                      &mDescriptorSetLayout));
+            for( auto &profile : mProfiles )
+            {
+                if( profile.bindings.empty() )
+                    continue;
 
-            pipelineLayoutCi.pSetLayouts = &mDescriptorSetLayout;
-            pipelineLayoutCi.setLayoutCount = 1;
-            OGRE_VK_CHECK(vkCreatePipelineLayout(mActiveDevice->mDevice, &pipelineLayoutCi, 0, &mLayout));
+                VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCi =
+                    {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
+                descriptorSetLayoutCi.bindingCount = profile.bindings.size();
+                descriptorSetLayoutCi.pBindings = profile.bindings.data();
+                OGRE_VK_CHECK( vkCreateDescriptorSetLayout( mActiveDevice->mDevice, &descriptorSetLayoutCi,
+                                                            nullptr, &profile.layout ) );
+
+                pipelineLayoutCi.pSetLayouts = &profile.layout;
+                pipelineLayoutCi.setLayoutCount = 1;
+                OGRE_VK_CHECK(
+                    vkCreatePipelineLayout( mActiveDevice->mDevice, &pipelineLayoutCi, 0,
+                                            &profile.pipelineLayout ) );
+            }
 
             // allocate 1.5MB buffer. Holds e.g. 1024 batches of 512 bytes for 3 frames-in-flight
             resizeAutoParamsBuffer(1024 * 512 * 3);
@@ -839,9 +936,15 @@ namespace Ogre
         mUBOInfo[1].buffer = mUBOInfo[0].buffer;
 
         // descriptors referring to old buffer are invalidated
-        mDescriptorSetCache.clear();
-        mActiveDevice->mGraphicsQueue.queueForDeletion(mDescriptorPool);
-        mDescriptorPool.reset( new VulkanDescriptorPool(mDescriptorPoolSizes, mDescriptorSetLayout, mDevice));
+        for(auto& p : mProfiles)
+        {
+            if(!p.layout)
+                continue;
+            p.cache.clear();
+            if(p.pool)
+                mActiveDevice->mGraphicsQueue.queueForDeletion(p.pool);
+            p.pool.reset( new VulkanDescriptorPool(p.poolSizes, p.layout, mDevice));
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -855,6 +958,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::_setTexture( size_t unit, bool enabled, const TexturePtr& texPtr )
     {
+        setStorageTexture( unit, nullptr, 0 );
+
         if( texPtr && enabled)
         {
             VulkanTextureGpu *tex = static_cast<VulkanTextureGpu *>( texPtr.get() );
@@ -883,90 +988,142 @@ namespace Ogre
         endRenderPassDescriptor();
         //mActiveDevice->commitAndNextCommandBuffer( SubmissionType::EndFrameAndSwap );
     }
-    //-------------------------------------------------------------------------
-    void VulkanRenderSystem::flushRootLayout( void )
-    {
-        //VulkanRootLayout *rootLayout = reinterpret_cast<VulkanHlmsPso *>( mPso->rsData )->rootLayout;
-        //rootLayout->bind( mDevice, vaoManager, mGlobalTable );
-    }
 
-    VkDescriptorSet VulkanRenderSystem::getDescriptorSet()
+VkDescriptorSet VulkanRenderSystem::getDescriptorSet( DescriptorSetProfileId profile )
+{
+    auto &prf = mProfiles[profile];
+    if( !prf.pool )
+        return VK_NULL_HANDLE;
+
+    if( profile == Graphics )
     {
-        uint32 hash = HashCombine(0, mUBOInfo);
+        uint32 hash = HashCombine( 0, mUBOInfo );
 
         int numTextures = 0;
         for (; numTextures < VULKAN_MAX_TEXTURE_UNITS; numTextures++)
         {
-            if (!mImageInfos[numTextures].imageView)
+            if( !mImageInfos[numTextures].imageView )
                 break;
-            hash = HashCombine(hash, mImageInfos[numTextures]);
+            hash = HashCombine( hash, mImageInfos[numTextures] );
         }
 
-        VkDescriptorSet retVal = mDescriptorSetCache[hash];
-
-        if(retVal != VK_NULL_HANDLE)
+        VkDescriptorSet retVal = prf.cache[hash];
+        if( retVal != VK_NULL_HANDLE )
             return retVal;
 
-        retVal = mDescriptorPool->allocate();
+        retVal = prf.pool->allocate();
 
-        mDescriptorWrites[0].dstSet = retVal;
-        mDescriptorWrites[1].dstSet = retVal;
-        for(int i = 0; i < numTextures; i++)
-        {
-            mDescriptorWrites[i + 2].dstSet = retVal;
-        }
+        prf.writes[0].dstSet = retVal;
+        prf.writes[1].dstSet = retVal;
+        for( int i = 0; i < numTextures; i++ )
+            prf.writes[i + 2].dstSet = retVal;
 
         int bindCount = numTextures + 2;
-        vkUpdateDescriptorSets(mActiveDevice->mDevice, bindCount, mDescriptorWrites.data(), 0, nullptr);
+        vkUpdateDescriptorSets( mActiveDevice->mDevice, bindCount, prf.writes.data(), 0, nullptr );
 
-        mDescriptorSetCache[hash] = retVal;
-
+        prf.cache[hash] = retVal;
         return retVal;
     }
 
-    VkPipeline VulkanRenderSystem::getPipeline()
+    if( profile != Compute )
+        return VK_NULL_HANDLE;
+
+    mComputeImageInfo = mStorageImageInfos[0];
+
+    if( !mComputeImageInfo.imageView )
+        return VK_NULL_HANDLE;
+
+    uint32 hash = HashCombine( 0u, mUBOInfo[1] );
+    hash = HashCombine( hash, mComputeImageInfo.imageView );
+
+    VkDescriptorSet retVal = prf.cache[hash];
+    if( retVal != VK_NULL_HANDLE )
+        return retVal;
+
+    retVal = prf.pool->allocate();
+    prf.writes[0].dstSet = retVal;
+    prf.writes[0].pImageInfo = &mComputeImageInfo;
+    prf.writes[1].dstSet = retVal;
+    vkUpdateDescriptorSets( mActiveDevice->mDevice, 2u, prf.writes.data(), 0, nullptr );
+    prf.cache[hash] = retVal;
+    return retVal;
+}
+
+VkPipeline VulkanRenderSystem::getPipeline( DescriptorSetProfileId profile )
+{
+    if( profile == Graphics )
     {
+        auto &prf = mProfiles[profile];
         pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
-        pipelineCi.layout = mLayout;
-        mssCi.rasterizationSamples = VkSampleCountFlagBits(std::max(mActiveRenderTarget->getFSAA(), 1u));
+        pipelineCi.layout = prf.pipelineLayout;
+        mssCi.rasterizationSamples =
+            VkSampleCountFlagBits( std::max( mActiveRenderTarget->getFSAA(), 1u ) );
 
-        auto hash = HashCombine(0, pipelineCi.renderPass);
-        hash = HashCombine(hash, blendStates[0]);
-        hash = HashCombine(hash, rasterState);
-        hash = HashCombine(hash, inputAssemblyCi);
-        hash = HashCombine(hash, mssCi);
+        auto hash = HashCombine( 0, uint32( profile ) );
+        hash = HashCombine( hash, pipelineCi.renderPass );
+        hash = HashCombine( hash, blendStates[0] );
+        hash = HashCombine( hash, rasterState );
+        hash = HashCombine( hash, inputAssemblyCi );
+        hash = HashCombine( hash, mssCi );
+        hash = HashCombine( hash, depthStencilStateCi );
 
-        for(uint32 i = 0; i <vertexFormatCi.vertexAttributeDescriptionCount; i++)
-        {
-            hash = HashCombine(hash, vertexFormatCi.pVertexAttributeDescriptions[i]);
-        }
+        for( uint32 i = 0; i < vertexFormatCi.vertexAttributeDescriptionCount; i++ )
+            hash = HashCombine( hash, vertexFormatCi.pVertexAttributeDescriptions[i] );
 
-        for(uint32 i = 0; i < vertexFormatCi.vertexBindingDescriptionCount; i++)
-        {
-            hash = HashCombine(hash, vertexFormatCi.pVertexBindingDescriptions[i]);
-        }
+        for( uint32 i = 0; i < vertexFormatCi.vertexBindingDescriptionCount; i++ )
+            hash = HashCombine( hash, vertexFormatCi.pVertexBindingDescriptions[i] );
 
-        for(uint32 i= 0; i < pipelineCi.stageCount; i++)
-        {
-            hash = HashCombine(hash, mBoundGpuPrograms[i]);
-        }
+        for( uint32 i = 0; i < pipelineCi.stageCount; i++ )
+            hash = HashCombine( hash, mBoundGpuPrograms[i] );
 
         VkPipeline retVal = mPipelineCache[hash];
-        if(retVal != VK_NULL_HANDLE)
+        if( retVal != VK_NULL_HANDLE )
             return retVal;
 
         // if we resize the window, we create new FBOs which mean a new renderpass and invalid caches anyway..
         // VK_DYNAMIC_STATE_VIEWPORT
         const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR};
-        VkPipelineDynamicStateCreateInfo dynamicStateCi = {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+        VkPipelineDynamicStateCreateInfo dynamicStateCi =
+        {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
         dynamicStateCi.dynamicStateCount = 1;
         dynamicStateCi.pDynamicStates = dynamicStates;
         pipelineCi.pDynamicState = &dynamicStateCi;
 
-        OGRE_VK_CHECK(vkCreateGraphicsPipelines(mActiveDevice->mDevice, 0, 1, &pipelineCi, 0, &retVal));
+        OGRE_VK_CHECK(
+            vkCreateGraphicsPipelines( mActiveDevice->mDevice, 0, 1, &pipelineCi, 0, &retVal ) );
 
         mPipelineCache[hash] = retVal;
+        return retVal;
+    }
 
+        auto &prf = mProfiles[profile];
+        if( prf.pipelineLayout == VK_NULL_HANDLE )
+            return VK_NULL_HANDLE;
+
+        auto hash = HashCombine( 0u, uint32( profile ) );
+        hash = HashCombine( hash, mBoundGpuPrograms[GPT_COMPUTE_PROGRAM] );
+
+        VkPipeline retVal = mComputePipelineCache[hash];
+        if( retVal != VK_NULL_HANDLE )
+            return retVal;
+
+        if( !mProgramBound[GPT_COMPUTE_PROGRAM] )
+            return VK_NULL_HANDLE;
+
+        const auto &computeStage = mComputeShaderStage;
+        if( computeStage.stage != VK_SHADER_STAGE_COMPUTE_BIT ||
+            computeStage.module == VK_NULL_HANDLE )
+        {
+            return VK_NULL_HANDLE;
+        }
+
+        VkComputePipelineCreateInfo computeCi = {VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO};
+        computeCi.layout = prf.pipelineLayout;
+        computeCi.stage = computeStage;
+
+        OGRE_VK_CHECK( vkCreateComputePipelines( mActiveDevice->mDevice, VK_NULL_HANDLE, 1u, &computeCi,
+                                                 nullptr, &retVal ) );
+        mComputePipelineCache[hash] = retVal;
         return retVal;
     }
 
@@ -1036,9 +1193,10 @@ namespace Ogre
             vkCmdBindIndexBuffer(cmdBuffer, b, 0, itype);
         }
 
-        auto pipeline = getPipeline();
-        auto descriptorSet = getDescriptorSet();
-        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineCi.layout, 0, 1, &descriptorSet, 2,
+        auto pipeline = getPipeline( mBoundGraphicsProfile );
+        auto descriptorSet = getDescriptorSet( mBoundGraphicsProfile );
+        auto& prf = mProfiles[mBoundGraphicsProfile];
+        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prf.pipelineLayout, 0, 1, &descriptorSet, 2,
                                 mUBODynOffsets.data());
 
         vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline );
@@ -1090,17 +1248,99 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
+    void VulkanRenderSystem::_dispatchCompute( const Vector3i &workgroupDim )
+    {
+        if( !mActiveDevice )
+            return;
+
+        if( workgroupDim[0] <= 0 || workgroupDim[1] <= 0 || workgroupDim[2] <= 0 )
+            return;
+
+        if( !mProgramBound[GPT_COMPUTE_PROGRAM] )
+        {
+            LogManager::getSingleton().logWarning(
+                "[Vulkan] _dispatchCompute called without a bound compute program" );
+            return;
+        }
+
+        mActiveDevice->mGraphicsQueue.getComputeEncoder();
+        VkCommandBuffer cmdBuffer = mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer;
+        OGRE_ASSERT_HIGH( cmdBuffer != VK_NULL_HANDLE );
+
+        auto pipeline = getPipeline( mBoundComputeProfile );
+        auto descriptorSet = getDescriptorSet( mBoundComputeProfile );
+        if( pipeline == VK_NULL_HANDLE || descriptorSet == VK_NULL_HANDLE )
+        {
+            LogManager::getSingleton().logWarning(
+                StringUtil::format("[Vulkan] Compute dispatch skipped: pipeline=%p descriptorSet=%p",
+                                  (void*)pipeline, (void*)descriptorSet));
+            return;
+    }
+
+        auto &prf = mProfiles[mBoundComputeProfile];
+        const uint32 dynOffset = mUBODynOffsets[1];
+
+        VulkanTextureGpu *computeTexture = mStorageTextures[0];
+        if( computeTexture && computeTexture->mCurrLayout != VK_IMAGE_LAYOUT_GENERAL )
+        {
+            VkImageMemoryBarrier barrier = computeTexture->getImageMemoryBarrier();
+            barrier.srcAccessMask = VulkanMappings::get( computeTexture ) & static_cast<VkAccessFlags>( ~VK_ACCESS_SHADER_READ_BIT );
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+            barrier.oldLayout = computeTexture->mCurrLayout;
+            barrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+            if( barrier.srcAccessMask == 0u )
+                barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            vkCmdPipelineBarrier( cmdBuffer,
+                                  VK_PIPELINE_STAGE_ALL_COMMANDS_BIT & mActiveDevice->mSupportedStages,
+                                  VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0, 0u, nullptr, 0u, nullptr,
+                                  1u, &barrier );
+            computeTexture->mCurrLayout = VK_IMAGE_LAYOUT_GENERAL;
+            computeTexture->mNextLayout = VK_IMAGE_LAYOUT_GENERAL;
+        }
+
+        vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline );
+        vkCmdBindDescriptorSets( cmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, prf.pipelineLayout, 0, 1,
+                                 &descriptorSet, 1, &dynOffset );
+        vkCmdDispatch( cmdBuffer, static_cast<uint32>( workgroupDim[0] ),
+                       static_cast<uint32>( workgroupDim[1] ),
+                       static_cast<uint32>( workgroupDim[2] ) );
+
+        if( computeTexture )
+        {
+            VkImageMemoryBarrier barrier = computeTexture->getImageMemoryBarrier();
+            barrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+            vkCmdPipelineBarrier( cmdBuffer, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                                  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT |
+                                      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                                  0, 0u, nullptr, 0u, nullptr, 1u, &barrier );
+            computeTexture->mCurrLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            computeTexture->mNextLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        }
+    }
+    //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindGpuProgram(GpuProgram* prg)
     {
         auto shader = static_cast<VulkanProgram*>(prg);
-        shaderStages[prg->getType() % GPT_PIPELINE_COUNT] = shader->getPipelineShaderStageCi();
         mBoundGpuPrograms[prg->getType()] = prg->_getHash();
+
+        // Compute program automatically switches to the compute pipeline stage slot;
+        // graphics programs (vertex/fragment/...) go into the graphics stage array.
+        if (prg->getType() == GPT_COMPUTE_PROGRAM)
+            mComputeShaderStage = shader->getPipelineShaderStageCi();
+        else
+            shaderStages[prg->getType() % GPT_PIPELINE_COUNT] = shader->getPipelineShaderStageCi();
 
         RenderSystem::bindGpuProgram(prg);
     }
+    //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindGpuProgramParameters( GpuProgramType gptype,
-                                                       const GpuProgramParametersPtr& params,
-                                                       uint16 variabilityMask )
+                                                   const GpuProgramParametersPtr& params,
+                                                   uint16 variabilityMask )
     {
         mActiveParameters[gptype] = params;
 
