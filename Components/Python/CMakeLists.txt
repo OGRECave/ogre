@@ -45,7 +45,11 @@ else()
     endif()
 	add_definitions(-Wno-cast-qual -Wno-shadow -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-but-set-variable -Wno-missing-declarations -Wno-unused-variable)
 endif()
-set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
+# CMake parses %module to determine the generated proxy file names, but cannot
+# evaluate the #ifdef SWIGPYTHON blocks in some of the .i files. Set the module
+# names explicitly, otherwise the build expects proxy files that SWIG never
+# generates and re-runs SWIG on every build.
+set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME Ogre)
 
 # weakly link libpython on Unix to allow relocation
 if(APPLE)
@@ -62,35 +66,35 @@ ogre_python_module(Ogre)
 install(FILES __init__.py Numpy.py HighPy.py DESTINATION ${PYTHON_SITE_PACKAGES})
 
 if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-    set_source_files_properties(../RTShaderSystem/include/OgreRTShader.i PROPERTIES CPLUSPLUS ON)
+    set_source_files_properties(../RTShaderSystem/include/OgreRTShader.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME RTShader)
     swig_add_library(RTShader LANGUAGE python SOURCES ../RTShaderSystem/include/OgreRTShader.i)
     swig_link_libraries(RTShader OgreRTShaderSystem ${PYTHON_LIBRARIES})
     ogre_python_module(RTShader)
 endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY)
-    set_source_files_properties(../Overlay/include/OgreOverlay.i PROPERTIES CPLUSPLUS ON)
+    set_source_files_properties(../Overlay/include/OgreOverlay.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME Overlay)
     swig_add_library(Overlay LANGUAGE python SOURCES ../Overlay/include/OgreOverlay.i)
     swig_link_libraries(Overlay OgreOverlay ${PYTHON_LIBRARIES})
     ogre_python_module(Overlay)
 endif()
 
 if(OGRE_BUILD_COMPONENT_TERRAIN)
-	set_source_files_properties(../Terrain/include/OgreTerrain.i PROPERTIES CPLUSPLUS ON)
+	set_source_files_properties(../Terrain/include/OgreTerrain.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME Terrain)
     swig_add_library(Terrain LANGUAGE python SOURCES ../Terrain/include/OgreTerrain.i)
     swig_link_libraries(Terrain OgreTerrain ${PYTHON_LIBRARIES})
     ogre_python_module(Terrain)
 endif()
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
-    set_source_files_properties(../Overlay/include/ImGui.i PROPERTIES CPLUSPLUS ON)
+    set_source_files_properties(../Overlay/include/ImGui.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME ImGui)
     swig_add_library(ImGui LANGUAGE python SOURCES ../Overlay/include/ImGui.i)
     swig_link_libraries(ImGui OgreOverlay ${PYTHON_LIBRARIES})
     ogre_python_module(ImGui)
 endif()
 
 if(OGRE_BUILD_COMPONENT_BITES)    
-    set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
+    set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME Bites)
     swig_add_library(Bites LANGUAGE python SOURCES ../Bites/include/OgreBites.i)
     swig_link_libraries(Bites OgreMain OgreBites ${PYTHON_LIBRARIES})
     ogre_python_module(Bites)
@@ -98,7 +102,7 @@ endif()
 
 if(OGRE_BUILD_COMPONENT_BULLET)
     include_directories("${BULLET_INCLUDE_DIRS}")
-    set_source_files_properties(../Bullet/include/OgreBullet.i PROPERTIES CPLUSPLUS ON)
+    set_source_files_properties(../Bullet/include/OgreBullet.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME Bullet)
     swig_add_library(Bullet LANGUAGE python SOURCES ../Bullet/include/OgreBullet.i)
     swig_link_libraries(Bullet OgreMain OgreBullet ${PYTHON_LIBRARIES})
     ogre_python_module(Bullet)
