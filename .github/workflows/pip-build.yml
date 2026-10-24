@@ -2,9 +2,9 @@ name: PIP packages
 on:
   push:
     tags: ["v*"]
-env:
-  TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-  TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+permissions:
+  contents: read
+  id-token: write  # Trusted Publishing via GitHub OIDC
 jobs:
   linux:
     runs-on: ubuntu-22.04
