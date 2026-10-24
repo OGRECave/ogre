@@ -1076,7 +1076,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const String& Mesh::getSkeletonName(void) const
     {
-        return mSkeleton ? mSkeleton->getName() : BLANKSTRING;
+        static const String blank;
+        return mSkeleton ? mSkeleton->getName() : blank;
     }
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const

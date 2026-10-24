@@ -841,11 +841,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& Pass::getGpuProgramName(GpuProgramType type) const
     {
+        static const String blank;
         OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
 
         const std::unique_ptr<GpuProgramUsage>& programUsage = getProgramUsage(type);
         if (!programUsage)
-            return BLANKSTRING;
+            return blank;
         else
             return programUsage->getProgramName();
     }

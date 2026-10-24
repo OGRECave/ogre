@@ -31,8 +31,6 @@ THE SOFTWARE.
 #include "OgreMovablePlane.h"
 
 namespace Ogre {
-
-    const String MOT_CAMERA = "Camera";
     //-----------------------------------------------------------------------
     Camera::Camera( const String& name, SceneManager* sm)
         : Frustum(name),
@@ -625,7 +623,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& Camera::getMovableType(void) const
     {
-        return MOT_CAMERA;
+        static const String name = MOT_CAMERA;
+        return name;
     }
     //-----------------------------------------------------------------------
     void Camera::setLodBias(Real factor)

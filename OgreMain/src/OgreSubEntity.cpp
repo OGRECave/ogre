@@ -48,7 +48,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& SubEntity::getMaterialName(void) const
     {
-        return mMaterialPtr ? mMaterialPtr->getName() : BLANKSTRING;
+        static const String blank;
+        return mMaterialPtr ? mMaterialPtr->getName() : blank;
     }
     //-----------------------------------------------------------------------
     void SubEntity::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)

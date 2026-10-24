@@ -64,7 +64,11 @@ class Rectangle2DFactory : public MovableObjectFactory
     MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params) override;
 
 public:
-    const String& getType(void) const override { return MOT_RECTANGLE2D; }
+    const String& getType(void) const override
+    {
+        static const String type = MOT_RECTANGLE2D;
+        return type;
+    }
 };
 
 class RibbonTrailFactory : public MovableObjectFactory
@@ -80,7 +84,11 @@ class StaticGeometryFactory : public MovableObjectFactory
     MovableObject* createInstanceImpl( const String& name, const NameValuePairList* params) override { return NULL; }
 
 public:
-    const String& getType(void) const override { return MOT_STATIC_GEOMETRY; }
+    const String& getType(void) const override
+    {
+        static const String type = MOT_STATIC_GEOMETRY;
+        return type;
+    }
 };
 } // namespace Ogre
 
