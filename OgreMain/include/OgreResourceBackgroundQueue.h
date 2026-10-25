@@ -46,22 +46,28 @@ namespace Ogre {
     *  @{
     */
 
-    /** This class is used to perform Resource operations in a
-        background thread. 
+    /** Performs resource operations on the shared background work queue.
 
-        All these requests are now queued via Root::getWorkQueue in order
+        All operations are queued via Root::getWorkQueue in order
         to share the thread pool amongst all background tasks. You should therefore
-        refer to that class for configuring the behaviour of the threads
-        themselves, this class merely provides an interface that is specific
-        to resource loading around this common functionality.
-    @par
-        The general approach here is that on requesting a background resource
-        process, your request is placed on a queue ready for the background
-        thread to be picked up, and you will get a 'ticket' back, identifying
-        the request. Your call will then return and your thread can
-        proceed, knowing that at some point in the background the operation will 
-        be performed. In it's own thread, the resource operation will be 
-        performed, and once finished the ticket will be marked as complete.
+        refer to @ref background-resource for configuring the threads and for the
+        lifetime and exception rules of tasks; this class merely provides an
+        interface that is specific to resource handling.
+
+        Every call returns a `std::future<void>` that becomes ready when the
+        background portion of the operation has finished. This may be before the
+        corresponding Resource::Listener callback has run, because those callbacks
+        are dispatched back to the main thread. Use the future to wait for the data
+        to become available, and a listener to observe the completed resource.
+
+        Which resource methods can run on a worker thread depends on
+        `OGRE_THREAD_SUPPORT`. With the default configuration (3), workers cannot
+        access the RenderSystem: prepare() runs Resource::prepare in the background,
+        while load() prepares in the background and performs the actual load on the
+        main thread. With `OGRE_THREAD_SUPPORT == 1`, resources are fully thread-safe
+        and load() runs entirely in the background.
+
+        @see @ref background-resource
     */
     class _OgreExport ResourceBackgroundQueue : public Singleton<ResourceBackgroundQueue>
     {
