@@ -30,10 +30,13 @@ THE SOFTWARE
 
 namespace Ogre
 {
-    /** Implementation of a general purpose request / response style background work queue.
+    /** Threaded implementation of a general purpose task-based background work queue.
 
-        This default implementation of a work queue starts a thread pool and 
-        provides queues to process requests. 
+        This implementation starts a pool of worker threads on @ref startup and
+        provides the FIFO queues for background and main-thread tasks. Worker threads
+        are named `[Ogre] Worker` where the platform supports it.
+
+        @see @ref background-resource
     */
     class _OgreExport DefaultWorkQueue : public DefaultWorkQueueBase
     {
@@ -42,19 +45,34 @@ namespace Ogre
         DefaultWorkQueue(const String& name = BLANKSTRING);
         virtual ~DefaultWorkQueue(); 
 
-        /// Main function for each thread spawned.
+        /** Worker thread loop.
+
+            Waits for tasks and executes them until @ref shutdown is requested.
+            With workers allowed to access the render system, the thread registers
+            itself before entering the loop.
+        */
         void _threadMain() override;
 
-        /// @copydoc WorkQueue::shutdown
+        /** Stop and join all worker threads.
+
+            Tasks that are already running are allowed to finish. Tasks still waiting
+            in the queues are not executed and are left in the queues, so they may run
+            if the queue is started again before it is destroyed. The destructor calls
+            this method.
+        */
         void shutdown() override;
 
-        /// @copydoc WorkQueue::startup
+        /** Start the worker threads.
+
+            @param forceRestart If the queue is already running, shut it down first.
+                Otherwise this is a no-op while running.
+        */
         void startup(bool forceRestart = true) override;
 
     protected:
-        /** To be called by a separate thread; will return immediately if there
-            are items in the queue, or suspend the thread until new items are added
-            otherwise.
+        /** To be called by a worker thread; returns immediately if there
+            are tasks in the queue, otherwise suspends the thread until new tasks
+            are added or a shutdown is requested.
         */
         virtual void waitForNextRequest();
 

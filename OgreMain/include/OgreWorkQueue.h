@@ -52,18 +52,18 @@ namespace Ogre
         A work queue is a simple structure, where tasks of work are placed
         onto the queue, then removed by a worker for processing.
         The typical use for this is in a threaded environment,
-        although any kind of deferred processing could use this approach to 
-        decouple and distribute work over a period of time even 
+        although any kind of deferred processing could use this approach to
+        decouple and distribute work over a period of time even
         if it was single threaded.
 
         WorkQueues also incorporate thread pools. One or more background worker threads
-        can wait on the queue and be notified when a request is waiting to be
+        can wait on the queue and be notified when a task is waiting to be
         processed. For maximal thread usage, a WorkQueue instance should be shared
         among many sources of work, rather than many work queues being created.
-        This way, you can share a small number of hardware threads among a large 
+        This way, you can share a small number of hardware threads among a large
         number of background tasks. This doesn't mean you have to implement all the
-        request processing in one class, you can plug in many handlers in order to
-        process the tasks.
+        task processing in one class, you can submit as many independent tasks as
+        you like.
 
         The WorkQueue distinguishes between two types of tasks:
         1. Background tasks: Added via @ref addTask. These are processed by the worker threads.
@@ -74,7 +74,27 @@ namespace Ogre
         @ref processMainThreadTasks is automatically called by @ref Root::renderOneFrame (via @ref Root::_fireFrameEnded)
         or can be called manually by the user in the main loop.
 
-        This is an abstract interface definition; users can subclass this and 
+        Both queues are FIFO and thread-safe; `addTask` and `addMainThreadTask` may be
+        called from any thread. There is no priority and no cancellation. With more than
+        one worker thread, background tasks may complete out of order.
+
+        Tasks are `std::function<void()>`, therefore their captures must be copyable.
+
+        @par Task lifetime
+        A task may run after the object that submitted it has been destroyed. Capture a
+        `std::shared_ptr` (or check a `std::weak_ptr`) if no other mechanism guarantees
+        that everything the task accesses is still alive. Keep resource references needed
+        by the task alive in its capture.
+
+        @par Exceptions
+        An exception thrown by a background task is not caught and will terminate the
+        process. Use a `std::packaged_task` to capture the exception in a `std::future`
+        instead. An exception thrown by a main-thread task propagates out of
+        @ref processMainThreadTasks.
+
+        @see @ref background-resource for a tutorial and usage examples.
+
+        This is an abstract interface definition; users can subclass this and
         provide their own implementation if required to centralise task management
         in their own subsystems. We also provide a default implementation in the
         form of DefaultWorkQueue.
@@ -82,10 +102,15 @@ namespace Ogre
     class _OgreExport WorkQueue : public UtilityAlloc
     {
     public:
-        /// Numeric identifier for a request
+        /// Legacy identifier type of the request/response API
         typedef unsigned long long int RequestID;
 
-        /** General purpose request structure. 
+        /** Legacy request structure.
+
+            The task-based API passes the work directly as a `std::function`, so
+            Request/Response are not needed and are not used by %Ogre internally.
+            They are kept for source compatibility with code written against the
+            old request/response API.
         */
         class _OgreExport Request : public UtilityAlloc
         {
@@ -120,7 +145,12 @@ namespace Ogre
             RequestID getID() const { return mID; }
         };
 
-        /** General purpose response structure. 
+        /** Legacy response structure.
+
+            @warning A Response takes ownership of its Request: destroying the
+            response deletes the request as well. Do not delete both.
+            Like Request, this type is not used by %Ogre internally and is kept
+            for source compatibility with the old request/response API.
         */
         struct _OgreExport Response : public UtilityAlloc
         {
@@ -150,6 +180,8 @@ namespace Ogre
 
         /** Get the number of worker threads that this queue will start when
             startup() is called.
+
+            Implementations are free to ignore this setting; the default is 1.
         */
         virtual size_t getWorkerThreadCount() const { return 1; }
 
@@ -166,24 +198,45 @@ namespace Ogre
         */
         virtual void startup(bool forceRestart = true) = 0;
 
-        /** Add a new task to the queue */
+        /** Add a new task to the background queue.
+
+            May be called from any thread. Tasks are executed in submission order,
+            but with more than one worker thread the completion order is unspecified.
+
+            The task is silently dropped if the queue is shutting down or if
+            @ref setRequestsAccepted has been called with `false`.
+
+            Tasks are `std::function<void()>`, so the captures must be copyable.
+            With `OGRE_THREAD_SUPPORT == 0` the task is executed inline on the
+            calling thread instead of being queued.
+
+            @warning An exception escaping the task terminates the process.
+            Wrap potentially throwing work in a `std::packaged_task`.
+        */
         virtual void addTask(std::function<void()> task) = 0;
-        
-        /** Set whether to pause further processing of any requests. 
-        If true, any further requests will simply be queued and not processed until
-        setPaused(false) is called. Any requests which are in the process of being
-        worked on already will still continue. 
+
+        /** Set whether to pause further processing of tasks.
+
+            If true, further tasks will simply be queued and not processed until
+            setPaused(false) is called. Tasks which are already being worked on
+            will still continue.
+
+            @note Pausing is not currently implemented by DefaultWorkQueueBase;
+            this flag is retained for custom implementations. Use
+            @ref setRequestsAccepted to stop accepting new tasks.
         */
         virtual void setPaused(bool pause) = 0;
         /// Return whether the queue is paused ie not sending more work to workers
         virtual bool isPaused() const = 0;
 
-        /** Set whether to accept new requests or not. 
-        If true, requests are added to the queue as usual. If false, requests
-        are silently ignored until setRequestsAccepted(true) is called. 
+        /** Set whether to accept new tasks or not.
+
+            If true, tasks are added to the queues as usual. If false, both
+            @ref addTask and @ref addMainThreadTask silently ignore new tasks
+            until setRequestsAccepted(true) is called.
         */
         virtual void setRequestsAccepted(bool accept) = 0;
-        /// Returns whether requests are being accepted right now
+        /// Returns whether tasks are being accepted right now
         virtual bool getRequestsAccepted() const = 0;
 
         /** Process the tasks in the main-thread queue.
@@ -193,8 +246,11 @@ namespace Ogre
             try to clear all tasks before returning; however, you can specify
             a time limit on the tasks processing to limit the impact of
             spikes in demand by calling @ref setMainThreadProcessingTimeLimit.
+            Tasks added while the queue is being processed may be picked up in
+            the same call, subject to the time limit.
 
-            @note This is automatically called by @ref Root::renderOneFrame.
+            @note This is automatically called by @ref Root::renderOneFrame, after
+            the `frameEnded` listeners.
         */
         virtual void processMainThreadTasks();
 
@@ -213,21 +269,48 @@ namespace Ogre
             single frame, in milliseconds (0 indicates no limit).
             This sets the maximum time that will be spent in @ref processMainThreadTasks() in
             a single frame. The default is 10ms.
+
+            The limit is checked after each task completes, so a single long task
+            can overshoot it. Each call to @ref processMainThreadTasks gets its own
+            budget.
         */
         void setMainThreadProcessingTimeLimit(uint64 ms) { setResponseProcessingTimeLimit(static_cast<unsigned long>(ms)); }
 
         /// @deprecated use @ref setMainThreadProcessingTimeLimit
         virtual void setResponseProcessingTimeLimit(unsigned long ms) = 0;
 
-        /** Add a deferred task that will be processed on the main render thread */
+        /** Add a task that will be processed on the main render thread.
+
+            May be called from any thread. The task does not run immediately, even
+            when called from the main thread; it runs during the next
+            @ref processMainThreadTasks call.
+
+            The task is silently dropped if the queue is shutting down or if
+            @ref setRequestsAccepted has been called with `false`.
+
+            @warning An exception escaping the task propagates out of
+            @ref processMainThreadTasks.
+        */
         virtual void addMainThreadTask(std::function<void()> task) = 0;
 
         /** Shut down the queue.
+
+            Stops the worker threads and waits for them to finish. Tasks that are
+            already running complete, but tasks still waiting in the queues are not
+            executed. The queues are not cleared, so starting the queue again may
+            still process them.
         */
         virtual void shutdown() = 0;
     };
 
-    /** Base for a general purpose task-based background work queue.
+    /** Base implementation of a general purpose task-based background work queue.
+
+        It provides the two FIFO queues, the accept/pause flags and the main-thread
+        processing loop. Concrete implementations only have to provide the thread
+        management via `_threadMain()` and `notifyWorkers()`, plus
+        @ref startup / @ref shutdown.
+
+        @see @ref background-resource
     */
     class _OgreExport DefaultWorkQueueBase : public WorkQueue
     {
@@ -267,12 +350,12 @@ namespace Ogre
         */
         virtual void setWorkersCanAccessRenderSystem(bool access);
 
-        /** Process the next request on the queue. 
+        /** Pop and execute the next task from the background queue.
 
-            This method is public, but only intended for advanced users to call. 
-            The only reason you would call this, is if you were using your 
-            own thread to drive the worker processing. The thread calling this
-            method will be the thread used to call the RequestHandler.
+            This method is public, but only intended for advanced users. The only
+            reason you would call it is if you drive the worker processing with your
+            own thread. The task runs on the calling thread; an exception escaping it
+            is not caught here.
         */
         virtual void _processNextRequest();
 
@@ -297,7 +380,9 @@ namespace Ogre
         void setResponseProcessingTimeLimit(unsigned long ms) override { mResposeTimeLimitMS = ms; }
         size_t getWorkerThreadCount() const override { return mWorkerThreadCount; }
         void setWorkerThreadCount(size_t c) override { mWorkerThreadCount = c; }
+        /// @copydoc WorkQueue::addMainThreadTask
         void addMainThreadTask(std::function<void()> task) override;
+        /// @copydoc WorkQueue::addTask
         void addTask(std::function<void()> task) override;
     protected:
         String mName;
@@ -316,7 +401,7 @@ namespace Ogre
         OGRE_WQ_MUTEX(mRequestMutex);
         OGRE_WQ_MUTEX(mResponseMutex);
 
-        /// Notify workers about a new request. 
+        /// Notify workers about a new task.
         virtual void notifyWorkers() = 0;
     };
 

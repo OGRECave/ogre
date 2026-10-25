@@ -880,18 +880,28 @@ namespace Ogre
         OGRE_DEPRECATED MovableObjectFactoryIterator getMovableObjectFactoryIterator(void) const;
 
         /** Get the WorkQueue for processing background tasks.
-            You are free to add new requests and handlers to this queue to
-            process your custom background tasks using the shared thread pool.
-            However, you must remember to assign yourself a new channel through
-            which to process your tasks.
+
+            Root creates a DefaultWorkQueue named `"Root"` whose worker count is
+            clamped to 1&ndash;2 based on the hardware concurrency. The queue is
+            started after the first render window has been created and is shut down
+            before the scene and resource managers. You are free to add your own
+            tasks to it, thereby sharing the thread pool with resource loading and
+            the other subsystems.
+
+            @see @ref background-resource
         */
         WorkQueue* getWorkQueue() const { return mWorkQueue.get(); }
 
         /** Replace the current work queue with an alternative.
+
             You can use this method to replace the internal implementation of
-            WorkQueue with  your own, e.g. to externalise the processing of
+            WorkQueue with your own, e.g. to externalise the processing of
             background events. Doing so will delete the existing queue and
-            replace it with this one.
+            replace it with this one. If Root is already initialised, the new
+            queue is started immediately.
+
+            Call this during initialisation, before submitting tasks.
+
         @param queue The new WorkQueue instance. Root will delete this work queue
             at shutdown, so do not destroy it yourself.
         */
