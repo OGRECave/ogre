@@ -127,6 +127,14 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     endif()
 
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
+        # SDL loads enabled audio backends
+        # at runtime by default (SDL_*_SHARED), so no hard dependency on a
+        # specific sound server is added.
+        set(SDL_AUDIO_OPTS)
+        if(UNIX AND NOT APPLE)
+            set(SDL_AUDIO_OPTS -DSDL_ALSA=ON -DSDL_PULSEAUDIO=ON)
+        endif()
+
         message(STATUS "Building SDL2")
         file(DOWNLOAD
             https://libsdl.org/release/SDL2-2.32.10.tar.gz
@@ -138,6 +146,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DSDL_STATIC=FALSE
             -DCMAKE_INSTALL_LIBDIR=lib
+            ${SDL_AUDIO_OPTS}
             ${PROJECT_BINARY_DIR}/SDL2-2.32.10
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${CMAKE_COMMAND}
