@@ -94,6 +94,8 @@ namespace Ogre {
 
         ConfigOption optDisplayFrequency;
         optDisplayFrequency.name = "Display Frequency";
+        optDisplayFrequency.possibleValues.push_back("0");
+        optDisplayFrequency.currentValue = "0";
         optDisplayFrequency.immutable = false;
         mOptions[optDisplayFrequency.name] = optDisplayFrequency;
 
