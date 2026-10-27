@@ -43,11 +43,6 @@ namespace Ogre {
         c.erase(p, c.end());
     }
 
-    String VideoMode::getDescription() const
-    {
-        return StringUtil::format("%4d x %4d", width, height);
-    }
-
     void GLRenderSystemCommon::_unregisterContext(GLContext *context)
     {
         for(auto & rt : mRenderTargets)
@@ -102,21 +97,6 @@ namespace Ogre {
         optDisplayFrequency.immutable = false;
         mOptions[optDisplayFrequency.name] = optDisplayFrequency;
 
-        ConfigOption optVideoMode;
-        optVideoMode.name = "Video Mode";
-        optVideoMode.immutable = false;
-        for (const auto& mode : mGLSupport->getVideoModes())
-        {
-            optVideoMode.possibleValues.push_back(mode.getDescription());
-        }
-        removeDuplicates(optVideoMode.possibleValues); // also sorts
-
-        if(!optVideoMode.possibleValues.empty()) // otherwise keep dummy defaults
-        {
-            optVideoMode.currentValue = optVideoMode.possibleValues[0];
-            mOptions[optVideoMode.name] = optVideoMode;
-        }
-
         ConfigOption optFSAA;
         optFSAA.name = "FSAA";
         optFSAA.immutable = false;
@@ -130,67 +110,6 @@ namespace Ogre {
             optFSAA.currentValue = optFSAA.possibleValues[0];
         }
         mOptions[optFSAA.name] = optFSAA;
-
-        refreshConfig();
-    }
-
-    void GLRenderSystemCommon::refreshConfig()
-    {
-        // set bpp and refresh rate as appropriate
-        ConfigOptionMap::iterator optVideoMode = mOptions.find("Video Mode");
-        ConfigOptionMap::iterator optDisplayFrequency = mOptions.find("Display Frequency");
-        ConfigOptionMap::iterator optFullScreen = mOptions.find("Full Screen");
-        ConfigOptionMap::iterator optColourDepth = mOptions.find("Colour Depth");
-
-        // coulour depth is optional
-        if (optColourDepth != mOptions.end())
-        {
-            for (const auto& mode : mGLSupport->getVideoModes())
-            {
-                if (mode.getDescription() == optVideoMode->second.currentValue)
-                {
-                    optColourDepth->second.possibleValues.push_back(
-                        StringConverter::toString((unsigned int)mode.bpp));
-                }
-            }
-
-            removeDuplicates(optColourDepth->second.possibleValues);
-        }
-
-        // we can only set refresh rate in full screen mode
-        bool isFullscreen = false;
-        if( optFullScreen != mOptions.end())
-            isFullscreen = optFullScreen->second.currentValue == "Yes";
-
-        if (optVideoMode == mOptions.end() || optDisplayFrequency == mOptions.end())
-            return;
-
-        optDisplayFrequency->second.possibleValues.clear();
-        if (isFullscreen)
-        {
-            for (const auto& mode : mGLSupport->getVideoModes())
-            {
-                if (mode.getDescription() == optVideoMode->second.currentValue)
-                {
-                    String frequency = StringConverter::toString(mode.refreshRate) + " Hz";
-                    optDisplayFrequency->second.possibleValues.push_back(frequency);
-
-                    if(optColourDepth != mOptions.end())
-                        optColourDepth->second.possibleValues.push_back(
-                            StringConverter::toString((unsigned int)mode.bpp));
-                }
-            }
-
-            removeDuplicates(optDisplayFrequency->second.possibleValues);
-        }
-
-        if (optDisplayFrequency->second.possibleValues.empty())
-        {
-            optDisplayFrequency->second.possibleValues.push_back("N/A");
-            optDisplayFrequency->second.immutable = true;
-        }
-
-        optDisplayFrequency->second.currentValue = optDisplayFrequency->second.possibleValues.front();
     }
 
     //-------------------------------------------------------------------------------------------------//
@@ -201,9 +120,6 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Option named '" + name + "' does not exist.");
         }
         option->second.currentValue = value;
-
-        if( name == "Video Mode" || name == "Full Screen" )
-            refreshConfig();
     }
 
     //-----------------------------------------------------------------------

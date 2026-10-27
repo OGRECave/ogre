@@ -159,47 +159,4 @@ void finaliseTopLevel(Display* display, Window window, int& left, int& top, uint
     height = windowAttrib.height;
 }
 
-bool getXVideoModes(Display* display, VideoMode& currentMode, VideoModes& videoModes)
-{
-    int dummy;
-    if (!XQueryExtension(display, "RANDR", &dummy, &dummy, &dummy))
-        return false;
-
-    auto screenConfig = XRRGetScreenInfo(display, DefaultRootWindow(display));
-    if (!screenConfig)
-        return false;
-
-    XRRScreenSize* screenSizes;
-    int nSizes = 0;
-    Rotation currentRotation;
-    int currentSizeID = XRRConfigCurrentConfiguration(screenConfig, &currentRotation);
-
-    screenSizes = XRRConfigSizes(screenConfig, &nSizes);
-
-    currentMode.width = screenSizes[currentSizeID].width;
-    currentMode.height = screenSizes[currentSizeID].height;
-    currentMode.refreshRate = XRRConfigCurrentRate(screenConfig);
-
-    for (int sizeID = 0; sizeID < nSizes; sizeID++)
-    {
-        short* rates;
-        int nRates = 0;
-
-        rates = XRRConfigRates(screenConfig, sizeID, &nRates);
-
-        for (int rate = 0; rate < nRates; rate++)
-        {
-            VideoMode mode = {};
-
-            mode.width = screenSizes[sizeID].width;
-            mode.height = screenSizes[sizeID].height;
-            mode.refreshRate = rates[rate];
-
-            videoModes.push_back(mode);
-        }
-    }
-    XRRFreeScreenConfigInfo(screenConfig);
-
-    return true;
-}
 } // namespace Ogre

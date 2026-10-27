@@ -70,17 +70,6 @@ namespace Ogre {
             DisplayDevices.push_back(DisplayDevice.DeviceName);
         }*/
 
-        // Video mode possibilities
-        DEVMODE DevMode;
-        DevMode.dmSize = sizeof(DEVMODE);
-        for (DWORD i = 0; EnumDisplaySettings(NULL, i, &DevMode); ++i)
-        {
-            if (DevMode.dmBitsPerPel < 16 || DevMode.dmPelsHeight < 480)
-                continue;
-            mVideoModes.push_back({DevMode.dmPelsWidth, DevMode.dmPelsHeight,
-                                   short(DevMode.dmDisplayFrequency), uint8(DevMode.dmBitsPerPel)});
-        }
-
         ConfigOption optColourDepth;
         optColourDepth.name = "Colour Depth";
         optColourDepth.immutable = false;

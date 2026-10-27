@@ -31,8 +31,6 @@ void queryRect(Display* display, Window window, int& left, int& top, uint& width
 
 void finaliseTopLevel(Display* display, Window window, int& left, int& top, uint& width, uint& height, String& title,
                       Atom wmDelete);
-
-bool getXVideoModes(Display* display, VideoMode& currentMode, VideoModes& videoModes);
 } // namespace Ogre
 
 #endif
