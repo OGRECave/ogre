@@ -174,7 +174,12 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           ${PROJECT_BINARY_DIR}/v6.0.5.tar.gz)
       execute_process(COMMAND ${CMAKE_COMMAND}
           -E tar xf v6.0.5.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+      # Assimp is only used for asset import, so favour size over import speed.
+      # Override the configuration flags rather than the build type to keep
+      # Debug builds debuggable and multi-config generators working.
       execute_process(COMMAND ${BUILD_COMMAND_COMMON}
+          "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG"
+          "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-Os -g -DNDEBUG"
           -DZLIB_ROOT=${OGREDEPS_PATH}
           -DBUILD_SHARED_LIBS=OFF
           -DASSIMP_BUILD_TESTS=OFF
