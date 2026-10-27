@@ -26,8 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreD3D11Driver.h"
-#include "OgreD3D11VideoModeList.h"
-#include "OgreD3D11VideoMode.h"
 #include "OgreD3D11Device.h"
 #include "OgreString.h"
 #include "OgreStringConverter.h"
@@ -69,14 +67,6 @@ namespace Ogre
             driverDescription += " (" + Ogre::StringConverter::toString(mSameNameAdapterIndex + 1) + ")";
 
         return driverDescription;
-    }
-    //---------------------------------------------------------------------
-    D3D11VideoModeList* D3D11Driver::getVideoModeList()
-    {
-        if(!mVideoModeList)
-            mVideoModeList = std::make_shared<D3D11VideoModeList>(getDeviceAdapter());
-
-        return mVideoModeList.get();
     }
     //---------------------------------------------------------------------
     const DXGI_ADAPTER_DESC1& D3D11Driver::getAdapterIdentifier() const
