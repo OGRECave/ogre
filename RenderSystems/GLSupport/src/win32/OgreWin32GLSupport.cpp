@@ -70,12 +70,6 @@ namespace Ogre {
             DisplayDevices.push_back(DisplayDevice.DeviceName);
         }*/
 
-        ConfigOption optColourDepth;
-        optColourDepth.name = "Colour Depth";
-        optColourDepth.immutable = false;
-
-        mOptions[optColourDepth.name] = optColourDepth;
-
         return mOptions;
     }
 
