@@ -28,6 +28,26 @@ static void initSDL()
     SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
 }
 
+static void normalizeVideoMode(Ogre::ConfigOption& opt)
+{
+    if (std::find(opt.possibleValues.begin(), opt.possibleValues.end(), opt.currentValue) != opt.possibleValues.end())
+        return;
+
+    auto pos = opt.currentValue.find(" x ");
+    if (pos == Ogre::String::npos)
+        return;
+
+    auto prefix = opt.currentValue.substr(0, pos + 3);
+    for (const auto& mode : opt.possibleValues)
+    {
+        if (mode.compare(0, prefix.size(), prefix) == 0)
+        {
+            opt.currentValue = mode;
+            return;
+        }
+    }
+}
+
 static void addVideoMode(const SDL_DisplayMode& mode,
                          std::vector<Ogre::String>& modes,
                          std::vector<Ogre::String>& frequencies)
@@ -107,7 +127,19 @@ bool ApplicationContextSDL::oneTimeConfig()
         }
     }
 
-    return ApplicationContextBase::oneTimeConfig();
+    if (!ApplicationContextBase::oneTimeConfig())
+        return false;
+
+    // upgrade legacy config files that have no colour depth suffix
+    for (auto rs : mRoot->getAvailableRenderers())
+    {
+        auto& options = const_cast<Ogre::ConfigOptionMap&>(rs->getConfigOptions());
+        auto opt = options.find("Video Mode");
+        if (opt != options.end())
+            normalizeVideoMode(opt->second);
+    }
+
+    return true;
 }
 
 void ApplicationContextSDL::addInputListener(NativeWindowType* win, InputListener* lis)
