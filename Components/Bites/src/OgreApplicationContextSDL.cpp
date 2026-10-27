@@ -107,6 +107,7 @@ bool ApplicationContextSDL::oneTimeConfig()
 
     for (auto rs : mRoot->getAvailableRenderers())
     {
+        // the option map is owned by the render system, which only exposes a const view
         auto& options = const_cast<Ogre::ConfigOptionMap&>(rs->getConfigOptions());
 
         auto opt = options.find("Video Mode");
