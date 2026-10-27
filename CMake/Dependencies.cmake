@@ -185,6 +185,9 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           -DASSIMP_BUILD_TESTS=OFF
           -DASSIMP_NO_EXPORT=TRUE
           -DASSIMP_BUILD_OGRE_IMPORTER=OFF
+          # IFC accounts for ~3.4 MB of the statically linked plugin and is
+          # rarely used for real-time assets.
+          -DASSIMP_BUILD_IFC_IMPORTER=OFF
           -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
           ${PROJECT_BINARY_DIR}/assimp-6.0.5
           WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-6.0.5)
