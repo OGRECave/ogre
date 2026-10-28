@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>OGRE Emscripten Sample</title>
+<link rel="icon" href="data:,">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1b1b1b; }
+  /* the canvas follows the page size, SDL resizes the render window to match */
+  #canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; }
+  #status { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #ddd;
+            font: 16px sans-serif; text-align: center; pointer-events: none; }
+  #status progress { display: block; width: 240px; margin-top: 8px; }
+  #toolbar { position: fixed; right: 12px; top: 12px; display: flex; gap: 8px; }
+  #toolbar button { width: 44px; height: 44px; padding: 10px; border: 0; border-radius: 8px;
+                    background: rgba(0, 0, 0, 0.4); cursor: pointer; }
+  #toolbar button[aria-pressed="true"] { background: rgba(0, 0, 0, 0.7); }
+  #toolbar svg { width: 100%; height: 100%; fill: none; stroke: #fff; stroke-width: 2.5; }
+  /* the log, for devices without developer tools */
+  #output { position: fixed; left: 0; right: 0; bottom: 0; height: 40%; margin: 0; padding: 8px; box-sizing: border-box;
+            overflow: auto; background: rgba(0, 0, 0, 0.75); color: #ddd; font: 12px monospace; white-space: pre-wrap; }
+  #output .error { color: #f88; }
+</style>
+</head>
+<body>
+<canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
+<div id="status">Loading&hellip;<progress hidden></progress></div>
+<div id="toolbar">
+  <button id="log" title="Log" aria-label="Log" aria-pressed="false">
+    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+  </button>
+  <button id="fullscreen" title="Fullscreen" aria-label="Fullscreen" hidden>
+    <svg viewBox="0 0 24 24"><path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6"/></svg>
+  </button>
+</div>
+<pre id="output" hidden></pre>
+<script>
+  var statusElement = document.getElementById('status');
+  var progressElement = statusElement.querySelector('progress');
+  var fullscreenButton = document.getElementById('fullscreen');
+  var logButton = document.getElementById('log');
+  var outputElement = document.getElementById('output');
+  var canvas = document.getElementById('canvas');
+
+  function appendOutput(text, isError) {
+    var atBottom = outputElement.scrollTop + outputElement.clientHeight >= outputElement.scrollHeight - 4;
+    var line = document.createElement('div');
+    line.textContent = text;
+    if (isError)
+      line.className = 'error';
+    outputElement.appendChild(line);
+    if (outputElement.childElementCount > 1000)
+      outputElement.firstChild.remove();
+    if (atBottom)
+      outputElement.scrollTop = outputElement.scrollHeight;
+  }
+
+  var Module = {
+    canvas: canvas,
+    print: function(text) {
+      console.log(text);
+      appendOutput(text, false);
+    },
+    printErr: function(text) {
+      console.error(text);
+      appendOutput(text, true);
+    },
+    setStatus: function(text) {
+      // "Downloading data... (12/34)"
+      var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+      statusElement.firstChild.textContent = m ? m[1] : text;
+      progressElement.hidden = !m;
+      if (m) {
+        progressElement.value = parseInt(m[2]);
+        progressElement.max = parseInt(m[4]);
+      }
+      statusElement.hidden = !text;
+    },
+    onRuntimeInitialized: function() {
+      fullscreenButton.hidden = !document.fullscreenEnabled;
+      canvas.focus();
+    },
+  };
+
+  // the render window follows the canvas into fullscreen
+  fullscreenButton.addEventListener('click', function() {
+    if (document.fullscreenElement)
+      document.exitFullscreen();
+    else
+      canvas.requestFullscreen();
+  });
+
+  logButton.addEventListener('click', function() {
+    outputElement.hidden = !outputElement.hidden;
+    logButton.setAttribute('aria-pressed', String(!outputElement.hidden));
+    outputElement.scrollTop = outputElement.scrollHeight;
+  });
+
+  window.onerror = function(message) {
+    appendOutput(message, true);
+    Module.setStatus('Exception thrown, see the log');
+  };
+</script>
+{{{ SCRIPT }}}
+</body>
+</html>
