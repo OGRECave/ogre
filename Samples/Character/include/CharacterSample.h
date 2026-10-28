@@ -22,7 +22,8 @@ public:
             "Sinbad's swords. With the swords equipped, you can left click to slice vertically or "
             "right click to slice horizontally. When the swords are not equipped, press E to "
             "start/stop a silly dance routine. "
-            "On touch screens, hold to run, drag to look around and tap to jump or slice.";
+            "On touch screens, hold to run, drag to look around, tap to jump or slice and "
+            "double tap to take out or put back the swords.";
     }
 
 protected:

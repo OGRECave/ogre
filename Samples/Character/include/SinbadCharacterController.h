@@ -16,6 +16,7 @@ using namespace OgreBites;
 #define GRAVITY 90.0f          // gravity in downward units per squared second
 #define TOUCH_HOLD_TIME 0.2f   // seconds a touch is held before the character starts running
 #define TOUCH_TAP_DRAG 10      // pixels a touch may move and still count as a tap
+#define TOUCH_DOUBLE_TAP_TIME 0.25f // seconds within which a second tap makes a double tap
 
 class SinbadCharacterController : public InputListener
 {
@@ -64,6 +65,20 @@ public:
             }
         }
 
+        // a tap acts once it can no longer become a double tap
+        if (mTapPending)
+        {
+            mTapTime += evt.timeSinceLastFrame;
+            if (mTapTime > TOUCH_DOUBLE_TAP_TIME)
+            {
+                mTapPending = false;
+                if (mSwordsDrawn)
+                    slice(ANIM_SLICE_VERTICAL);
+                else
+                    jump();
+            }
+        }
+
         updateBody(evt.timeSinceLastFrame);
         updateAnimations(evt.timeSinceLastFrame);
         updateCamera(evt.timeSinceLastFrame);
@@ -72,11 +87,9 @@ public:
     bool keyPressed(const KeyboardEvent& evt) override
     {
         Keycode key = evt.keysym.sym;
-        if (key == 'q' && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
+        if (key == 'q')
         {
-            // take swords out (or put them back, since it's the same animation but reversed)
-            setTopAnimation(ANIM_DRAW_SWORDS, true);
-            mTimer = 0;
+            toggleSwords();
         }
         else if (key == 'e' && !mSwordsDrawn)
         {
@@ -141,7 +154,8 @@ public:
     }
 
     // Touches arrive as left mouse button events: holding runs, dragging turns the camera and
-    // with it the running direction, and a tap jumps or, with the swords drawn, slices.
+    // with it the running direction, a tap jumps or, with the swords drawn, slices and a double
+    // tap takes the swords out or puts them back.
     bool mousePressed(const MouseButtonEvent& evt) override
     {
         if (evt.button == BUTTON_RIGHT)
@@ -168,10 +182,16 @@ public:
         }
         else if (mPointerDrag < TOUCH_TAP_DRAG)
         {
-            if (mSwordsDrawn)
-                slice(ANIM_SLICE_VERTICAL);
+            if (mTapPending)
+            {
+                mTapPending = false;
+                toggleSwords();
+            }
             else
-                jump();
+            {
+                mTapPending = true;
+                mTapTime = 0;
+            }
         }
         return true;
     }
@@ -208,6 +228,15 @@ private:
             return;
         setBaseAnimation(ANIM_JUMP_START, true);
         setTopAnimation(ANIM_NONE);
+        mTimer = 0;
+    }
+
+    void toggleSwords()
+    {
+        if (mTopAnimID != ANIM_IDLE_TOP && mTopAnimID != ANIM_RUN_TOP)
+            return;
+        // take swords out (or put them back, since it's the same animation but reversed)
+        setTopAnimation(ANIM_DRAW_SWORDS, true);
         mTimer = 0;
     }
 
@@ -584,6 +613,8 @@ private:
     bool mPointerRunning = false; // held long enough to run
     Real mPointerTime = 0;        // how long it is held
     int mPointerDrag = 0;         // how far it moved while held, in pixels
+    bool mTapPending = false;     // a tap that may still become a double tap
+    Real mTapTime = 0;            // time since that tap
     Vector3 mGoalDirection;     // actual intended direction in world-space
     Real mVerticalVelocity;     // for jumping
     Real mTimer;                // general timer to see how long animations have been playing
