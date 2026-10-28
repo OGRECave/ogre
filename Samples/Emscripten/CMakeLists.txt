@@ -7,7 +7,7 @@ set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. --shell-file ${SHELL_
 add_definitions(-s USE_SDL=2)
 
 if(TRUE)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1")
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/Samples/Character/include)

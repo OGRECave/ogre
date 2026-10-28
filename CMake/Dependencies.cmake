@@ -25,6 +25,13 @@ if(CMAKE_CROSSCOMPILING)
     set(CMAKE_FIND_ROOT_PATH ${OGREDEPS_PATH} "${CMAKE_FIND_ROOT_PATH}")
 
     set(CROSS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+
+    if(EMSCRIPTEN)
+        # all code must use the same exception handling, see CMakeLists.txt
+        set(CROSS ${CROSS}
+            -DCMAKE_C_FLAGS=-fwasm-exceptions
+            -DCMAKE_CXX_FLAGS=-fwasm-exceptions)
+    endif()
     
     if(ANDROID)
         set(CROSS ${CROSS}

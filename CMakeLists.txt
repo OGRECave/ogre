@@ -271,6 +271,11 @@ elseif(EMSCRIPTEN)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for Emscripten" FORCE)
 
   set(OGRE_CONFIG_THREADS "0" CACHE STRING "Threading is unstable on Emscripten" FORCE)
+
+  # Ogre reports errors with exceptions and recovers from some of them, which emscripten only
+  # supports if all code, including the dependencies, is compiled with exception handling
+  add_compile_options(-fwasm-exceptions)
+  add_link_options(-fwasm-exceptions)
 elseif (APPLE AND NOT APPLE_IOS)
   # Make sure that the GLES2 render system is disabled for non-iOS Apple builds
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE CACHE BOOL "" FORCE)
