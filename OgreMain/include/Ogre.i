@@ -496,22 +496,26 @@ CS_VECTOR_OPS(4);
 }
 
 
-%define TYPEMAP_SEQUENCE_FOR(TYPE, LEN_CHECK)
+%define TYPEMAP_SEQUENCE_FOR(TYPE, LEN_CHECK, DESCRIPTION)
 %typemap(in) const TYPE& (TYPE temp) {
     void *argp = 0;
     int res = SWIG_ConvertPtr($input, &argp, $descriptor, $disown);
     if (SWIG_IsOK(res)) {
         $1 = ($ltype)(argp);
     } else {
-        int len = PySequence_Length($input);
-        for (int i = 0; i < len; i++) {
+        // overload resolution checks the length, but plain functions do not
+        Py_ssize_t len = PySequence_Check($input) ? PySequence_Length($input) : -1;
+        if (len < 0 || !(LEN_CHECK)) {
+            %argument_fail(SWIG_TypeError, DESCRIPTION, $symname, $argnum);
+        }
+        for (Py_ssize_t i = 0; i < len; i++) {
             PyObject *o = PySequence_GetItem($input, i);
-            if (!PyNumber_Check(o)) {
-                Py_XDECREF(o);
-                %argument_fail(SWIG_TypeError, "Sequence[float]", $symname, $argnum);
+            double v = o ? PyFloat_AsDouble(o) : -1;
+            Py_XDECREF(o);
+            if (v == -1 && PyErr_Occurred()) {
+                %argument_fail(SWIG_TypeError, DESCRIPTION, $symname, $argnum);
             }
-            temp.ptr()[i] = (float)PyFloat_AsDouble(o);
-            Py_DECREF(o);
+            temp.ptr()[i] = (float)v;
         }
         $1 = &temp;
     }
@@ -527,11 +531,11 @@ CS_VECTOR_OPS(4);
     }
 }
 %enddef
-TYPEMAP_SEQUENCE_FOR(Ogre::Vector2, len == 2)
-TYPEMAP_SEQUENCE_FOR(Ogre::Vector3, len == 3)
-TYPEMAP_SEQUENCE_FOR(Ogre::Vector4, len == 4)
-TYPEMAP_SEQUENCE_FOR(Ogre::Quaternion, len == 4)
-TYPEMAP_SEQUENCE_FOR(Ogre::ColourValue, len >= 3 && len <= 4)
+TYPEMAP_SEQUENCE_FOR(Ogre::Vector2, len == 2, "Sequence[float] of length 2")
+TYPEMAP_SEQUENCE_FOR(Ogre::Vector3, len == 3, "Sequence[float] of length 3")
+TYPEMAP_SEQUENCE_FOR(Ogre::Vector4, len == 4, "Sequence[float] of length 4")
+TYPEMAP_SEQUENCE_FOR(Ogre::Quaternion, len == 4, "Sequence[float] of length 4")
+TYPEMAP_SEQUENCE_FOR(Ogre::ColourValue, len >= 3 && len <= 4, "Sequence[float] of length 3 or 4")
 #endif
 
 %ignore Ogre::Matrix3::Orthonormalize;
