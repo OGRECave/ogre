@@ -24,6 +24,8 @@ file(COPY
     "${CMAKE_SOURCE_DIR}/Samples/Media/materials/textures/rockwall.tga"
     "${CMAKE_SOURCE_DIR}/Media/packs/SdkTrays.zip"
     "${CMAKE_SOURCE_DIR}/Samples/Media/packs/Sinbad.zip"
+    "${CMAKE_SOURCE_DIR}/Samples/Media/packs/cubemapsJS.zip"
+    "${CMAKE_SOURCE_DIR}/Samples/Media/materials/scripts/SinbadPBR.material"
     DESTINATION ${MEDIA_DIR}/)
 
 file(COPY

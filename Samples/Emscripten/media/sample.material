@@ -32,3 +32,21 @@ material Examples/Rockwall
 		}
 	}
 }
+
+material Examples/CloudyNoonSkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				texture cloudy_noon.jpg cubic
+				tex_address_mode clamp
+			}
+		}
+	}
+}
