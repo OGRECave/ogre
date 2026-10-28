@@ -39,6 +39,8 @@ jobs:
         ./TestContext -rs "OpenGL ES 2.x Rendering Subsystem"
         # verify that the python modules are loadable
         cd ../lib && python -c "import _Ogre; import _RTShader; import _Bites"
+        # run the python tests, they import the modules from the current directory
+        python ../../Tests/Python/ogre_test.py
         cd ../../
         # validate XMLConverter output
         build/bin/OgreXMLConverter Samples/Media/models/ninja.mesh && build/bin/OgreXMLConverter Samples/Media/models/ninja.skeleton
