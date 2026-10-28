@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+#if OGRE_THREAD_SUPPORT
 // Names the *calling* thread. Truncate to 15 chars for Linux compatibility.
 static void set_current_thread_name(std::string name)
 {
@@ -72,6 +73,7 @@ static void set_current_thread_name(std::string name)
     (void)name; // unsupported platform
 #endif
 }
+#endif
 
     //---------------------------------------------------------------------
     DefaultWorkQueue::DefaultWorkQueue(const String& name)
