@@ -1,7 +1,8 @@
 set(MEDIA_DIR ${CMAKE_BINARY_DIR}/bin/media)
 
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
-set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. -s EXPORTED_FUNCTIONS=\"[ '_passAssetAsArrayBuffer', '_clearScene', '_main']\" -s USE_SDL=2 -s MAX_WEBGL_VERSION=2")
+set(SHELL_FILE ${CMAKE_CURRENT_SOURCE_DIR}/shell.html)
+set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. --shell-file ${SHELL_FILE} -s EXPORTED_FUNCTIONS=\"[ '_passAssetAsArrayBuffer', '_clearScene', '_main']\" -s USE_SDL=2 -s MAX_WEBGL_VERSION=2")
 
 add_definitions(-s USE_SDL=2)
 
@@ -12,6 +13,7 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/Samples/Character/include)
 add_executable(EmscriptenSample Main.cpp Context.cpp)
 target_link_libraries(EmscriptenSample OgreBites ${OGRE_LIBRARIES})
+set_target_properties(EmscriptenSample PROPERTIES LINK_DEPENDS ${SHELL_FILE})
 
 file(COPY
     "${CMAKE_SOURCE_DIR}/Samples/Emscripten/media" 
