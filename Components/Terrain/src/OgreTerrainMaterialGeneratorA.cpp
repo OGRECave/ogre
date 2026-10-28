@@ -47,6 +47,16 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    namespace
+    {
+        RTShader::SubRenderState* createShadowMapping(PSSMShadowCameraSetup* pssmSetup)
+        {
+            auto pssm = RTShader::ShaderGenerator::getSingleton().createSubRenderState(RTShader::SRS_SHADOW_MAPPING);
+            if (pssmSetup)
+                pssm->setParameter("split_points", pssmSetup->getSplitPoints());
+            return pssm;
+        }
+    }
     //---------------------------------------------------------------------
     TerrainMaterialGeneratorA::TerrainMaterialGeneratorA() :
         mLightmapEnabled(true),
@@ -296,20 +306,17 @@ namespace Ogre
 
         try
         {
+            RenderState shadowRS;
+            if(isShadowingEnabled(HIGH_LOD, terrain))
+                shadowRS.addTemplateSubRenderState(createShadowMapping(mPSSM));
+
             mainRenderState->link(*tplRS, pass, pass);
+            mainRenderState->link(shadowRS, pass, pass);
             auto surface = mainRenderState->getSubRenderState("TerrainSurface");
             OgreAssert(surface, "TerrainSurface SubRenderState not found");
             surface->setParameter("use_parallax_mapping", std::to_string(mLayerParallaxMappingEnabled));
             surface->setParameter("use_parallax_occlusion_mapping", std::to_string(mLayerParallaxOcclusionMappingEnabled));
             surface->setParameter("use_specular_mapping", std::to_string(mLayerSpecularMappingEnabled));
-            if(isShadowingEnabled(HIGH_LOD, terrain))
-            {
-                auto pssm = ShaderGenerator::getSingleton().createSubRenderState(SRS_SHADOW_MAPPING);
-                if(mPSSM)
-                    pssm->setParameter("split_points", mPSSM->getSplitPoints());
-                pssm->preAddToRenderState(mainRenderState.get(), pass, pass);
-                mainRenderState->addSubRenderStateInstance(pssm);
-            }
             mainRenderState->acquirePrograms(pass);
         }
         catch(const std::exception& e)
@@ -341,11 +348,9 @@ namespace Ogre
                 {
                     // light count needed to enable PSSM3
                     lod1RenderState->setLightCount(1);
-                    auto pssm = ShaderGenerator::getSingleton().createSubRenderState(SRS_SHADOW_MAPPING);
-                    if(mPSSM)
-                        pssm->setParameter("split_points", mPSSM->getSplitPoints());
-                    pssm->preAddToRenderState(lod1RenderState.get(), pass, pass);
-                    lod1RenderState->addSubRenderStateInstance(pssm);
+                    RenderState shadowRS;
+                    shadowRS.addTemplateSubRenderState(createShadowMapping(mPSSM));
+                    lod1RenderState->link(shadowRS, pass, pass);
                 }
                 lod1RenderState->acquirePrograms(pass);
             }
