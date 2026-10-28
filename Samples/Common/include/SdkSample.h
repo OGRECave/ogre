@@ -54,14 +54,19 @@ namespace OgreBites
             return mouseMoved(e);
         }
         bool touchPressed(const TouchFingerEvent& evt) override {
-            MouseButtonEvent e;
-            e.button = BUTTON_LEFT;
-            return mousePressed(e);
+            return mousePressed(toMouseButton(evt));
         }
         bool touchReleased(const TouchFingerEvent& evt) override {
-            MouseButtonEvent e;
+            return mouseReleased(toMouseButton(evt));
+        }
+    private:
+        MouseButtonEvent toMouseButton(const TouchFingerEvent& evt) const {
+            MouseButtonEvent e = {};
+            e.x = evt.x * mWindow->getWidth();
+            e.y = evt.y * mWindow->getHeight();
             e.button = BUTTON_LEFT;
-            return mouseReleased(e);
+            e.clicks = 1;
+            return e;
         }
     };
 
