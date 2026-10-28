@@ -264,75 +264,54 @@ void TargetRenderState::updateGpuProgramsParams(Renderable* rend, const Pass* pa
 
 void TargetRenderState::link(const StringVector& srsTypes, Pass* srcPass, Pass* dstPass)
 {
-    for (const auto& srsType : srsTypes)
-    {
-        auto srs = ShaderGenerator::getSingleton().createSubRenderState(srsType);
+    RenderState templateRS;
+    templateRS.addTemplateSubRenderStates(srsTypes);
+    link(templateRS, srcPass, dstPass);
+}
 
-        if (srs->preAddToRenderState(this, srcPass, dstPass))
-        {
-            addSubRenderStateInstance(srs);
-        }
-        else
-        {
-            ShaderGenerator::getSingleton().destroySubRenderState(srs);
-        }
+bool overridesSubRenderState(const SubRenderState* srs, const SubRenderState* other)
+{
+    switch (srs->getExecutionOrder())
+    {
+    case FFP_TRANSFORM:
+    case FFP_COLOUR:
+    case FFP_LIGHTING:
+    case FFP_TEXTURING:
+    case FFP_FOG:
+        if (srs->getExecutionOrder() == other->getExecutionOrder())
+            return true;
+    default:
+        break;
     }
+    return srs->getType() == other->getType();
 }
 
 //-----------------------------------------------------------------------
 void TargetRenderState::link(const RenderState& templateRS, Pass* srcPass, Pass* dstPass)
 {
+    SubRenderStateList added;
     for (auto srcSubRenderState : templateRS.getSubRenderStates())
     {
-        auto it = mSubRenderStateList.end();
-        switch (srcSubRenderState->getExecutionOrder())
-        {
-        case FFP_TRANSFORM:
-        case FFP_COLOUR:
-        case FFP_LIGHTING:
-        case FFP_TEXTURING:
-        case FFP_FOG:
-            // Check if this FFP stage already exists.
-            it = std::find_if(mSubRenderStateList.begin(), mSubRenderStateList.end(),
-                              [srcSubRenderState](const SubRenderState* e) {
-                                  return srcSubRenderState->getExecutionOrder() == e->getExecutionOrder();
-                              });
-        default:
-            break;
-        }
+        auto it = std::remove_if(mSubRenderStateList.begin(), mSubRenderStateList.end(), [&](SubRenderState* e) {
+            if (!overridesSubRenderState(srcSubRenderState, e))
+                return false;
+            added.erase(std::remove(added.begin(), added.end(), e), added.end());
+            ShaderGenerator::getSingleton().destroySubRenderState(e);
+            return true;
+        });
+        mSubRenderStateList.erase(it, mSubRenderStateList.end());
 
-        if(it != mSubRenderStateList.end())
-        {
-            ShaderGenerator::getSingleton().destroySubRenderState(*it);
-            std::swap(*it, mSubRenderStateList.back());
-            mSubRenderStateList.pop_back();
-        }
-
-        // Check if this type of sub render state already exists.
-        it = std::find_if(mSubRenderStateList.begin(), mSubRenderStateList.end(),
-                          [srcSubRenderState](const SubRenderState* e) {
-                              return srcSubRenderState->getType() == e->getType();
-                          });
-
-        if(it != mSubRenderStateList.end())
-        {
-            ShaderGenerator::getSingleton().destroySubRenderState(*it);
-            std::swap(*it, mSubRenderStateList.back());
-            mSubRenderStateList.pop_back();
-        }
-
-        // Case custom sub render state not exits -> add it to custom list.
         auto newSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());
         *newSubRenderState = *srcSubRenderState;
+        addSubRenderStateInstance(newSubRenderState);
+        added.push_back(newSubRenderState);
+    }
 
-        if (newSubRenderState->preAddToRenderState(this, srcPass, dstPass))
-        {
-            addSubRenderStateInstance(newSubRenderState);
-        }
-        else
-        {
-            ShaderGenerator::getSingleton().destroySubRenderState(newSubRenderState);
-        }
+    // only now each sub render state sees what it is linked with
+    for (auto subRenderState : added)
+    {
+        if (!subRenderState->preAddToRenderState(this, srcPass, dstPass))
+            removeSubRenderState(subRenderState);
     }
 }
 

@@ -50,6 +50,10 @@ bool ImageBasedLighting::preAddToRenderState(const RenderState* renderState, Pas
     if (!srcPass->getLightingEnabled())
         return false;
 
+    // builds on the PBR lighting, which a custom render state might have replaced
+    if (!renderState->getSubRenderState(SRS_COOK_TORRANCE_LIGHTING))
+        return false;
+
     // requires GLES3
     if (ShaderGenerator::getSingleton().getTargetLanguage() == "glsles" &&
         !GpuProgramManager::getSingleton().isSyntaxSupported("glsl300es"))

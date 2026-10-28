@@ -1336,17 +1336,28 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
     targetRenderState->setLightCount(lightCount);
     targetRenderState->setHaveAreaLights(haveAreaLights);
 
-    // Link the target render state with the scheme render state of the shader generator.
-    if (renderStateGlobal != NULL)
+    // Merge the custom render state of this pass into the scheme render state of the shader
+    // generator before linking, so the sub render states only check whether they apply once it is
+    // settled which of them the custom render state replaces.
+    RenderState templateRenderState;
+    for (const RenderState* renderState : {renderStateGlobal, static_cast<const RenderState*>(mCustomRenderState)})
     {
-        targetRenderState->link(*renderStateGlobal, mSrcPass, mDstPass);
+        if (!renderState)
+            continue;
+        for (auto subRenderState : renderState->getSubRenderStates())
+        {
+            auto merged = templateRenderState.getSubRenderStates();
+            for (auto other : merged)
+            {
+                if (overridesSubRenderState(subRenderState, other))
+                    templateRenderState.removeSubRenderState(other);
+            }
+            auto copy = ShaderGenerator::getSingleton().createSubRenderState(subRenderState->getType());
+            *copy = *subRenderState;
+            templateRenderState.addTemplateSubRenderState(copy);
+        }
     }
-
-    // Link the target render state with the custom render state of this pass if exists.
-    if (mCustomRenderState != NULL)
-    {
-        targetRenderState->link(*mCustomRenderState, mSrcPass, mDstPass);
-    }
+    targetRenderState->link(templateRenderState, mSrcPass, mDstPass);
 
     targetRenderState->acquirePrograms(mDstPass);
     mDstPass->getUserObjectBindings().setUserAny(TargetRenderState::UserKey, targetRenderState);
