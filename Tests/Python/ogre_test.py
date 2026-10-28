@@ -18,6 +18,16 @@ class SequenceTest(unittest.TestCase):
             with self.assertRaises(IndexError):
                 value[n] = 1
 
+    def test_matrix_index(self):
+        m = Ogre.Matrix4(1, 0, 0, 1, 0, 1, 0, 2, 0, 0, 1, 3, 0, 0, 0, 1)
+        self.assertEqual(m[0, 0], 1)
+        self.assertEqual(m[1, 3], 2)
+        with self.assertRaises(IndexError):
+            m[4, 0]
+        for invalid in (0, (0,), (0, 1, 2), ("a", 0)):
+            with self.assertRaises(TypeError):
+                m[invalid]
+
     def test_sequence_arguments(self):
         plane = Ogre.Plane(Ogre.Vector3(0, 1, 0), 0)
         self.assertEqual(plane.getDistance((0, 5, 0)), 5)

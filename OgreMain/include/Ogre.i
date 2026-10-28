@@ -548,6 +548,15 @@ ADD_REPR(Matrix3)
 %ignore Ogre::TransformBaseReal::extract3x3Matrix; // deprecated
 %ignore Ogre::TransformBaseReal::extractQuaternion; // deprecated
 %ignore Ogre::Matrix4::concatenate; // deprecated
+#ifdef SWIGPYTHON
+// m[row, column]
+%feature("python:slot", "mp_subscript", functype="binaryfunc") Ogre::Matrix4::__getitem__;
+%typemap(in) (int row, int column) {
+    if (!PyTuple_Check($input) || !PyArg_ParseTuple($input, "ii", &$1, &$2)) {
+        %argument_fail(SWIG_TypeError, "tuple (row, column)", $symname, $argnum);
+    }
+}
+#endif
 %include "OgreMatrix4.h"
 ADD_REPR(Matrix4)
 %template(TransformBaseMatrix4) Ogre::TransformBase<4, Ogre::Real>;
@@ -559,7 +568,11 @@ ADD_REPR(Matrix4)
     Ogre::Matrix4 operator*(const Ogre::Affine3& m) { return *$self * m; }
     Ogre::Matrix4 operator+(const Ogre::Matrix4& m) { return *$self + m; }
     Ogre::Matrix4 operator-(const Ogre::Matrix4& m) { return *$self - m; }
-    Ogre::Real __getitem__(int row, int column) { return (*$self)[row][column]; }
+    Ogre::Real __getitem__(int row, int column) {
+        if(row < 0 || row > 3 || column < 0 || column > 3)
+            throw std::length_error("out of bounds");
+        return (*$self)[row][column];
+    }
 }
 ADD_REPR(Affine3)
 %extend Ogre::Affine3
