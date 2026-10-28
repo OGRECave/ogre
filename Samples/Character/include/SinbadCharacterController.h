@@ -14,6 +14,8 @@ using namespace OgreBites;
 #define ANIM_FADE_SPEED 7.5f   // animation crossfade speed in % of full weight per second
 #define JUMP_ACCEL 30.0f       // character jump acceleration in upward units per squared second
 #define GRAVITY 90.0f          // gravity in downward units per squared second
+#define TOUCH_HOLD_TIME 0.2f   // seconds a touch is held before the character starts running
+#define TOUCH_TAP_DRAG 10      // pixels a touch may move and still count as a tap
 
 class SinbadCharacterController : public InputListener
 {
@@ -51,6 +53,17 @@ public:
 
     void frameRendered(const FrameEvent& evt) override
     {
+        // a held touch runs towards where the camera looks
+        if (mPointerDown && !mPointerRunning)
+        {
+            mPointerTime += evt.timeSinceLastFrame;
+            if (mPointerTime > TOUCH_HOLD_TIME)
+            {
+                mPointerRunning = true;
+                updateRunning();
+            }
+        }
+
         updateBody(evt.timeSinceLastFrame);
         updateAnimations(evt.timeSinceLastFrame);
         updateCamera(evt.timeSinceLastFrame);
@@ -91,21 +104,9 @@ public:
         else if (key == 's') mKeyDirection.z = 1;
         else if (key == 'd') mKeyDirection.x = 1;
 
-        else if (key == SDLK_SPACE && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
-        {
-            // jump if on ground
-            setBaseAnimation(ANIM_JUMP_START, true);
-            setTopAnimation(ANIM_NONE);
-            mTimer = 0;
-        }
+        else if (key == SDLK_SPACE) jump();
 
-        if (!mKeyDirection.isZeroLength() && mBaseAnimID == ANIM_IDLE_BASE)
-        {
-            // start running if not already moving and the player wants to move
-            setBaseAnimation(ANIM_RUN_BASE, true);
-            if (mTopAnimID == ANIM_IDLE_TOP) setTopAnimation(ANIM_RUN_TOP, true);
-        }
-
+        updateRunning();
         return true;
     }
 
@@ -118,18 +119,15 @@ public:
         else if (key == 's' && mKeyDirection.z == 1) mKeyDirection.z = 0;
         else if (key == 'd' && mKeyDirection.x == 1) mKeyDirection.x = 0;
 
-        if (mKeyDirection.isZeroLength() && mBaseAnimID == ANIM_RUN_BASE)
-        {
-            // stop running if already moving and the player doesn't want to move
-            setBaseAnimation(ANIM_IDLE_BASE);
-            if (mTopAnimID == ANIM_RUN_TOP) setTopAnimation(ANIM_IDLE_TOP);
-        }
-
+        updateRunning();
         return true;
     }
 
     bool mouseMoved(const MouseMotionEvent& evt) override
     {
+        if (mPointerDown)
+            mPointerDrag += std::abs(evt.xrel) + std::abs(evt.yrel);
+
         // update camera goal based on mouse movement
         updateCameraGoal(-0.05f * evt.xrel, -0.05f * evt.yrel, 0);
         return true;
@@ -142,19 +140,85 @@ public:
         return true;
     }
 
+    // Touches arrive as left mouse button events: holding runs, dragging turns the camera and
+    // with it the running direction, and a tap jumps or, with the swords drawn, slices.
     bool mousePressed(const MouseButtonEvent& evt) override
     {
-        if (mSwordsDrawn && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
+        if (evt.button == BUTTON_RIGHT)
+            slice(ANIM_SLICE_HORIZONTAL);
+        else if (evt.button == BUTTON_LEFT)
         {
-            // if swords are out, and character's not doing something weird, then SLICE!
-            if (evt.button == BUTTON_LEFT) setTopAnimation(ANIM_SLICE_VERTICAL, true);
-            else if (evt.button == BUTTON_RIGHT) setTopAnimation(ANIM_SLICE_HORIZONTAL, true);
-            mTimer = 0;
+            mPointerDown = true;
+            mPointerTime = 0;
+            mPointerDrag = 0;
+        }
+        return true;
+    }
+
+    bool mouseReleased(const MouseButtonEvent& evt) override
+    {
+        if (evt.button != BUTTON_LEFT || !mPointerDown)
+            return true;
+
+        mPointerDown = false;
+        if (mPointerRunning)
+        {
+            mPointerRunning = false;
+            updateRunning();
+        }
+        else if (mPointerDrag < TOUCH_TAP_DRAG)
+        {
+            if (mSwordsDrawn)
+                slice(ANIM_SLICE_VERTICAL);
+            else
+                jump();
         }
         return true;
     }
 
 private:
+
+    /// the local direction the player wants to move in, a held touch runs forward
+    Vector3 getMoveDirection() const
+    {
+        if (mPointerRunning && mKeyDirection.isZeroLength())
+            return Vector3::NEGATIVE_UNIT_Z;
+        return mKeyDirection;
+    }
+
+    /// start or stop running when the player's intended direction changes
+    void updateRunning()
+    {
+        if (!getMoveDirection().isZeroLength() && mBaseAnimID == ANIM_IDLE_BASE)
+        {
+            setBaseAnimation(ANIM_RUN_BASE, true);
+            if (mTopAnimID == ANIM_IDLE_TOP) setTopAnimation(ANIM_RUN_TOP, true);
+        }
+        else if (getMoveDirection().isZeroLength() && mBaseAnimID == ANIM_RUN_BASE)
+        {
+            setBaseAnimation(ANIM_IDLE_BASE);
+            if (mTopAnimID == ANIM_RUN_TOP) setTopAnimation(ANIM_IDLE_TOP);
+        }
+    }
+
+    void jump()
+    {
+        // jump if on ground and not doing something else
+        if (mTopAnimID != ANIM_IDLE_TOP && mTopAnimID != ANIM_RUN_TOP)
+            return;
+        setBaseAnimation(ANIM_JUMP_START, true);
+        setTopAnimation(ANIM_NONE);
+        mTimer = 0;
+    }
+
+    void slice(AnimID anim)
+    {
+        // if swords are out, and character's not doing something weird, then SLICE!
+        if (!mSwordsDrawn || (mTopAnimID != ANIM_IDLE_TOP && mTopAnimID != ANIM_RUN_TOP))
+            return;
+        setTopAnimation(anim, true);
+        mTimer = 0;
+    }
 
     void setupBody(SceneManager* sceneMgr)
     {
@@ -247,11 +311,12 @@ private:
     {
         mGoalDirection = Vector3::ZERO;   // we will calculate this
 
-        if (mKeyDirection != Vector3::ZERO && mBaseAnimID != ANIM_DANCE)
+        const Vector3 moveDirection = getMoveDirection();
+        if (moveDirection != Vector3::ZERO && mBaseAnimID != ANIM_DANCE)
         {
             // calculate actually goal direction in world based on player's key directions
-            mGoalDirection += mKeyDirection.z * mCameraNode->getOrientation().zAxis();
-            mGoalDirection += mKeyDirection.x * mCameraNode->getOrientation().xAxis();
+            mGoalDirection += moveDirection.z * mCameraNode->getOrientation().zAxis();
+            mGoalDirection += moveDirection.x * mCameraNode->getOrientation().xAxis();
             mGoalDirection.y = 0;
             mGoalDirection.normalise();
 
@@ -375,7 +440,7 @@ private:
             if (mTimer >= mAnims[mBaseAnimID]->getLength())
             {
                 // safely landed, so go back to running or idling
-                if (mKeyDirection == Vector3::ZERO)
+                if (getMoveDirection() == Vector3::ZERO)
                 {
                     setBaseAnimation(ANIM_IDLE_BASE);
                     setTopAnimation(ANIM_IDLE_TOP);
@@ -515,6 +580,10 @@ private:
     bool mFadingOut[NUM_ANIMS];           // which animations are fading out
     bool mSwordsDrawn;
     Vector3 mKeyDirection;      // player's local intended direction based on WASD keys
+    bool mPointerDown = false;    // left mouse button or touch held
+    bool mPointerRunning = false; // held long enough to run
+    Real mPointerTime = 0;        // how long it is held
+    int mPointerDrag = 0;         // how far it moved while held, in pixels
     Vector3 mGoalDirection;     // actual intended direction in world-space
     Real mVerticalVelocity;     // for jumping
     Real mTimer;                // general timer to see how long animations have been playing

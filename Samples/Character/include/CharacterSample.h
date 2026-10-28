@@ -21,7 +21,8 @@ public:
             "Use mouse to look around and mouse wheel to zoom. Press Q to take out or put back "
             "Sinbad's swords. With the swords equipped, you can left click to slice vertically or "
             "right click to slice horizontally. When the swords are not equipped, press E to "
-            "start/stop a silly dance routine.";
+            "start/stop a silly dance routine. "
+            "On touch screens, hold to run, drag to look around and tap to jump or slice.";
     }
 
 protected:
