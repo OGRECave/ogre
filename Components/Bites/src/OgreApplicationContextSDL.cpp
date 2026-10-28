@@ -193,6 +193,16 @@ void ApplicationContextSDL::pollEvents()
                 Ogre::LogManager::getSingleton().stream() << "Opened Gamepad: " << (name ? name : "unnamed");
             }
             break;
+        // touches arrive as finger events, so skip the mouse events SDL emulates from them
+        case SDL_MOUSEMOTION:
+            if(event.motion.which != SDL_TOUCH_MOUSEID)
+                _fireInputEvent(convert(event), event.window.windowID);
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+            if(event.button.which != SDL_TOUCH_MOUSEID)
+                _fireInputEvent(convert(event), event.window.windowID);
+            break;
         default:
             _fireInputEvent(convert(event), event.window.windowID);
             break;
