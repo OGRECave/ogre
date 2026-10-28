@@ -1,0 +1,228 @@
+// Sinbad's materials for physically based lighting, as used by the Character sample.
+// With the metal_roughness lighting stage, the specular colour holds roughness and metallic.
+
+abstract pass SinbadPBR/Pass
+{
+	rtshader_system
+	{
+		lighting_stage metal_roughness
+		// reflect the sky, dimmer than the sun to keep the shadows visible
+		image_based_lighting texture cloudy_noon.jpg luminance 0.25
+	}
+}
+
+material SinbadPBR/Body
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.55 0 0 1
+
+			texture_unit
+			{
+				texture sinbad_body.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Gold
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 0.8 0.8 0.8 1
+			specular 0.3 1 0 1
+
+			texture_unit
+			{
+				texture sinbad_clothes.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Sheaths
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.6 0 0 1
+
+			texture_unit
+			{
+				texture sinbad_sword.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Clothes
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.8 0 0 1
+
+			texture_unit
+			{
+				texture sinbad_clothes.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Teeth
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.35 0 0 1
+
+			texture_unit
+			{
+				texture sinbad_body.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Eyes
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.2 0 0 1
+
+			texture_unit
+			{
+				texture sinbad_body.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Spikes
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.35 1 0 1
+
+			texture_unit
+			{
+				texture sinbad_clothes.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Blade
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.2 1 0 1
+
+			texture_unit
+			{
+				texture sinbad_sword.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Ruby
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.15 0 0 1
+
+			texture_unit
+			{
+				texture sinbad_sword.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Hilt
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 0.8 0.8 0.8 1
+			specular 0.35 1 0 1
+
+			texture_unit
+			{
+				texture sinbad_sword.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Handle
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.6 0 0 1
+
+			texture_unit
+			{
+				texture sinbad_sword.tga
+			}
+		}
+	}
+}
+
+material SinbadPBR/Floor
+{
+	receive_shadows on
+	technique
+	{
+		pass : SinbadPBR/Pass
+		{
+			diffuse 1 1 1 1
+			specular 0.9 0 0 1
+
+			texture_unit
+			{
+				texture rockwall.tga
+			}
+		}
+	}
+}
