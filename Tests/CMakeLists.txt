@@ -89,6 +89,12 @@ if (OGRE_BUILD_TESTS)
         COMMAND $<TARGET_FILE_NAME:Test_Ogre>
         WORKING_DIRECTORY $<TARGET_FILE_DIR:Test_Ogre>)
 
+    if(OGRE_BUILD_COMPONENT_PYTHON)
+        add_test(NAME Test_Python_Ogre
+            COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Python/ogre_test.py
+            WORKING_DIRECTORY $<TARGET_FILE_DIR:Ogre>)
+    endif()
+
     if(ANDROID)
         set_target_properties(Test_Ogre PROPERTIES LINK_FLAGS -pie)
     endif()

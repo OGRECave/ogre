@@ -120,7 +120,7 @@ JNIEnv* OgreJNIGetEnv() {
         SWIG_fail;
     }
     catch (std::length_error &e) {
-        SWIG_fail;
+        SWIG_exception(SWIG_IndexError, e.what());
     }
 #endif
     catch (const std::exception& e) {
@@ -171,7 +171,11 @@ JNIEnv* OgreJNIGetEnv() {
 %ignore *::operator[];
 %define SEQUENCE_METHODS
 {
-    void __setitem__(uint i, float v) { (*$self)[i] = v; }
+    void __setitem__(uint i, float v) {
+        if(i >= sizeof(*$self)/sizeof(float))
+            throw std::length_error("out of bounds");
+        (*$self)[i] = v;
+    }
     size_t __len__() { return sizeof(*$self)/sizeof(float); }
     float __getitem__(uint i) {
         if(i >= sizeof(*$self)/sizeof(float))
