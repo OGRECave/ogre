@@ -18,6 +18,16 @@ class SequenceTest(unittest.TestCase):
             with self.assertRaises(IndexError):
                 value[n] = 1
 
+    def test_sequence_arguments(self):
+        plane = Ogre.Plane(Ogre.Vector3(0, 1, 0), 0)
+        self.assertEqual(plane.getDistance((0, 5, 0)), 5)
+        self.assertEqual(plane.getDistance([0, 5, 0]), 5)
+
+        # getDistance is not overloaded, so only the argument conversion checks the input
+        for invalid in ((0, 5), (0, 5, 0, 9), 5, (x for x in (0, 5, 0)), ("a", 1, 1)):
+            with self.assertRaises(TypeError):
+                plane.getDistance(invalid)
+
 
 if __name__ == "__main__":
     unittest.main()
