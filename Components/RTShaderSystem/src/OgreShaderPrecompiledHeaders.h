@@ -114,6 +114,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace RTShader {
+/// Whether srs replaces other when render states are linked: the same type or the same FFP stage
+bool overridesSubRenderState(const SubRenderState* srs, const SubRenderState* other);
+
 class LayeredBlendingFactory : public SubRenderStateFactory
 {
 public:
