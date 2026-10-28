@@ -135,20 +135,6 @@ namespace Ogre {
 
         GLSLES::logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
 
-        const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
-
-        if(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-        {
-            if(glIsProgramPipelineEXT(mGLProgramHandle))
-                glValidateProgramPipelineEXT(mGLProgramHandle);
-        }
-        else if(glIsProgram(mGLProgramHandle))
-        {
-            glValidateProgram(mGLProgramHandle);
-        }
-
-        GLSLES::logObjectInfo( getCombinedName() + String(" GLSL validation result : "), mGLProgramHandle );
-
         if(mLinked)
         {
             _writeToCache(hash, mGLProgramHandle);
