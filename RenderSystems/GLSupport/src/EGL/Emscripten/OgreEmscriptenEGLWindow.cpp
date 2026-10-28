@@ -50,19 +50,19 @@ namespace Ogre {
           mMSAA(0),
           mCSAA(0)
     {
-        // already handled by resize
-        emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, (void*)this, 1, &EmscriptenEGLWindow::fullscreenCallback);
-        emscripten_set_webglcontextlost_callback("#canvas", (void*)this, 1, &EmscriptenEGLWindow::contextLostCallback);
-        emscripten_set_webglcontextrestored_callback("#canvas", (void*)this, 1, &EmscriptenEGLWindow::contextRestoredCallback);
-        emscripten_set_resize_callback("#canvas", (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
     }
 
     EmscriptenEGLWindow::~EmscriptenEGLWindow()
     {
-        emscripten_set_fullscreenchange_callback("#canvas", NULL, 0, NULL);
-        emscripten_set_resize_callback("#canvas", NULL, 0, NULL);
-        emscripten_set_webglcontextlost_callback("#canvas", NULL, 0, NULL);
-        emscripten_set_webglcontextrestored_callback("#canvas", NULL, 0, NULL);
+        if (mCanvasSelector.empty())
+            return;
+
+        // remove the callbacks from the targets they were registered on. This removes all
+        // handlers of these events, but the window owning the canvas is going away anyway
+        emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, NULL, 0, NULL);
+        emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, NULL, 0, NULL);
+        emscripten_set_webglcontextlost_callback(mCanvasSelector.c_str(), NULL, 0, NULL);
+        emscripten_set_webglcontextrestored_callback(mCanvasSelector.c_str(), NULL, 0, NULL);
     }
 
     void EmscriptenEGLWindow::resize(uint width, uint height)
@@ -72,7 +72,8 @@ namespace Ogre {
         EMSCRIPTEN_RESULT result = emscripten_set_canvas_element_size(mCanvasSelector.c_str(), width, height);
         // This is a workaroud for issue: https://github.com/emscripten-core/emscripten/issues/3283.
         // The setTimeout of 0 will ensure that this code is runs on the next JSEventLoop.
-        EM_ASM(setTimeout(function(){var canvas = document.getElementById('canvas'); canvas.width = $0; canvas.height = $1;}, 0), width, height);
+        EM_ASM(setTimeout(function(){var canvas = document.querySelector(UTF8ToString($0)); canvas.width = $1; canvas.height = $2;}, 0),
+               mCanvasSelector.c_str(), width, height);
         
         if(result < 0)
         {
@@ -98,7 +99,7 @@ namespace Ogre {
     void EmscriptenEGLWindow::switchFullScreen(bool fullscreen)
     {
         if(fullscreen)
-            emscripten_request_fullscreen(NULL, 1);
+            emscripten_request_fullscreen(mCanvasSelector.c_str(), 1);
         else
             emscripten_exit_fullscreen();
     }
@@ -203,6 +204,13 @@ namespace Ogre {
         
         mOldWidth = width;
         mOldHeight = height;
+
+        // the browser sends resize events to the window, not to the canvas
+        emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, this, 1, &EmscriptenEGLWindow::fullscreenCallback);
+        emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, 1, &EmscriptenEGLWindow::canvasWindowResized);
+        emscripten_set_webglcontextlost_callback(mCanvasSelector.c_str(), this, 1, &EmscriptenEGLWindow::contextLostCallback);
+        emscripten_set_webglcontextrestored_callback(mCanvasSelector.c_str(), this, 1, &EmscriptenEGLWindow::contextRestoredCallback);
+
         if(fullScreen)
             switchFullScreen(true);
         
