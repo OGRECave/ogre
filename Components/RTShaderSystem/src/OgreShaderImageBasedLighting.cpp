@@ -62,12 +62,9 @@ bool ImageBasedLighting::preAddToRenderState(const RenderState* renderState, Pas
     // generate with ./cmgen --size=64 --ibl-dfg-multiscatter --ibl-dfg=dfgLUTmultiscatter.dds
     // see https://github.com/google/filament/blob/78554d231947bae965492eb5c47ad24a8d4a426e/filament/CMakeLists.txt#L510
     auto tus = dstPass->createTextureUnitState();
-    if(auto tex = TextureManager::getSingleton().getByName("dfgLUTmultiscatter.dds", RGN_INTERNAL))
-    {
-        tus->setTexture(tex);
-        tus->setNumMipmaps(0);
-        tus->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
-    }
+    tus->setTexture(TextureManager::getSingleton().load("dfgLUTmultiscatter.dds", RGN_INTERNAL, TEX_TYPE_2D, 0));
+    tus->setNumMipmaps(0);
+    tus->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
     mDfgLUTSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
     tus = dstPass->createTextureUnitState();
