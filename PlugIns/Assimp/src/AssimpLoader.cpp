@@ -440,6 +440,9 @@ bool AssimpLoader::_load(const char* name, Assimp::Importer& importer, Mesh* mes
 
         createBonesFromNode(scene, scene->mRootNode);
         createBoneHiearchy(scene, scene->mRootNode);
+        // Like SkeletonSerializer: without this the initial state of every bone
+        // is identity, so Skeleton::reset() collapses the master skeleton.
+        mSkeleton->setBindingPose();
 
         if (scene->HasAnimations())
         {
