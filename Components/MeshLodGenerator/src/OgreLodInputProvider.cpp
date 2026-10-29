@@ -321,7 +321,7 @@ namespace Ogre
             return;
         }
 
-        data->mIndexBufferInfoList[subMeshIndex].indexSize = id->indexBuffer->getIndexSize();
+        data->mIndexBufferInfoList[subMeshIndex].indexType = id->indexBuffer->getType();
         data->mIndexBufferInfoList[subMeshIndex].indexCount = id->indexCount;
 
         bool useSharedVertexLookup = getSubMeshUseSharedVertices(subMeshIndex);
