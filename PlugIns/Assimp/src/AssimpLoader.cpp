@@ -738,13 +738,21 @@ void AssimpLoader::parseAnimation(const aiScene* mScene, int index, aiAnimation*
                     if (node_anim->mNumScalingKeys == 0)
                         scale = Vector3(restScale.x, restScale.y, restScale.z);
 
+                    // A zero scale component (glTF hides nodes this way) makes the
+                    // composed transform singular, and decomposing it yields NaN
+                    // rotation and scale. Decompose with those components set to
+                    // one and zero the matching decomposed scale afterwards.
+                    Vector3 safeScale(scale.x != 0 ? scale.x : 1, scale.y != 0 ? scale.y : 1,
+                                      scale.z != 0 ? scale.z : 1);
+
                     Affine3 fullTransform;
-                    fullTransform.makeTransform(trans, scale, rot);
+                    fullTransform.makeTransform(trans, safeScale, rot);
                     Affine3 targetTransform = parentSpace * fullTransform;
 
                     Vector3 targetTrans, targetScale;
                     Quaternion targetRot;
                     targetTransform.decomposition(targetTrans, targetScale, targetRot);
+                    targetScale *= componentwiseDivide(scale, safeScale);
 
                     keyframe = track->createNodeKeyFrame(Real(it->first));
 
