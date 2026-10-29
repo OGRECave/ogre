@@ -103,6 +103,7 @@ void ImGuiOverlay::ImGUIRenderable::createMaterial()
     mMaterial = MaterialManager::getSingleton().create("ImGui/material", RGN_INTERNAL);
     Pass* mPass = mMaterial->getTechnique(0)->getPass(0);
     mPass->setCullingMode(CULL_NONE);
+    mPass->setFog(true, FOG_NONE);
     mPass->setVertexColourTracking(TVC_DIFFUSE);
     mPass->setSceneBlendingOperation(SBO_ADD);
     mPass->setSeparateSceneBlending(SBF_SOURCE_ALPHA, SBF_ONE_MINUS_SOURCE_ALPHA, SBF_ONE, SBF_ONE_MINUS_SOURCE_ALPHA);
