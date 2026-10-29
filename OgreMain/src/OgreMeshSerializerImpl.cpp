@@ -58,6 +58,17 @@ namespace Ogre {
         size_t remaining = chunkSize - MSTREAM_OVERHEAD_SIZE;
         return remaining / itemSize >= itemCount;
     }
+
+    /** Legacy (v1.8) exporters wrote bogus LOD chunk lengths, so check the LOD count
+    against what is left in the stream instead of the declared chunk length. */
+    static bool checkLegacyLodCount(const DataStreamPtr& stream, size_t numLods)
+    {
+        if (numLods <= 1)
+            return true;
+        size_t pos = stream->tell(), size = stream->size();
+        size_t remaining = pos < size ? size - pos : 0;
+        return remaining / (MSTREAM_OVERHEAD_SIZE + sizeof(float)) >= numLods - 1;
+    }
     //---------------------------------------------------------------------
     MeshSerializerImpl::MeshSerializerImpl()
     {
@@ -2983,7 +2994,7 @@ namespace Ogre {
         String strategyName = readString(stream);
         uint16 numLods;
         readShorts(stream, &numLods, 1);
-        if (!checkChunkRemainingSize(mCurrentstreamLen, numLods > 0 ? numLods - 1 : 0, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+        if (!checkLegacyLodCount(stream, numLods))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
         bool manual;
         readBools(stream, &manual, 1); // missing in v1_9
@@ -3054,7 +3065,7 @@ namespace Ogre {
         readShorts(stream, &numLods, 1);
         numLods = std::max<ushort>(numLods, 1);
 
-        if (!checkChunkRemainingSize(mCurrentstreamLen, numLods - 1, MSTREAM_OVERHEAD_SIZE + sizeof(float)))
+        if (!checkLegacyLodCount(stream, numLods))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "LOD level count exceeds chunk size");
 
         if(pMesh->getNumLodLevels() > 1)
