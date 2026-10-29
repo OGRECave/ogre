@@ -520,7 +520,8 @@ void GLSLangProgram::prepareImpl()
 
     if (ogreUniformsIdx != -1)
     {
-        mConstantDefs->bufferSize = program.getUniformBlockSize(ogreUniformsIdx) / 4;
+        // round up to a full vec4, as a trailing vec3 is padded to 4 elements above
+        mConstantDefs->bufferSize = (program.getUniformBlockSize(ogreUniformsIdx) + 15) / 16 * 4;
         mLogicalToPhysical.reset();
     }
 }
