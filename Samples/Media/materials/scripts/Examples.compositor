@@ -738,9 +738,7 @@ compositor Compute
     {
         target_output
         {
-            // just do normal rendering
-            input previous
-            // execute compute shaders post-render
+            // execute compute shaders pre-render, so the result is shown in the same frame
             pass compute
             {
                 material Compute/Compositor
@@ -748,6 +746,8 @@ compositor Compute
                 // so we have to launch 16x16x1 groups
                 thread_groups 16 16 1
             }
+            // just do normal rendering
+            pass render_scene {}
         }
     }
 }

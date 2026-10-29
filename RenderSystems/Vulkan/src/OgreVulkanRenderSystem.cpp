@@ -54,6 +54,13 @@ THE SOFTWARE.
 
 #define VULKAN_MAX_TEXTURE_UNITS 16
 
+// compute descriptor set layout, must match OgreUnifiedCompute.h
+#define VULKAN_COMPUTE_IMAGE_BINDING 1
+#define VULKAN_MAX_STORAGE_IMAGES 8
+#define VULKAN_COMPUTE_TEXTURE_BINDING 9
+#define VULKAN_COMPUTE_BUFFER_BINDING 25
+#define VULKAN_MAX_STORAGE_BUFFERS 8
+
 namespace Ogre
 {
     static const uint32 VERTEX_ATTRIBUTE_INDEX[VES_COUNT] =
@@ -125,6 +132,11 @@ namespace Ogre
         mUBOInfo{},
         mUBODynOffsets{},
         mImageInfos{},
+        mStorageImageInfos{},
+        mStorageTextures{},
+        mStorageBufferInfos{},
+        mNumStorageImageBindings( 0 ),
+        mNumStorageBufferBindings( 0 ),
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
         mScissorRect{},
@@ -161,38 +173,11 @@ namespace Ogre
         viewportStateCi.viewportCount = 1u;
         viewportStateCi.scissorCount = 1u;
 
-        // use a single descriptor set for all shaders
-        mDescriptorSetBindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
-        mDescriptorSetBindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
-        for(uint32 i = 0; i < VULKAN_MAX_TEXTURE_UNITS; ++i)
-            mDescriptorSetBindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
-
-        // one descriptor will have at most OGRE_MAX_TEXTURE_LAYERS and one UBO per shader type (for now)
-        mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
-        mDescriptorPoolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VULKAN_MAX_TEXTURE_UNITS});
-
         // silence validation layer, when unused
         mUBOInfo[0].range = 1;
         mUBOInfo[1].range = 1;
 
-        mDescriptorWrites.resize(VULKAN_MAX_TEXTURE_UNITS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
-        mDescriptorWrites[0].dstBinding = 0;
-        mDescriptorWrites[0].descriptorCount = 1;
-        mDescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        mDescriptorWrites[0].pBufferInfo = mUBOInfo.data();
-
-        mDescriptorWrites[1].dstBinding = 1;
-        mDescriptorWrites[1].descriptorCount = 1;
-        mDescriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        mDescriptorWrites[1].pBufferInfo = mUBOInfo.data() + 1;
-
-        for(int i = 0; i < VULKAN_MAX_TEXTURE_UNITS; i++)
-        {
-            mDescriptorWrites[i + 2].dstBinding = 2 + i;
-            mDescriptorWrites[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            mDescriptorWrites[i + 2].pImageInfo = mImageInfos.data() + i;
-            mDescriptorWrites[i + 2].descriptorCount = 1;
-        }
+        initGraphicsDescriptorSetProfile();
 
         if(volkInitialize() != VK_SUCCESS)
         {
@@ -291,17 +276,25 @@ namespace Ogre
         OGRE_DELETE mSPIRVProgramFactory;
         mSPIRVProgramFactory = 0;
 
-        vkDestroyPipelineLayout(mDevice->mDevice, mLayout, 0);
-        vkDestroyDescriptorSetLayout(mDevice->mDevice, mDescriptorSetLayout, 0);
+        for(auto& profile : mDescriptorSetProfiles)
+        {
+            vkDestroyPipelineLayout(mDevice->mDevice, profile.pipelineLayout, 0);
+            vkDestroyDescriptorSetLayout(mDevice->mDevice, profile.layout, 0);
+            profile.pool.reset();
+        }
 
         for(auto it : mRenderPassCache)
         {
             vkDestroyRenderPass(mDevice->mDevice, it.second, 0);
         }
 
-        mDescriptorPool.reset();
-
         clearPipelineCache();
+
+        for(auto it : mComputePipelineCache)
+        {
+            vkDestroyPipeline(mDevice->mDevice, it.second, 0);
+        }
+        mComputePipelineCache.clear();
 
         delete mDevice;
         mDevice = 0;
@@ -410,6 +403,83 @@ namespace Ogre
                               VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
         OGRE_VK_CHECK(
             CreateDebugReportCallback( mVkInstance, &dbgCreateInfo, 0, &mDebugReportCallback ));
+    }
+    //-------------------------------------------------------------------------
+    void VulkanRenderSystem::initGraphicsDescriptorSetProfile( void )
+    {
+        // use a single descriptor set for all shaders
+        auto& profile = mDescriptorSetProfiles[DSP_GRAPHICS];
+        profile.layout = VK_NULL_HANDLE;
+        profile.pipelineLayout = VK_NULL_HANDLE;
+
+        profile.bindings.push_back({0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        profile.bindings.push_back({1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+        for(uint32 i = 0; i < VULKAN_MAX_TEXTURE_UNITS; ++i)
+            profile.bindings.push_back({2 + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS});
+
+        // one descriptor will have at most OGRE_MAX_TEXTURE_LAYERS and one UBO per shader type (for now)
+        profile.poolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, GPT_COUNT});
+        profile.poolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VULKAN_MAX_TEXTURE_UNITS});
+
+        profile.writes.resize(VULKAN_MAX_TEXTURE_UNITS + 2, {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET});
+        profile.writes[0].dstBinding = 0;
+        profile.writes[0].descriptorCount = 1;
+        profile.writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        profile.writes[0].pBufferInfo = mUBOInfo.data();
+
+        profile.writes[1].dstBinding = 1;
+        profile.writes[1].descriptorCount = 1;
+        profile.writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        profile.writes[1].pBufferInfo = mUBOInfo.data() + 1;
+
+        for(int i = 0; i < VULKAN_MAX_TEXTURE_UNITS; i++)
+        {
+            profile.writes[i + 2].dstBinding = 2 + i;
+            profile.writes[i + 2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            profile.writes[i + 2].pImageInfo = mImageInfos.data() + i;
+            profile.writes[i + 2].descriptorCount = 1;
+        }
+    }
+    //-------------------------------------------------------------------------
+    void VulkanRenderSystem::initComputeDescriptorSetProfile( void )
+    {
+        // compute only has one uniform buffer, but uses storage images and buffers
+        auto& profile = mDescriptorSetProfiles[DSP_COMPUTE];
+        profile.layout = VK_NULL_HANDLE;
+        profile.pipelineLayout = VK_NULL_HANDLE;
+
+        const auto& limits = mDevice->mDeviceProperties.limits;
+        mNumStorageImageBindings = std::min<uint32>(VULKAN_MAX_STORAGE_IMAGES, limits.maxPerStageDescriptorStorageImages);
+        mNumStorageBufferBindings =
+            std::min<uint32>(VULKAN_MAX_STORAGE_BUFFERS, limits.maxPerStageDescriptorStorageBuffers);
+
+        auto addBinding = [&](uint32 binding, VkDescriptorType type) {
+            profile.bindings.push_back({binding, type, 1, VK_SHADER_STAGE_COMPUTE_BIT});
+
+            VkWriteDescriptorSet write = {VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+            write.dstBinding = binding;
+            write.descriptorType = type;
+            write.descriptorCount = 1;
+            profile.writes.push_back(write);
+            return &profile.writes.back();
+        };
+
+        // the compute parameters use the same slot as the fragment parameters
+        addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC)->pBufferInfo = mUBOInfo.data() + 1;
+        for(uint32 i = 0; i < mNumStorageImageBindings; ++i)
+            addBinding(VULKAN_COMPUTE_IMAGE_BINDING + i, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE)->pImageInfo =
+                mStorageImageInfos.data() + i;
+        for(uint32 i = 0; i < VULKAN_MAX_TEXTURE_UNITS; ++i)
+            addBinding(VULKAN_COMPUTE_TEXTURE_BINDING + i, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER)->pImageInfo =
+                mImageInfos.data() + i;
+        for(uint32 i = 0; i < mNumStorageBufferBindings; ++i)
+            addBinding(VULKAN_COMPUTE_BUFFER_BINDING + i, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER)->pBufferInfo =
+                mStorageBufferInfos.data() + i;
+
+        profile.poolSizes.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1});
+        profile.poolSizes.push_back({VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, mNumStorageImageBindings});
+        profile.poolSizes.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VULKAN_MAX_TEXTURE_UNITS});
+        profile.poolSizes.push_back({VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, mNumStorageBufferBindings});
     }
     //-------------------------------------------------------------------------
     HardwareOcclusionQuery *VulkanRenderSystem::createHardwareOcclusionQuery( void )
@@ -769,7 +839,7 @@ namespace Ogre
                         deviceExtensions.push_back( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
                         mRealCapabilities->setCapability(RSC_MESH_PROGRAM);
 
-                        mDescriptorSetBindings[0].stageFlags |= VK_SHADER_STAGE_MESH_BIT_NV;
+                        mDescriptorSetProfiles[DSP_GRAPHICS].bindings[0].stageFlags |= VK_SHADER_STAGE_MESH_BIT_NV;
                     }
 #endif
                 }
@@ -796,15 +866,27 @@ namespace Ogre
             mTextureManager = new VulkanTextureGpuManager(this, mDevice, bCanRestrictImageViewUsage);
             mTextureManager->_getWarningTexture(); // preload warning texture, so does not interrupt render pass
 
-            VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCi = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
-            descriptorSetLayoutCi.bindingCount = mDescriptorSetBindings.size();
-            descriptorSetLayoutCi.pBindings = mDescriptorSetBindings.data();
-            OGRE_VK_CHECK(vkCreateDescriptorSetLayout(mActiveDevice->mDevice, &descriptorSetLayoutCi, nullptr,
-                                                      &mDescriptorSetLayout));
+            // compute needs to be supported by the queue we are rendering with
+            const auto& graphicsQueueProps = mDevice->mQueueProps[mDevice->mGraphicsQueue.getFamilyIdx()];
+            if (graphicsQueueProps.queueFlags & VK_QUEUE_COMPUTE_BIT)
+                mRealCapabilities->setCapability(RSC_COMPUTE_PROGRAM);
 
-            pipelineLayoutCi.pSetLayouts = &mDescriptorSetLayout;
-            pipelineLayoutCi.setLayoutCount = 1;
-            OGRE_VK_CHECK(vkCreatePipelineLayout(mActiveDevice->mDevice, &pipelineLayoutCi, 0, &mLayout));
+            initComputeDescriptorSetProfile();
+
+            for(auto& profile : mDescriptorSetProfiles)
+            {
+                VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCi = {
+                    VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
+                descriptorSetLayoutCi.bindingCount = profile.bindings.size();
+                descriptorSetLayoutCi.pBindings = profile.bindings.data();
+                OGRE_VK_CHECK(vkCreateDescriptorSetLayout(mActiveDevice->mDevice, &descriptorSetLayoutCi, nullptr,
+                                                          &profile.layout));
+
+                pipelineLayoutCi.pSetLayouts = &profile.layout;
+                pipelineLayoutCi.setLayoutCount = 1;
+                OGRE_VK_CHECK(
+                    vkCreatePipelineLayout(mActiveDevice->mDevice, &pipelineLayoutCi, 0, &profile.pipelineLayout));
+            }
 
             // allocate 1.5MB buffer. Holds e.g. 1024 batches of 512 bytes for 3 frames-in-flight
             resizeAutoParamsBuffer(1024 * 512 * 3);
@@ -839,9 +921,12 @@ namespace Ogre
         mUBOInfo[1].buffer = mUBOInfo[0].buffer;
 
         // descriptors referring to old buffer are invalidated
-        mDescriptorSetCache.clear();
-        mActiveDevice->mGraphicsQueue.queueForDeletion(mDescriptorPool);
-        mDescriptorPool.reset( new VulkanDescriptorPool(mDescriptorPoolSizes, mDescriptorSetLayout, mDevice));
+        for(auto& profile : mDescriptorSetProfiles)
+        {
+            profile.cache.clear();
+            mActiveDevice->mGraphicsQueue.queueForDeletion(profile.pool);
+            profile.pool.reset(new VulkanDescriptorPool(profile.poolSizes, profile.layout, mDevice));
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -855,6 +940,9 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::_setTexture( size_t unit, bool enabled, const TexturePtr& texPtr )
     {
+        mStorageTextures[unit] = NULL;
+        mStorageImageInfos[unit].imageView = NULL;
+
         if( texPtr && enabled)
         {
             VulkanTextureGpu *tex = static_cast<VulkanTextureGpu *>( texPtr.get() );
@@ -865,6 +953,18 @@ namespace Ogre
         {
             mImageInfos[unit].imageView = NULL;
         }
+    }
+    //-------------------------------------------------------------------------
+    void VulkanRenderSystem::setStorageTexture( size_t unit, VulkanTextureGpu* tex, int mipmapLevel )
+    {
+        OgreAssert(unit < mNumStorageImageBindings, "too many storage images");
+
+        // the unit is used for unordered access instead of sampling
+        mImageInfos[unit].imageView = NULL;
+
+        mStorageTextures[unit] = tex;
+        mStorageImageInfos[unit].imageView = tex->getStorageView(mipmapLevel);
+        mStorageImageInfos[unit].imageLayout = VK_IMAGE_LAYOUT_GENERAL;
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::_beginFrame( void ) {}
@@ -902,24 +1002,64 @@ namespace Ogre
             hash = HashCombine(hash, mImageInfos[numTextures]);
         }
 
-        VkDescriptorSet retVal = mDescriptorSetCache[hash];
+        auto& profile = mDescriptorSetProfiles[DSP_GRAPHICS];
+        VkDescriptorSet retVal = profile.cache[hash];
 
         if(retVal != VK_NULL_HANDLE)
             return retVal;
 
-        retVal = mDescriptorPool->allocate();
+        retVal = profile.pool->allocate();
 
-        mDescriptorWrites[0].dstSet = retVal;
-        mDescriptorWrites[1].dstSet = retVal;
+        profile.writes[0].dstSet = retVal;
+        profile.writes[1].dstSet = retVal;
         for(int i = 0; i < numTextures; i++)
         {
-            mDescriptorWrites[i + 2].dstSet = retVal;
+            profile.writes[i + 2].dstSet = retVal;
         }
 
         int bindCount = numTextures + 2;
-        vkUpdateDescriptorSets(mActiveDevice->mDevice, bindCount, mDescriptorWrites.data(), 0, nullptr);
+        vkUpdateDescriptorSets(mActiveDevice->mDevice, bindCount, profile.writes.data(), 0, nullptr);
 
-        mDescriptorSetCache[hash] = retVal;
+        profile.cache[hash] = retVal;
+
+        return retVal;
+    }
+
+    VkDescriptorSet VulkanRenderSystem::getComputeDescriptorSet()
+    {
+        auto& profile = mDescriptorSetProfiles[DSP_COMPUTE];
+
+        // only write the bound resources, which may be interleaved
+        uint32 hash = HashCombine(0, mUBOInfo[1]);
+        std::vector<VkWriteDescriptorSet> writes;
+        for (auto write : profile.writes)
+        {
+            if (write.pImageInfo && !write.pImageInfo->imageView)
+                continue;
+            if (write.pBufferInfo && !write.pBufferInfo->buffer)
+                continue;
+
+            hash = HashCombine(hash, write.dstBinding);
+            if (write.pImageInfo)
+                hash = HashCombine(hash, *write.pImageInfo);
+            else if (write.dstBinding > 0) // dynamic UBO offset is not part of the set
+                hash = HashCombine(hash, *write.pBufferInfo);
+            writes.push_back(write);
+        }
+
+        VkDescriptorSet retVal = profile.cache[hash];
+
+        if(retVal != VK_NULL_HANDLE)
+            return retVal;
+
+        retVal = profile.pool->allocate();
+
+        for (auto& write : writes)
+            write.dstSet = retVal;
+
+        vkUpdateDescriptorSets(mActiveDevice->mDevice, writes.size(), writes.data(), 0, nullptr);
+
+        profile.cache[hash] = retVal;
 
         return retVal;
     }
@@ -927,7 +1067,7 @@ namespace Ogre
     VkPipeline VulkanRenderSystem::getPipeline()
     {
         pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
-        pipelineCi.layout = mLayout;
+        pipelineCi.layout = mDescriptorSetProfiles[DSP_GRAPHICS].pipelineLayout;
         mssCi.rasterizationSamples = VkSampleCountFlagBits(std::max(mActiveRenderTarget->getFSAA(), 1u));
 
         auto hash = HashCombine(0, pipelineCi.renderPass);
@@ -966,6 +1106,25 @@ namespace Ogre
         OGRE_VK_CHECK(vkCreateGraphicsPipelines(mActiveDevice->mDevice, 0, 1, &pipelineCi, 0, &retVal));
 
         mPipelineCache[hash] = retVal;
+
+        return retVal;
+    }
+
+    VkPipeline VulkanRenderSystem::getComputePipeline()
+    {
+        auto hash = mBoundGpuPrograms[GPT_COMPUTE_PROGRAM];
+
+        VkPipeline retVal = mComputePipelineCache[hash];
+        if(retVal != VK_NULL_HANDLE)
+            return retVal;
+
+        VkComputePipelineCreateInfo computeCi = {VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO};
+        computeCi.layout = mDescriptorSetProfiles[DSP_COMPUTE].pipelineLayout;
+        computeCi.stage = mComputeShaderStage;
+
+        OGRE_VK_CHECK(vkCreateComputePipelines(mActiveDevice->mDevice, 0, 1, &computeCi, 0, &retVal));
+
+        mComputePipelineCache[hash] = retVal;
 
         return retVal;
     }
@@ -1090,19 +1249,127 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
+    void VulkanRenderSystem::_dispatchCompute(const Vector3i& workgroupDim)
+    {
+        auto& queue = mActiveDevice->mGraphicsQueue;
+        // ends the current render pass
+        queue.getComputeEncoder();
+        VkCommandBuffer cmdBuffer = queue.mCurrentCmdBuffer;
+
+        // storage images must be in general layout during the dispatch
+        mImageBarriers.clear();
+        for (uint32 i = 0; i < mNumStorageImageBindings; i++)
+        {
+            auto tex = mStorageTextures[i];
+            if (!tex || !mStorageImageInfos[i].imageView)
+                continue;
+
+            VkImageMemoryBarrier barrier = tex->getImageMemoryBarrier();
+            barrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+            barrier.oldLayout = tex->mCurrLayout;
+            barrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+            mImageBarriers.push_back(barrier);
+        }
+
+        if (!mImageBarriers.empty())
+        {
+            vkCmdPipelineBarrier(cmdBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0,
+                                 0, 0, 0, 0, mImageBarriers.size(), mImageBarriers.data());
+        }
+
+        auto pipeline = getComputePipeline();
+        auto descriptorSet = getComputeDescriptorSet();
+        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
+                                mDescriptorSetProfiles[DSP_COMPUTE].pipelineLayout, 0, 1, &descriptorSet, 1,
+                                &mUBODynOffsets[1]);
+        vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+
+        vkCmdDispatch(cmdBuffer, workgroupDim[0], workgroupDim[1], workgroupDim[2]);
+
+        // make the results available for sampling, which is the layout all other code expects
+        for (auto& barrier : mImageBarriers)
+        {
+            barrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        }
+
+        if (!mImageBarriers.empty())
+        {
+            vkCmdPipelineBarrier(cmdBuffer, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                                 VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT |
+                                     VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                                 0, 0, 0, 0, 0, mImageBarriers.size(), mImageBarriers.data());
+        }
+
+        for (uint32 i = 0; i < mNumStorageImageBindings; i++)
+        {
+            if (auto tex = mStorageTextures[i])
+            {
+                tex->mCurrLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                tex->mNextLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            }
+        }
+    }
+    //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindGpuProgram(GpuProgram* prg)
     {
         auto shader = static_cast<VulkanProgram*>(prg);
-        shaderStages[prg->getType() % GPT_PIPELINE_COUNT] = shader->getPipelineShaderStageCi();
         mBoundGpuPrograms[prg->getType()] = prg->_getHash();
+
+        // compute is not part of the graphics pipeline and would alias with the fragment stage
+        if (prg->getType() == GPT_COMPUTE_PROGRAM)
+            mComputeShaderStage = shader->getPipelineShaderStageCi();
+        else
+            shaderStages[prg->getType() % GPT_PIPELINE_COUNT] = shader->getPipelineShaderStageCi();
 
         RenderSystem::bindGpuProgram(prg);
     }
+    void VulkanRenderSystem::bindStorageBuffers(const GpuProgramParametersPtr& params, uint16 variabilityMask)
+    {
+        // the shared parameters are bound in the order they are referenced
+        mStorageBufferInfos.fill({});
+
+        uint32 slot = 0;
+        for (const auto& usage : params->getSharedParameters())
+        {
+            if (slot == mNumStorageBufferBindings)
+            {
+                LogManager::getSingleton().logError("Vulkan: too many storage buffers for compute");
+                break;
+            }
+
+            auto& info = mStorageBufferInfos[slot++];
+            const auto& sharedParams = usage.getSharedParams();
+            auto bufSize = sharedParams->getConstantList().size();
+            if (bufSize == 0)
+                continue;
+
+            auto hwBuffer = sharedParams->_getHardwareBuffer();
+            if (!hwBuffer || hwBuffer->getSizeInBytes() < bufSize)
+            {
+                hwBuffer = mHardwareBufferManager->createShaderStorageBuffer(bufSize);
+                sharedParams->_setHardwareBuffer(hwBuffer);
+            }
+
+            info.buffer = static_cast<VulkanHardwareBuffer*>(hwBuffer.get())->getVkBuffer();
+            info.range = VK_WHOLE_SIZE;
+        }
+
+        if (variabilityMask & (uint16)GPV_GLOBAL)
+            params->_updateSharedParams();
+    }
+    //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindGpuProgramParameters( GpuProgramType gptype,
                                                        const GpuProgramParametersPtr& params,
                                                        uint16 variabilityMask )
     {
         mActiveParameters[gptype] = params;
+
+        if (gptype == GPT_COMPUTE_PROGRAM)
+            bindStorageBuffers(params, variabilityMask);
 
         int dstUBO = gptype % GPT_PIPELINE_COUNT;
 

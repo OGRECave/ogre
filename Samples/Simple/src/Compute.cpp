@@ -37,6 +37,9 @@ namespace OgreBites {
         mCameraMan->setStyle(CS_ORBIT);
         mCameraMan->setYawPitchDist(Degree(0), Degree(0), 30);
 
+        // load first, so the shared texture is created for unordered access
+        MaterialManager::getSingleton().getByName("Compute/Compositor")->load();
+
         mOgreEnt = mSceneMgr->createEntity(SceneManager::PT_PLANE);
 
         mOgreEnt->setMaterial(MaterialManager::getSingleton().getByName("Compute/Show"));
