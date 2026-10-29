@@ -470,14 +470,14 @@ void GLSLangProgram::prepareImpl()
     program.buildReflection();
 
     int nuniforms = program.getNumLiveUniformVariables();
-    int blockIdx = -1;
+    int ogreUniformsIdx = -1;
     for(int i = 0; i < nuniforms; i++)
     {
         auto constType = mapToGCT(program.getUniformType(i));
         if(GpuConstantDefinition::isSampler(constType) || constType == GCT_UNKNOWN)
             continue;
 
-        blockIdx = program.getUniformBlockIndex(i);
+        int blockIdx = program.getUniformBlockIndex(i);
         auto isUBO = blockIdx != -1;
         auto uoffset = program.getUniformBufferOffset(i);
 
@@ -489,9 +489,11 @@ void GLSLangProgram::prepareImpl()
                 if(mType == GPT_MESH_PROGRAM || mType == GPT_TASK_PROGRAM)
                     continue; // SSBOs in mesh shaders are used for vertex buffers
 
+                // other blocks are backed by the shared parameters of the same name
                 GpuProgramManager::getSingleton().getSharedParameters(uboName);
-                // TODO: there is no public API to set the binding point and create the correct buffer yet
+                continue;
             }
+            ogreUniformsIdx = blockIdx;
         }
 
         auto utype = (const TType*)program.getUniformTType(i);
@@ -516,9 +518,9 @@ void GLSLangProgram::prepareImpl()
         }
     }
 
-    if (blockIdx != -1)
+    if (ogreUniformsIdx != -1)
     {
-        mConstantDefs->bufferSize = program.getUniformBlockSize(blockIdx) / 4;
+        mConstantDefs->bufferSize = program.getUniformBlockSize(ogreUniformsIdx) / 4;
         mLogicalToPhysical.reset();
     }
 }
