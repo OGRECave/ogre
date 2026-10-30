@@ -201,6 +201,8 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
     if(renderState->haveAreaLights())
         mLtcLUT1SamplerIndex = ensureLtcLUTPresent(dstPass);
 
+    srcPass->setShadingMode(SO_PHONG); // signal per-pixel lighting
+
     if(mMetalRoughnessMapName.empty())
         return true;
 
@@ -209,8 +211,6 @@ bool CookTorranceLighting::preAddToRenderState(const RenderState* renderState, P
 
     if(mSampler)
         dstPass->getTextureUnitState(mMRMapSamplerIndex)->setSampler(mSampler);
-
-    srcPass->setShadingMode(SO_PHONG); // signal per-pixe lighting
 
     return true;
 }
