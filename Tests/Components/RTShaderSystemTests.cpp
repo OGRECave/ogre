@@ -103,6 +103,35 @@ TEST_F(RTShaderSystem, TargetRenderState)
     EXPECT_TRUE(pass->hasGpuProgram(GPT_FRAGMENT_PROGRAM));
 }
 
+TEST_F(RTShaderSystem, ClusteredLightCulling)
+{
+    auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
+    auto pass = mat->getTechniques()[0]->getPasses()[0];
+    pass->setLightingEnabled(true);
+
+    using namespace RTShader;
+    RenderState renderState;
+    renderState.addTemplateSubRenderStates({SRS_COOK_TORRANCE_LIGHTING, SRS_CLUSTERED_LIGHT_CULLING});
+
+    TargetRenderState targetRenderState;
+    targetRenderState.setLightCount(4);
+    targetRenderState.link(renderState, pass, pass);
+
+    // the pass is not SO_PHONG, the lighting model is taken from the linked render state
+    EXPECT_TRUE(targetRenderState.getSubRenderState(SRS_CLUSTERED_LIGHT_CULLING));
+
+    // without a lighting SRS nothing consumes the froxel light list
+    RenderState noLightingState;
+    noLightingState.addTemplateSubRenderState(
+        ShaderGenerator::getSingleton().createSubRenderState(SRS_CLUSTERED_LIGHT_CULLING));
+
+    TargetRenderState noLighting;
+    noLighting.setLightCount(4);
+    noLighting.link(noLightingState, pass, pass);
+
+    EXPECT_FALSE(noLighting.getSubRenderState(SRS_CLUSTERED_LIGHT_CULLING));
+}
+
 TEST_F(RTShaderSystem, FunctionInvocationOrder)
 {
     using namespace RTShader;
