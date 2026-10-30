@@ -186,8 +186,11 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to get config from context");
             return 0;
         }
+        assert(id > 0);
+
         configs = getConfigs(&numConfigs);
-        glConfig = configs[id];
+        glConfig = configs[id - 1];
+
         free(configs);
         return glConfig;
     }

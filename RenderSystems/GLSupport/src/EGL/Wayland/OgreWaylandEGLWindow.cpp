@@ -206,7 +206,19 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
 
     initNativeCreatedWindow(miscParams);
 
-    if (mHdrDisplay && mGLSupport->checkExtension("EGL_EXT_pixel_format_float"))
+    if (!mEglConfig && eglContext)
+    {
+        mEglConfig = mGLSupport->getGLConfigFromContext(eglContext);
+
+        if (!mEglConfig)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Unexpected failure to determine EGLConfig",
+                        "EGLWindow::create");
+        }
+    }
+
+    if (!mEglConfig && mHdrDisplay && mGLSupport->checkExtension("EGL_EXT_pixel_format_float"))
     {
         // HDR requires a FP16 surface, which in turn does not support multisampling
         int hdrMinAttribs[] = {
