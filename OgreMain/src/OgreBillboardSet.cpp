@@ -854,169 +854,65 @@ namespace Ogre {
         const Ogre::FloatRect& r =
             bb.mUseTexcoordRect ? bb.mTexcoordRect : mTextureCoords[bb.mTexcoordIndex];
 
-        if (bb.mRotation == Radian(0))
+        // Left-top, right-top, left-bottom, right-bottom
+        const Vector3* corners = offsets;
+        Vector3 rotatedCorners[4];
+        float u[4] = {r.left, r.right, r.left, r.right};
+        float v[4] = {r.top, r.top, r.bottom, r.bottom};
+
+        if (bb.mRotation != Radian(0))
         {
-            // Left-top
-            // Positions
-            *mLockPtr++ = offsets[0].x + bb.mPosition.x;
-            *mLockPtr++ = offsets[0].y + bb.mPosition.y;
-            *mLockPtr++ = offsets[0].z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = r.left;
-            *mLockPtr++ = r.top;
+            if (mRotationType == BBR_VERTEX)
+            {
+                // TODO: Cache axis when billboard type is BBT_POINT or BBT_PERPENDICULAR_COMMON
+                Vector3 axis = (offsets[3] - offsets[0]).crossProduct(offsets[2] - offsets[1]).normalisedCopy();
 
-            // Right-top
-            // Positions
-            *mLockPtr++ = offsets[1].x + bb.mPosition.x;
-            *mLockPtr++ = offsets[1].y + bb.mPosition.y;
-            *mLockPtr++ = offsets[1].z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = r.right;
-            *mLockPtr++ = r.top;
+                Matrix3 rotation;
+                rotation.FromAngleAxis(axis, bb.mRotation);
 
-            // Left-bottom
-            // Positions
-            *mLockPtr++ = offsets[2].x + bb.mPosition.x;
-            *mLockPtr++ = offsets[2].y + bb.mPosition.y;
-            *mLockPtr++ = offsets[2].z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = r.left;
-            *mLockPtr++ = r.bottom;
+                for (int i = 0; i < 4; i++)
+                    rotatedCorners[i] = rotation * offsets[i];
+                corners = rotatedCorners;
+            }
+            else
+            {
+                const Real      cos_rot  ( Math::Cos(bb.mRotation)   );
+                const Real      sin_rot  ( Math::Sin(bb.mRotation)   );
 
-            // Right-bottom
-            // Positions
-            *mLockPtr++ = offsets[3].x + bb.mPosition.x;
-            *mLockPtr++ = offsets[3].y + bb.mPosition.y;
-            *mLockPtr++ = offsets[3].z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = r.right;
-            *mLockPtr++ = r.bottom;
+                float width = (r.right-r.left)/2;
+                float height = (r.bottom-r.top)/2;
+                float mid_u = r.left+width;
+                float mid_v = r.top+height;
+
+                float cos_rot_w = cos_rot * width;
+                float cos_rot_h = cos_rot * height;
+                float sin_rot_w = sin_rot * width;
+                float sin_rot_h = sin_rot * height;
+
+                u[0] = mid_u - cos_rot_w + sin_rot_h;
+                v[0] = mid_v - sin_rot_w - cos_rot_h;
+                u[1] = mid_u + cos_rot_w + sin_rot_h;
+                v[1] = mid_v + sin_rot_w - cos_rot_h;
+                u[2] = mid_u - cos_rot_w - sin_rot_h;
+                v[2] = mid_v - sin_rot_w + cos_rot_h;
+                u[3] = mid_u + cos_rot_w - sin_rot_h;
+                v[3] = mid_v + sin_rot_w + cos_rot_h;
+            }
         }
-        else if (mRotationType == BBR_VERTEX)
+
+        // Use locals, so the compiler does not reload the members after every write
+        float* pVert = mLockPtr;
+        const float x = bb.mPosition.x, y = bb.mPosition.y, z = bb.mPosition.z;
+        for (int i = 0; i < 4; i++)
         {
-            // TODO: Cache axis when billboard type is BBT_POINT or BBT_PERPENDICULAR_COMMON
-            Vector3 axis = (offsets[3] - offsets[0]).crossProduct(offsets[2] - offsets[1]).normalisedCopy();
-
-            Matrix3 rotation;
-            rotation.FromAngleAxis(axis, bb.mRotation);
-
-            Vector3 pt;
-
-            // Left-top
-            // Positions
-            pt = rotation * offsets[0];
-            *mLockPtr++ = pt.x + bb.mPosition.x;
-            *mLockPtr++ = pt.y + bb.mPosition.y;
-            *mLockPtr++ = pt.z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = r.left;
-            *mLockPtr++ = r.top;
-
-            // Right-top
-            // Positions
-            pt = rotation * offsets[1];
-            *mLockPtr++ = pt.x + bb.mPosition.x;
-            *mLockPtr++ = pt.y + bb.mPosition.y;
-            *mLockPtr++ = pt.z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = r.right;
-            *mLockPtr++ = r.top;
-
-            // Left-bottom
-            // Positions
-            pt = rotation * offsets[2];
-            *mLockPtr++ = pt.x + bb.mPosition.x;
-            *mLockPtr++ = pt.y + bb.mPosition.y;
-            *mLockPtr++ = pt.z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = r.left;
-            *mLockPtr++ = r.bottom;
-
-            // Right-bottom
-            // Positions
-            pt = rotation * offsets[3];
-            *mLockPtr++ = pt.x + bb.mPosition.x;
-            *mLockPtr++ = pt.y + bb.mPosition.y;
-            *mLockPtr++ = pt.z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = r.right;
-            *mLockPtr++ = r.bottom;
+            *pVert++ = corners[i].x + x;
+            *pVert++ = corners[i].y + y;
+            *pVert++ = corners[i].z + z;
+            memcpy(pVert++, &colour, sizeof(RGBA));
+            *pVert++ = u[i];
+            *pVert++ = v[i];
         }
-        else
-        {
-            const Real      cos_rot  ( Math::Cos(bb.mRotation)   );
-            const Real      sin_rot  ( Math::Sin(bb.mRotation)   );
-
-            float width = (r.right-r.left)/2;
-            float height = (r.bottom-r.top)/2;
-            float mid_u = r.left+width;
-            float mid_v = r.top+height;
-
-            float cos_rot_w = cos_rot * width;
-            float cos_rot_h = cos_rot * height;
-            float sin_rot_w = sin_rot * width;
-            float sin_rot_h = sin_rot * height;
-
-            // Left-top
-            // Positions
-            *mLockPtr++ = offsets[0].x + bb.mPosition.x;
-            *mLockPtr++ = offsets[0].y + bb.mPosition.y;
-            *mLockPtr++ = offsets[0].z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = mid_u - cos_rot_w + sin_rot_h;
-            *mLockPtr++ = mid_v - sin_rot_w - cos_rot_h;
-
-            // Right-top
-            // Positions
-            *mLockPtr++ = offsets[1].x + bb.mPosition.x;
-            *mLockPtr++ = offsets[1].y + bb.mPosition.y;
-            *mLockPtr++ = offsets[1].z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = mid_u + cos_rot_w + sin_rot_h;
-            *mLockPtr++ = mid_v + sin_rot_w - cos_rot_h;
-
-            // Left-bottom
-            // Positions
-            *mLockPtr++ = offsets[2].x + bb.mPosition.x;
-            *mLockPtr++ = offsets[2].y + bb.mPosition.y;
-            *mLockPtr++ = offsets[2].z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = mid_u - cos_rot_w - sin_rot_h;
-            *mLockPtr++ = mid_v - sin_rot_w + cos_rot_h;
-
-            // Right-bottom
-            // Positions
-            *mLockPtr++ = offsets[3].x + bb.mPosition.x;
-            *mLockPtr++ = offsets[3].y + bb.mPosition.y;
-            *mLockPtr++ = offsets[3].z + bb.mPosition.z;
-            // Colour
-            memcpy(mLockPtr++, &colour, sizeof(RGBA));
-            // Texture coords
-            *mLockPtr++ = mid_u + cos_rot_w - sin_rot_h;
-            *mLockPtr++ = mid_v + sin_rot_w + cos_rot_h;
-        }
+        mLockPtr = pVert;
     }
     //-----------------------------------------------------------------------
     void BillboardSet::genVertOffsets(Real inleft, Real inright, Real intop, Real inbottom,
