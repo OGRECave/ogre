@@ -141,10 +141,16 @@ public:
     */
     virtual void updateGpuProgramsParams(Renderable* rend, const Pass* pass,  const AutoParamDataSource* source,  const LightList* pLightList) { }
 
-    /** Called before adding this sub render state to the given render state.
+    /** Called once the target render state has been composed for a pass.
     Allows this sub render state class to configure specific parameters depending on source pass or parent render state.
     Return of false value will cause canceling the add operation.
-    @param renderState The target render state container this sub render state is about to be added.    
+
+    The target render state already contains the sub render states of the scheme and of the pass, with
+    overrides (same type or same FFP stage) resolved. Use @ref RenderState::getSubRenderState to check which
+    other sub render states will be part of the generated program; a sub render state that is overridden is
+    never instantiated and thus never called. Do not rely on the pass being modified by the
+    @c preAddToRenderState of another sub render state, as the call order is not defined.
+    @param renderState The target render state container this sub render state is part of.
     @param srcPass The source pass.
     @param dstPass The destination pass.
     */
