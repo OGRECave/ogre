@@ -29,7 +29,13 @@ bool ClusteredLightCulling::setParameter(const String& name, const String& value
 //-----------------------------------------------------------------------
 bool ClusteredLightCulling::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-    if (!srcPass->getLightingEnabled() || srcPass->getShadingMode() != SO_PHONG)
+    if (!srcPass->getLightingEnabled())
+        return false;
+
+    // the froxel light list is only consumed by these lighting SRS. Check the render state instead of
+    // the pass shade option, as an overriding lighting stage would not set the SO_PHONG marker.
+    if (!renderState->getSubRenderState(SRS_PER_PIXEL_LIGHTING) &&
+        !renderState->getSubRenderState(SRS_COOK_TORRANCE_LIGHTING))
         return false;
 
     if (SceneManager::hasPerRenderableLights())
