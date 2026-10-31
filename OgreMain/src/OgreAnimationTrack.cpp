@@ -301,7 +301,7 @@ namespace Ogre {
         {
         default:
         case AnimableValue::INT:
-            return any_cast<int>(v) * s;
+            return static_cast<int>(any_cast<int>(v) * s);
         case AnimableValue::REAL:
             return any_cast<Real>(v) * s;
         case AnimableValue::VECTOR2:
