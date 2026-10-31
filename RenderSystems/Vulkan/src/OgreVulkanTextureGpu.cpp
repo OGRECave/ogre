@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 #include "OgreRoot.h"
 #include "OgreVulkanTextureGpuWindow.h"
+#include "OgreVulkanRenderSystem.h"
 
 #define TODO_add_resource_transitions
 
@@ -303,6 +304,13 @@ namespace Ogre
 
         vkDestroyImageView(device->mDevice, mDefaultDisplaySrv, 0);
         mDefaultDisplaySrv = 0;
+
+        for (auto view : mStorageViews)
+        {
+            if (view)
+                vkDestroyImageView(device->mDevice, view, 0);
+        }
+        mStorageViews.clear();
 
         vmaDestroyImage(device->getAllocator(), mFinalTextureName, mAllocation);
 
@@ -623,6 +631,44 @@ namespace Ogre
         VkImageView imageView;
         OGRE_VK_CHECK(vkCreateImageView( device->mDevice, &imageViewCi, 0, &imageView ));
         return imageView;
+    }
+    //-----------------------------------------------------------------------------------
+    VkImageView VulkanTextureGpu::getStorageView(uint8 mipLevel)
+    {
+        OgreAssert(isUav(), "Texture was not created with TU_UNORDERED_ACCESS");
+        OgreAssert(mipLevel <= mNumMipmaps, "mip level out of range");
+
+        mStorageViews.resize(mNumMipmaps + 1);
+        if (mStorageViews[mipLevel])
+            return mStorageViews[mipLevel];
+
+        VkImageViewType viewType = getInternalVulkanTextureViewType();
+        if (viewType == VK_IMAGE_VIEW_TYPE_CUBE || viewType == VK_IMAGE_VIEW_TYPE_CUBE_ARRAY)
+            viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY; // storage images cannot be cubes
+
+        VkImageViewCreateInfo imageViewCi = {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
+        imageViewCi.image = mFinalTextureName;
+        imageViewCi.viewType = viewType;
+        // no sRGB storage images, the shader must do the conversion
+        imageViewCi.format = VulkanMappings::get(mFormat, false);
+        imageViewCi.subresourceRange.aspectMask = VulkanMappings::getImageAspect(mFormat);
+        imageViewCi.subresourceRange.baseMipLevel = mipLevel;
+        imageViewCi.subresourceRange.levelCount = 1;
+        imageViewCi.subresourceRange.baseArrayLayer = 0;
+        imageViewCi.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
+
+        auto textureManager = static_cast<VulkanTextureGpuManager*>(mCreator);
+        OGRE_VK_CHECK(vkCreateImageView(textureManager->getDevice()->mDevice, &imageViewCi, 0,
+                                        &mStorageViews[mipLevel]));
+        return mStorageViews[mipLevel];
+    }
+    //-----------------------------------------------------------------------------------
+    void VulkanTextureGpu::createShaderAccessPoint(uint bindPoint, TextureAccess access, int mipmapLevel,
+                                                   int textureArrayIndex, PixelFormat format)
+    {
+        // access is defined by the shader and all layers are bound like on GL. The format must match the texture.
+        auto rs = static_cast<VulkanRenderSystem*>(Root::getSingleton().getRenderSystem());
+        rs->setStorageTexture(bindPoint, this, mipmapLevel);
     }
     //-----------------------------------------------------------------------------------
     void VulkanTextureGpu::destroyView( VkImageView imageView )

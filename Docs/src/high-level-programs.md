@@ -954,6 +954,28 @@ MAIN_DECLARATION
 }
 ```
 
+For compute programs, `OgreUnifiedCompute.h` maps the resource declarations to D3D11, GL and Vulkan. It does not include `OgreUnifiedShader.h`, so include that as well if you need the GLSL types and functions in HLSL.
+- `MAIN_COMPUTE(x, y, z)` declares the entry point with the given work group size and the `gl_*InvocationID` inputs
+- `OGRE_COMPUTE_UNIFORMS(...)` wraps the parameters of the `compute_program_ref`
+- `IMAGE2D(format, name, reg)` (also `IMAGE2DARRAY`, `IMAGE3D`) declare images, where `format` is the GLSL image format and `reg` the index of the `texture_unit` that sets `unordered_access_mip`. Prefix them with `readonly` or `writeonly` as in GLSL. Use `imageLoad` and `imageStore` to access them.
+- `TEXTURE2D(name, reg)` (also `TEXTURE2DARRAY`, `TEXTURE3D`) declare sampled textures, where `reg` is the index of the `texture_unit`. Use `textureLod` and `texelFetch` to read them.
+- `BUFFER(block, type, name, reg)` declares an array of `type` in a storage buffer, backed by the `shared_params_ref` with index `reg`. On GL, the shared parameters are looked up by `block`; `block` is unused in HLSL, where the buffer is declared as a `RWStructuredBuffer`.
+
+```cpp
+OGRE_NATIVE_GLSL_VERSION_DIRECTIVE
+#include <OgreUnifiedShader.h>
+#include <OgreUnifiedCompute.h>
+
+writeonly IMAGE2D(rgba8, image, 0);
+TEXTURE2D(source, 1);
+
+MAIN_COMPUTE(16, 16, 1)
+{
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    imageStore(image, uv, texelFetch(source, uv, 0));
+}
+```
+
 @note If you only target different versions of the same API, there are reduced headers:
 - `HLSL_SM4Support.hlsl` providing the `SAMPLER*` macros for mapping HLSL9/ Cg and HLSL SM4 (D3D11)
 - `GLSL_GL3Support.glsl` providing the `IN`/ `OUT` macros and `texture` aliases for mapping GLSL <= 120 and GLSL >= 130

@@ -97,4 +97,11 @@ namespace Ogre
         return std::make_shared<VulkanHardwareBuffer>(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeBytes, usage, false,
                                                       mDevice);
     }
+    //-----------------------------------------------------------------------------------
+    HardwareBufferPtr VulkanHardwareBufferManager::createShaderStorageBuffer(size_t sizeBytes,
+                                                                             HardwareBufferUsage usage)
+    {
+        return std::make_shared<VulkanHardwareBuffer>(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, sizeBytes, usage, false,
+                                                      mDevice);
+    }
 }  // namespace Ogre
