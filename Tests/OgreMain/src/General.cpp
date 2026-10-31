@@ -53,6 +53,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgram.h"
 
 #include "OgreKeyFrame.h"
+#include "OgreAnimable.h"
 
 #include "OgreBillboardSet.h"
 #include "OgreBillboard.h"
@@ -704,6 +705,37 @@ TEST(Light, AnimationTrack)
 
     attenuation->apply(0.5);
     EXPECT_EQ(l.getAttenuation(), Vector4f(1.5, 3, 4.5, 6));
+}
+
+namespace
+{
+/// Minimal AnimableValue implementation for testing the numeric track helpers
+class TestIntAnimableValue : public AnimableValue
+{
+public:
+    TestIntAnimableValue(int& value) : AnimableValue(INT), mValue(value) {}
+    void setCurrentStateAsBaseValue() override { setAsBaseValue(mValue); }
+    void setValue(int val) override { mValue = val; }
+    void applyDeltaValue(int val) override { mValue += val; }
+
+private:
+    int& mValue;
+};
+} // namespace
+
+TEST(AnimableValue, IntAnimationTrack)
+{
+    int value = 0;
+    auto animable = std::make_shared<TestIntAnimableValue>(value);
+
+    Animation anim("test", 1.0);
+    auto track = anim.createNumericTrack(0, animable);
+    track->createNumericKeyFrame(0)->setValue(10);
+    track->createNumericKeyFrame(1)->setValue(20);
+
+    // scaled value must stay an int, otherwise applyDeltaValue() cannot cast it
+    track->apply(0.5);
+    EXPECT_EQ(value, 15);
 }
 
 TEST(GpuProgramParams, Variability)
