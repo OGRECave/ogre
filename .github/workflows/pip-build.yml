@@ -60,7 +60,7 @@ jobs:
         SKBUILD_BUILD_OPTIONS: -j4
         PYTHONUTF8: "1"  # pypi-attestations writes UTF-8 JSON via Path.write_text
   macos:
-    runs-on: macos-14
+    runs-on: macos-15
     strategy:
       matrix:
         pyver: ['3.14', '3.12']
