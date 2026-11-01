@@ -5,7 +5,7 @@ add_library(Codec_Assimp ${OGRE_LIB_TYPE} ${HEADER_FILES} src/AssimpLoader.cpp)
 target_include_directories(Codec_Assimp PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     $<INSTALL_INTERFACE:include/OGRE/Plugins/Assimp>)
-target_link_libraries(Codec_Assimp PUBLIC OgreMain fix::assimp)
+target_link_libraries(Codec_Assimp PUBLIC OgreMain PRIVATE ${OGRE_ASSIMP_TARGET})
 target_compile_features(Codec_Assimp PRIVATE cxx_std_17)
 
 if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)

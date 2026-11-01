@@ -339,14 +339,20 @@ find_package(Bullet QUIET)
 macro_log_feature(BULLET_FOUND "Bullet" "Bullet physics" "https://pybullet.org")
 
 if(assimp_FOUND)
-  # workaround horribly broken assimp cmake, fixed with assimp 5.1
-  add_library(fix::assimp INTERFACE IMPORTED)
-  set_target_properties(fix::assimp PROPERTIES
-      INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES};pugixml"
-      INTERFACE_LINK_DIRECTORIES "${ASSIMP_LIBRARY_DIRS}"
-  )
-  if(EXISTS "${ASSIMP_INCLUDE_DIRS}")
-    set_target_properties(fix::assimp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}")
+  if(assimp_VERSION VERSION_LESS 5.1)
+    # workaround horribly broken assimp cmake, fixed with assimp 5.1
+    add_library(fix::assimp INTERFACE IMPORTED)
+    set_target_properties(fix::assimp PROPERTIES
+        INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARIES};pugixml"
+        INTERFACE_LINK_DIRECTORIES "${ASSIMP_LIBRARY_DIRS}"
+    )
+    if(EXISTS "${ASSIMP_INCLUDE_DIRS}")
+      set_target_properties(fix::assimp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}")
+    endif()
+    set(OGRE_ASSIMP_TARGET fix::assimp)
+  else()
+    # assimp >= 5.1 ships a proper CMake package with a namespaced target
+    set(OGRE_ASSIMP_TARGET assimp::assimp)
   endif()
 endif()
 
