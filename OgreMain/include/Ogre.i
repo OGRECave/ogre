@@ -27,6 +27,7 @@ using namespace Ogre;
 %include std_string.i
 %include std_pair.i
 %include std_map.i
+%include std_unordered_map.i
 #ifdef SWIGPYTHON
 %include std_multimap.i
 %include std_list.i
@@ -994,6 +995,7 @@ SHARED_PTR(Material);
 %ignore Ogre::Mesh::getBoneAssignmentIterator;
 %template(PoseList) std::vector<Ogre::Pose*>;
 %template(SubMeshList) std::vector<Ogre::SubMesh*>;
+%template(SubMeshNameMap) std::unordered_map<std::string, unsigned short>;
 %apply unsigned short& OUTPUT { unsigned short& outSourceCoordSet, unsigned short& outIndex };
 SHARED_PTR(Mesh);
 %ignore Ogre::Mesh::buildTangentVectors(VertexElementSemantic,unsigned short=0,unsigned short=0,bool=false,bool=false,bool=false);
