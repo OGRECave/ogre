@@ -150,3 +150,22 @@ TEST_F(RTShaderSystem, FunctionInvocationOrder)
     EXPECT_TRUE(c == a);
     EXPECT_FALSE(c < a);
 }
+
+TEST_F(RTShaderSystem, UnlitEmissive)
+{
+    auto& shaderGen = RTShader::ShaderGenerator::getSingleton();
+    auto mat = MaterialManager::getSingleton().create("UnlitEmissiveMat", RGN_DEFAULT);
+    auto pass = mat->getTechniques()[0]->getPasses()[0];
+    pass->setLightingEnabled(false);
+    pass->setEmissive(ColourValue(0.9f, 0.7f, 0.4f));
+
+    EXPECT_TRUE(shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+    shaderGen.getRenderState("MyScheme")->setLightCountAutoUpdate(false);
+    shaderGen.validateMaterial("MyScheme", *mat);
+
+    auto newPass = mat->getTechniques()[1]->getPasses()[0];
+    auto fsSource = newPass->getFragmentProgram()->getSource();
+    EXPECT_NE(fsSource.find("surface_emissive_colour"), String::npos);
+
+    EXPECT_TRUE(shaderGen.removeShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+}
