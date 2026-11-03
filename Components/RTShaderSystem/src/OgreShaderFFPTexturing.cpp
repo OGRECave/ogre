@@ -414,8 +414,14 @@ ParameterPtr FFPTexturing::getPSArgument(ParameterPtr texel, LayerBlendSource bl
             return ParameterFactory::createConstParam(Vector4(alphaValue));
         }
 
-        return ParameterFactory::createConstParam(Vector4((Real)colourValue.r, (Real)colourValue.g,
-                                                         (Real)colourValue.b, (Real)colourValue.a));
+        // the manual colour is baked into the shader instead of going through GpuProgramParameters,
+        // so apply the same conversion here as for every other ColourValue
+        ColourValue colour = colourValue;
+        if (ShaderGenerator::getSingleton().getTargetLinearColours())
+            colour = colour.gammaToLinear();
+
+        return ParameterFactory::createConstParam(Vector4((Real)colour.r, (Real)colour.g,
+                                                         (Real)colour.b, (Real)colour.a));
     }
 
     return ParameterPtr();
