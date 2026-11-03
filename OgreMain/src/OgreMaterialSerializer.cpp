@@ -878,6 +878,11 @@ namespace Ogre
                 {
                     writeValue(PixelUtil::getFormatName(pTex->getDesiredFormat()));
                 }
+
+                if (pTex->isHardwareGammaEnabled())
+                {
+                    writeValue("gamma");
+                }
             }
 
             //anim. texture
