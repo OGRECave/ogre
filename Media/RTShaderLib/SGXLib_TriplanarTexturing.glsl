@@ -25,7 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-void SGX_TriplanarTexturing(in vec4 diffuse, in vec3 normal, in vec4 position, in sampler2D texFromX, in sampler2D texFromY, in sampler2D texFromZ, in vec3 parameters, out vec4 cOut)
+void SGX_TriplanarTexturing(in vec4 diffuse, in vec3 normal, in f32vec4 position, in sampler2D texFromX, in sampler2D texFromY, in sampler2D texFromZ, in vec3 parameters, out vec4 cOut)
 {
 	vec3 blendWeights = abs(normalize(normal));
 	blendWeights = blendWeights - parameters.y;
@@ -34,9 +34,9 @@ void SGX_TriplanarTexturing(in vec4 diffuse, in vec3 normal, in vec4 position, i
 	blendWeights /= vec3(tot, tot, tot);
 	// Move the planar mapping a bit according to the normal length to avoid bad looking skirts.
 	float nLength = length(normal - 1.0);
-	vec2 coord1 = (position.yz + nLength) * parameters.x;
-	vec2 coord2 = (position.zx + nLength) * parameters.x;
-	vec2 coord3 = (position.xy + nLength) * parameters.x;
+	f32vec2 coord1 = (position.yz + nLength) * parameters.x;
+	f32vec2 coord2 = (position.zx + nLength) * parameters.x;
+	f32vec2 coord3 = (position.xy + nLength) * parameters.x;
 	
 	vec4 col1 = texture2D(texFromX, coord1);
 	vec4 col2 = texture2D(texFromY, coord2);

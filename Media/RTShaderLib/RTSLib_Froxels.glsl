@@ -26,7 +26,7 @@ struct FroxelLights
 // fragCoord = gl_FragCoord.xyz: .xy in pixels, .z = screen depth
 // froxel_params = (countX, countY, fixY, tileSizePx)
 // froxel_z_params = (scaleZ, biasZ, linZ, sliceCount)
-uvec3 getFroxelCoord(in vec3 fragCoord, in vec4 froxel_params, in vec4 froxel_z_params)
+uvec3 getFroxelCoord(in f32vec3 fragCoord, in f32vec4 froxel_params, in f32vec4 froxel_z_params)
 {
 #ifdef OGRE_GLSL
     if(froxel_params.z > 0.0) // needs flipping
@@ -76,8 +76,8 @@ void debugFroxelOccupancy(in FroxelLights lights, inout vec3 color)
 #endif
 }
 
-void getFroxelLights(in vec3 fragCoord, in vec4 froxel_params, in vec4 froxel_z_params,
-                     in vec4 light0Pos,
+void getFroxelLights(in f32vec3 fragCoord, in f32vec4 froxel_params, in f32vec4 froxel_z_params,
+                     in f32vec4 light0Pos,
                      out FroxelLights lights
 #ifdef DEBUG_FROXELS
                      , inout vec3 color

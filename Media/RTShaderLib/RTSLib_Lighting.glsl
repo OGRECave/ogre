@@ -6,14 +6,14 @@
 #define M_PI 3.14159265359
 
 // classical attenuation formula
-float getDistanceAttenuation(const vec3 params, float32_t distance)
+float getDistanceAttenuation(const f32vec3 params, float32_t distance)
 {
     return 1.0 / (params.x + params.y * distance + params.z * distance * distance);
 }
 
 // smooth attenuation formula
 // variant of https://google.github.io/filament/Filament.md.html#lighting/directlighting/punctuallights/attenuationfunction
-float getDistanceAttenuation(const vec4 params, float distance)
+float getDistanceAttenuation(const f32vec4 params, float32_t distance)
 {
     float atten = getDistanceAttenuation(params.yzw, distance);
     float factor = distance / params.x; // distance / range

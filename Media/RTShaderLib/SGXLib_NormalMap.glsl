@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 //-----------------------------------------------------------------------------
 void SGX_FetchNormal(in sampler2D s,
-				   in vec2 uv,
+				   in f32vec2 uv,
 				   out vec3 vOut)
 {
 	vOut = 2.0 * texture2D(s, uv).xyz - 1.0;
@@ -53,8 +53,8 @@ void SGX_CalculateTBN(in vec3 vNormal,
 
 //-----------------------------------------------------------------------------
 void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
-						in vec2 texCoord,
-						in vec3 viewPos,
+						in f32vec2 texCoord,
+						in f32vec3 viewPos,
 						in float heightScale,
 						in mat3 TBN,
 						out f32vec2 newTexCoord)

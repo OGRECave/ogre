@@ -113,9 +113,9 @@ vec3 evaluateLight(
                 in f32vec3 viewPos,
                 in f32vec4 lightPos,
                 in vec3 lightColor,
-                in vec4 pointParams,
-                in vec4 vLightDirView,
-                in vec4 spotParams,
+                in f32vec4 pointParams,
+                in f32vec4 vLightDirView,
+                in f32vec4 spotParams,
                 in PixelParams pixel)
 {
     f32vec3 vLightView = lightPos.xyz;
