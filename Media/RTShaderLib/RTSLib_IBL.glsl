@@ -39,7 +39,7 @@ vec3 getSpecularDominantDirection(const vec3 n, const vec3 r, float roughness) {
 
 void evaluateIBL(inout PixelParams pixel,
                  in vec3 vNormal,
-                 in vec3 viewPos,
+                 in f32vec3 viewPos,
                  in mat4 invViewMat,
                  in sampler2D dfgTex,
                  in samplerCube iblEnvTex,

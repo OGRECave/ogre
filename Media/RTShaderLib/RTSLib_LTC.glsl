@@ -22,7 +22,7 @@ vec3 IntegrateEdgeVec(vec3 v1, vec3 v2)
     return cross(v1, v2)*theta_sintheta;
 }
 
-float LTC_Evaluate(vec3 N, vec3 V, vec3 P, mat3 Minv, vec3 points[4], sampler2D ltc_2)
+float LTC_Evaluate(vec3 N, vec3 V, in f32vec3 P, mat3 Minv, in f32vec3 points[4], sampler2D ltc_2)
 {
     vec3 dir = points[0] - P;
     vec3 lightDir = cross(points[1] - points[0], points[3] - points[0]);
@@ -69,7 +69,7 @@ float LTC_Evaluate(vec3 N, vec3 V, vec3 P, mat3 Minv, vec3 points[4], sampler2D 
     return len*scale;
 }
 
-void InitRectPoints(vec3 center, vec3 ex, vec3 ey, out vec3 points[4])
+void InitRectPoints(in f32vec3 center, in f32vec3 ex, in f32vec3 ey, out f32vec3 points[4])
 {
     points[0] = center - ex - ey;
     points[1] = center + ex - ey;
@@ -77,10 +77,11 @@ void InitRectPoints(vec3 center, vec3 ex, vec3 ey, out vec3 points[4])
     points[3] = center - ex + ey;
 }
 
-void evaluateRectLight(sampler2D ltc_1, sampler2D ltc_2, float roughness, vec3 N, vec3 pos, vec3 lpos, vec3 halfwidth, vec3 halfheight,
+void evaluateRectLight(sampler2D ltc_1, sampler2D ltc_2, float roughness, vec3 N, in f32vec3 pos,
+                       in f32vec3 lpos, in f32vec3 halfwidth, in f32vec3 halfheight,
                        inout vec3 scol, inout vec3 dcol)
 {
-    vec3 points[4];
+    f32vec3 points[4];
     InitRectPoints(lpos, halfwidth, halfheight, points);
 
     vec3 V = -normalize(pos);

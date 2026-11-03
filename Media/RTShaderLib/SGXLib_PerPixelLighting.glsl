@@ -67,10 +67,10 @@ void SGX_Flip_Backface_Normal(in bool frontFacing, in float targetFlipped, inout
 void evaluateLight(
 				in vec3 vNormal,
 				in f32vec3 vViewPos,
-				in vec4 vLightPos,
-				in vec4 vAttParams,
-				in vec4 vLightDirView,
-				in vec4 spotParams,
+				in f32vec4 vLightPos,
+				in f32vec4 vAttParams,
+				in f32vec4 vLightDirView,
+				in f32vec4 spotParams,
 				in vec3 vDiffuseColour,
 				in float shadowFactor,
 				inout vec3 vOutDiffuse
