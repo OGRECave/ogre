@@ -278,7 +278,6 @@ namespace Ogre {
                                                   msh->getName());
         }
 
-        AxisAlignedBox sharedWorldBounds;
         // queue this entities submeshes and choice of material
         // also build the lists of geometry to be used for the source of lods
         for (uint i = 0; i < ent->getNumSubEntities(); ++i)
