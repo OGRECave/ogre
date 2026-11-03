@@ -105,10 +105,45 @@ struct OgreIOSystem : public Assimp::IOSystem
 
     OgreIOSystem(const DataStreamPtr& _source, const String& group) : source(_source), _group(group) {}
 
+    String getResourceName(const char* pFile) const
+    {
+        String file =
+            StringUtil::normalizeFilePath(
+                pFile,
+                false);
+
+        String sourceName =
+            StringUtil::normalizeFilePath(
+                source->getName(),
+                false);
+
+        const String::size_type slash =
+            sourceName.find_last_of('/');
+
+        if (slash == String::npos)
+            return file;
+
+        const String sourceDirectory =
+            sourceName.substr(
+                0,
+                slash + 1);
+
+        if (file.compare(
+                0,
+                sourceDirectory.size(),
+                sourceDirectory) == 0)
+        {
+            return file.substr(
+                sourceDirectory.size());
+        }
+
+        return file;
+    }
+
     bool Exists(const char* pFile) const override
     {
-        String file = StringUtil::normalizeFilePath(pFile, false);
-        if (file == source->getName())
+        String file = getResourceName(pFile);
+        if (file == getResourceName(source->getName().c_str()))
             return true;
         return ResourceGroupManager::getSingleton().resourceExists(_group, file);
     }
@@ -116,9 +151,9 @@ struct OgreIOSystem : public Assimp::IOSystem
 
     Assimp::IOStream* Open(const char* pFile, const char* pMode) override
     {
-        String file = StringUtil::normalizeFilePath(pFile, false);
+        String file = getResourceName(pFile);
         DataStreamPtr res;
-        if (file == source->getName())
+        if (file == getResourceName(source->getName().c_str()))
         {
             res = source;
             // glTF2 importer wants to open files multiple times
