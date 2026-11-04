@@ -29,8 +29,6 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreD3D11DriverList.h"
 #include "OgreD3D11Driver.h"
-#include "OgreD3D11VideoModeList.h"
-#include "OgreD3D11VideoMode.h"
 #include "OgreD3D11RenderWindow.h"
 #include "OgreD3D11TextureManager.h"
 #include "OgreD3D11Texture.h"
@@ -443,47 +441,6 @@ namespace Ogre
         opt.immutable = false;
 
         mOptions[opt.name] = opt;
-
-        refreshD3DSettings();
-
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::refreshD3DSettings()
-    {
-        ConfigOption* optVideoMode;
-        D3D11VideoMode* videoMode;
-
-        ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
-        if( opt != mOptions.end() )
-        {
-            D3D11Driver *driver = getDirect3DDrivers()->findByName(opt->second.currentValue);
-            if (driver)
-            {
-                opt = mOptions.find( "Video Mode" );
-                optVideoMode = &opt->second;
-                optVideoMode->possibleValues.clear();
-                // get vide modes for this device
-                for( unsigned k=0; k < driver->getVideoModeList()->count(); k++ )
-                {
-                    videoMode = driver->getVideoModeList()->item( k );
-                    optVideoMode->possibleValues.push_back( videoMode->getDescription() );
-                }
-
-                // Reset video mode to default if previous doesn't avail in new possible values
-                StringVector::const_iterator itValue =
-                    std::find(optVideoMode->possibleValues.begin(),
-                              optVideoMode->possibleValues.end(),
-                              optVideoMode->currentValue);
-                if (itValue == optVideoMode->possibleValues.end())
-                {
-                    optVideoMode->currentValue = "800 x 600 @ 32-bit colour";
-                }
-
-                // Also refresh FSAA options
-                refreshFSAAOptions();
-            }
-        }
-
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setConfigOption( const String &name, const String &value )
@@ -507,10 +464,6 @@ namespace Ogre
             str << "Option named '" << name << "' does not exist.";
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, str.str(), "D3D11RenderSystem::setConfigOption" );
         }
-
-        // Refresh other options if D3DDriver changed
-        if( name == "Rendering Device" )
-            refreshD3DSettings();
 
         if( name == "Full Screen" )
         {
@@ -567,10 +520,16 @@ namespace Ogre
         if (driver)
         {
             it = mOptions.find("Video Mode");
+            unsigned bpp = 32;
+            if (it != mOptions.end())
+            {
+                auto pos = it->second.currentValue.find(" @ ");
+                if (pos != String::npos)
+                    bpp = StringConverter::parseUnsignedInt(it->second.currentValue.substr(pos + 3));
+            }
             ComPtr<ID3D11DeviceN> device;
             device.Attach(createD3D11Device(driver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, NULL));
-            D3D11VideoMode* videoMode = driver->getVideoModeList()->item(it->second.currentValue); // Could be NULL if working over RDP/Simulator
-            DXGI_FORMAT format = videoMode ? videoMode->getFormat() : DXGI_FORMAT_R8G8B8A8_UNORM;
+            DXGI_FORMAT format = bpp <= 16 ? DXGI_FORMAT_B5G6R5_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM;
             UINT numLevels = 0;
             // set maskable levels supported
             for (unsigned int n = 1; n <= D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; n++)

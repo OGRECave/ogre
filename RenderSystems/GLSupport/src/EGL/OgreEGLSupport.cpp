@@ -288,8 +288,6 @@ namespace Ogre {
 
     void EGLSupport::switchMode(void)
     {
-        return switchMode(mOriginalMode.width,
-                          mOriginalMode.height, mOriginalMode.refreshRate);
     }
 
     ::EGLContext EGLSupport::createNewContext(EGLDisplay eglDisplay,

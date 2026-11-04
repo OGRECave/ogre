@@ -56,23 +56,6 @@ static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
 
 namespace Ogre
 {
-    struct GLXVideoMode
-    {
-        typedef std::pair<uint, uint>      ScreenSize;
-        typedef short                      Rate;
-        ScreenSize first;
-        Rate second;
-
-        GLXVideoMode() {}
-        GLXVideoMode(const VideoMode& m) : first(m.width, m.height), second(m.refreshRate) {}
-
-        bool operator!=(const GLXVideoMode& o) const
-        {
-            return first != o.first || second != o.second;
-        }
-    };
-    typedef std::vector<GLXVideoMode>    GLXVideoModes;
-
     GLNativeSupport* getGLSupport(int profile)
     {
         return new GLXGLSupport(profile);
@@ -86,19 +69,6 @@ namespace Ogre
 
         // A connection that is NOT shared to enable independent event processing:
         mXDisplay  = getXDisplay();
-
-        getXVideoModes(mXDisplay, mCurrentMode, mVideoModes);
-
-        if(mVideoModes.empty())
-        {
-            mCurrentMode.width = DisplayWidth(mXDisplay, DefaultScreen(mXDisplay));
-            mCurrentMode.height = DisplayHeight(mXDisplay, DefaultScreen(mXDisplay));
-            mCurrentMode.refreshRate = 0;
-
-            mVideoModes.push_back(mCurrentMode);
-        }
-
-        mOriginalMode = mCurrentMode;
 
         GLXFBConfig *fbConfigs;
         int config, nConfigs = 0;
@@ -589,67 +559,4 @@ namespace Ogre
         return visualInfo;
     }
 
-    //-------------------------------------------------------------------------------------------------//
-    void GLXGLSupport::switchMode(uint& width, uint& height, short& frequency)
-    {
-        int size = 0;
-        int newSize = -1;
-
-        GLXVideoModes glxVideoModes(mVideoModes.begin(), mVideoModes.end());
-
-        GLXVideoModes::iterator mode;
-        GLXVideoModes::iterator end = glxVideoModes.end();
-        GLXVideoMode *newMode = 0;
-
-        for(mode = glxVideoModes.begin(); mode != end; size++)
-        {
-            if (mode->first.first >= width &&
-                mode->first.second >= height)
-            {
-                if (! newMode ||
-                    mode->first.first < newMode->first.first ||
-                    mode->first.second < newMode->first.second)
-                {
-                    newSize = size;
-                    newMode = &(*mode);
-                }
-            }
-
-            GLXVideoMode *lastMode = &(*mode);
-
-            while (++mode != end && mode->first == lastMode->first)
-            {
-                if (lastMode == newMode && mode->second == frequency)
-                {
-                    newMode = &(*mode);
-                }
-            }
-        }
-
-        if (newMode && *newMode != mCurrentMode)
-        {
-            XRRScreenConfiguration *screenConfig = XRRGetScreenInfo (mXDisplay, DefaultRootWindow(mXDisplay));
-
-            if (screenConfig)
-            {
-                Rotation currentRotation;
-
-                XRRConfigCurrentConfiguration (screenConfig, &currentRotation);
-
-                XRRSetScreenConfigAndRate(mXDisplay, screenConfig, DefaultRootWindow(mXDisplay), newSize, currentRotation, newMode->second, CurrentTime);
-
-                XRRFreeScreenConfigInfo(screenConfig);
-
-                mCurrentMode = {newMode->first.first, newMode->first.second, newMode->second};
-
-                LogManager::getSingleton().logMessage("Entered video mode " + mCurrentMode.getDescription() + " @ " + StringConverter::toString(mCurrentMode.refreshRate) + "Hz");
-            }
-        }
-    }
-
-    //-------------------------------------------------------------------------------------------------//
-    void GLXGLSupport::switchMode(void)
-    {
-        return switchMode(mOriginalMode.width, mOriginalMode.height, mOriginalMode.refreshRate);
-    }
 }

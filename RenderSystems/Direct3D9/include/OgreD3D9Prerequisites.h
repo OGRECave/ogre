@@ -81,8 +81,6 @@ namespace Ogre
     class D3D9TextureManager;
     class D3D9Driver;
     class D3D9DriverList;
-    class D3D9VideoMode;
-    class D3D9VideoModeList;
     class D3D9GpuProgram;
     class D3D9GpuProgramManager;
     class D3D9HardwareBufferManager;

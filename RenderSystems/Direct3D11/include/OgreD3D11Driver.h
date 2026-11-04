@@ -34,16 +34,12 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-    class D3D11VideoModeList;
-    class D3D11VideoMode;
-
     class _OgreD3D11Export D3D11Driver
     {
     private:
         ComPtr<IDXGIAdapterN> mDXGIAdapter;
         DXGI_ADAPTER_DESC1 mAdapterIdentifier;
         unsigned mSameNameAdapterIndex;
-        SharedPtr<D3D11VideoModeList> mVideoModeList;
 
     public:
         // Constructors
@@ -57,7 +53,6 @@ namespace Ogre
         // change the device
         const DXGI_ADAPTER_DESC1& getAdapterIdentifier() const;
         IDXGIAdapterN* getDeviceAdapter() const;
-        D3D11VideoModeList* getVideoModeList();
     };
 }
 #endif

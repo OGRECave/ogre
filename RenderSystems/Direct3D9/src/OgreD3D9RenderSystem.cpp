@@ -29,8 +29,6 @@ THE SOFTWARE.
 #include "OgreD3D9Prerequisites.h"
 #include "OgreD3D9DriverList.h"
 #include "OgreD3D9Driver.h"
-#include "OgreD3D9VideoModeList.h"
-#include "OgreD3D9VideoMode.h"
 #include "OgreD3D9RenderWindow.h"
 #include "OgreD3D9TextureManager.h"
 #include "OgreD3D9Texture.h"
@@ -426,56 +424,6 @@ namespace Ogre
         mOptions[optMultiDeviceMemHint.name] = optMultiDeviceMemHint;
         mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
 
-        refreshD3DSettings();
-
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::refreshD3DSettings()
-    {
-        ConfigOption* optVideoMode;
-        D3D9Driver* driver = 0;
-        D3D9VideoMode* videoMode;
-
-        ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
-        if( opt != mOptions.end() )
-        {
-            for( unsigned j=0; j < getDirect3DDrivers()->count(); j++ )
-            {
-                D3D9Driver* curDriver = getDirect3DDrivers()->item(j);
-                if( curDriver->DriverDescription() == opt->second.currentValue )
-                {
-                    driver = curDriver;
-                    break;
-                }
-            }
-
-            if (driver)
-            {
-                opt = mOptions.find( "Video Mode" );
-                optVideoMode = &opt->second;
-                optVideoMode->possibleValues.clear();
-                // get vide modes for this device
-                for( unsigned k=0; k < driver->getVideoModeList()->count(); k++ )
-                {
-                    videoMode = driver->getVideoModeList()->item( k );
-                    optVideoMode->possibleValues.push_back( videoMode->getDescription() );
-                }
-
-                // Reset video mode to default if previous doesn't avail in new possible values
-                StringVector::const_iterator itValue =
-                    std::find(optVideoMode->possibleValues.begin(),
-                    optVideoMode->possibleValues.end(),
-                    optVideoMode->currentValue);
-                if (itValue == optVideoMode->possibleValues.end())
-                {
-                    optVideoMode->currentValue = "800 x 600 @ 32-bit colour";
-                }
-
-                // Also refresh FSAA options
-                refreshFSAAOptions();
-            }
-        }
-
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::setConfigOption( const String &name, const String &value )
@@ -498,10 +446,6 @@ namespace Ogre
             str << "Option named '" << name << "' does not exist.";
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, str.str(), "D3D9RenderSystem::setConfigOption" );
         }
-
-        // Refresh other options if D3DDriver changed
-        if( name == "Rendering Device" )
-            refreshD3DSettings();
 
         if ( name == "Allow DirectX9Ex" )
         {
@@ -605,31 +549,33 @@ namespace Ogre
         D3D9Driver *driver = getDirect3DDrivers()->item(it->second.currentValue);
         if (driver)
         {
+            unsigned bpp = 32;
             it = mOptions.find("Video Mode");
-            D3D9VideoMode *videoMode = driver->getVideoModeList()->item(it->second.currentValue);
-            if (videoMode)
+            if (it != mOptions.end())
             {
-                bool bOK;
+                auto pos = it->second.currentValue.find(" @ ");
+                if (pos != String::npos)
+                    bpp = StringConverter::parseUnsignedInt(it->second.currentValue.substr(pos + 3));
+            }
 
-                for (unsigned int n = (unsigned int)D3DMULTISAMPLE_2_SAMPLES; n <= (unsigned int)D3DMULTISAMPLE_16_SAMPLES; n++)
+            D3DFORMAT format = bpp <= 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
+            for (unsigned int n = (unsigned int)D3DMULTISAMPLE_2_SAMPLES; n <= (unsigned int)D3DMULTISAMPLE_16_SAMPLES; n++)
+            {
+                DWORD numLevels = 2;
+                bool bOK = this->_checkMultiSampleQuality(
+                    (D3DMULTISAMPLE_TYPE)n,
+                    &numLevels,
+                    format,
+                    driver->getAdapterNumber(),
+                    D3DDEVTYPE_HAL,
+                    TRUE);
+                if (bOK)
                 {
-                    DWORD numLevels = 2;
-                    bOK = this->_checkMultiSampleQuality(
-                        (D3DMULTISAMPLE_TYPE)n,
-                        &numLevels,
-                        videoMode->getFormat(),
-                        driver->getAdapterNumber(),
-                        D3DDEVTYPE_HAL,
-                        TRUE);
-                    if (bOK)
-                    {
-                        // CSAA modes supported by both AMD and Nvidia
-                        if (n == 8 && numLevels > 2) optFSAA->possibleValues.push_back("4f8");
-                        if (n == 16 && numLevels > 2) optFSAA->possibleValues.push_back("8f16");
-                        optFSAA->possibleValues.push_back(StringConverter::toString(n));
-                    }
+                    // CSAA modes supported by both AMD and Nvidia
+                    if (n == 8 && numLevels > 2) optFSAA->possibleValues.push_back("4f8");
+                    if (n == 16 && numLevels > 2) optFSAA->possibleValues.push_back("8f16");
+                    optFSAA->possibleValues.push_back(StringConverter::toString(n));
                 }
-
             }
         }
 

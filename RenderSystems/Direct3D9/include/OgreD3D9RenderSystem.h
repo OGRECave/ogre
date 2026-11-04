@@ -112,7 +112,6 @@ namespace Ogre
         ColourValue mManualBlendColours[OGRE_MAX_TEXTURE_LAYERS][2];
 
         D3D9DriverList* getDirect3DDrivers();
-        void refreshD3DSettings();
         void refreshFSAAOptions();
         
         void setD3D9Light( size_t index, bool enabled);

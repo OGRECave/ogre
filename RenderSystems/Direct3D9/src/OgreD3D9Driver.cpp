@@ -26,8 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreD3D9Driver.h"
-#include "OgreD3D9VideoModeList.h"
-#include "OgreD3D9VideoMode.h"
 
 #include <sstream>
 
@@ -38,8 +36,7 @@ namespace Ogre
         mAdapterNumber  = 0;
         ZeroMemory( &mD3D9DeviceCaps, sizeof(mD3D9DeviceCaps) );
         ZeroMemory( &mAdapterIdentifier, sizeof(mAdapterIdentifier) );
-        ZeroMemory( &mDesktopDisplayMode, sizeof(mDesktopDisplayMode) );        
-        mVideoModeList = NULL;              
+        ZeroMemory( &mDesktopDisplayMode, sizeof(mDesktopDisplayMode) );
     }
 
     D3D9Driver::D3D9Driver( const D3D9Driver &ob )
@@ -48,7 +45,6 @@ namespace Ogre
         mD3D9DeviceCaps     = ob.mD3D9DeviceCaps;
         mAdapterIdentifier  = ob.mAdapterIdentifier;
         mDesktopDisplayMode = ob.mDesktopDisplayMode;
-        mVideoModeList      = NULL;             
     }
 
     D3D9Driver::D3D9Driver( unsigned int adapterNumber,
@@ -60,16 +56,6 @@ namespace Ogre
         mD3D9DeviceCaps     = deviceCaps;
         mAdapterIdentifier  = adapterIdentifier;
         mDesktopDisplayMode = desktopDisplayMode;
-        mVideoModeList      = NULL;         
-    }
-
-    D3D9Driver::~D3D9Driver()
-    {
-        if (mVideoModeList != NULL)
-        {
-            OGRE_DELETE mVideoModeList;
-            mVideoModeList = NULL;
-        }
     }
 
     String D3D9Driver::DriverName() const
@@ -86,12 +72,4 @@ namespace Ogre
 
         return  driverDescription;
     }
-
-    D3D9VideoModeList* D3D9Driver::getVideoModeList()
-    {
-        if( !mVideoModeList )
-            mVideoModeList = OGRE_NEW D3D9VideoModeList( this );
-
-        return mVideoModeList;
-    }   
 }

@@ -78,72 +78,6 @@ ConfigOptionMap OSXGLSupport::getConfigOptions()
     for(int i = 0; i <= maxSamples; i += 2)
         mFSAALevels.push_back( i );
 
-	// Video mode possibilities
-	CFArrayRef displayModes = CGDisplayCopyAllDisplayModes(CGMainDisplayID(), NULL);
-	// NULL for an invalid display, which includes a process that has no window
-	// server session. Report no video modes instead of dereferencing it.
-	CFIndex numModes = displayModes ? CFArrayGetCount(displayModes) : 0;
-	CFMutableArrayRef goodModes = NULL;
-	goodModes = CFArrayCreateMutable(kCFAllocatorDefault, numModes, NULL);
-	
-	// Grab all the available display modes, then weed out duplicates...
-	for(int i = 0; i < numModes; ++i)
-	{
-		CGDisplayModeRef modeInfo = (CGDisplayModeRef)CFArrayGetValueAtIndex(displayModes, i);
-
-        // Get IOKit flags for the display mode
-        uint32_t ioFlags = CGDisplayModeGetIOFlags(modeInfo);
-
-        bool safeForHardware = ioFlags & kDisplayModeSafetyFlags ? true : false;
-		bool stretched = ioFlags & kDisplayModeStretchedFlag ? true : false;
-		bool skipped = false;
-		
-		if((safeForHardware) || (!stretched))
-		{
-			size_t width  = CGDisplayModeGetWidth(modeInfo);
-			size_t height = CGDisplayModeGetHeight(modeInfo); 
-			
-			for(CFIndex j = 0; j < CFArrayGetCount(goodModes); ++j)
-			{
-				CGDisplayModeRef otherMode = (CGDisplayModeRef)CFArrayGetValueAtIndex(goodModes, j);
-                
-				size_t otherWidth  = CGDisplayModeGetWidth(otherMode);
-				size_t otherHeight = CGDisplayModeGetHeight(otherMode);
-				
-				// If we find a duplicate then skip this mode
-				if((otherWidth == width) && (otherHeight == height))
-					skipped = true;
-			}
-			
-			// This is a new mode, so add it to our goodModes array
-			if(!skipped)
-				CFArrayAppendValue(goodModes, modeInfo);
-		}
-	}
-	
-    // Release memory
-    if(displayModes)
-        CFRelease(displayModes);
-
-	// Sort the modes...
-	CFArraySortValues(goodModes, CFRangeMake(0, CFArrayGetCount(goodModes)), 
-					  (CFComparatorFunction)_compareModes, NULL);
-					  
-	// Now pull the modes out and put them into optVideoModes
-	for(int i = 0; i < CFArrayGetCount(goodModes); ++i)
-	{
-		CGDisplayModeRef resolution = (CGDisplayModeRef)CFArrayGetValueAtIndex(goodModes, i);
-		
-		size_t fWidth  = CGDisplayModeGetWidth(resolution);
-		size_t fHeight = CGDisplayModeGetHeight(resolution);
-		// allow 16 and 32 bpp
-		mVideoModes.push_back({uint32(fWidth), uint32(fHeight),0, 16});
-		mVideoModes.push_back({uint32(fWidth), uint32(fHeight),0, 32});
-    }
-	
-    // Release memory
-    CFRelease(goodModes);
-
 	return mOptions;
 }
 
@@ -182,55 +116,6 @@ void OSXGLSupport::stop()
 void* OSXGLSupport::getProcAddress( const char* name ) const
 {
     return dlsym (RTLD_DEFAULT, name);
-}
-
-CFComparisonResult OSXGLSupport::_compareModes (const void *val1, const void *val2, void *context)
-{
-	// These are the values we will be interested in...
-	/*
-	CGDisplayModeGetWidth
-	CGDisplayModeGetHeight
-	CGDisplayModeGetRefreshRate
-	_getDictionaryLong((mode), kCGDisplayBitsPerPixel)
-	CGDisplayModeGetIOFlags((mode), kDisplayModeStretchedFlag)
-	CGDisplayModeGetIOFlags((mode), kDisplayModeSafetyFlags)
-	*/
-	
-	// CFArray comparison callback for sorting display modes.
-	#pragma unused(context)
-	CGDisplayModeRef thisMode = (CGDisplayModeRef)val1;
-	CGDisplayModeRef otherMode = (CGDisplayModeRef)val2;
-	
-	size_t width = CGDisplayModeGetWidth(thisMode);
-	size_t otherWidth = CGDisplayModeGetWidth(otherMode);
-	
-	size_t height = CGDisplayModeGetHeight(thisMode);
-	size_t otherHeight = CGDisplayModeGetHeight(otherMode);
-
-	// Sort modes in screen size order
-	if (width * height < otherWidth * otherHeight)
-	{
-		return kCFCompareLessThan;
-	}
-	else if (width * height > otherWidth * otherHeight)
-	{
-		return kCFCompareGreaterThan;
-	}
-
-	// Sort modes by refresh rate.
-	double refreshRate = CGDisplayModeGetRefreshRate(thisMode);
-	double otherRefreshRate = CGDisplayModeGetRefreshRate(otherMode);
-
-	if (refreshRate < otherRefreshRate)
-	{
-		return kCFCompareLessThan;
-	}
-	else if (refreshRate > otherRefreshRate)
-	{
-		return kCFCompareGreaterThan;
-	}
-
-	return kCFCompareEqualTo;
 }
 
 Boolean OSXGLSupport::_getDictionaryBoolean(CFDictionaryRef dict, const void* key)

@@ -82,7 +82,6 @@ namespace Ogre
                          D3D_FEATURE_LEVEL minFL, D3D_FEATURE_LEVEL maxFL, D3D_FEATURE_LEVEL* pFeatureLevel);
 
         D3D11DriverList* getDirect3DDrivers(bool refreshList = false);
-        void refreshD3DSettings(void);
         void refreshFSAAOptions(void);
 
         void freeDevice(void);

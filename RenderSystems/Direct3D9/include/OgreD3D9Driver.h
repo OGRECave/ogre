@@ -34,9 +34,6 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-    class D3D9VideoModeList;
-    class D3D9VideoMode;
-
     class _OgreD3D9Export D3D9Driver : public ResourceAlloc
     {
     
@@ -48,7 +45,6 @@ namespace Ogre
             const D3DCAPS9& deviceCaps,
             const D3DADAPTER_IDENTIFIER9& adapterIdentifer, 
             const D3DDISPLAYMODE& desktopDisplayMode);
-        ~D3D9Driver();
 
                 
         const D3DCAPS9&     getD3D9DeviceCaps   () const { return mD3D9DeviceCaps; }
@@ -58,7 +54,6 @@ namespace Ogre
         unsigned int                    getAdapterNumber    () const { return mAdapterNumber; }
         const D3DADAPTER_IDENTIFIER9&   getAdapterIdentifier() const { return mAdapterIdentifier; }
         const D3DDISPLAYMODE&           getDesktopMode      () const { return mDesktopDisplayMode; }
-        D3D9VideoModeList*              getVideoModeList    ();
             
     private:                
         // Adapter number.
@@ -72,9 +67,6 @@ namespace Ogre
 
         // Desktop display mode.
         D3DDISPLAYMODE          mDesktopDisplayMode;
-
-        // Video modes list.
-        D3D9VideoModeList*      mVideoModeList; 
     };
 }
 #endif

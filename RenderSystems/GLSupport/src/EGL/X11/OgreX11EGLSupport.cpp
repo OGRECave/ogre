@@ -52,30 +52,6 @@ namespace Ogre {
         // A connection that is NOT shared to enable independent event processing:
         mNativeDisplay = getNativeDisplay();
 
-
-        if(mNativeDisplay == EGL_DEFAULT_DISPLAY)
-        {
-            // fake video mode
-            mCurrentMode.width = 0;
-            mCurrentMode.height = 0;
-            mCurrentMode.refreshRate = 0;
-            mVideoModes.push_back(mCurrentMode);
-        }
-        else
-        {
-            getXVideoModes(mNativeDisplay, mCurrentMode, mVideoModes);
-        }
-
-        if(mVideoModes.empty()) // none of the above worked
-        {
-            mCurrentMode.width = DisplayWidth(mNativeDisplay, DefaultScreen(mNativeDisplay));
-            mCurrentMode.height = DisplayHeight(mNativeDisplay, DefaultScreen(mNativeDisplay));
-            mCurrentMode.refreshRate = 0;
-            mVideoModes.push_back(mCurrentMode);
-        }
-
-        mOriginalMode = mCurrentMode;
-
         EGLConfig *glConfigs;
         int config, nConfigs = 0;
 
