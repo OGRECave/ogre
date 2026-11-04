@@ -24,8 +24,8 @@ vec3 IntegrateEdgeVec(vec3 v1, vec3 v2)
 
 float LTC_Evaluate(vec3 N, vec3 V, in f32vec3 P, mat3 Minv, in f32vec3 points[4], sampler2D ltc_2)
 {
-    vec3 dir = points[0] - P;
-    vec3 lightDir = cross(points[1] - points[0], points[3] - points[0]);
+    f32vec3 dir = points[0] - P;
+    f32vec3 lightDir = cross(points[1] - points[0], points[3] - points[0]);
     if(dot(dir, lightDir) < 0.0)
         return 0.0;
 
@@ -38,7 +38,7 @@ float LTC_Evaluate(vec3 N, vec3 V, in f32vec3 P, mat3 Minv, in f32vec3 points[4]
     Minv = mul(Minv, mtxFromRows(T1, T2, N));
 
     // polygon
-    vec3 L[4];
+    f32vec3 L[4];
     L[0] = mul(Minv, points[0] - P);
     L[1] = mul(Minv, points[1] - P);
     L[2] = mul(Minv, points[2] - P);
