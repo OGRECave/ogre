@@ -90,18 +90,14 @@ namespace Ogre {
         };
         typedef std::array<Vector3, 8> Corners;
 
-        AxisAlignedBox()
+        constexpr AxisAlignedBox()
+            // Default to a null box
+            : mMinimum(-0.5, -0.5, -0.5), mMaximum(0.5, 0.5, 0.5), mExtent(EXTENT_NULL)
         {
-            // Default to a null box 
-            setMinimum( -0.5, -0.5, -0.5 );
-            setMaximum( 0.5, 0.5, 0.5 );
-            mExtent = EXTENT_NULL;
         }
-        AxisAlignedBox(Extent e)
+        constexpr AxisAlignedBox(Extent e)
+            : mMinimum(-0.5, -0.5, -0.5), mMaximum(0.5, 0.5, 0.5), mExtent(e)
         {
-            setMinimum( -0.5, -0.5, -0.5 );
-            setMaximum( 0.5, 0.5, 0.5 );
-            mExtent = e;
         }
 
         AxisAlignedBox( const Vector3& min, const Vector3& max )
