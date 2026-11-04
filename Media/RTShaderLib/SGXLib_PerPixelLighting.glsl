@@ -75,7 +75,8 @@ void evaluateLight(
 				in float shadowFactor,
 				inout vec3 vOutDiffuse
 #ifdef USE_SPECULAR
-				, in vec3 vSpecularColour,
+				, in f32vec3 vView,
+				in vec3 vSpecularColour,
 				in float fSpecularPower,
 				inout vec3 vOutSpecular
 #endif
@@ -116,7 +117,6 @@ void evaluateLight(
 	vOutDiffuse = FFP_SATURATE(vOutDiffuse);
 
 #ifdef USE_SPECULAR
-	f32vec3 vView       = -normalize(vViewPos);
 	f32vec3 vHalfWay    = normalize(vView + vLightView);
 	float32_t nDotH  = saturate(dot(vNormalView, vHalfWay));
 #ifdef NORMALISED
@@ -162,6 +162,9 @@ void FFP_Lights(
 #endif
 				)
 {
+#ifdef USE_SPECULAR
+	f32vec3 vView = -normalize(vViewPos);
+#endif
 	for (int n = 0; n < CURRENT_LIGHT_COUNT; ++n)
 	{
 		int i = GET_LIGHT_INDEX(n);
@@ -211,7 +214,7 @@ void FFP_Lights(
 		evaluateLight(vNormal, vViewPos, vLightPos[i], vAttParams[i], vLightDirView[i],
 					  spotParams[i], dcol, fShadowFactor, vOutDiffuse
 #ifdef USE_SPECULAR
-					  , scol, fSpecularPower, vOutSpecular
+					  , vView, scol, fSpecularPower, vOutSpecular
 #endif
 					  );
 	}
