@@ -112,6 +112,9 @@ namespace Ogre
         /// Only used when hasMsaaExplicitResolves() == false
         VkImage mMsaaTextureName;
         VmaAllocation mMsaaAllocation;
+
+        /// views for unordered access, one per mip level. Created on demand
+        std::vector<VkImageView> mStorageViews;
     public:
         /// The current layout we're in. Including any internal stuff.
         VkImageLayout mCurrLayout;
@@ -134,7 +137,7 @@ namespace Ogre
         virtual void destroyMsaaSurface( void );
     public:
         bool hasMsaaExplicitResolves() const { return false; }
-        bool isUav() const { return false; }
+        bool isUav() const { return (mUsage & TU_UNORDERED_ACCESS) != 0; }
         bool isMultisample() const { return mFSAA > 1; }
         virtual bool isRenderWindowSpecific() const { return false; }
 
@@ -160,6 +163,11 @@ namespace Ogre
 
         VkImageView createView( void ) const;
         VkImageView getDefaultDisplaySrv( void ) const { return mDefaultDisplaySrv; }
+        /// view for unordered access of all layers of the given mip level
+        VkImageView getStorageView( uint8 mipLevel );
+
+        void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE, int mipmapLevel = 0,
+                                     int textureArrayIndex = 0, PixelFormat format = PF_UNKNOWN) override;
 
         void destroyView( VkImageView imageView );
 

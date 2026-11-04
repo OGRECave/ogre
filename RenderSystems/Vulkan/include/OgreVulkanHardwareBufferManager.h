@@ -52,6 +52,8 @@ namespace Ogre
         HardwareBufferPtr createUniformBuffer(size_t sizeBytes,
                                               HardwareBufferUsage usage = HBU_CPU_TO_GPU,
                                               bool useShadowBuffer = false) override;
+        /// Create a shader storage buffer
+        HardwareBufferPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBufferUsage usage = HBU_CPU_TO_GPU);
     };
 }
 

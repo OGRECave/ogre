@@ -467,7 +467,8 @@ void GLSLangProgram::prepareImpl()
         LogManager::getSingleton().logWarning("GLSLang SPIR-V messages for " + mName + ":\n" + messages);
 
     getConstantDefinitions();
-    program.buildReflection();
+    // storage buffers are backed by shared parameters and do not contain program constants
+    program.buildReflection(EShReflectionDefault | EShReflectionSeparateBuffers);
 
     int nuniforms = program.getNumLiveUniformVariables();
     int ogreUniformsIdx = -1;
