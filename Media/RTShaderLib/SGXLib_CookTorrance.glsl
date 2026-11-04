@@ -111,6 +111,7 @@ float D_GGX(float roughness, float32_t NoH, const vec3 h, const vec3 n) {
 vec3 evaluateLight(
                 in f32vec3 vNormal,
                 in f32vec3 viewPos,
+                in vec3 vView,
                 in f32vec4 lightPos,
                 in vec3 lightColor,
                 in f32vec4 pointParams,
@@ -142,8 +143,6 @@ vec3 evaluateLight(
 
     // https://google.github.io/filament/Filament.md.html#toc5.6.2
     float f90 = saturate(dot(pixel.f0, vec3_splat(50.0 * 0.33)));
-
-	vec3 vView       = -normalize(viewPos);
 
     // https://google.github.io/filament/Filament.md.html#materialsystem/standardmodelsummary
     vec3 h    = normalize(vView + vLightView);
@@ -220,6 +219,8 @@ void PBR_Lights(
     // See "Multiple-Scattering Microfacet BSDFs with the Smith Model"
     pixel.energyCompensation = 1.0 + pixel.f0 * (1.0 / pixel.dfg.y - 1.0);
 
+    vec3 vView = -normalize(viewPos);
+
     for(int n = 0; n < CURRENT_LIGHT_COUNT; n++)
     {
         int i = GET_LIGHT_INDEX(n);
@@ -235,7 +236,7 @@ void PBR_Lights(
             continue;
         }
 #endif
-        vec3 lightVal = evaluateLight(vNormal, viewPos, lightPos[i], lightColor[i].xyz, pointParams[i], vLightDirView[i], spotParams[i],
+        vec3 lightVal = evaluateLight(vNormal, viewPos, vView, lightPos[i], lightColor[i].xyz, pointParams[i], vLightDirView[i], spotParams[i],
                         pixel);
 
 #ifdef SHADOWLIGHT_COUNT
