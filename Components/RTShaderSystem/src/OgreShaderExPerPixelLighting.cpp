@@ -252,7 +252,10 @@ void PerPixelLighting::addVSInvocation(const FunctionStageRef& stage)
 {
     // Transform normal in view space.
     if(mLightCount && mVSInNormal)
+    {
         stage.callBuiltin("mul", mWorldViewITMatrix, mVSInNormal, mVSOutNormal);
+        stage.callBuiltin("normalize", mVSOutNormal, mVSOutNormal);
+    }
 
     // Transform view space position if need to.
     if (mVSOutViewPos)

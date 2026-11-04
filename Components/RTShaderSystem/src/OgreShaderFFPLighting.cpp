@@ -222,7 +222,10 @@ void FFPLighting::addGlobalIlluminationInvocation(const FunctionStageRef& stage)
 {
     // Transform normal to view space
 	if(mLightCount)
+    {
 	    stage.callBuiltin("mul", mWorldViewITMatrix, mVSInNormal, mViewNormal);
+	    stage.callBuiltin("normalize", mViewNormal, mViewNormal);
+    }
 
     if(mViewPos)
     {
