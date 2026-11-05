@@ -144,9 +144,9 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
         message(STATUS "Building SDL2")
         file(DOWNLOAD
-            https://libsdl.org/release/SDL2-2.32.10.tar.gz
-            ${PROJECT_BINARY_DIR}/SDL2-2.32.10.tar.gz)
-        execute_process(COMMAND ${CMAKE_COMMAND} 
+            https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-2.32.10.tar.gz
+            ${PROJECT_BINARY_DIR}/SDL2-2.32.10.tar.gz
+            EXPECTED_HASH SHA256=5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165
             -E tar xf SDL2-2.32.10.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
         execute_process(COMMAND ${CMAKE_COMMAND}
             -E make_directory ${PROJECT_BINARY_DIR}/SDL2-build)
@@ -371,6 +371,13 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
         INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
         INTERFACE_LINK_LIBRARIES "${SDL2_LIBRARIES}"
     )
+  endif()
+
+  if(SKBUILD AND NOT SDL2_FOUND)
+    # the Python wheels ship OgreBites with the bundled SDL2 and must not be
+    # published without input handling
+    message(FATAL_ERROR "SDL2 is required to build the Python packages, but was not found. "
+        "See the dependency build output above.")
   endif()
 
   find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui QUIET CONFIG)
