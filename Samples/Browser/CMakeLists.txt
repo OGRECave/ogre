@@ -173,6 +173,7 @@ if (APPLE)
         Plugin_ParticleFX
         Plugin_PCZSceneManager
         Plugin_DotScene
+        Codec_Assimp
         Codec_STBI
         Codec_FreeImage
         RenderSystem_GL
