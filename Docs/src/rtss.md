@@ -497,6 +497,33 @@ mViewport->setMaterialScheme(Ogre::MSN_SHADERGEN);
 
 @note you can automate the shader generation process for all materials. First set the viewport scheme to the destination scheme of the RTSS shaders. Second register to the `Ogre::MaterialManager::Listener` implementing `handleSchemeNotFound()` - e.g. OgreBites::SGTechniqueResolverListener
 
+### Accessing a generated technique from code {#rtssTechniqueAccess}
+
+The generated technique is added to the material, but
+`Material::getBestTechnique()` chooses a technique for the **active** material
+scheme. A `Viewport` only makes its scheme active for the duration of its
+update and then restores the previous one, so a lookup performed outside
+rendering usually resolves against `Default` and returns the original
+fixed-function technique. Select the scheme explicitly around the lookup and
+restore it afterwards:
+
+```cpp
+auto& mm = Ogre::MaterialManager::getSingleton();
+const auto previous = mm.getActiveScheme();
+mm.setActiveScheme(Ogre::MSN_SHADERGEN);
+Ogre::Technique* tech = mat->getBestTechnique();
+mm.setActiveScheme(previous);
+```
+
+The technique is normally created lazily, the first time the scheme is
+requested while a `MaterialManager::Listener::handleSchemeNotFound` listener is
+active; OgreBites provides one (`SGTechniqueResolverListener`). Before that,
+`getBestTechnique()` returns `NULL`. `Material::load()` does not invoke the
+listener, and `ShaderGenerator::validateMaterial()` only validates techniques
+that are already registered with the scheme; neither creates a missing scheme
+technique. Call `ShaderGenerator::createShaderBasedTechnique()` first, or
+render one frame with the scheme active.
+
 ## Shader generation at runtime {#rtssGenerate}
 During the application runtime the @c ShaderGenerator instance receives notifications on a per frame basis from its target @c SceneManager.
 At this point it checks the material scheme in use. In case the current scheme has representations in the manager, it executes its validate method.
@@ -504,7 +531,7 @@ The @c SGScheme validation includes synchronization with scene light and fog set
 1. The first step is to loop over every @c SGTechnique associated with this @c SGScheme and build its @c RenderStates - one for each pass.
 2. The second step is to loop again on every @c SGTechnique and acquire a program set for each @c SGPass.
 
-@note The shaders are only automatically updated for lights and fog changes. If you change the source pass after initial shader creation, you must call Ogre::RTShader::ShaderGenerator::invalidateMaterial manually.
+@note The shaders are only automatically updated for lights and fog changes. If you change the source pass after initial shader creation, you must call Ogre::RTShader::ShaderGenerator::invalidateMaterial manually. Features that select generated code (for example whether `FFPTexturing` emits a texture-matrix uniform) are sampled from the source pass when the shader is generated. Setting such state on the generated pass afterwards cannot add the missing code; change the source pass and invalidate, or set it before the first generation.
 
 The actual acquiring process is done by the @c TargetRenderState that generates CPU program representation, send them to a matching @c ProgramWriter that is chosen by the active target language, the writer generates source code that is the basis for the GPU programs.
 The result of this entire process is that each technique associated with the @c SGScheme has vertex and pixel shaders applied to all its passes. These shaders are synchronized with scene lights and fog settings.
