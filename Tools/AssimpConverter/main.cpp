@@ -213,11 +213,14 @@ int main(int numargs, char** args)
 
         auto codec = Codec::getCodec(ext);
 
-        ResourceGroupManager::getSingleton().addResourceLocation(path, "FileSystem", RGN_DEFAULT);
+        // resolve referenced files against the model directory, which is also
+        // where the converted files are written by default
+        ResourceGroupManager::getSingleton().addResourceLocation(path.empty() ? "." : path, "FileSystem", RGN_DEFAULT,
+                                                                 true);
 
         MeshPtr mesh = MeshManager::getSingleton().createManual(basename + "." + ext, RGN_DEFAULT);
         mesh->getUserObjectBindings().setUserAny("_AssimpLoaderOptions", opts.options);
-        codec->decode(Root::openFileStream(opts.source), mesh.get());
+        codec->decode(Root::openFileStream(basename + "." + ext, RGN_DEFAULT), mesh.get());
 
         if (!opts.dest.empty())
         {
