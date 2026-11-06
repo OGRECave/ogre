@@ -258,6 +258,17 @@ namespace Ogre {
             The best supported technique is only available after this material has been compiled,
             which typically happens on loading the material. Therefore, if this method returns
             NULL, try calling Material::load.
+        @par
+            The technique is chosen for the active material scheme (see
+            MaterialManager::setActiveScheme). A Viewport only sets its scheme while it is
+            being rendered and restores the previous one afterwards, so a query made outside
+            rendering normally resolves against the Default scheme.
+        @par
+            A scheme technique may be created on demand by a MaterialManager::Listener, as the
+            RTShaderSystem does. Such a technique is not created by Material::load. If this
+            method returns NULL for a scheme served by a listener, make sure the scheme is active
+            and the listener is registered, or create the technique explicitly with
+            Ogre::RTShader::ShaderGenerator::createShaderBasedTechnique.
         @param lodIndex The material LOD index to use
         @param rend Optional parameter specifying the Renderable that is requesting
             this technique. Only used if no valid technique for the active material 
