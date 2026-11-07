@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreImage.h"
 #include "OgreTexture.h"
+#include "OgreTextureManager.h"
 
 namespace Ogre {
     static const char* CUBEMAP_SUFFIXES[] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
@@ -78,6 +79,36 @@ namespace Ogre {
         }
 
         
+    }
+    //--------------------------------------------------------------------------
+    Texture::~Texture()
+    {
+        // may still be queued even if the dirty flag was cleared by an
+        // explicit generateMipmaps() after it was marked
+        if (TextureManager* tm = TextureManager::getSingletonPtr())
+            tm->_removeMipmapsDirty(this);
+        mMipmapsDirty = false;
+    }
+    //--------------------------------------------------------------------------
+    void Texture::_markMipmapsDirty()
+    {
+        if (mMipmapsDirty || !(mUsage & TU_AUTOMIPMAP) || !mNumMipmaps)
+            return;
+
+        mMipmapsDirty = true;
+        if (TextureManager* tm = TextureManager::getSingletonPtr())
+            tm->_notifyMipmapsDirty(this);
+    }
+    //--------------------------------------------------------------------------
+    void Texture::generateMipmaps()
+    {
+        if (!(mUsage & TU_AUTOMIPMAP) || !mNumMipmaps || !mInternalResourcesCreated)
+            return;
+
+        // clear first: a failing generation is reported once, instead of
+        // being retried and thrown again at every following flush point
+        mMipmapsDirty = false;
+        generateMipmapsImpl();
     }
     //--------------------------------------------------------------------------
     void Texture::loadRawData( DataStreamPtr& stream, 
@@ -322,6 +353,7 @@ namespace Ogre {
 
             createInternalResourcesImpl();
             mInternalResourcesCreated = true;
+            mMipmapsDirty = false;
 
             // this is also public API, so update state accordingly
             if(!isLoading())
@@ -337,6 +369,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void Texture::freeInternalResources(void)
     {
+        // may still be queued even if the dirty flag was cleared by an
+        // explicit generateMipmaps() after it was marked
+        if (TextureManager* tm = TextureManager::getSingletonPtr())
+            tm->_removeMipmapsDirty(this);
+        mMipmapsDirty = false;
+
         if (mInternalResourcesCreated)
         {
             mSurfaceList.clear();
@@ -410,6 +448,8 @@ namespace Ogre {
     {
         OgreAssert(face < getNumFaces(), "out of range");
         OgreAssert(mipmap <= mNumMipmaps, "out of range");
+        OgreAssertDbg(mipmap == 0 || !mMipmapsDirty,
+                      "mip levels above 0 are dirty; call generateMipmaps() first");
 
         size_t idx = face * (mNumMipmaps + 1) + mipmap;
         assert(idx < mSurfaceList.size());
@@ -419,6 +459,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Texture::convertToImage(Image& destImage, bool includeMipMaps)
     {
+        if (includeMipMaps && _isMipmapsDirty())
+            generateMipmaps();
+
         uint32 numMips = includeMipMaps? getNumMipmaps() : 0;
         destImage.create(getFormat(), getWidth(), getHeight(), getDepth(), getNumFaces(), numMips);
 

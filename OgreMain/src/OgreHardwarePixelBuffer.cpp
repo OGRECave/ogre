@@ -35,10 +35,11 @@ namespace Ogre
     //-----------------------------------------------------------------------------    
     HardwarePixelBuffer::HardwarePixelBuffer(uint32 width, uint32 height, uint32 depth,
             PixelFormat format,
-            HardwareBuffer::Usage usage, bool useShadowBuffer):
+            HardwareBuffer::Usage usage, bool useShadowBuffer,
+            Texture* parentTexture):
         HardwareBuffer(usage, useShadowBuffer),
         mCurrentLockOptions(), mWidth(width), mHeight(height), mDepth(depth),
-        mFormat(format)
+        mFormat(format), mOwningTexture(parentTexture)
     {
         // Default
         mRowPitch = mWidth;
