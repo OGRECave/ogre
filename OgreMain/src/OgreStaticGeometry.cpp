@@ -1485,7 +1485,11 @@ namespace Ogre {
                 uchar* pSrcBase = static_cast<uchar*>(srcBufLock.pData);
                 // Get buffer lock pointer, we'll update this later
                 uchar* pDstBase = destBufferLocks[b];
-                size_t bufInc = srcBuf->getVertexSize();
+                // the source may be prepared for shadow volumes and therefore
+                // have a padded position buffer; advance the destination by
+                // the stride of the buffer we are writing to
+                size_t srcInc = srcBuf->getVertexSize();
+                size_t dstInc = dcl->getVertexSize(b);
 
                 // Iterate over vertices
                 float *pSrcReal, *pDstReal;
@@ -1544,8 +1548,8 @@ namespace Ogre {
                     }
 
                     // Increment both pointers
-                    pDstBase += bufInc;
-                    pSrcBase += bufInc;
+                    pDstBase += dstInc;
+                    pSrcBase += srcInc;
 
                 }
 
