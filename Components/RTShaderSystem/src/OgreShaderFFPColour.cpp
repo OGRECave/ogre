@@ -39,6 +39,9 @@ const String SRS_VERTEX_COLOUR = "FFP_Colour";
 FFPColour::FFPColour()
 {
     mResolveStageFlags  = 0;
+    mUseEmissiveColour  = false;
+    mSurfaceEmissiveColour = UniformParameterPtr();
+    mSurfaceEmissiveColourPS = UniformParameterPtr();
 }
 
 //-----------------------------------------------------------------------
@@ -83,6 +86,14 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
     // Resolve PS output diffuse color.
     mPSOutputDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
+    if (mUseEmissiveColour)
+    {
+        if (mVSOutputDiffuse)
+            mSurfaceEmissiveColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR);
+        if (!mPSInputDiffuse)
+            mSurfaceEmissiveColourPS = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR);
+    }
+
     return true;
 }
 
@@ -117,7 +128,10 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
-        vsStage.assign(Vector4(1.0), vsDiffuse);
+        if (mSurfaceEmissiveColour)
+            vsStage.assign(mSurfaceEmissiveColour, vsDiffuse);
+        else
+            vsStage.assign(Vector4(1.0), vsDiffuse);
     }
 
     if (mVSOutputDiffuse)
@@ -148,7 +162,10 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         psDiffuse = psMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
-        psStage.assign(Vector4(1.0), psDiffuse);
+        if (mSurfaceEmissiveColourPS)
+            psStage.assign(mSurfaceEmissiveColourPS, psDiffuse);
+        else
+            psStage.assign(Vector4(1.0), psDiffuse);
     }
 
     // Handle specular colour.
@@ -189,6 +206,8 @@ bool FFPColour::preAddToRenderState(const RenderState* renderState, Pass* srcPas
 
     if (trackColour != 0)
         addResolveStageMask(FFPColour::SF_VS_INPUT_DIFFUSE);
+
+    mUseEmissiveColour = !srcPass->getLightingEnabled() && srcPass->getEmissive() != ColourValue::Black;
 
     return true;
 }
