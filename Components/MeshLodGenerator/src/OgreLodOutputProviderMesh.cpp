@@ -49,10 +49,8 @@ namespace Ogre
         return mMesh->getNumSubMeshes();
     }
 
-    HardwareIndexBufferPtr LodOutputProviderMesh::createIndexBufferImpl(size_t indexCount)
+    HardwareIndexBufferPtr LodOutputProviderMesh::createIndexBufferImpl(HardwareIndexBuffer::IndexType indexType, size_t indexCount)
     {
-        auto indexType = indexCount - 1 <= std::numeric_limits<uint16>::max() ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT;
-
         return mMesh->getHardwareBufferManager()->createIndexBuffer(indexType, indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
     }
 
