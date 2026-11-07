@@ -1496,21 +1496,13 @@ namespace Ogre {
                 // This loads into [2,3]. [1] is unused
                 norm = _mm_loadh_pi(norm, (__m64*)(pNorm + 0));
                 
-                // Fill a 4-vec with vector length
-                // square
-                __m128 tmp = _mm_mul_ps(norm, norm);
-                // Add - for this we want this effect:
-                // orig   3 | 2 | 1 | 0
-                // add1   0 | 0 | 0 | 2
-                // add2   2 | 3 | 0 | 3
-                // This way elements 0, 2 and 3 have the sum of all entries (except 1 which is unused)
-                
-                tmp = _mm_add_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(0,0,0,2)));
-                // Add final combination & sqrt 
-                // bottom 3 elements of l will have length, we don't care about 4
-                tmp = _mm_add_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2,3,0,3)));
-                // Then divide to normalise
-                norm = _mm_div_ps(norm, _mm_sqrt_ps(tmp));
+                // Calculate the squared length in lane 0. The normal is
+                // stored as (z, 0, x, y), so add x^2 and y^2 to z^2.
+                __m128 tmp = _mm_mul_ps(norm, norm);                    // z^2 0 x^2 y^2
+                tmp = _mm_add_ss(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2,2,2,2)));
+                tmp = _mm_add_ss(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(3,3,3,3)));
+                tmp = _mm_sqrt_ss(tmp);
+                norm = _mm_div_ps(norm, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(0,0,0,0)));
                 
                 // Store back in the same place
                 _mm_storeh_pi((__m64*)(pNorm + 0), norm);
