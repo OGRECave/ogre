@@ -1255,7 +1255,7 @@ namespace Ogre {
                 *pDstNorm++ = (float)norm.z;
 
                 pDstBase += dstbuf->getVertexSize();
-                pSrcBase += dstbuf->getVertexSize();
+                pSrcBase += srcbuf->getVertexSize();
             }
         }
     }
