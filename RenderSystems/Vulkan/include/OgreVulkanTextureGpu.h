@@ -151,6 +151,8 @@ namespace Ogre
 
         void _autogenerateMipmaps( bool bUseBarrierSolver = false );
 
+        void generateMipmapsImpl() override;
+
         VkImageType getVulkanTextureType( void ) const;
 
         VkImageViewType getInternalVulkanTextureViewType( void ) const;

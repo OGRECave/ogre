@@ -101,8 +101,10 @@ namespace Ogre {
 
         /// @copydoc Texture::createInternalResourcesImpl
         void createInternalResourcesImpl(void);
-        /// free internal resources
+        /// @copydoc Resource::freeInternalResourcesImpl
         void freeInternalResourcesImpl(void);
+        /// @copydoc Texture::generateMipmapsImpl
+        void generateMipmapsImpl() override;
         /// internal method, set Texture class final texture protected attributes
         void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format, UINT miscflags);
 

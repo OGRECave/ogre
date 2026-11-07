@@ -47,8 +47,8 @@ namespace Ogre {
 
 D3D9HardwarePixelBuffer::D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 
                                                  D3D9Texture* ownerTexture):
-    HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage, false),
-    mDoMipmapGen(false), mHWMipmaps(false), mOwnerTexture(ownerTexture)
+    HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage, false, ownerTexture),
+    mOwnerTexture(ownerTexture)
 {   
 }
 D3D9HardwarePixelBuffer::~D3D9HardwarePixelBuffer()
@@ -479,8 +479,7 @@ void D3D9HardwarePixelBuffer::unlockImpl(void)
     // 2. Unlock the locked buffer.
     it = mMapDeviceToBufferResources.begin();                           
     unlockBuffer( it->second);      
-    if(mDoMipmapGen)
-        _genMipmaps(it->second->mipTex);
+    mOwnerTexture->_markMipmapsDirty();
 
     // in case we used this
     mStagingBuffer.freeMemory();
@@ -742,8 +741,7 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dst
         }
     }
 
-    if(mDoMipmapGen)
-        _genMipmaps(dstBufferResources->mipTex);
+    mOwnerTexture->_markMipmapsDirty();
 
 }
 
@@ -923,38 +921,7 @@ void D3D9HardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &ds
     }
 }
 
-//-----------------------------------------------------------------------------  
-void D3D9HardwarePixelBuffer::_genMipmaps(IDirect3DBaseTexture9* mipTex)
-{
-    assert(mipTex);
-
-    // Mipmapping
-    if (mHWMipmaps)
-    {
-        // Hardware mipmaps
-        mipTex->GenerateMipSubLevels();
-    }
-    else
-    {
-        // Software mipmaps
-        if( D3DXFilterTexture( mipTex, NULL, D3DX_DEFAULT, D3DX_DEFAULT ) != D3D_OK )
-        {
-            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR, 
-            "Failed to filter texture (generate mipmaps)",
-             "D3D9HardwarePixelBuffer::_genMipmaps" );
-        }
-    }
-
-}
-//----------------------------------------------------------------------------- 
-void D3D9HardwarePixelBuffer::_setMipmapping(bool doMipmapGen, 
-                                             bool HWMipmaps)
-{   
-    mDoMipmapGen = doMipmapGen;
-    mHWMipmaps = HWMipmaps; 
-}
-
-//-----------------------------------------------------------------------------  
+//-----------------------------------------------------------------------------
 void D3D9HardwarePixelBuffer::releaseSurfaces(IDirect3DDevice9* d3d9Device)
 {
     BufferResources* bufferResources = getBufferResources(d3d9Device);

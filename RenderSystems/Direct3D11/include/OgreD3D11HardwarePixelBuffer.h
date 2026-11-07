@@ -74,13 +74,11 @@ namespace Ogre {
         /// @copydoc HardwarePixelBuffer::blitToMemory
         void blitToMemory(const Box &srcBox, const PixelBox &dst);
 
-        /// Internal function to update mipmaps on update of level 0
-        void _genMipmaps();
-
 
         ~D3D11HardwarePixelBuffer();
 
-        D3D11Texture * getParentTexture() const;
+        /// Hides HardwarePixelBuffer::getParentTexture() to return the derived type
+        D3D11Texture * getParentTexture() const { return mParentTexture; }
 
         UINT getFace() const;
         UINT getMipLevel() const;

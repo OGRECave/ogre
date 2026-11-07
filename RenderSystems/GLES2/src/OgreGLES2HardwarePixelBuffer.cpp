@@ -80,7 +80,7 @@ namespace Ogre {
     // TextureBuffer
     GLES2TextureBuffer::GLES2TextureBuffer(GLES2Texture* parent, GLint face, GLint level,
                                            GLint width, GLint height, GLint depth)
-        : GLHardwarePixelBufferCommon(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
+        : GLHardwarePixelBufferCommon(width, height, depth, parent->getFormat(), (Usage)parent->getUsage(), parent),
           mTarget(parent->getGLES2TextureTarget()), mTextureID(parent->getGLID()),
           mLevel(level)
     {
@@ -239,10 +239,10 @@ namespace Ogre {
 
             // TU_AUTOMIPMAP is only enabled when there are no custom mips
             // so we do not have to care about overwriting
-            if ((mUsage & TU_AUTOMIPMAP) && (mLevel == 0)
-                    && (hasGLES30 || mTarget == GL_TEXTURE_2D || mTarget == GL_TEXTURE_CUBE_MAP))
+            if ((mLevel == 0) &&
+                    (hasGLES30 || mTarget == GL_TEXTURE_2D || mTarget == GL_TEXTURE_CUBE_MAP))
             {
-                OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
+                getParentTexture()->_markMipmapsDirty();
             }
         }
 
@@ -368,11 +368,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &tempFBO));
 
-        // Generate mipmaps
-        if (mUsage & TU_AUTOMIPMAP)
-        {
-            OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
-        }
+        // Mark the mipmaps for regeneration
+        getParentTexture()->_markMipmapsDirty();
     }
     //-----------------------------------------------------------------------------  
     // blitFromMemory doing hardware trilinear scaling

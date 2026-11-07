@@ -96,8 +96,57 @@ namespace Ogre
         size_t mActiveTextureUnit;
         /// A map of texture parameters for each texture unit
         TexUnitsMap mTexUnitsMap;
+
+        struct BoundTexture
+        {
+            size_t unit;
+            uint32 target;
+            uint32 texture;
+        };
+        /// The texture bound to each (texture unit, target), as set through bindGLTexture
+        std::vector<BoundTexture> mBoundTextures;
+
+        /// Records the binding of texture to target on the active texture unit
+        void recordBoundTexture(uint32 target, uint32 texture)
+        {
+            // one entry per (unit, target) actually used, so this stays short
+            for (auto& b : mBoundTextures)
+            {
+                if (b.unit == mActiveTextureUnit && b.target == target)
+                {
+                    b.texture = texture;
+                    return;
+                }
+            }
+            mBoundTextures.push_back({mActiveTextureUnit, target, texture});
+        }
+
+        /// Forgets a deleted texture; GL reverts its bindings to 0
+        void forgetBoundTexture(uint32 texture)
+        {
+            for (auto& b : mBoundTextures)
+            {
+                if (b.texture == texture)
+                    b.texture = 0;
+            }
+        }
     public:
         virtual ~GLStateCacheManagerCommon() {}
+
+        /** Gets the texture bound to a target on the active texture unit.
+
+         Only bindings made through bindGLTexture are known.
+         @param target The texture target.
+         */
+        uint32 getBoundTexture(uint32 target) const
+        {
+            for (const auto& b : mBoundTextures)
+            {
+                if (b.unit == mActiveTextureUnit && b.target == target)
+                    return b.texture;
+            }
+            return 0;
+        }
 
         /** Gets the current colour mask setting.
          @return An array containing the mask in RGBA order.

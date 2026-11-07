@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreMetalHardwarePixelBuffer.h"
 #include "OgreMetalRenderTexture.h"
 #include "OgreMetalRenderSystem.h"
+#include "OgreMetalTexture.h"
 #include "OgreRoot.h"
 
 #include "OgreMetalMappings.h"
@@ -38,8 +39,9 @@ THE SOFTWARE.
 namespace Ogre {
     MetalHardwarePixelBuffer::MetalHardwarePixelBuffer( uint32 width, uint32 height,
                                                         uint32 depth, PixelFormat format,
-                                                        bool hwGamma, HardwareBuffer::Usage usage )
-        : HardwarePixelBuffer(width, height, depth, format, usage, false),
+                                                        bool hwGamma, HardwareBuffer::Usage usage,
+                                                        Texture* parentTexture )
+        : HardwarePixelBuffer(width, height, depth, format, usage, false, parentTexture),
           mBuffer(width, height, depth, format)
     {
     }
@@ -218,11 +220,12 @@ namespace Ogre {
     MetalTextureBuffer::MetalTextureBuffer( __unsafe_unretained id<MTLTexture> renderTexture,
                                             __unsafe_unretained id<MTLTexture> resolveTexture,
                                             MetalDevice *device,
+                                            MetalTexture *parentTexture,
                                             const String &baseName, MTLTextureType target,
                                             int width, int height, int depth, PixelFormat format,
                                             int face, int level, Usage usage,
                                             bool writeGamma, uint fsaa ) :
-        MetalHardwarePixelBuffer(0, 0, 0, format, writeGamma, usage),
+        MetalHardwarePixelBuffer(0, 0, 0, format, writeGamma, usage, parentTexture),
         mTexture( renderTexture ? renderTexture : resolveTexture ),
         mTarget( target ),
         mBufferId( 0 ),
@@ -284,6 +287,7 @@ namespace Ogre {
     {
     }
 
+    //-----------------------------------------------------------------------------------
     void MetalTextureBuffer::upload(const PixelBox &data, const Box &dest)
     {
         if(PixelUtil::isCompressed(data.format) && (NSUInteger)mLevel == mTexture.mipmapLevelCount)
@@ -411,6 +415,9 @@ namespace Ogre {
         << " data format: " << PixelUtil::getFormatName(data.format);
         LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 #endif
+
+        if (mLevel == 0 && getParentTexture())
+            getParentTexture()->_markMipmapsDirty();
     }
 
     //-----------------------------------------------------------------------------------
@@ -549,7 +556,7 @@ namespace Ogre {
         int depth = src.getDepth();
 
         // Metal texture buffer
-        MetalTextureBuffer tex( mTexture, 0, 0, BLANKSTRING, target, width, height, depth,
+        MetalTextureBuffer tex( mTexture, 0, 0, nullptr, BLANKSTRING, target, width, height, depth,
                                 src.format,
                                 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY),
                                 src.format == mFormat ? mHwGamma : false, 0 );

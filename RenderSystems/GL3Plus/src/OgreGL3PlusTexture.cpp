@@ -321,15 +321,22 @@ namespace Ogre {
 
         createSurfaceList();
 
-        // Generate mipmaps after all texture levels have been loaded
-        // This is required for compressed formats such as DXT
-        if (PixelUtil::isCompressed(mFormat) && mUsage & TU_AUTOMIPMAP)
-        {
-            OGRE_CHECK_GL_ERROR(glGenerateMipmap(getGL3PlusTextureTarget()));
-        }
-
         // Get final internal format.
         mFormat = getBuffer(0,0)->getFormat();
+    }
+
+    void GL3PlusTexture::generateMipmapsImpl()
+    {
+        if (!mTextureID)
+            return;
+
+        // may run right before a draw, so restore the previous binding
+        GL3PlusStateCacheManager* cache = mRenderSystem->_getStateCacheManager();
+        GLenum target = getGL3PlusTextureTarget();
+        GLuint previous = cache->getBoundTexture(target);
+        cache->bindGLTexture(target, mTextureID);
+        OGRE_CHECK_GL_ERROR(glGenerateMipmap(target));
+        cache->bindGLTexture(target, previous);
     }
 
     void GL3PlusTexture::freeInternalResourcesImpl()

@@ -49,6 +49,7 @@ THE SOFTWARE.
 #include "OgreGLContext.h"
 #include "OgreGLSLProgramFactory.h"
 #include "OgreGLStateCacheManager.h"
+#include "OgreTextureManager.h"
 
 #include "OgreGLFBORenderTexture.h"
 #include "OgreGLPBRenderTexture.h"
@@ -2120,6 +2121,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLRenderSystem::_render(const RenderOperation& op)
     {
+        TextureManager::getSingleton()._flushMipmaps();
+
         // Call super class
         RenderSystem::_render(op);
 

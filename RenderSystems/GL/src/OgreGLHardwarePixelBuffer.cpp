@@ -83,7 +83,7 @@ void GLTextureBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
 //********* GLTextureBuffer
 GLTextureBuffer::GLTextureBuffer(GLRenderSystem* renderSystem, GLTexture* parent, GLint face,
                                  GLint level, uint32 width, uint32 height, uint32 depth)
-    : GLHardwarePixelBufferCommon(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
+    : GLHardwarePixelBufferCommon(width, height, depth, parent->getFormat(), (Usage)parent->getUsage(), parent),
       mTarget(parent->getGLTextureTarget()), mFaceTarget(0), mTextureID(parent->getGLID()),
       mLevel(level), mHwGamma(parent->isHardwareGammaEnabled()),
       mRenderSystem(renderSystem)
@@ -263,9 +263,9 @@ void GLTextureBuffer::upload(const PixelBox &data, const Box &dest)
 
     // TU_AUTOMIPMAP is only enabled when there are no custom mips
     // so we do not have to care about overwriting
-    if((mUsage & TU_AUTOMIPMAP) && (mLevel == 0))
+    if (mLevel == 0)
     {
-        glGenerateMipmapEXT(mTarget);
+        getParentTexture()->_markMipmapsDirty();
     }
 
     // Restore defaults
@@ -350,6 +350,10 @@ void GLTextureBuffer::copyFromFramebuffer(uint32 zoffset)
         glCopyTexSubImage3D(mFaceTarget, mLevel, 0, 0, zoffset, 0, 0, mWidth, mHeight);
         break;
     }
+
+    // the copy happens when the target is unbound, which can be after
+    // RenderTexture::_endUpdate() has already marked the texture
+    getParentTexture()->_markMipmapsDirty();
 }
 //-----------------------------------------------------------------------------  
 void GLTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox)
@@ -550,12 +554,8 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Box &srcBox, c
     /// Finish up 
     if(!tempTex)
     {
-        /// Generate mipmaps
-        if(mUsage & TU_AUTOMIPMAP)
-        {
-            mRenderSystem->_getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
-            glGenerateMipmapEXT(mTarget);
-        }
+        /// Mark the mipmaps for regeneration
+        getParentTexture()->_markMipmapsDirty();
     }
 
     /// Reset source texture to sane state

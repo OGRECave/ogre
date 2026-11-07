@@ -48,6 +48,7 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRenderWindow.h"
+#include "OgreTextureManager.h"
 #include "OgreGLES2PixelFormat.h"
 #include "OgreGLMultiRenderTarget.h"
 
@@ -1023,6 +1024,8 @@ namespace Ogre {
 
     void GLES2RenderSystem::_render(const RenderOperation& op)
     {
+        TextureManager::getSingleton()._flushMipmaps();
+
         // Call super class
         RenderSystem::_render(op);
 

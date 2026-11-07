@@ -46,7 +46,7 @@ namespace Ogre
 {
     VulkanHardwarePixelBuffer::VulkanHardwarePixelBuffer(VulkanTextureGpu* tex, uint32 width, uint32 height, uint32 depth,
                                                         uint8 face, uint32 mip)
-        : HardwarePixelBuffer(width, height, depth, tex->getFormat(), tex->getUsage(), false), mParent(tex),
+        : HardwarePixelBuffer(width, height, depth, tex->getFormat(), tex->getUsage(), false, tex), mParent(tex),
         mFace(face), mLevel(mip)
     {
         if(mParent->getUsage() & TU_RENDERTARGET)
@@ -147,9 +147,7 @@ namespace Ogre
                                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1u, &region);
         }
 
-        bool finalSlice = region.imageSubresource.baseArrayLayer == mParent->getNumLayers() - 1;
-        if((mParent->getUsage() & TU_AUTOMIPMAP) && finalSlice)
-            mParent->_autogenerateMipmaps();
+        mParent->_markMipmapsDirty();
         mStagingBuffer.reset();
     }
 
@@ -500,6 +498,13 @@ namespace Ogre
                                   VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0u,
                                   0, 0u, 0, 1u, &imageBarrier );
         }
+
+        mMipmapsDirty = false;
+    }
+    //-----------------------------------------------------------------------------------
+    void VulkanTextureGpu::generateMipmapsImpl()
+    {
+        _autogenerateMipmaps();
     }
     //-----------------------------------------------------------------------------------
     VkImageType VulkanTextureGpu::getVulkanTextureType( void ) const

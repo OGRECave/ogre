@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreD3D9HardwareOcclusionQuery.h"
 #include "OgreFrustum.h"
+#include "OgreTextureManager.h"
 #include "OgreD3D9MultiRenderTarget.h"
 #include "OgreCompositorManager.h"
 #include "OgreD3D9DeviceManager.h"
@@ -2987,6 +2988,8 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_render(const RenderOperation& op)
     {
+        TextureManager::getSingleton()._flushMipmaps();
+
         // Exit immediately if there is nothing to render
         // This caused a problem on FireGL 8800
         if (op.vertexData->vertexCount == 0)

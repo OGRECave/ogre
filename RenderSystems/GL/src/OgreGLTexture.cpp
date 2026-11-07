@@ -109,11 +109,6 @@ namespace Ogre {
         // This needs to be set otherwise the texture doesn't get rendered
         mRenderSystem->_getStateCacheManager()->setTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL,
                                                                  mNumMipmaps);
-
-        if ((mUsage & TU_AUTOMIPMAP) && mNumMipmaps)
-        {
-            mRenderSystem->_getStateCacheManager()->setTexParameteri( getGLTextureTarget(), GL_GENERATE_MIPMAP, GL_TRUE );
-        }
         
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
@@ -229,6 +224,20 @@ namespace Ogre {
 
     //*************************************************************************
     
+    void GLTexture::generateMipmapsImpl()
+    {
+        if (!mTextureID)
+            return;
+
+        // may run right before a draw, so restore the previous binding
+        GLStateCacheManager* cache = mRenderSystem->_getStateCacheManager();
+        GLenum target = getGLTextureTarget();
+        GLuint previous = cache->getBoundTexture(target);
+        cache->bindGLTexture(target, mTextureID);
+        glGenerateMipmapEXT(target);
+        cache->bindGLTexture(target, previous);
+    }
+
     void GLTexture::freeInternalResourcesImpl()
     {
         if (GLStateCacheManager* stateCacheManager = mRenderSystem->_getStateCacheManager())

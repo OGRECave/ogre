@@ -63,7 +63,7 @@ namespace Ogre {
 
     D3D11HardwarePixelBuffer::D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, UINT mipLevel,
         size_t width, size_t height, size_t depth, UINT face, PixelFormat format, HardwareBuffer::Usage usage):
-    HardwarePixelBuffer(width, height, depth, format, usage, false),
+    HardwarePixelBuffer(width, height, depth, format, usage, false, parentTexture),
         mParentTexture(parentTexture),
         mDevice(device),
         mFace(face),
@@ -223,7 +223,7 @@ namespace Ogre {
         else
             _unmap(mParentTexture->getTextureResource());
 
-        _genMipmaps();
+        mParentTexture->_markMipmapsDirty();
     }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Box &srcBox, const Box &dstBox)
@@ -272,7 +272,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, errorDescription, "D3D11HardwarePixelBuffer::blit");
         }
 
-        _genMipmaps();
+        mParentTexture->_markMipmapsDirty();
     }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dst)
@@ -350,7 +350,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, errorDescription, "D3D11HardwarePixelBuffer::blitFromMemory");
         }
 
-        _genMipmaps();
+        mParentTexture->_markMipmapsDirty();
     }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)
@@ -423,29 +423,6 @@ namespace Ogre {
         mDevice.GetImmediateContext()->Unmap(stagingTexture.Get(), srcSubresource);
     }
 
-    //-----------------------------------------------------------------------------  
-    void D3D11HardwarePixelBuffer::_genMipmaps()
-    {
-        if(mParentTexture->HasAutoMipMapGenerationEnabled())
-        {
-            ID3D11ShaderResourceView *pShaderResourceView = mParentTexture->getSrvView();
-            ID3D11DeviceContextN * context =  mDevice.GetImmediateContext();
-            context->GenerateMips(pShaderResourceView);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot generate mips\nError Description:" + errorDescription,
-                    "D3D11HardwarePixelBuffer::_genMipmaps");
-            }   
-        }
-
-    }
-    //-----------------------------------------------------------------------------    
-    D3D11Texture * D3D11HardwarePixelBuffer::getParentTexture() const
-    {
-        return mParentTexture;
-    }
     //-----------------------------------------------------------------------------    
     UINT D3D11HardwarePixelBuffer::getSubresourceIndex(size_t box_front) const
     {
