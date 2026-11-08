@@ -87,7 +87,6 @@ namespace Ogre {
         // explicit generateMipmaps() after it was marked
         if (TextureManager* tm = TextureManager::getSingletonPtr())
             tm->_removeMipmapsDirty(this);
-        mMipmapsDirty = false;
     }
     //--------------------------------------------------------------------------
     void Texture::_markMipmapsDirty()

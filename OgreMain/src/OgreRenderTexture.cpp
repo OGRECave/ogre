@@ -62,9 +62,10 @@ namespace Ogre
 
         for (RenderTexture* rt : mBoundSurfaces)
         {
-            if (rt)
-                if (Texture* tex = rt->mBuffer->getParentTexture())
-                    tex->_markMipmapsDirty();
+            if (!rt)
+                continue;
+            if (Texture* tex = rt->mBuffer->getParentTexture())
+                tex->_markMipmapsDirty();
         }
     }
 

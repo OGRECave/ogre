@@ -239,11 +239,8 @@ namespace Ogre {
 
             // TU_AUTOMIPMAP is only enabled when there are no custom mips
             // so we do not have to care about overwriting
-            if ((mLevel == 0) &&
-                    (hasGLES30 || mTarget == GL_TEXTURE_2D || mTarget == GL_TEXTURE_CUBE_MAP))
-            {
+            if (mLevel == 0)
                 getParentTexture()->_markMipmapsDirty();
-            }
         }
 
         // Restore defaults

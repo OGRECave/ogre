@@ -47,10 +47,15 @@ namespace Ogre {
 
 D3D9HardwarePixelBuffer::D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 
                                                  D3D9Texture* ownerTexture):
-    HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage, false, ownerTexture),
-    mOwnerTexture(ownerTexture)
+    HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage, false, ownerTexture)
 {   
 }
+//-----------------------------------------------------------------------------
+D3D9Texture* D3D9HardwarePixelBuffer::getParentTexture() const
+{
+    return static_cast<D3D9Texture*>(mOwningTexture);
+}
+//-----------------------------------------------------------------------------
 D3D9HardwarePixelBuffer::~D3D9HardwarePixelBuffer()
 {
     D3D9_DEVICE_ACCESS_CRITICAL_SECTION
@@ -126,7 +131,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *sur
         }
     }
 
-    if (isNewBuffer && mOwnerTexture->isLoaded() && mOwnerTexture->isManuallyLoaded())
+    if (isNewBuffer && getParentTexture()->isLoaded() && getParentTexture()->isManuallyLoaded())
     {
         DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
 
@@ -182,7 +187,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DVolume9 *volu
     mSlicePitch = mHeight*mWidth;
     mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
-    if (isNewBuffer && mOwnerTexture->isManuallyLoaded())
+    if (isNewBuffer && getParentTexture()->isManuallyLoaded())
     {
         DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
         
@@ -479,7 +484,7 @@ void D3D9HardwarePixelBuffer::unlockImpl(void)
     // 2. Unlock the locked buffer.
     it = mMapDeviceToBufferResources.begin();                           
     unlockBuffer( it->second);      
-    mOwnerTexture->_markMipmapsDirty();
+    getParentTexture()->_markMipmapsDirty();
 
     // in case we used this
     mStagingBuffer.freeMemory();
@@ -741,7 +746,7 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dst
         }
     }
 
-    mOwnerTexture->_markMipmapsDirty();
+    getParentTexture()->_markMipmapsDirty();
 
 }
 
@@ -941,7 +946,7 @@ D3D9HardwarePixelBuffer::createOrRetrieveResources(IDirect3DDevice9* d3d9Device)
 
     if (bufferResources == NULL)
     {
-        mOwnerTexture->createTextureResources(d3d9Device);
+        getParentTexture()->createTextureResources(d3d9Device);
         bufferResources = getBufferResources(d3d9Device);
     }
 

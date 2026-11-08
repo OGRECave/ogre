@@ -160,17 +160,10 @@ namespace Ogre
                                                     mipmap, mUsage, mHwGamma, mFSAA);
     }
     //-----------------------------------------------------------------------------------
-    void MetalTexture::_autogenerateMipmaps(void)
+    void MetalTexture::generateMipmapsImpl()
     {
         __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
         [blitEncoder generateMipmapsForTexture: mTexture];
-
-        // mSurfaceList[0]->getRenderTarget()->_setMipmapsUpdated();
-    }
-    //-----------------------------------------------------------------------------------
-    void MetalTexture::generateMipmapsImpl()
-    {
-        _autogenerateMipmaps();
     }
     //-----------------------------------------------------------------------------------
     id<MTLTexture> MetalTexture::getTextureForSampling( MetalRenderSystem *renderSystem )

@@ -61,8 +61,7 @@ namespace Ogre
                       MetalDevice *device );
         virtual ~MetalTexture();
 
-        void _autogenerateMipmaps(void);
-
+        /// @copydoc Texture::generateMipmapsImpl
         void generateMipmapsImpl() override;
 
         id<MTLTexture> getTextureForSampling( MetalRenderSystem *renderSystem );
