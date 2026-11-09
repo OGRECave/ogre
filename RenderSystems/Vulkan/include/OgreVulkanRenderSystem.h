@@ -53,6 +53,27 @@ namespace Ogre
     class _OgreVulkanExport VulkanRenderSystem : public RenderSystem
     {
         friend class VulkanSampler;
+        friend class VulkanTextureGpu;
+
+        /// descriptor set and pipeline layout shared by all graphics or all compute pipelines
+        struct DescriptorSetProfile
+        {
+            std::vector<VkDescriptorSetLayoutBinding> bindings;
+            std::vector<VkDescriptorPoolSize> poolSizes;
+            std::vector<VkWriteDescriptorSet> writes;
+            VkDescriptorSetLayout layout;
+            VkPipelineLayout pipelineLayout;
+            std::unordered_map<uint32, VkDescriptorSet> cache;
+            std::shared_ptr<VulkanDescriptorPool> pool;
+        };
+
+        enum DescriptorSetProfileId
+        {
+            DSP_GRAPHICS,
+            DSP_COMPUTE,
+            DSP_COUNT
+        };
+
         bool mInitialized;
         VulkanHardwareBufferManager *mHardwareBufferManager;
 
@@ -101,18 +122,20 @@ namespace Ogre
         VkPipelineRasterizationStateCreateInfo rasterState;
         VkPipelineColorBlendStateCreateInfo blendStateCi;
         std::array<VkPipelineShaderStageCreateInfo, GPT_COUNT> shaderStages;
+        VkPipelineShaderStageCreateInfo mComputeShaderStage;
         std::array<uint32, GPT_COUNT> mBoundGpuPrograms;
 
-        // descriptor set layout
-        std::vector<VkDescriptorSetLayoutBinding> mDescriptorSetBindings;
-        std::vector<VkDescriptorPoolSize> mDescriptorPoolSizes;
-        std::vector<VkWriteDescriptorSet> mDescriptorWrites;
+        std::array<DescriptorSetProfile, DSP_COUNT> mDescriptorSetProfiles;
         std::array<VkDescriptorBufferInfo, 2> mUBOInfo;
         std::array<uint32, 2> mUBODynOffsets;
         std::array<VkDescriptorImageInfo, OGRE_MAX_TEXTURE_LAYERS> mImageInfos;
-        VkDescriptorSetLayout mDescriptorSetLayout;
-
-        VkPipelineLayout mLayout;
+        /// images bound for unordered access via TextureUnitState::setUnorderedAccessMipLevel
+        std::array<VkDescriptorImageInfo, OGRE_MAX_TEXTURE_LAYERS> mStorageImageInfos;
+        std::array<VulkanTextureGpu*, OGRE_MAX_TEXTURE_LAYERS> mStorageTextures;
+        /// shared parameters of the compute program, bound as storage buffers
+        std::array<VkDescriptorBufferInfo, OGRE_MAX_TEXTURE_LAYERS> mStorageBufferInfos;
+        uint32 mNumStorageImageBindings;
+        uint32 mNumStorageBufferBindings;
 
         std::array<VkPipelineColorBlendAttachmentState, OGRE_MAX_MULTIPLE_RENDER_TARGETS> blendStates;
 
@@ -121,11 +144,9 @@ namespace Ogre
         VkRect2D   mScissorRect;
         VkPipelineViewportStateCreateInfo viewportStateCi;
 
-        std::unordered_map<uint32, VkDescriptorSet> mDescriptorSetCache;
         std::unordered_map<uint32, VkRenderPass> mRenderPassCache;
         std::unordered_map<uint32, VkPipeline> mPipelineCache;
-
-        std::shared_ptr<VulkanDescriptorPool> mDescriptorPool;
+        std::unordered_map<uint32, VkPipeline> mComputePipelineCache;
 
         // clears the pipeline cache
         void clearPipelineCache();
@@ -134,8 +155,15 @@ namespace Ogre
         void enumerateDevices();
         uint32 getSelectedDeviceIdx() const;
 
+        void initGraphicsDescriptorSetProfile( void );
+        void initComputeDescriptorSetProfile( void );
+        void bindStorageBuffers( const GpuProgramParametersPtr& params, uint16 variabilityMask );
+        void setStorageTexture( size_t unit, VulkanTextureGpu* tex, int mipmapLevel );
+
         VkDescriptorSet getDescriptorSet();
+        VkDescriptorSet getComputeDescriptorSet();
         VkPipeline getPipeline();
+        VkPipeline getComputePipeline();
     public:
         VulkanRenderSystem();
         ~VulkanRenderSystem();
@@ -168,6 +196,7 @@ namespace Ogre
         void _endFrame( void ) override;
 
         void _render( const RenderOperation &op ) override;
+        void _dispatchCompute( const Vector3i &workgroupDim ) override;
 
         void bindGpuProgram(GpuProgram* prg) override;
         void bindGpuProgramParameters( GpuProgramType gptype,
