@@ -92,6 +92,7 @@ namespace Ogre {
         mActiveTextureUnit = 0;
         mClearDepth = 1.0f;
         mLastBoundTexID = 0;
+        mBoundTextures.clear();
         mShininess = 0.0f;
         mPolygonMode = GL_FILL;
         mShadeModel = GL_SMOOTH;
@@ -214,6 +215,7 @@ namespace Ogre {
 #ifdef OGRE_ENABLE_STATE_CACHE
         mTexUnitsMap.erase(texture);
 #endif
+        forgetBoundTexture(texture);
     }
 
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
@@ -253,6 +255,7 @@ namespace Ogre {
     void GLStateCacheManager::bindGLTexture(GLenum target, GLuint texture)
     {
         mLastBoundTexID = texture;
+        recordBoundTexture(target, texture);
         
         // Update GL
         glBindTexture(target, texture);

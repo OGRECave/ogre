@@ -105,6 +105,23 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
+    void D3D11Texture::generateMipmapsImpl()
+    {
+        if (!HasAutoMipMapGenerationEnabled())
+            return;
+
+        ID3D11ShaderResourceView *pShaderResourceView = getSrvView();
+        ID3D11DeviceContextN * context = mDevice.GetImmediateContext();
+        context->GenerateMips(pShaderResourceView);
+        if (mDevice.isError())
+        {
+            String errorDescription = mDevice.getErrorDescription();
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                "D3D11 device cannot generate mips\nError Description:" + errorDescription,
+                "D3D11Texture::generateMipmapsImpl");
+        }
+    }
+    //---------------------------------------------------------------------
     void D3D11Texture::freeInternalResourcesImpl()
     {
         mpTex.Reset();

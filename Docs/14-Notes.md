@@ -25,6 +25,8 @@ Since 14.5, `GpuProgramParameters::setUseLinearColours` can be used to specify t
 
 Since 14.6, `GpuSharedParameters` may contain auto constants, which allows sharing automatically updated values across programs.
 
+Since 14.7, automatic mipmap generation is batched: uploads only mark the texture, and all marked textures are regenerated once before the next draw instead of after every upload. Uploading the faces of a cubemap or the slices of an array one by one now costs one generation. Call `Texture::generateMipmaps()` if the mip levels are needed immediately, e.g. before reading them back. On Metal, textures updated during an active render pass are regenerated at the next `_beginFrame()`.
+
 ### OgreUnifiedShader.h
 
 Sampler definitions now implicitly include the `uniform` keyword to support Vulkan; i.e. this will generate an error:

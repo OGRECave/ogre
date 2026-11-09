@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 #include "OgreHardwareOcclusionQuery.h"
 #include "OgreComponents.h"
+#include "OgreTextureManager.h"
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #include "OgreRTShaderConfig.h"
@@ -500,6 +501,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::_beginFrame(void)
     {
+        TextureManager::getSingleton()._flushMipmaps();
+
         if (!mActiveViewport)
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Cannot begin frame - no viewport selected.");
     }

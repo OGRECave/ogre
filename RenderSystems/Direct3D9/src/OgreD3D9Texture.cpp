@@ -210,6 +210,30 @@ namespace Ogre
     }
 
     /****************************************************************************************/
+    void D3D9Texture::generateMipmapsImpl()
+    {
+        D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
+        // every device holds its own copy, and uploads update all of them
+        for (auto& it : mMapDeviceToTextureResources)
+        {
+            IDirect3DBaseTexture9* baseTex = it.second->pBaseTex;
+            if (!baseTex)
+                continue;
+
+            if (mMipmapsHardwareGenerated)
+            {
+                baseTex->GenerateMipSubLevels();
+            }
+            else if (D3DXFilterTexture(baseTex, NULL, D3DX_DEFAULT, D3DX_DEFAULT) != D3D_OK)
+            {
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "Failed to filter texture (generate mipmaps)",
+                            "D3D9Texture::generateMipmapsImpl");
+            }
+        }
+    }
+    /****************************************************************************************/
     void D3D9Texture::freeInternalResourcesImpl()
     {
         D3D9_DEVICE_ACCESS_CRITICAL_SECTION
@@ -1073,9 +1097,6 @@ namespace Ogre
 
                 D3D9HardwarePixelBuffer* currPixelBuffer = GETLEVEL(0, mip);
                                 
-                if (mip == 0 && mNumMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
-                    currPixelBuffer->_setMipmapping(true, mMipmapsHardwareGenerated);
-
                 currPixelBuffer->bind(d3d9Device, surface, textureResources->pFSAASurface,
                     mHwGammaWriteSupported, mFSAA, mName, textureResources->pBaseTex);
 
@@ -1099,9 +1120,6 @@ namespace Ogre
                     D3D9HardwarePixelBuffer* currPixelBuffer = GETLEVEL(face, mip);
                     
                     
-                    if (mip == 0 && mNumMipmaps != 0 && (mUsage & TU_AUTOMIPMAP) && face == 5)
-                        currPixelBuffer->_setMipmapping(true, mMipmapsHardwareGenerated);
-
                     currPixelBuffer->bind(d3d9Device, surface, textureResources->pFSAASurface,
                         mHwGammaWriteSupported, mFSAA, mName, textureResources->pBaseTex);
 
@@ -1123,9 +1141,6 @@ namespace Ogre
                 D3D9HardwarePixelBuffer* currPixelBuffer = GETLEVEL(0, mip);
 
                 currPixelBuffer->bind(d3d9Device, volume, textureResources->pBaseTex);
-
-                if (mip == 0 && mNumMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
-                    currPixelBuffer->_setMipmapping(true, mMipmapsHardwareGenerated);
 
                 // decrement reference count, the GetSurfaceLevel call increments this
                 // this is safe because the pixel buffer keeps a reference as well

@@ -137,13 +137,6 @@ namespace Ogre
 
         createMetalTexResource();
         createSurfaceList();
-
-        if( (mUsage & TU_AUTOMIPMAP) &&
-            mNumMipmaps && mMipmapsHardwareGenerated )
-        {
-            __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
-            [blitEncoder generateMipmapsForTexture:mTexture];
-        }
     }
     void MetalTexture::freeInternalResourcesImpl(void)
     {
@@ -162,17 +155,15 @@ namespace Ogre
             resolveTexture  = mTexture;
         }
 
-        return std::make_shared<MetalTextureBuffer>(renderTexture, resolveTexture, mDevice, mName,
+        return std::make_shared<MetalTextureBuffer>(renderTexture, resolveTexture, mDevice, this, mName,
                                                     getMetalTextureTarget(), width, height, depth, mFormat, face,
                                                     mipmap, mUsage, mHwGamma, mFSAA);
     }
     //-----------------------------------------------------------------------------------
-    void MetalTexture::_autogenerateMipmaps(void)
+    void MetalTexture::generateMipmapsImpl()
     {
         __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
         [blitEncoder generateMipmapsForTexture: mTexture];
-
-        // mSurfaceList[0]->getRenderTarget()->_setMipmapsUpdated();
     }
     //-----------------------------------------------------------------------------------
     id<MTLTexture> MetalTexture::getTextureForSampling( MetalRenderSystem *renderSystem )
@@ -220,14 +211,6 @@ namespace Ogre
                     //Fsaa texture before it has been resolved
                     retVal = mMsaaTexture;
                 }
-            }
-
-            if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET)) ==
-                    (TU_AUTOMIPMAP|TU_RENDERTARGET) )
-            {
-                // RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
-                // if( renderTarget->isMipmapsDirty() )
-                    this->_autogenerateMipmaps();
             }
         }
 

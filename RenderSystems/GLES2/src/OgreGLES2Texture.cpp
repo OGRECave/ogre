@@ -320,6 +320,24 @@ namespace Ogre {
         }
         mTextureID = 0;
     }
+
+    void GLES2Texture::generateMipmapsImpl()
+    {
+        if (!mTextureID || !mMipmapsHardwareGenerated)
+            return;
+
+        GLenum target = getGLES2TextureTarget();
+        bool hasGLES30 = mRenderSystem->hasMinGLVersion(3, 0);
+        if (!hasGLES30 && target != GL_TEXTURE_2D && target != GL_TEXTURE_CUBE_MAP)
+            return;
+
+        // may run right before a draw, so restore the previous binding
+        GLES2StateCacheManager* cache = mRenderSystem->_getStateCacheManager();
+        GLuint previous = cache->getBoundTexture(target);
+        cache->bindGLTexture(target, mTextureID);
+        OGRE_CHECK_GL_ERROR(glGenerateMipmap(target));
+        cache->bindGLTexture(target, previous);
+    }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2Texture::notifyOnContextLost()
