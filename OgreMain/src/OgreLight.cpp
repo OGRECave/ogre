@@ -879,7 +879,7 @@ namespace Ogre {
         const NameValuePairList* params)
     {
 
-        Light* light = OGRE_NEW Light(name);
+        std::unique_ptr<Light> light(OGRE_NEW Light(name));
  
         if(params)
         {
@@ -943,6 +943,6 @@ namespace Ogre {
                 light->setSpotlightFalloff(StringConverter::parseReal(ni->second));
         }
 
-        return light;
+        return light.release();
     }
 } // Namespace
