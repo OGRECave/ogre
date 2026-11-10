@@ -228,6 +228,9 @@ protected:
     btCollisionWorld* mBtWorld;
 
 public:
+    /// mesh of an internally created trimesh shape, which does not own it
+    std::unique_ptr<btStridingMeshInterface> mMeshInterface;
+
     CollisionObject(btCollisionObject* btBody, btCollisionWorld* btWorld) : mBtBody(btBody), mBtWorld(btWorld) {}
     virtual ~CollisionObject()
     {
@@ -324,6 +327,8 @@ btRigidBody* DynamicsWorld::addRigidBody(float mass, Entity* ent, ColliderType c
 
     // transfer ownership to node
     auto objWrapper = std::make_shared<RigidBody>(rb, mBtWorld);
+    if (ct == CT_TRIMESH)
+        objWrapper->mMeshInterface.reset(static_cast<btTriangleMeshShape*>(cs)->getMeshInterface());
     node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
 
     return rb;
@@ -402,6 +407,8 @@ btCollisionObject* CollisionWorld::addCollisionObject(Entity* ent, ColliderType 
 
     // transfer ownership to node
     auto objWrapper = std::make_shared<CollisionObject>(co, mBtWorld);
+    if (ct == CT_TRIMESH)
+        objWrapper->mMeshInterface.reset(static_cast<btTriangleMeshShape*>(cs)->getMeshInterface());
     node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
 
     return co;
