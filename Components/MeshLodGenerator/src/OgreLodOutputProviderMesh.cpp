@@ -35,6 +35,7 @@ namespace Ogre
     {
         LodOutputProvider::prepare(data);
 
+        mMesh->removeLodLevels();
         size_t submeshCount = mMesh->getNumSubMeshes();
 
         // Create buffers.
