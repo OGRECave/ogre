@@ -130,7 +130,7 @@ namespace Ogre {
         else
         {
             SettingsMultiMap::const_iterator i = seci->second.lower_bound(key);
-            if (i == seci->second.end())
+            if (i == seci->second.end() || i->first != key)
             {
                 return defaultValue;
             }
