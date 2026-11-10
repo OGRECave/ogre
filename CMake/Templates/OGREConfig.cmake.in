@@ -170,7 +170,12 @@ endif()
 cmake_policy(POP)
 
 if(@OGRE_STATIC@)
-    list(APPEND OGRE_LIBRARIES OgreGLSupport@OGRE_LIB_SUFFIX@ @CMAKE_DL_LIBS@) # glXXw uses dlopen
+    if(TARGET OgreGLSupport)
+        # OgreGLSupport is exported as an imported target. Use the target name
+        # rather than the static output name, so that consumers do not have to
+        # add the install library directory to the linker search path.
+        list(APPEND OGRE_LIBRARIES OgreGLSupport @CMAKE_DL_LIBS@) # glXXw uses dlopen
+    endif()
     list(APPEND OGRE_LIBRARY_DIRS "${OGRE_LIBRARY_DIRS}/OGRE") # plugins folder
 endif()
 
