@@ -106,7 +106,28 @@ namespace Ogre
         {
             // For directional lights, all we care about is projecting the receivers
             // backwards towards the light, clipped by the camera region
-            mBodyB.clip(receiverBB.intersection(sceneBB));
+            mBodyB.clip(receiverBB);
+
+            // A caster can only shadow receivers behind it along the light direction. Clip with the
+            // caster bounds swept along the light direction instead of the caster bounds themselves,
+            // so receivers below the casters are still covered (#2928), while a huge receiver-only
+            // plane is still limited to the casters' footprint.
+            const Vector3& d = light.getDerivedDirection();
+            Vector3 u = d.perpendicular();
+            Vector3 v = d.crossProduct(u);
+            Vector3 minP(Math::POS_INFINITY), maxP(Math::NEG_INFINITY);
+            for (const auto& c : sceneBB.getAllCorners())
+            {
+                Vector3 p(u.dotProduct(c), v.dotProduct(c), d.dotProduct(c));
+                minP.makeFloor(p);
+                maxP.makeCeil(p);
+            }
+            // keepNegative: keep the half-space on the plane's negative side
+            mBodyB.clip(Plane(u, maxP.x));
+            mBodyB.clip(Plane(-u, -minP.x));
+            mBodyB.clip(Plane(v, maxP.y));
+            mBodyB.clip(Plane(-v, -minP.y));
+            mBodyB.clip(Plane(-d, -minP.z));
 
             // Also clip based on shadow far distance if appropriate
             Real farDist = light.getShadowFarDistance();
@@ -265,9 +286,8 @@ namespace Ogre
         const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
         AxisAlignedBox sceneBB = visInfo.aabb;
         AxisAlignedBox receiverAABB = sm->getVisibleObjectsBoundsInfo(cam).receiverAabb;
-        sceneBB.merge(cam->getDerivedPosition());
 
-        // in case the sceneBB is empty (e.g. nothing visible to the cam) simply
+        // in case the sceneBB is empty (e.g. no casters visible to the light) simply
         // return the standard shadow mapping matrix
         if (sceneBB.isNull())
         {
@@ -277,6 +297,9 @@ namespace Ogre
         // calculate the intersection body B
         mPointListBodyB.reset();
         calculateB(*sm, *cam, *light, sceneBB, receiverAABB, &mPointListBodyB);
+
+        // B only depends on the casters, but the LVS must contain the camera
+        sceneBB.merge(cam->getDerivedPosition());
 
         // in case the bodyB is empty (e.g. nothing visible to the light or the cam)
         // simply return the standard shadow mapping matrix

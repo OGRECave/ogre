@@ -225,9 +225,8 @@ namespace Ogre
         const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
         AxisAlignedBox sceneBB = visInfo.aabb;
         AxisAlignedBox receiverAABB = sm->getVisibleObjectsBoundsInfo(cam).receiverAabb;
-        sceneBB.merge(cam->getDerivedPosition());
 
-        // in case the sceneBB is empty (e.g. nothing visible to the cam) simply
+        // in case the sceneBB is empty (e.g. no casters visible to the light) simply
         // return the standard shadow mapping matrix
         if (sceneBB.isNull())
         {
@@ -237,6 +236,9 @@ namespace Ogre
         // calculate the intersection body B
         mPointListBodyB.reset();
         calculateB(*sm, *cam, *light, sceneBB, receiverAABB, &mPointListBodyB);
+
+        // B only depends on the casters, but the LVS must contain the camera
+        sceneBB.merge(cam->getDerivedPosition());
 
         // in case the bodyB is empty (e.g. nothing visible to the light or the cam)
         // simply return the standard shadow mapping matrix
