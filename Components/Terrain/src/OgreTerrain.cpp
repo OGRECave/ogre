@@ -710,7 +710,6 @@ namespace Ogre
         if(mainChunk->version == 1)
         {
             // Load delta data
-            mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
             stream.read(mDeltaData, numVertices);
         }
 
