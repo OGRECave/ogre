@@ -355,7 +355,7 @@ public:
         : RigidBody(btBody, btWorld), hfdata(data) {}
     ~TerrainRigidBody()
     {
-        delete hfdata.terrainHeights;
+        delete[] hfdata.terrainHeights;
     }
 };
 btRigidBody* DynamicsWorld::addTerrainRigidBody(TerrainGroup* terrainGroup, long x, long y, int group, int mask, bool debugDraw)
