@@ -385,13 +385,15 @@ namespace Ogre
                     continue;
                 TRect<int> r;
                 stbtt_GetGlyphBitmapBox(font, idx, scale, scale, &r.left, &r.top, &r.right, &r.bottom);
-                max_height = std::max(r.height(), max_height);
+                // FreeType uses 2 * bitmap.rows - bearingY as the cell height. For
+                // the stb bitmap box, rows is r.height() and bearingY is -r.top,
+                // which reduces to r.height() + r.bottom.
+                max_height = std::max(r.height() + r.bottom, max_height);
                 mTtfMaxBearingY = std::max(-r.top, mTtfMaxBearingY);
                 max_width = std::max(r.width(), max_width);
             }
         }
 
-        max_height *= 1.125;
         return font;
 #endif
     }
