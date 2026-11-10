@@ -230,6 +230,8 @@ protected:
 public:
     /// mesh of an internally created trimesh shape, which does not own it
     std::unique_ptr<btStridingMeshInterface> mMeshInterface;
+    /// listener allocated by attachCollisionObject
+    std::unique_ptr<EntityCollisionListener> mListener;
 
     CollisionObject(btCollisionObject* btBody, btCollisionWorld* btWorld) : mBtBody(btBody), mBtWorld(btWorld) {}
     virtual ~CollisionObject()
@@ -441,8 +443,9 @@ void CollisionWorld::attachCollisionObject(btCollisionObject* collisionObject, E
         mBtWorld->addCollisionObject(collisionObject, group, mask);
 
     // transfer ownership to node
-    collisionObject->setUserPointer(new EntityCollisionListener{ent, nullptr});
     auto objWrapper = std::make_shared<CollisionObject>(collisionObject, mBtWorld);
+    objWrapper->mListener.reset(new EntityCollisionListener{ent, nullptr});
+    collisionObject->setUserPointer(objWrapper->mListener.get());
     node->getUserObjectBindings().setUserAny("BtCollisionObject", objWrapper);
 }
 
