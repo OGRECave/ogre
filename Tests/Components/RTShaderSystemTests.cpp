@@ -103,6 +103,29 @@ TEST_F(RTShaderSystem, TargetRenderState)
     EXPECT_TRUE(pass->hasGpuProgram(GPT_FRAGMENT_PROGRAM));
 }
 
+TEST_F(RTShaderSystem, SubRenderStateInstances)
+{
+    using namespace RTShader;
+    auto& shaderGen = ShaderGenerator::getSingleton();
+    auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
+
+    shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme");
+    auto renderState = shaderGen.getRenderState("MyScheme");
+    renderState->setLightCountAutoUpdate(false);
+
+    auto templateSRS = shaderGen.createSubRenderState(SRS_TRANSFORM);
+    renderState->addTemplateSubRenderState(templateSRS);
+
+    shaderGen.validateMaterial("MyScheme", *mat);
+
+    // the instance used by the generated pass must be reachable from the template
+    const auto& instances = templateSRS->getAccessor()->getSubRenderStateInstanceSet();
+    ASSERT_EQ(instances.size(), size_t(1));
+    EXPECT_EQ((*instances.begin())->getType(), SRS_TRANSFORM);
+
+    shaderGen.removeShaderBasedTechnique(mat->getTechniques()[0], "MyScheme");
+}
+
 TEST_F(RTShaderSystem, ClusteredLightCulling)
 {
     auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);

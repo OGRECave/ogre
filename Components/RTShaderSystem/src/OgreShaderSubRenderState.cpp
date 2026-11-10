@@ -113,7 +113,12 @@ SubRenderState& SubRenderState::operator=(const SubRenderState& rhs)
 
     copyFrom(rhs);
 
-    SubRenderStateAccessorPtr rhsAccessor = rhs.getAccessor();
+    if (mOtherAccessor)
+        mOtherAccessor->removeSubRenderStateInstance(this);
+
+    // register with the template rhs was copied from, so intermediate copies
+    // (e.g. when merging render states) do not hide the final instances
+    SubRenderStateAccessorPtr rhsAccessor = rhs.mOtherAccessor ? rhs.mOtherAccessor : rhs.getAccessor();
 
     rhsAccessor->addSubRenderStateInstance(this);
     mOtherAccessor = rhsAccessor;
