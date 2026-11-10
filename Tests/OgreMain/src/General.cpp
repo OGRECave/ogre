@@ -822,3 +822,13 @@ TEST(ParticleEmitter, AngleAbove180EmitsInAllDirections)
 
     Math::SetRandomValueProvider(NULL);
 }
+
+TEST(ConfigFile, MissingKeyReturnsDefault)
+{
+    static char text[] = "b = 2\n";
+    ConfigFile cf;
+    cf.load(std::make_shared<MemoryDataStream>(text, sizeof(text) - 1));
+
+    EXPECT_EQ(cf.getSetting("b"), "2");
+    EXPECT_EQ(cf.getSetting("a", "", "default"), "default");
+}
