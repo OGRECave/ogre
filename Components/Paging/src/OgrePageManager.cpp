@@ -73,7 +73,10 @@ namespace Ogre
             c->removeListener(&mEventRouter);
         }
         mCameraList.clear();
-        
+
+        for (auto& w : mWorlds)
+            OGRE_DELETE w.second;
+
         OGRE_DELETE mGrid3DPageStrategy;
         OGRE_DELETE mGrid2DPageStrategy;
         OGRE_DELETE mSimpleCollectionFactory;
