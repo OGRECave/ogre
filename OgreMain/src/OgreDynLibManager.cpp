@@ -57,10 +57,10 @@ namespace Ogre
         }
         else
         {
-            DynLib* pLib = OGRE_NEW DynLib(filename);
-            pLib->load();        
-            mLibList[filename] = pLib;
-            return pLib;
+            std::unique_ptr<DynLib> pLib(OGRE_NEW DynLib(filename));
+            pLib->load();
+            mLibList[filename] = pLib.get();
+            return pLib.release();
         }
     }
     //-----------------------------------------------------------------------
