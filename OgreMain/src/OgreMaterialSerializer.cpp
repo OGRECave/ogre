@@ -878,6 +878,11 @@ namespace Ogre
                 {
                     writeValue(PixelUtil::getFormatName(pTex->getDesiredFormat()));
                 }
+
+                if (pTex->isHardwareGammaEnabled())
+                {
+                    writeValue("gamma");
+                }
             }
 
             //anim. texture
@@ -887,6 +892,8 @@ namespace Ogre
                 for (unsigned int n = 0; n < pTex->getNumFrames(); n++)
                     writeValue(quoteWord(pTex->getFrameTextureName(n)));
                 writeValue(StringConverter::toString(pTex->getAnimationDuration()));
+                if (pTex->isHardwareGammaEnabled())
+                    writeValue("gamma");
             }
 
             //anisotropy level
