@@ -299,7 +299,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const String& OverlayElement::getMaterialName(void) const
     {
-        return mMaterial ? mMaterial->getName() : BLANKSTRING;
+        static const String blank;
+        return mMaterial ? mMaterial->getName() : blank;
     }
     //---------------------------------------------------------------------
     void OverlayElement::setMaterial(const MaterialPtr& mat)

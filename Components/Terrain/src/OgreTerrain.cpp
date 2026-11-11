@@ -1736,13 +1736,14 @@ namespace Ogre
     //---------------------------------------------------------------------
     const String& Terrain::getLayerTextureName(uint8 layerIndex, uint8 samplerIndex) const
     {
+        static const String blank;
         if (layerIndex < mLayers.size() && samplerIndex < mLayerDecl.size())
         {
             return mLayers[layerIndex].textureNames[samplerIndex];
         }
         else
         {
-            return BLANKSTRING;
+            return blank;
         }
 
     }

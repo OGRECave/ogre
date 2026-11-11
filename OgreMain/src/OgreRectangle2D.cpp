@@ -201,10 +201,9 @@ namespace Ogre {
 
     const String& Rectangle2D::getMovableType() const
     {
-        return MOT_RECTANGLE2D;
+        static const String name = MOT_RECTANGLE2D;
+        return name;
     }
-
-    const String MOT_RECTANGLE2D = "Rectangle2D";
 
     MovableObject* Rectangle2DFactory::createInstanceImpl(const String& name, const NameValuePairList* params)
     {

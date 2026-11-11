@@ -215,11 +215,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& TextureUnitState::getTextureName(void) const
     {
+        static const String blank;
         // Return name of current frame
         if (mCurrentFrame < mFramePtrs.size() && mFramePtrs[mCurrentFrame])
             return mFramePtrs[mCurrentFrame]->getName();
         else
-            return BLANKSTRING;
+            return blank;
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTextureName( const String& name)
@@ -460,9 +461,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& TextureUnitState::getFrameTextureName(unsigned int frameNumber) const
     {
+        static const String blank;
         OgreAssert(frameNumber < mFramePtrs.size(), "out of range");
 
-        return mFramePtrs[0] ? mFramePtrs[frameNumber]->getName() : BLANKSTRING;
+        return mFramePtrs[0] ? mFramePtrs[frameNumber]->getName() : blank;
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setDesiredFormat(PixelFormat desiredFormat)
