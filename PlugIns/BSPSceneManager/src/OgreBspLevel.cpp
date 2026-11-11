@@ -120,6 +120,8 @@ namespace Ogre {
 
         loadQuake3Level(q3);
 
+        // loaded outside of Resource::load, so mark it for unload() to free the data
+        mLoadingState.store(LOADSTATE_LOADED);
     }
     //-----------------------------------------------------------------------
     void BspLevel::unloadImpl()
