@@ -101,33 +101,24 @@ namespace Ogre
         }
     }
 
+    // The LOD output providers always allocate 32-bit index buffers (see
+    // createIndexBufferImpl), so the write stride must always be 32-bit as well.
+    // Deriving the stride from the source index size (mIndexBufferInfoList[..].indexSize)
+    // could disagree with the element size of the buffer we actually allocated and
+    // overflow it. Both sides must use the same element size.
     inline void writeTriangle(LodData * data, size_t i)
     {
-        if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-            for (unsigned int m : data->mTriangleList[i].vertexID) {
-                *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
-                    static_cast<uint16>(m);
-            }
-        } else {
-            for (unsigned int m : data->mTriangleList[i].vertexID) {
-                *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
-                    static_cast<uint32>(m);
-            }
+        for (unsigned int m : data->mTriangleList[i].vertexID) {
+            *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
+                static_cast<uint32>(m);
         }
     }
 
     inline void writeLine(LodData * data, size_t i)
     {
-        if (data->mIndexBufferInfoList[data->mLineList[i].submeshID].indexSize == 2) {
-            for (unsigned int m : data->mLineList[i].vertexID) {
-                *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pshort++) =
-                    static_cast<uint16>(m);
-            }
-        } else {
-            for (unsigned int m : data->mLineList[i].vertexID) {
-                *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pint++) =
-                    static_cast<uint32>(m);
-            }
+        for (unsigned int m : data->mLineList[i].vertexID) {
+            *(data->mIndexBufferInfoList[data->mLineList[i].submeshID].buf.pint++) =
+                static_cast<uint32>(m);
         }
     }
 
