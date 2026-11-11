@@ -275,7 +275,20 @@ struct ImGuiConfigDialog : Ogre::FrameListener
         auto center = ImGui::GetMainViewport()->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
         ImGui::Begin("Rendering Settings", NULL, flags);
+
+        // the option list can be taller than the window, which is created at a fixed
+        // size. Scroll it instead of pushing the buttons out of the window.
+        const ImGuiStyle& style = ImGui::GetStyle();
+        const ImGuiViewport* vp = ImGui::GetMainViewport();
+        const float footerHeight = ImGui::GetFrameHeightWithSpacing() + style.ItemSpacing.y;
+        const ImVec2 maxSize(vp->WorkSize.x - style.DisplaySafeAreaPadding.x * 2 - style.WindowPadding.x * 2,
+                             vp->WorkSize.y - style.DisplaySafeAreaPadding.y * 2 - ImGui::GetFrameHeight() -
+                                 style.WindowPadding.y * 2 - footerHeight - style.ItemSpacing.y * 3);
+        ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), maxSize);
+        ImGui::BeginChild("##options", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
         Ogre::DrawRenderingSettings(nextRenderer);
+        ImGui::EndChild();
+
         ImGui::Separator();
         if (ImGui::Button("Accept"))
         {
