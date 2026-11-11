@@ -319,15 +319,22 @@ void ApplicationContextBase::runRenderingSettingsDialog()
     getRoot()->startRendering();
 
     destroyDummyScene();
-    shutdown();
-    mRoot->shutdown();
+
     if(dialog.saveConfig)
-    {
         mRoot->setRenderSystem(mRoot->getRenderSystemByName(dialog.nextRenderer));
-        mRoot->saveConfig();
+
+    shutdown();
+
+    // some backends (e.g. SDL) release the Root in shutdown(), as the render system
+    // has to go down before the native display. Only clean up if they did not.
+    if(mRoot)
+    {
+        if(dialog.saveConfig)
+            mRoot->saveConfig();
+        mRoot->shutdown();
+        OGRE_DELETE mRoot;
+        mRoot = NULL;
     }
-    delete mRoot;
-    mRoot = NULL;
 #endif
 }
 
