@@ -806,6 +806,14 @@ CameraGizmo::CameraGizmo(Viewport* viewport)
     mViewport->addListener(this);
 }
 
+CameraGizmo::~CameraGizmo()
+{
+    if (mViewport)
+        mViewport->removeListener(this);
+}
+
+void CameraGizmo::viewportDestroyed(Ogre::Viewport* viewport) { mViewport = nullptr; }
+
 void CameraGizmo::viewportDimensionsChanged(Ogre::Viewport* viewport)
 {
     const float nx = mOverlayLeft + mOverlayWidth * 0.5f;
