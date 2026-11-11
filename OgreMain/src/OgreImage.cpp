@@ -234,7 +234,7 @@ namespace Ogre {
         size_t size = calculateSize(numMipMaps, numFaces, uWidth, uHeight, uDepth, eFormat);
         OgreAssert(size == stream->size(), "Wrong stream size");
 
-        uchar *buffer = OGRE_ALLOC_T(uchar, size, MEMCATEGORY_GENERAL);
+        uchar *buffer = (uchar*)malloc(size);
         stream->read(buffer, size);
 
         return loadDynamicImage(buffer,
