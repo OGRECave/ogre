@@ -136,6 +136,19 @@ THE SOFTWARE.
 #	define OGRE_NORETURN
 #endif
 
+/* define an constexpr macros for different support levels */
+#if __cpp_constexpr >= 202002L
+#define OGRE_CPP20_CONSTEXPR constexpr
+#else
+#define OGRE_CPP20_CONSTEXPR
+#endif
+
+#if __cpp_constexpr >= 202211L
+#define OGRE_CPP23_CONSTEXPR constexpr
+#else
+#define OGRE_CPP23_CONSTEXPR
+#endif
+
 /* Finds the current platform */
 #if (defined( __WIN32__ ) || defined( _WIN32 )) && !defined(__ANDROID__)
 #   include <sdkddkver.h>
