@@ -81,13 +81,14 @@ namespace Ogre
             return;
         }
 
-        static SubRenderStateFactory* factory = nullptr;
-        if(!factory)
+        // register with the current ShaderGenerator, which might have been re-created since
+        static SubRenderStateFactory* transformFactory = new TerrainTransformFactory;
+        static SubRenderStateFactory* surfaceFactory = new TerrainSurfaceFactory;
+        auto& shaderGen = ShaderGenerator::getSingleton();
+        if (!shaderGen.getSubRenderStateFactory(transformFactory->getType()))
         {
-            factory = new TerrainTransformFactory;
-            ShaderGenerator::getSingleton().addSubRenderStateFactory(factory);
-            factory = new TerrainSurfaceFactory;
-            ShaderGenerator::getSingleton().addSubRenderStateFactory(factory);
+            shaderGen.addSubRenderStateFactory(transformFactory);
+            shaderGen.addSubRenderStateFactory(surfaceFactory);
         }
 
         mMainRenderState.reset(new RenderState());
