@@ -65,6 +65,13 @@ protected:
         mScale = mTrayMgr->createButton(TL_TOPLEFT, "Scale", "Scale");
     }
 
+    void cleanupContent() override
+    {
+        delete mCameraGizmo;
+        delete mGizmo;
+        mSceneMgr->destroyQuery(mRayQuery);
+    }
+
     bool mousePressed(const MouseButtonEvent& evt) override
     {
         if (evt.button == BUTTON_LEFT)
