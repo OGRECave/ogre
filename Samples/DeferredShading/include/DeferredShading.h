@@ -46,6 +46,9 @@ The wiki article explaining this demo can be found here :
 using namespace Ogre;
 using namespace OgreBites;
 
+class GBufferSchemeHandler;
+class DeferredLightCompositionPass;
+
 /** System to manage Deferred Shading for a camera/render target.
  *  @note With the changes to the compositor framework, this class just
  *      selects which compositors to enable.
@@ -104,6 +107,9 @@ protected:
     //Used to unregister compositor logics and free memory
     typedef std::map<String, std::unique_ptr<CompositorLogic>> CompositorLogicMap;
     CompositorLogicMap mCompositorLogics;
+
+    std::unique_ptr<GBufferSchemeHandler> mGBufferSchemeHandler;
+    std::unique_ptr<DeferredLightCompositionPass> mDeferredLightPass;
 
     void createResources();
     

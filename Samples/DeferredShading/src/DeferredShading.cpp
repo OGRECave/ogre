@@ -82,6 +82,9 @@ DeferredShadingSystem::~DeferredShadingSystem()
         compMgr.unregisterCompositorLogic(logic.first);
     }
     mCompositorLogics.clear();
+
+    compMgr.unregisterCustomCompositionPass("DeferredLight");
+    MaterialManager::getSingleton().removeListener(mGBufferSchemeHandler.get(), "GBuffer");
 }
 
 void DeferredShadingSystem::setMode(DSMode mode)
@@ -154,17 +157,13 @@ void DeferredShadingSystem::createResources(void)
 
     //Hook up the compositor logic and scheme handlers.
     //This can theoretically happen in a loaded plugin, but in this case the demo contains the code.
-    static bool firstTime = true;
-    if (firstTime)
-    {
-        MaterialManager::getSingleton().addListener(new GBufferSchemeHandler, "GBuffer");
+    mGBufferSchemeHandler.reset(new GBufferSchemeHandler);
+    MaterialManager::getSingleton().addListener(mGBufferSchemeHandler.get(), "GBuffer");
 
-        compMan.registerCustomCompositionPass("DeferredLight", new DeferredLightCompositionPass);
+    mDeferredLightPass.reset(new DeferredLightCompositionPass);
+    compMan.registerCustomCompositionPass("DeferredLight", mDeferredLightPass.get());
 
-        rtShaderGen.createScheme("GBuffer");
-
-        firstTime = false;
-    }
+    rtShaderGen.createScheme("GBuffer");
 
 
     RTShader::RenderState* schemRenderState = rtShaderGen.getRenderState("GBuffer");

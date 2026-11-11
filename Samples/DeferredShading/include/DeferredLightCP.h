@@ -70,9 +70,6 @@ public:
     {
         return OGRE_NEW DeferredLightRenderOperation(instance, pass);
     }
-
-protected:
-    virtual ~DeferredLightCompositionPass() {}
 };
 
 #endif
