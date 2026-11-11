@@ -58,6 +58,7 @@ THE SOFTWARE.
 #include "OgreBillboardSet.h"
 #include "OgreBillboard.h"
 #include "OgreParticleEmitter.h"
+#include "OgrePredefinedControllers.h"
 
 #include <random>
 using std::minstd_rand;
@@ -831,4 +832,15 @@ TEST(ConfigFile, MissingKeyReturnsDefault)
 
     EXPECT_EQ(cf.getSetting("b"), "2");
     EXPECT_EQ(cf.getSetting("a", "", "default"), "default");
+}
+
+TEST(LinearControllerFunction, InputOnOrOutsideKeys)
+{
+    LinearControllerFunction f({0, 0.5, 1}, {10, 20, 40}, 1, false);
+
+    EXPECT_FLOAT_EQ(f.calculate(0), 10);
+    EXPECT_FLOAT_EQ(f.calculate(0.25), 15);
+    EXPECT_FLOAT_EQ(f.calculate(0.5), 20);
+    EXPECT_FLOAT_EQ(f.calculate(0.75), 30);
+    EXPECT_FLOAT_EQ(f.calculate(1), 40);
 }

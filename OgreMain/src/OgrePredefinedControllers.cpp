@@ -319,10 +319,8 @@ namespace Ogre
     float LinearControllerFunction::calculate(float source) {
         Real input = getAdjustedInput(source*mFrequency);
 
-        std::vector<Real>::iterator ifirst = std::lower_bound(mKeys.begin(), mKeys.end(), input);
-        size_t idx = ifirst - mKeys.begin() - 1;
-
-        assert(ifirst != mKeys.end());
+        auto it = std::upper_bound(mKeys.begin(), mKeys.end(), input);
+        size_t idx = Math::Clamp<size_t>(it - mKeys.begin(), 1, mKeys.size() - 1) - 1;
 
         Real alpha = Math::inverseLerp(mKeys[idx], mKeys[idx + 1], input);
         return Math::lerp(mValues[idx], mValues[idx + 1], alpha);
