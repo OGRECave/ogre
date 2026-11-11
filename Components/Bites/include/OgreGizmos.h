@@ -76,6 +76,7 @@ class _OgreBitesExport CameraGizmo : public InputListener, public Ogre::Viewport
 {
 public:
     CameraGizmo(Ogre::Viewport* viewport);
+    ~CameraGizmo();
 
     bool mouseMoved(const MouseMotionEvent& evt) override;
     bool mousePressed(const MouseButtonEvent& evt) override;
@@ -86,6 +87,7 @@ private:
     void createMesh(Ogre::SceneManager* manager, Ogre::String name);
 
     void viewportDimensionsChanged(Ogre::Viewport* viewport) override;
+    void viewportDestroyed(Ogre::Viewport* viewport) override;
 
     Ogre::SceneNode* mGizmoNode{};
     Ogre::Camera* mCamera{};
