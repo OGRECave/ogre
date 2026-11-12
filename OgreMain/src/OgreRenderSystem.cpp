@@ -702,15 +702,15 @@ namespace Ogre {
         if (mCurrentPassIterationCount <= 1)
             return false;
 
-        // Update derived depth bias
+        --mCurrentPassIterationCount;
+        ++mCurrentPassIterationNum;
+
+        // Update derived depth bias for the next iteration
         if (mDerivedDepthBias)
         {
             _setDepthBias(mDerivedDepthBiasBase + mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
                           mDerivedDepthBiasSlopeScale);
         }
-
-        --mCurrentPassIterationCount;
-        ++mCurrentPassIterationNum;
 
         const uint16 mask = GPV_PASS_ITERATION_NUMBER;
 
