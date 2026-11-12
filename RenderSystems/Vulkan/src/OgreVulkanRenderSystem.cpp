@@ -956,11 +956,11 @@ namespace Ogre
         if(retVal != VK_NULL_HANDLE)
             return retVal;
 
-        // if we resize the window, we create new FBOs which mean a new renderpass and invalid caches anyway..
-        // VK_DYNAMIC_STATE_VIEWPORT
-        const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR};
+        // state set per draw instead of creating a pipeline for each value, see setDynamicState
+        const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR,
+                                               VK_DYNAMIC_STATE_VIEWPORT};
         VkPipelineDynamicStateCreateInfo dynamicStateCi = {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
-        dynamicStateCi.dynamicStateCount = 1;
+        dynamicStateCi.dynamicStateCount = sizeof(dynamicStates) / sizeof(dynamicStates[0]);
         dynamicStateCi.pDynamicStates = dynamicStates;
         pipelineCi.pDynamicState = &dynamicStateCi;
 
@@ -1043,6 +1043,8 @@ namespace Ogre
                                 mUBODynOffsets.data());
 
         vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline );
+
+        setDynamicState(cmdBuffer);
 
         // Render to screen!
         if(mProgramBound[GPT_MESH_PROGRAM])
@@ -1169,6 +1171,11 @@ namespace Ogre
     void VulkanRenderSystem::beginGPUSampleProfile( const String &name, uint32 *hashCache ) {}
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::endGPUSampleProfile( const String &name ) {}
+    //-------------------------------------------------------------------------
+    void VulkanRenderSystem::setDynamicState(VkCommandBuffer cmdBuffer)
+    {
+        vkCmdSetViewport(cmdBuffer, 0, 1, &mVkViewport);
+    }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::executeRenderPassDescriptorDelayedActions( bool officialCall )
     {
