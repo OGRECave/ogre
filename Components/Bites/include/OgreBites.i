@@ -23,6 +23,8 @@
 
 #ifndef SWIGPYTHON
 %import "OgreOverlay.i"
+#else
+namespace Ogre { typedef String DisplayString; }
 #endif
 
 #define _OgreBitesExport
