@@ -8,7 +8,7 @@
 #include "RTSLib_LTC.glsl"
 #endif
 
-#ifdef OGRE_GLSLES
+#if defined(OGRE_GLSLES) || defined(VULKAN) || (OGRE_HLSL >= 4 && defined(USE_OGRE_FROM_FUTURE))
     // min roughness such that (MIN_PERCEPTUAL_ROUGHNESS^4) > 0 in fp16 (i.e. 2^(-14/4), rounded up)
     #define MIN_PERCEPTUAL_ROUGHNESS 0.089
 #else
@@ -95,7 +95,7 @@ float D_GGX(float roughness, float32_t NoH, const vec3 h, const vec3 n) {
     // This computes 1.0 - NoH^2 directly (which is close to zero in the highlights and has
     // enough precision).
     // Overall this yields better performance, keeping all computations in mediump
-#ifdef OGRE_GLSLES
+#if defined(OGRE_GLSLES) || defined(VULKAN) || (OGRE_HLSL >= 4 && defined(USE_OGRE_FROM_FUTURE))
     vec3 NxH = cross(n, h);
     float oneMinusNoHSquared = dot(NxH, NxH);
 #else
