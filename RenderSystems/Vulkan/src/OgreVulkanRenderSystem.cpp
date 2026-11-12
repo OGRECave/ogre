@@ -132,6 +132,7 @@ namespace Ogre
         mDepthBias{}
     {
         mAutoParamsBufferPos = 0;
+        resetBoundState();
 
         pipelineCi.pVertexInputState = &vertexFormatCi;
         pipelineCi.pInputAssemblyState = &inputAssemblyCi;
@@ -315,6 +316,8 @@ namespace Ogre
         }
 
         mPipelineCache.clear();
+        // a new pipeline might get the handle of a destroyed one
+        mBoundPipeline = VK_NULL_HANDLE;
     }
     //-------------------------------------------------------------------------
     const String &VulkanRenderSystem::getName( void ) const
@@ -841,6 +844,7 @@ namespace Ogre
 
         // descriptors referring to old buffer are invalidated
         mDescriptorSetCache.clear();
+        mBoundDescriptorSet = VK_NULL_HANDLE;
         mActiveDevice->mGraphicsQueue.queueForDeletion(mDescriptorPool);
         mDescriptorPool.reset( new VulkanDescriptorPool(mDescriptorPoolSizes, mDescriptorSetLayout, mDevice));
     }
@@ -989,9 +993,11 @@ namespace Ogre
             vkCmdSetScissor(mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer, 0u, 1, &mScissorRect);
             mAutoParamsBufferUsage[mActiveDevice->mGraphicsQueue.mCurrentFrameIdx] = 0;
             executeRenderPassDescriptorDelayedActions();
+            // new render pass, possibly in a new command buffer
+            resetBoundState();
         }
 
-        std::vector<VkVertexInputAttributeDescription> vertexInputs;
+        mVertexInputs.clear();
         uint32 uvCount = 0;
         for (auto elem : op.vertexData->vertexDeclaration->getElements())
         {
@@ -1005,44 +1011,56 @@ namespace Ogre
             inputDesc.offset = elem.getOffset();
             if (!op.vertexData->vertexBufferBinding->isBufferBound(inputDesc.binding))
                 continue; // skip unbound elements
-            vertexInputs.push_back(inputDesc);
+            mVertexInputs.push_back(inputDesc);
         }
 
         OgreAssert(!op.vertexData->vertexBufferBinding->hasGaps(), "no gaps allowed");
 
-        std::vector<VkBuffer> vertexBuffers;
-        std::vector<VkVertexInputBindingDescription> bufferBindings;
+        mVertexBuffers.clear();
+        mBufferBindings.clear();
         for(const auto& it : op.vertexData->vertexBufferBinding->getBindings())
         {
             auto inputRate = it.second->isInstanceData() ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX;
-            bufferBindings.push_back({it.first, uint32(it.second->getVertexSize()), inputRate});
+            mBufferBindings.push_back({it.first, uint32(it.second->getVertexSize()), inputRate});
             auto b = it.second->_getImpl<VulkanHardwareBuffer>()->getVkBuffer();
-            vertexBuffers.push_back(b);
+            mVertexBuffers.push_back(b);
         }
 
         VkDeviceSize offsets[15] = {};
 
-        vertexFormatCi.pVertexAttributeDescriptions = vertexInputs.data();
-        vertexFormatCi.vertexAttributeDescriptionCount = vertexInputs.size();
-        vertexFormatCi.pVertexBindingDescriptions = bufferBindings.data();
-        vertexFormatCi.vertexBindingDescriptionCount = bufferBindings.size();
+        vertexFormatCi.pVertexAttributeDescriptions = mVertexInputs.data();
+        vertexFormatCi.vertexAttributeDescriptionCount = mVertexInputs.size();
+        vertexFormatCi.pVertexBindingDescriptions = mBufferBindings.data();
+        vertexFormatCi.vertexBindingDescriptionCount = mBufferBindings.size();
 
         inputAssemblyCi.topology = VulkanMappings::get( op.operationType );
 
         VkCommandBuffer cmdBuffer = mActiveDevice->mGraphicsQueue.mCurrentCmdBuffer;
 
-        if(!vertexBuffers.empty())
-            vkCmdBindVertexBuffers(cmdBuffer, 0, vertexBuffers.size(), vertexBuffers.data(), offsets);
+        if(!mVertexBuffers.empty() && mVertexBuffers != mBoundVertexBuffers)
+        {
+            vkCmdBindVertexBuffers(cmdBuffer, 0, mVertexBuffers.size(), mVertexBuffers.data(), offsets);
+            mBoundVertexBuffers = mVertexBuffers;
+        }
 
         if(op.useIndexes)
         {
             auto itype = VkIndexType(op.indexData->indexBuffer->getType());
             auto b = op.indexData->indexBuffer->_getImpl<VulkanHardwareBuffer>()->getVkBuffer();
-            vkCmdBindIndexBuffer(cmdBuffer, b, 0, itype);
+            if (b != mBoundIndexBuffer || itype != mBoundIndexType)
+            {
+                vkCmdBindIndexBuffer(cmdBuffer, b, 0, itype);
+                mBoundIndexBuffer = b;
+                mBoundIndexType = itype;
+            }
         }
 
         auto pipeline = getPipeline();
-        vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline );
+        if (pipeline != mBoundPipeline)
+        {
+            vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+            mBoundPipeline = pipeline;
+        }
 
         // Render to screen!
         if(mProgramBound[GPT_MESH_PROGRAM])
@@ -1157,18 +1175,46 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::endGPUSampleProfile( const String &name ) {}
     //-------------------------------------------------------------------------
+    void VulkanRenderSystem::resetBoundState()
+    {
+        mBoundVertexBuffers.clear();
+        mBoundIndexBuffer = VK_NULL_HANDLE;
+        mBoundIndexType = VK_INDEX_TYPE_MAX_ENUM;
+        mBoundPipeline = VK_NULL_HANDLE;
+        mBoundDescriptorSet = VK_NULL_HANDLE;
+        mBoundUBODynOffsets = {};
+        mBoundViewport = {};
+        mBoundViewport.width = -1; // invalid, forces setting it
+        mBoundDepthBias = {NAN, NAN}; // never equal, forces setting it
+    }
+    //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindDescriptorSet(VkCommandBuffer cmdBuffer)
     {
         auto descriptorSet = getDescriptorSet();
-        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineCi.layout, 0, 1, &descriptorSet, 2,
-                                mUBODynOffsets.data());
+        // the dynamic offsets of the auto params usually change with every draw, the set only with the textures
+        if (descriptorSet != mBoundDescriptorSet || mUBODynOffsets != mBoundUBODynOffsets)
+        {
+            vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineCi.layout, 0, 1,
+                                    &descriptorSet, 2, mUBODynOffsets.data());
+            mBoundDescriptorSet = descriptorSet;
+            mBoundUBODynOffsets = mUBODynOffsets;
+        }
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::setDynamicState(VkCommandBuffer cmdBuffer)
     {
-        vkCmdSetViewport(cmdBuffer, 0, 1, &mVkViewport);
-        // only effective if enabled in the pipeline
-        vkCmdSetDepthBias(cmdBuffer, mDepthBias[0], 0.0f, mDepthBias[1]);
+        if (memcmp(&mVkViewport, &mBoundViewport, sizeof(VkViewport)) != 0)
+        {
+            vkCmdSetViewport(cmdBuffer, 0, 1, &mVkViewport);
+            mBoundViewport = mVkViewport;
+        }
+
+        // only effective if enabled in the pipeline, but cheap to track anyway
+        if (mDepthBias != mBoundDepthBias)
+        {
+            vkCmdSetDepthBias(cmdBuffer, mDepthBias[0], 0.0f, mDepthBias[1]);
+            mBoundDepthBias = mDepthBias;
+        }
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::executeRenderPassDescriptorDelayedActions( bool officialCall )
