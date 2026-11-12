@@ -173,3 +173,21 @@ TEST_F(RTShaderSystem, FunctionInvocationOrder)
     EXPECT_TRUE(c == a);
     EXPECT_FALSE(c < a);
 }
+
+TEST_F(RTShaderSystem, NormalMapTextureUnitParameters)
+{
+    struct ErrorCounter : ScriptCompilerListener
+    {
+        int count = 0;
+        void handleError(ScriptCompiler*, uint32, const String&, int, const String&) override { count++; }
+    } errors;
+    ScriptCompilerManager::getSingleton().setListener(&errors);
+
+    String script = "material NormalMapTest { technique { pass { texture_unit { rtshader_system {"
+                    " normal_map parallax_occlusion height_scale 0.1 } } } } }";
+    DataStreamPtr stream = std::make_shared<MemoryDataStream>("memory.material", &script[0], script.size());
+    MaterialManager::getSingleton().parseScript(stream, RGN_DEFAULT);
+
+    ScriptCompilerManager::getSingleton().setListener(NULL);
+    EXPECT_EQ(errors.count, 0);
+}

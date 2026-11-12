@@ -297,12 +297,13 @@ SubRenderState* NormalMapLightingFactory::createInstance(const ScriptProperty& p
         auto it = prop.values.begin() + 1;
         while(it != prop.values.end())
         {
-            if (!subRenderState->setParameter(*it, *++it))
+            const String& name = *it++;
+            const String& value = *it++;
+            if (!subRenderState->setParameter(name, value))
             {
                 translator->emitError();
                 return subRenderState;
             }
-            it++;
         }
 
         return subRenderState;
