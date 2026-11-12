@@ -127,11 +127,28 @@ namespace Ogre
 
         std::shared_ptr<VulkanDescriptorPool> mDescriptorPool;
 
+        /// Reused for every draw to avoid allocations
+        std::vector<VkVertexInputAttributeDescription> mVertexInputs;
+        std::vector<VkVertexInputBindingDescription> mBufferBindings;
+        std::vector<VkBuffer> mVertexBuffers;
+
+        /// State bound in the current render pass, to skip redundant binds
+        std::vector<VkBuffer> mBoundVertexBuffers;
+        VkBuffer mBoundIndexBuffer;
+        VkIndexType mBoundIndexType;
+        VkPipeline mBoundPipeline;
+        VkDescriptorSet mBoundDescriptorSet;
+        std::array<uint32, 2> mBoundUBODynOffsets;
+        VkViewport mBoundViewport;
+        std::array<float, 2> mBoundDepthBias;
+
         /// Dynamic state, i.e. not part of the pipeline objects
         std::array<float, 2> mDepthBias; ///< constant and slope scale factor
-        /// Bind the descriptor set with the current auto param offsets
+        /// Forget the bound state, so the next draw binds everything
+        void resetBoundState();
+        /// Bind the descriptor set and auto param offsets, if they changed since the last draw
         void bindDescriptorSet(VkCommandBuffer cmdBuffer);
-        /// Record the dynamic pipeline state for the next draw
+        /// Record the dynamic pipeline state that changed since the last draw
         void setDynamicState(VkCommandBuffer cmdBuffer);
 
         // clears the pipeline cache
