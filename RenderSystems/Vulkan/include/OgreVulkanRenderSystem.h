@@ -141,9 +141,11 @@ namespace Ogre
         std::array<uint32, 2> mBoundUBODynOffsets;
         VkViewport mBoundViewport;
         std::array<float, 2> mBoundDepthBias;
+        std::array<uint32, 3> mBoundStencilParams;
 
         /// Dynamic state, i.e. not part of the pipeline objects
         std::array<float, 2> mDepthBias; ///< constant and slope scale factor
+        std::array<uint32, 3> mStencilParams; ///< compare mask, write mask and reference
         /// Forget the bound state, so the next draw binds everything
         void resetBoundState();
         /// Bind the descriptor set and auto param offsets, if they changed since the last draw
