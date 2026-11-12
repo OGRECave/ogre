@@ -233,7 +233,9 @@ namespace Ogre {
                 VES_POSITION);
         HardwareVertexBufferSharedPtr vbuf =
             vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
-        HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_READ_ONLY);
+        HardwareBufferLockGuard vbufLock(vbuf, vertexData->vertexStart * vbuf->getVertexSize(),
+                                         vertexData->vertexCount * vbuf->getVertexSize(),
+                                         HardwareBuffer::HBL_READ_ONLY);
         unsigned char* vertex = static_cast<unsigned char*>(vbufLock.pData);
         float* pFloat;
 
@@ -362,9 +364,6 @@ namespace Ogre {
                         lodIndexData, &geomLink);
                 }
             }
-            assert (geomLink.vertexData->vertexStart == 0 &&
-                "Cannot use vertexStart > 0 on indexed geometry due to "
-                "rendersystem incompatibilities - see the docs!");
         }
 
 
@@ -406,7 +405,8 @@ namespace Ogre {
         // Convenience
         VertexData* newvd = targetGeomLink->vertexData;
         //IndexData* newid = targetGeomLink->indexData;
-        // Update the vertex count
+        // Update the vertex count, the new buffers start at the first vertex
+        newvd->vertexStart = 0;
         newvd->vertexCount = indexRemap.size();
 
         size_t numvbufs = vd->vertexBufferBinding->getBufferCount();
@@ -430,15 +430,17 @@ namespace Ogre {
             // to the new ones. By nature of the map the remap is in order of
             // indexes in the old buffer, but note that we're not guaranteed to
             // address every vertex (which is kinda why we're here)
-            HardwareBufferLockGuard oldBufLock(oldBuf, HardwareBuffer::HBL_READ_ONLY);
-            HardwareBufferLockGuard newBufLock(newBuf, HardwareBuffer::HBL_DISCARD);
             size_t vertexSize = oldBuf->getVertexSize();
+            // indexes are relative to vertexStart
+            HardwareBufferLockGuard oldBufLock(oldBuf, vd->vertexStart * vertexSize, vd->vertexCount * vertexSize,
+                                               HardwareBuffer::HBL_READ_ONLY);
+            HardwareBufferLockGuard newBufLock(newBuf, HardwareBuffer::HBL_DISCARD);
             // Buffers should be the same size
             assert (vertexSize == newBuf->getVertexSize());
 
             for (auto & r : indexRemap)
             {
-                assert (r.first < oldBuf->getNumVertices());
+                assert (r.first < vd->vertexCount);
                 assert (r.second < newBuf->getNumVertices());
 
                 uchar* pSrc = static_cast<uchar*>(oldBufLock.pData) + r.first * vertexSize;
@@ -1481,7 +1483,9 @@ namespace Ogre {
             {
                 // lock source
                 HardwareVertexBufferSharedPtr srcBuf = srcBinds->getBuffer(b);
-                HardwareBufferLockGuard srcBufLock(srcBuf, HardwareBuffer::HBL_READ_ONLY);
+                HardwareBufferLockGuard srcBufLock(srcBuf, srcVData->vertexStart * srcBuf->getVertexSize(),
+                                                   srcVData->vertexCount * srcBuf->getVertexSize(),
+                                                   HardwareBuffer::HBL_READ_ONLY);
                 uchar* pSrcBase = static_cast<uchar*>(srcBufLock.pData);
                 // Get buffer lock pointer, we'll update this later
                 uchar* pDstBase = destBufferLocks[b];
