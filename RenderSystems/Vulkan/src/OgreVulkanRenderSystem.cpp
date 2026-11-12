@@ -129,7 +129,8 @@ namespace Ogre
         mVkViewport{},
         mScissorRect{},
         viewportStateCi{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO},
-        mDepthBias{}
+        mDepthBias{},
+        mStencilParams{}
     {
         mAutoParamsBufferPos = 0;
         resetBoundState();
@@ -966,7 +967,10 @@ namespace Ogre
         // state set per draw instead of creating a pipeline for each value, see setDynamicState
         const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR,
                                                VK_DYNAMIC_STATE_VIEWPORT,
-                                               VK_DYNAMIC_STATE_DEPTH_BIAS};
+                                               VK_DYNAMIC_STATE_DEPTH_BIAS,
+                                               VK_DYNAMIC_STATE_STENCIL_COMPARE_MASK,
+                                               VK_DYNAMIC_STATE_STENCIL_WRITE_MASK,
+                                               VK_DYNAMIC_STATE_STENCIL_REFERENCE};
         VkPipelineDynamicStateCreateInfo dynamicStateCi = {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
         dynamicStateCi.dynamicStateCount = sizeof(dynamicStates) / sizeof(dynamicStates[0]);
         dynamicStateCi.pDynamicStates = dynamicStates;
@@ -1186,6 +1190,7 @@ namespace Ogre
         mBoundViewport = {};
         mBoundViewport.width = -1; // invalid, forces setting it
         mBoundDepthBias = {NAN, NAN}; // never equal, forces setting it
+        mBoundStencilParams = {~mStencilParams[0], ~mStencilParams[1], ~mStencilParams[2]};
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::bindDescriptorSet(VkCommandBuffer cmdBuffer)
@@ -1215,6 +1220,14 @@ namespace Ogre
             vkCmdSetDepthBias(cmdBuffer, mDepthBias[0], 0.0f, mDepthBias[1]);
             mBoundDepthBias = mDepthBias;
         }
+
+        if (mStencilParams[0] != mBoundStencilParams[0])
+            vkCmdSetStencilCompareMask(cmdBuffer, VK_STENCIL_FACE_FRONT_AND_BACK, mStencilParams[0]);
+        if (mStencilParams[1] != mBoundStencilParams[1])
+            vkCmdSetStencilWriteMask(cmdBuffer, VK_STENCIL_FACE_FRONT_AND_BACK, mStencilParams[1]);
+        if (mStencilParams[2] != mBoundStencilParams[2])
+            vkCmdSetStencilReference(cmdBuffer, VK_STENCIL_FACE_FRONT_AND_BACK, mStencilParams[2]);
+        mBoundStencilParams = mStencilParams;
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::executeRenderPassDescriptorDelayedActions( bool officialCall )
@@ -1362,17 +1375,14 @@ namespace Ogre
         depthStencilStateCi.front.passOp = VulkanMappings::get(state.depthStencilPassOp);
         depthStencilStateCi.front.depthFailOp = VulkanMappings::get(state.depthFailOp);
         depthStencilStateCi.front.compareOp = VulkanMappings::get(state.compareOp);
-        depthStencilStateCi.front.compareMask = state.compareMask;
-        depthStencilStateCi.front.writeMask = state.writeMask;
-        depthStencilStateCi.front.reference = state.referenceValue;
 
         depthStencilStateCi.back.failOp = VulkanMappings::get(state.stencilFailOp);
         depthStencilStateCi.back.passOp = VulkanMappings::get(state.depthStencilPassOp);
         depthStencilStateCi.back.depthFailOp = VulkanMappings::get(state.depthFailOp);
         depthStencilStateCi.back.compareOp = VulkanMappings::get(state.compareOp);
-        depthStencilStateCi.back.compareMask = state.compareMask;
-        depthStencilStateCi.back.writeMask = state.writeMask;
-        depthStencilStateCi.back.reference = state.referenceValue;
+
+        // dynamic state, see setDynamicState
+        mStencilParams = {state.compareMask, state.writeMask, state.referenceValue};
     }
 
     void VulkanRenderSystem::_setViewport(Viewport *vp)
