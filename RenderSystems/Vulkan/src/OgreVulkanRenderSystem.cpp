@@ -933,6 +933,7 @@ namespace Ogre
         auto hash = HashCombine(0, pipelineCi.renderPass);
         hash = HashCombine(hash, blendStates[0]);
         hash = HashCombine(hash, rasterState);
+        hash = HashCombine(hash, depthStencilStateCi);
         hash = HashCombine(hash, inputAssemblyCi);
         hash = HashCombine(hash, mssCi);
 
