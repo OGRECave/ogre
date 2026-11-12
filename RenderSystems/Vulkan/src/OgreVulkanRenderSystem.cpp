@@ -128,7 +128,8 @@ namespace Ogre
         depthStencilStateCi{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO},
         mVkViewport{},
         mScissorRect{},
-        viewportStateCi{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO}
+        viewportStateCi{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO},
+        mDepthBias{}
     {
         mAutoParamsBufferPos = 0;
 
@@ -929,6 +930,8 @@ namespace Ogre
         pipelineCi.renderPass = mCurrentRenderPassDescriptor->getRenderPass();
         pipelineCi.layout = mLayout;
         mssCi.rasterizationSamples = VkSampleCountFlagBits(std::max(mActiveRenderTarget->getFSAA(), 1u));
+        // the factors are dynamic, but enabling the bias is not. Derived depth bias can start at zero.
+        rasterState.depthBiasEnable = mDepthBias[0] != 0.0f || mDepthBias[1] != 0.0f || mDerivedDepthBias;
 
         auto hash = HashCombine(0, pipelineCi.renderPass);
         hash = HashCombine(hash, blendStates[0]);
@@ -958,7 +961,8 @@ namespace Ogre
 
         // state set per draw instead of creating a pipeline for each value, see setDynamicState
         const VkDynamicState dynamicStates[] = {VK_DYNAMIC_STATE_SCISSOR,
-                                               VK_DYNAMIC_STATE_VIEWPORT};
+                                               VK_DYNAMIC_STATE_VIEWPORT,
+                                               VK_DYNAMIC_STATE_DEPTH_BIAS};
         VkPipelineDynamicStateCreateInfo dynamicStateCi = {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
         dynamicStateCi.dynamicStateCount = sizeof(dynamicStates) / sizeof(dynamicStates[0]);
         dynamicStateCi.pDynamicStates = dynamicStates;
@@ -1044,11 +1048,10 @@ namespace Ogre
 
         vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline );
 
-        setDynamicState(cmdBuffer);
-
         // Render to screen!
         if(mProgramBound[GPT_MESH_PROGRAM])
         {
+            setDynamicState(cmdBuffer);
 #ifdef VK_EXT_mesh_shader
             OgreAssert(op.indexData, "indexData required for mesh shader");
             vkCmdDrawMeshTasksEXT(cmdBuffer, op.indexData->indexCount, 1, 1);
@@ -1058,17 +1061,8 @@ namespace Ogre
         {
             do
             {
-                // Update derived depth bias.
-                if( mDerivedDepthBias && mCurrentPassIterationNum > 0 )
-                {
-                    const float biasSign = mIsReverseDepthBufferEnabled ? 1.0f : -1.0f;
-                    vkCmdSetDepthBias( cmdBuffer,
-                                       ( mDerivedDepthBiasBase +
-                                         mDerivedDepthBiasMultiplier * mCurrentPassIterationNum ) *
-                                           biasSign,
-                                       0.f, mDerivedDepthBiasSlopeScale * biasSign );
-                }
-
+                // updatePassIterationRenderState updates the derived depth bias
+                setDynamicState(cmdBuffer);
                 vkCmdDrawIndexed(cmdBuffer, (uint32)op.indexData->indexCount, op.numberOfInstances,
                                  (uint32)op.indexData->indexStart, (int32)op.vertexData->vertexStart, 0u);
             } while( updatePassIterationRenderState() );
@@ -1077,16 +1071,8 @@ namespace Ogre
         {
             do
             {
-                // Update derived depth bias.
-                if( mDerivedDepthBias && mCurrentPassIterationNum > 0 )
-                {
-                    const float biasSign = mIsReverseDepthBufferEnabled ? 1.0f : -1.0f;
-                    vkCmdSetDepthBias( cmdBuffer,
-                                       ( mDerivedDepthBiasBase +
-                                         mDerivedDepthBiasMultiplier * mCurrentPassIterationNum ) *
-                                           biasSign,
-                                       0.0f, mDerivedDepthBiasSlopeScale * biasSign );
-                }
+                // updatePassIterationRenderState updates the derived depth bias
+                setDynamicState(cmdBuffer);
                 const uint32 vertexStart = static_cast<uint32>( op.vertexData->vertexStart );
                 vkCmdDraw(cmdBuffer, (uint32)op.vertexData->vertexCount, op.numberOfInstances, vertexStart, 0u);
             } while( updatePassIterationRenderState() );
@@ -1175,6 +1161,8 @@ namespace Ogre
     void VulkanRenderSystem::setDynamicState(VkCommandBuffer cmdBuffer)
     {
         vkCmdSetViewport(cmdBuffer, 0, 1, &mVkViewport);
+        // only effective if enabled in the pipeline
+        vkCmdSetDepthBias(cmdBuffer, mDepthBias[0], 0.0f, mDepthBias[1]);
     }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::executeRenderPassDescriptorDelayedActions( bool officialCall )
@@ -1270,14 +1258,12 @@ namespace Ogre
 
     void VulkanRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
-        rasterState.depthBiasEnable = (std::abs(constantBias) + std::abs(slopeScaleBias)) != 0.0f;
-        rasterState.depthBiasConstantFactor = -constantBias;
-        rasterState.depthBiasSlopeFactor = -slopeScaleBias;
+        mDepthBias = {-constantBias, -slopeScaleBias};
 
         if(mIsReverseDepthBufferEnabled)
         {
-            rasterState.depthBiasConstantFactor *= -1;
-            rasterState.depthBiasSlopeFactor *= -1;
+            mDepthBias[0] *= -1;
+            mDepthBias[1] *= -1;
         }
     }
 
