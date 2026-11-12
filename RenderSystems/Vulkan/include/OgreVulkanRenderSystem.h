@@ -127,6 +127,9 @@ namespace Ogre
 
         std::shared_ptr<VulkanDescriptorPool> mDescriptorPool;
 
+        /// Record the dynamic pipeline state for the next draw
+        void setDynamicState(VkCommandBuffer cmdBuffer);
+
         // clears the pipeline cache
         void clearPipelineCache();
 
