@@ -129,6 +129,8 @@ namespace Ogre
 
         /// Dynamic state, i.e. not part of the pipeline objects
         std::array<float, 2> mDepthBias; ///< constant and slope scale factor
+        /// Bind the descriptor set with the current auto param offsets
+        void bindDescriptorSet(VkCommandBuffer cmdBuffer);
         /// Record the dynamic pipeline state for the next draw
         void setDynamicState(VkCommandBuffer cmdBuffer);
 

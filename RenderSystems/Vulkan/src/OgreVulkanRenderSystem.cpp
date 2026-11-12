@@ -1042,15 +1042,12 @@ namespace Ogre
         }
 
         auto pipeline = getPipeline();
-        auto descriptorSet = getDescriptorSet();
-        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineCi.layout, 0, 1, &descriptorSet, 2,
-                                mUBODynOffsets.data());
-
         vkCmdBindPipeline( cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline );
 
         // Render to screen!
         if(mProgramBound[GPT_MESH_PROGRAM])
         {
+            bindDescriptorSet(cmdBuffer);
             setDynamicState(cmdBuffer);
 #ifdef VK_EXT_mesh_shader
             OgreAssert(op.indexData, "indexData required for mesh shader");
@@ -1061,7 +1058,8 @@ namespace Ogre
         {
             do
             {
-                // updatePassIterationRenderState updates the derived depth bias
+                // updatePassIterationRenderState updates the auto params and the derived depth bias
+                bindDescriptorSet(cmdBuffer);
                 setDynamicState(cmdBuffer);
                 vkCmdDrawIndexed(cmdBuffer, (uint32)op.indexData->indexCount, op.numberOfInstances,
                                  (uint32)op.indexData->indexStart, (int32)op.vertexData->vertexStart, 0u);
@@ -1071,7 +1069,8 @@ namespace Ogre
         {
             do
             {
-                // updatePassIterationRenderState updates the derived depth bias
+                // updatePassIterationRenderState updates the auto params and the derived depth bias
+                bindDescriptorSet(cmdBuffer);
                 setDynamicState(cmdBuffer);
                 const uint32 vertexStart = static_cast<uint32>( op.vertexData->vertexStart );
                 vkCmdDraw(cmdBuffer, (uint32)op.vertexData->vertexCount, op.numberOfInstances, vertexStart, 0u);
@@ -1157,6 +1156,13 @@ namespace Ogre
     void VulkanRenderSystem::beginGPUSampleProfile( const String &name, uint32 *hashCache ) {}
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::endGPUSampleProfile( const String &name ) {}
+    //-------------------------------------------------------------------------
+    void VulkanRenderSystem::bindDescriptorSet(VkCommandBuffer cmdBuffer)
+    {
+        auto descriptorSet = getDescriptorSet();
+        vkCmdBindDescriptorSets(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineCi.layout, 0, 1, &descriptorSet, 2,
+                                mUBODynOffsets.data());
+    }
     //-------------------------------------------------------------------------
     void VulkanRenderSystem::setDynamicState(VkCommandBuffer cmdBuffer)
     {
