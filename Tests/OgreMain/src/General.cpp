@@ -42,7 +42,9 @@ THE SOFTWARE.
 #include "OgreSTBICodec.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreMeshManager.h"
+#include "OgreMeshSerializer.h"
 #include "OgreMesh.h"
+#include "OgreSubMesh.h"
 #include "OgreSkeletonManager.h"
 #include "OgreSkeletonInstance.h"
 #include "OgreCompositorManager.h"
@@ -362,6 +364,202 @@ TEST(MaterialSerializer, Basic)
               TextureUnitState::CONTENT_SHADOW);
     EXPECT_EQ(mat2->getTechniques()[0]->getPasses()[0]->getTextureUnitState(1)->getTextureName(),
               "TextureName");
+}
+
+struct MeshSerializerBufferRange : public RootWithoutRenderSystemFixture
+{
+};
+
+TEST_F(MeshSerializerBufferRange, ExportsUsedRange)
+{
+    MeshPtr mesh = MeshManager::getSingleton().createManual("BufferRangeSrc", RGN_DEFAULT);
+    SubMesh* subMesh = mesh->createSubMesh();
+    subMesh->useSharedVertices = false;
+
+    auto vertexData = new VertexData();
+    vertexData->vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+
+    auto vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
+        vertexData->vertexDeclaration->getVertexSize(0), 7, HBU_CPU_TO_GPU);
+    float positions[7][3] = {
+        {9, 9, 9}, {9, 9, 9}, {9, 9, 9}, {9, 9, 9},
+        {0, 0, 0}, {1, 0, 0}, {0, 1, 0},
+    };
+    vertexBuffer->writeData(0, sizeof(positions), positions, true);
+    vertexData->vertexBufferBinding->setBinding(0, vertexBuffer);
+    vertexData->vertexStart = 4;
+    vertexData->vertexCount = 3;
+    subMesh->resetVertexData(vertexData);
+
+    auto indexData = new IndexData();
+    indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        HardwareIndexBuffer::IT_16BIT, 5, HBU_CPU_TO_GPU);
+    uint16 indices[] = {7, 7, 0, 1, 2};
+    indexData->indexBuffer->writeData(0, sizeof(indices), indices, true);
+    indexData->indexStart = 2;
+    indexData->indexCount = 3;
+    subMesh->indexData = indexData;
+
+    mesh->_setBounds(AxisAlignedBox(Vector3(0, 0, 0), Vector3(1, 1, 0)));
+    mesh->load();
+
+    MeshSerializer serializer;
+    std::vector<char> buffer(4096);
+    auto stream = std::make_shared<MemoryDataStream>("BufferRange.mesh", buffer.data(), buffer.size(),
+                                                     false, false);
+    serializer.exportMesh(mesh.get(), stream);
+
+    auto readStream = std::make_shared<MemoryDataStream>("BufferRange.mesh", buffer.data(), stream->tell(),
+                                                         false, true);
+    MeshPtr imported = MeshManager::getSingleton().createManual("BufferRangeDst", RGN_DEFAULT);
+    serializer.importMesh(readStream, imported.get());
+
+    SubMesh* importedSubMesh = imported->getSubMesh(0);
+    ASSERT_TRUE(importedSubMesh->vertexData);
+    EXPECT_EQ(importedSubMesh->vertexData->vertexStart, 0u);
+    EXPECT_EQ(importedSubMesh->vertexData->vertexCount, 3u);
+    ASSERT_TRUE(importedSubMesh->indexData);
+    EXPECT_EQ(importedSubMesh->indexData->indexStart, 0u);
+    EXPECT_EQ(importedSubMesh->indexData->indexCount, 3u);
+
+    auto importedVertexBuffer = importedSubMesh->vertexData->vertexBufferBinding->getBuffer(0);
+    HardwareBufferLockGuard vertexLock(importedVertexBuffer, HardwareBuffer::HBL_READ_ONLY);
+    const float* importedPositions = static_cast<const float*>(vertexLock.pData);
+    for (size_t i = 0; i < 3; ++i)
+        EXPECT_EQ(Vector3(importedPositions + i * 3), Vector3(positions[4 + i]));
+
+    auto importedIndexBuffer = importedSubMesh->indexData->indexBuffer;
+    HardwareBufferLockGuard indexLock(importedIndexBuffer, HardwareBuffer::HBL_READ_ONLY);
+    const uint16* importedIndices = static_cast<const uint16*>(indexLock.pData);
+    for (size_t i = 0; i < 3; ++i)
+        EXPECT_EQ(importedIndices[i], uint16(i));
+
+    MeshManager::getSingleton().remove(imported);
+    MeshManager::getSingleton().remove(mesh);
+}
+
+namespace
+{
+/// a triangle whose index data and generated LODs all live in one shared index buffer
+MeshPtr createSharedLodMesh(const String& name, const std::vector<std::pair<size_t, size_t>>& lodRanges)
+{
+    MeshPtr mesh = MeshManager::getSingleton().createManual(name, RGN_DEFAULT);
+    SubMesh* subMesh = mesh->createSubMesh();
+    subMesh->useSharedVertices = false;
+
+    auto vertexData = new VertexData();
+    vertexData->vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+    auto vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
+        vertexData->vertexDeclaration->getVertexSize(0), 3, HBU_CPU_TO_GPU);
+    float positions[3][3] = {{0, 0, 0}, {1, 0, 0}, {0, 1, 0}};
+    vertexBuffer->writeData(0, sizeof(positions), positions, true);
+    vertexData->vertexBufferBinding->setBinding(0, vertexBuffer);
+    vertexData->vertexCount = 3;
+    subMesh->resetVertexData(vertexData);
+
+    // 99 marks indices that belong to someone else and must not be exported
+    std::vector<uint16> indices(32, 99);
+    indices[0] = 0, indices[1] = 1, indices[2] = 2;
+    for (const auto& range : lodRanges)
+    {
+        for (size_t i = 0; i < range.second; ++i)
+            indices[range.first + i] = uint16((range.first + i) % 3);
+    }
+
+    auto indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        HardwareIndexBuffer::IT_16BIT, indices.size(), HBU_CPU_TO_GPU);
+    indexBuffer->writeData(0, indexBuffer->getSizeInBytes(), indices.data(), true);
+
+    subMesh->indexData->indexBuffer = indexBuffer;
+    subMesh->indexData->indexStart = 0;
+    subMesh->indexData->indexCount = 3;
+
+    mesh->_setLodInfo(ushort(lodRanges.size() + 1));
+    for (size_t lod = 0; lod < lodRanges.size(); ++lod)
+    {
+        MeshLodUsage usage;
+        usage.userValue = Real(100 * (lod + 1));
+        mesh->_setLodUsage(ushort(lod + 1), usage);
+
+        auto lodData = new IndexData();
+        lodData->indexBuffer = indexBuffer;
+        lodData->indexStart = lodRanges[lod].first;
+        lodData->indexCount = lodRanges[lod].second;
+        subMesh->mLodFaceList[lod] = lodData;
+    }
+
+    mesh->_setBounds(AxisAlignedBox(Vector3(0, 0, 0), Vector3(1, 1, 0)));
+    mesh->load();
+    return mesh;
+}
+
+MeshPtr exportAndImport(const MeshPtr& mesh, const String& name, size_t* exportedSize = nullptr)
+{
+    MeshSerializer serializer;
+    std::vector<char> buffer(4096);
+    auto stream = std::make_shared<MemoryDataStream>(name, buffer.data(), buffer.size(), false, false);
+    serializer.exportMesh(mesh.get(), stream);
+    if (exportedSize)
+        *exportedSize = stream->tell();
+
+    auto readStream = std::make_shared<MemoryDataStream>(name, buffer.data(), stream->tell(), false, true);
+    MeshPtr imported = MeshManager::getSingleton().createManual(name, RGN_DEFAULT);
+    serializer.importMesh(readStream, imported.get());
+    return imported;
+}
+
+std::vector<uint16> readLodIndices(const IndexData* indexData)
+{
+    HardwareBufferLockGuard lock(indexData->indexBuffer, indexData->indexStart * sizeof(uint16),
+                                 indexData->indexCount * sizeof(uint16), HardwareBuffer::HBL_READ_ONLY);
+    const uint16* data = static_cast<const uint16*>(lock.pData);
+    return std::vector<uint16>(data, data + indexData->indexCount);
+}
+} // namespace
+
+TEST_F(MeshSerializerBufferRange, ExportsUsedLodRanges)
+{
+    // disjoint LOD ranges in a buffer shared with other geometry, as in a GeometryPool page
+    MeshPtr mesh = createSharedLodMesh("LodRangeSrc", {{10, 3}, {20, 3}});
+    MeshPtr imported = exportAndImport(mesh, "LodRangeDst");
+
+    SubMesh* subMesh = imported->getSubMesh(0);
+    ASSERT_EQ(imported->getNumLodLevels(), 3);
+    ASSERT_EQ(subMesh->mLodFaceList.size(), 2u);
+
+    for (size_t lod = 0; lod < 2; ++lod)
+    {
+        const IndexData* lodData = subMesh->mLodFaceList[lod];
+        EXPECT_EQ(lodData->indexBuffer->getNumIndexes(), 3u) << "LOD " << lod + 1;
+        EXPECT_EQ(lodData->indexStart, 0u);
+        EXPECT_EQ(readLodIndices(lodData), readLodIndices(mesh->getSubMesh(0)->mLodFaceList[lod]));
+    }
+    EXPECT_NE(subMesh->mLodFaceList[0]->indexBuffer, subMesh->mLodFaceList[1]->indexBuffer);
+
+    MeshManager::getSingleton().remove(imported);
+    MeshManager::getSingleton().remove(mesh);
+}
+
+TEST_F(MeshSerializerBufferRange, SharesOverlappingLodRanges)
+{
+    // overlapping ranges, as written by the compressed LOD generator, keep sharing one buffer
+    MeshPtr mesh = createSharedLodMesh("LodOverlapSrc", {{4, 6}, {7, 6}});
+    MeshPtr imported = exportAndImport(mesh, "LodOverlapDst");
+
+    SubMesh* subMesh = imported->getSubMesh(0);
+    ASSERT_EQ(subMesh->mLodFaceList.size(), 2u);
+
+    const IndexData* lod1 = subMesh->mLodFaceList[0];
+    const IndexData* lod2 = subMesh->mLodFaceList[1];
+    EXPECT_EQ(lod1->indexBuffer, lod2->indexBuffer);
+    EXPECT_EQ(lod1->indexBuffer->getNumIndexes(), 9u);
+    EXPECT_EQ(lod1->indexStart, 0u);
+    EXPECT_EQ(lod2->indexStart, 3u);
+    EXPECT_EQ(readLodIndices(lod1), readLodIndices(mesh->getSubMesh(0)->mLodFaceList[0]));
+    EXPECT_EQ(readLodIndices(lod2), readLodIndices(mesh->getSubMesh(0)->mLodFaceList[1]));
+
+    MeshManager::getSingleton().remove(imported);
+    MeshManager::getSingleton().remove(mesh);
 }
 
 TEST(Image, FlipV)
