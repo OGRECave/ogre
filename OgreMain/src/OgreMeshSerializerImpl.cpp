@@ -69,6 +69,70 @@ namespace Ogre {
         size_t remaining = pos < size ? size - pos : 0;
         return remaining / (MSTREAM_OVERHEAD_SIZE + sizeof(float)) >= numLods - 1;
     }
+
+#if !OGRE_NO_MESHLOD
+    /// The part of a generated LOD index buffer that is exported
+    struct LodIndexBlock
+    {
+        unsigned int bufferIndex; ///< LOD number whose block is shared, or -1 if the LOD writes its own
+        size_t start;             ///< first index of the block in the buffer
+        size_t count;             ///< number of indices in the block
+    };
+
+    /** Generated LODs may share one index buffer, because the LOD generator compressed them or
+        because the buffer is shared with other meshes. Overlapping or adjacent ranges of the same
+        buffer form one block that is written by the lowest LOD and referenced by the others;
+        disjoint ranges get their own block, so that unrelated indices are never exported.
+    */
+    static LodIndexBlock getLodIndexBlock(const SubMesh* submesh, unsigned short lodNum)
+    {
+        const IndexData* indexData = submesh->mLodFaceList[lodNum - 1];
+        const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
+
+        if (indexData->indexCount == 0)
+        {
+            // nothing is drawn, share any previous buffer or write the whole one
+            unsigned int bufferIndex = -1;
+            for (ushort i = 1; i < lodNum; i++)
+            {
+                const IndexData* prevIndexData = submesh->mLodFaceList[i - 1];
+                if (prevIndexData->indexCount != 0 && prevIndexData->indexBuffer == ibuf)
+                    bufferIndex = i;
+            }
+            return {bufferIndex, 0, ibuf ? ibuf->getNumIndexes() : 0};
+        }
+
+        size_t begin = indexData->indexStart;
+        size_t end = begin + indexData->indexCount;
+        unsigned short owner = lodNum;
+        bool grown = true;
+        while (grown)
+        {
+            grown = false;
+            for (size_t i = 1; i <= submesh->mLodFaceList.size(); ++i)
+            {
+                const IndexData* other = submesh->mLodFaceList[i - 1];
+                if (!other || other->indexCount == 0 || other->indexBuffer != ibuf)
+                    continue;
+
+                size_t otherBegin = other->indexStart;
+                size_t otherEnd = otherBegin + other->indexCount;
+                if (otherBegin > end || otherEnd < begin)
+                    continue;
+
+                owner = std::min(owner, static_cast<unsigned short>(i));
+                if (otherBegin < begin || otherEnd > end)
+                {
+                    begin = std::min(begin, otherBegin);
+                    end = std::max(end, otherEnd);
+                    grown = true;
+                }
+            }
+        }
+
+        return {owner == lodNum ? (unsigned int)-1 : owner, begin, end - begin};
+    }
+#endif
     //---------------------------------------------------------------------
     MeshSerializerImpl::MeshSerializerImpl()
     {
@@ -279,7 +343,10 @@ namespace Ogre {
         {
             // unsigned short* faceVertexIndices ((indexCount)
             HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
-            HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_READ_ONLY);
+            HardwareBufferLockGuard ibufLock(ibuf,
+                                             s->indexData->indexStart * ibuf->getIndexSize(),
+                                             s->indexData->indexCount * ibuf->getIndexSize(),
+                                             HardwareBuffer::HBL_READ_ONLY);
             if (idx32bit)
             {
                 unsigned int* pIdx32 = static_cast<unsigned int*>(ibufLock.pData);
@@ -437,7 +504,9 @@ namespace Ogre {
             // Data
             size = MSTREAM_OVERHEAD_SIZE + vbufSizeInBytes;
             writeChunkHeader(M_GEOMETRY_VERTEX_BUFFER_DATA, size);
-            HardwareBufferLockGuard vbufLock(vbuf, HardwareBuffer::HBL_READ_ONLY);
+            HardwareBufferLockGuard vbufLock(vbuf,
+                                             vertexData->vertexStart * vbuf->getVertexSize(),
+                                             vbufSizeInBytes, HardwareBuffer::HBL_READ_ONLY);
 
             if (mFlipEndian)
             {
@@ -1214,19 +1283,13 @@ namespace Ogre {
 
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(ibuf);
-        unsigned int bufferIndex = -1;
-        for(ushort i = 1; i < lodNum; i++){
-            // it will check any previous Lod levels for the same buffer.
-            // This will allow to use merged/shared/compressed buffers.
-            const IndexData* prevIndexData = submesh->mLodFaceList[i-1];
-            if(prevIndexData->indexCount != 0 && prevIndexData->indexBuffer == indexData->indexBuffer){
-                bufferIndex = i;
-            }
-        }
+        // previous Lod levels may share the buffer (merged/shared/compressed buffers)
+        LodIndexBlock block = getLodIndexBlock(submesh, lodNum);
+        unsigned int bufferIndex = block.bufferIndex;
 
         unsigned int indexCount = static_cast<unsigned int>(indexData->indexCount);
         writeInts(&indexCount, 1);
-        unsigned int indexStart = static_cast<unsigned int>(indexData->indexStart);
+        unsigned int indexStart = static_cast<unsigned int>(indexData->indexStart - block.start);
         writeInts(&indexStart, 1);
         writeInts(&bufferIndex, 1);
 
@@ -1234,21 +1297,17 @@ namespace Ogre {
             bool is32BitIndices = (ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
             writeBools(&is32BitIndices, 1);
 
-            unsigned int bufIndexCount = static_cast<unsigned int>(ibuf->getNumIndexes());
+            unsigned int bufIndexCount = static_cast<unsigned int>(block.count);
             writeInts(&bufIndexCount, 1);
 
             if (bufIndexCount > 0)
             {
+                HardwareBufferLockGuard ibufLock(ibuf, block.start * ibuf->getIndexSize(),
+                                                 block.count * ibuf->getIndexSize(), HardwareBuffer::HBL_READ_ONLY);
                 if (is32BitIndices)
-                {
-                    HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_READ_ONLY);
                     writeInts(static_cast<unsigned int*>(ibufLock.pData), bufIndexCount);
-                }
                 else
-                {
-                    HardwareBufferLockGuard ibufLock(ibuf, HardwareBuffer::HBL_READ_ONLY);
                     writeShorts(static_cast<unsigned short*>(ibufLock.pData), bufIndexCount);
-                }
             }
         }
     }
@@ -1315,15 +1374,9 @@ namespace Ogre {
 
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(ibuf);
-        unsigned int bufferIndex = -1;
-        for(ushort i = 1; i < lodNum; i++){
-            // it will check any previous Lod levels for the same buffer.
-            // This will allow to use merged/shared/compressed buffers.
-            const IndexData* prevIndexData = submesh->mLodFaceList[i-1];
-            if(prevIndexData->indexCount != 0 && prevIndexData->indexBuffer == indexData->indexBuffer){
-                bufferIndex = i;
-            }
-        }
+        // previous Lod levels may share the buffer (merged/shared/compressed buffers)
+        LodIndexBlock block = getLodIndexBlock(submesh, lodNum);
+        unsigned int bufferIndex = block.bufferIndex;
         
         size += sizeof(unsigned int); // unsigned int indexData->indexCount;
         size += sizeof(unsigned int); // unsigned int indexData->indexStart;
@@ -1331,7 +1384,7 @@ namespace Ogre {
         if(bufferIndex == (unsigned int)-1) {
             size += sizeof(bool); // bool indexes32Bit
             size += sizeof(unsigned int); // unsigned int ibuf->getNumIndexes()
-            size += !ibuf ? 0 : static_cast<unsigned long>(ibuf->getIndexSize() * ibuf->getNumIndexes()); // faces
+            size += !ibuf ? 0 : static_cast<unsigned long>(ibuf->getIndexSize() * block.count); // faces
         }
         return size;
     }
