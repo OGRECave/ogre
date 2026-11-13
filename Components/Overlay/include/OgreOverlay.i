@@ -45,9 +45,16 @@
 #endif
 
 SHARED_PTR(Font);
+#ifdef SWIGPYTHON
+%template(FontList) std::vector<Ogre::SharedPtr<Ogre::Font> >;
+%template(CodePointRangeList) std::vector<std::pair<Ogre::uint32, Ogre::uint32> >;
+#endif
 %include "OgreFont.h"
 %include "OgreFontManager.h"
 %ignore Ogre::Overlay::get2DElementsIterator;
+#ifdef SWIGPYTHON
+%template(OverlayContainerList) std::list<Ogre::OverlayContainer*>;
+#endif
 %include "OgreOverlay.h"
 SHARED_PTR(OverlayElement);
 %extend Ogre::OverlayElement {
@@ -84,10 +91,17 @@ SHARED_PTR(OverlayContainer);
         typedef pointer_category category;
         static const char* type_name() { return "Ogre::OverlayElement"; }
     };
+    template<> struct traits<Ogre::OverlayElementFactory> {
+        typedef pointer_category category;
+        static const char* type_name() { return "Ogre::OverlayElementFactory"; }
+    };
     }
 %}
 #endif
 %template(OverlayElementMap) std::map<std::string, Ogre::OverlayElement*>;
+#ifdef SWIGPYTHON
+%template(OverlayElementFactoryMap) std::map<std::string, Ogre::OverlayElementFactory*>;
+#endif
 %include "OgreOverlayManager.h"
 SHARED_PTR(OverlaySystem);
 %include "OgreOverlaySystem.h"

@@ -77,6 +77,9 @@ JNIEnv* OgreJNIGetEnv();
 %ignore OgreBites::TrayManager::getWidgetIterator;
 %ignore OgreBites::SelectMenu::getItemsCount;
 #ifndef SWIGCSHARP
+#ifdef SWIGPYTHON
+%template(WidgetList) std::vector<OgreBites::Widget*>;
+#endif
 %include "OgreTrays.h"
 %include "OgreAdvancedRenderControls.h"
 #endif

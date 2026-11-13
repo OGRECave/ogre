@@ -24,6 +24,12 @@
 #define __inline
 #define __forceinline
 
+#ifdef SWIGPYTHON
+namespace Ogre { struct TerrainLayerSampler; class Terrain; }
+%template(TerrainLayerDeclaration) std::vector<Ogre::TerrainLayerSampler>;
+%template(TerrainList) std::vector<Ogre::Terrain*>;
+%template(UInt8Pair) std::pair<Ogre::uint8, Ogre::uint8>;
+#endif
 %ignore Ogre::TerrainMaterialGenerator::setActiveProfile;
 %include "OgreTerrainMaterialGenerator.h"
 %include "OgreTerrainMaterialGeneratorA.h"
