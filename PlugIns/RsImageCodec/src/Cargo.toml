@@ -6,7 +6,26 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-image = "0.25.6"
+# only the formats registered in RsImageCodec::startup(); the default feature
+# set additionally pulls in rav1e (AVIF encoding) and rayon
+image = { version = "0.25.6", default-features = false, features = [
+    "bmp",
+    "exr",
+    "gif",
+    "hdr",
+    "jpeg",
+    "png",
+    "tga",
+    "tiff",
+    "webp",
+] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = "s"
+panic = "abort"
+strip = "debuginfo"
 
 [lib]
 crate-type = ["staticlib"]
