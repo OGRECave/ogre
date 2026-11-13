@@ -28,7 +28,9 @@ add_dependencies(Codec_RsImage rsimage)
 target_link_libraries(Codec_RsImage PUBLIC OgreMain PRIVATE ${RS_LIB_PATH} ${CMAKE_DL_LIBS})
 
 if(MSVC)
-    target_link_libraries(Codec_RsImage PRIVATE wsock32 ws2_32 bcrypt userenv Ntdll)
+    # staticlib crates do not emit linker directives, so supply what Rust's std
+    # pulls in. Synchronization provides WaitOnAddress/WakeByAddress*.
+    target_link_libraries(Codec_RsImage PRIVATE wsock32 ws2_32 bcrypt userenv Ntdll Synchronization)
 endif()
 
 target_include_directories(Codec_RsImage PUBLIC
