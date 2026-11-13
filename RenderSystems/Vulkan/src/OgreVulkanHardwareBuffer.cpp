@@ -163,6 +163,11 @@ namespace Ogre
         auto srcBuffer = dynamic_cast<VulkanHardwareBuffer*>( &_srcBuffer );
         if( srcBuffer && (mUsage & HBU_CPU_ONLY) == 0)
         {
+            // reads are served from the shadow buffer, keep it in sync with the GPU copy, unless
+            // this is the upload from the shadow buffer itself
+            if( mShadowBuffer && &_srcBuffer != mShadowBuffer.get() )
+                mShadowBuffer->copyData( _srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer );
+
             mDevice->mGraphicsQueue.getCopyEncoderV1Buffer( false );
 
             VkBuffer srcBuf = srcBuffer->getVkBuffer();
