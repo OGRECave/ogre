@@ -129,6 +129,12 @@ protected:
     ParameterPtr mPSOutputDiffuse;
     // Stage flags that defines resolve parameters definitions.
     unsigned int mResolveStageFlags;
+    // Use diffuse colour for unlit passes.
+    bool mUseDiffuseColour;
+    // Surface diffuse colour uniform parameter (VS).
+    UniformParameterPtr mSurfaceDiffuseColour;
+    // Surface diffuse colour uniform parameter (PS).
+    UniformParameterPtr mSurfaceDiffuseColourPS;
 };
 
 

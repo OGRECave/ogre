@@ -191,3 +191,41 @@ TEST_F(RTShaderSystem, NormalMapTextureUnitParameters)
     ScriptCompilerManager::getSingleton().setListener(NULL);
     EXPECT_EQ(errors.count, 0);
 }
+
+TEST_F(RTShaderSystem, UnlitDiffuse)
+{
+    auto& shaderGen = RTShader::ShaderGenerator::getSingleton();
+    auto mat = MaterialManager::getSingleton().create("UnlitDiffuseMat", RGN_DEFAULT);
+    auto pass = mat->getTechniques()[0]->getPasses()[0];
+    pass->setLightingEnabled(false);
+    pass->setDiffuse(ColourValue(0.9f, 0.7f, 0.4f));
+
+    EXPECT_TRUE(shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+    shaderGen.getRenderState("MyScheme")->setLightCountAutoUpdate(false);
+    shaderGen.validateMaterial("MyScheme", *mat);
+
+    auto newPass = mat->getTechniques()[1]->getPasses()[0];
+    auto fsSource = newPass->getFragmentProgram()->getSource();
+    EXPECT_NE(fsSource.find("surface_diffuse_colour"), String::npos);
+
+    EXPECT_TRUE(shaderGen.removeShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+}
+
+TEST_F(RTShaderSystem, UnlitDiffuseWithVertexColour)
+{
+    auto& shaderGen = RTShader::ShaderGenerator::getSingleton();
+    auto mat = MaterialManager::getSingleton().create("UnlitDiffuseVertexMat", RGN_DEFAULT);
+    auto pass = mat->getTechniques()[0]->getPasses()[0];
+    pass->setLightingEnabled(false);
+    pass->setVertexColourTracking(TVC_DIFFUSE);
+
+    EXPECT_TRUE(shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+    shaderGen.getRenderState("MyScheme")->setLightCountAutoUpdate(false);
+    shaderGen.validateMaterial("MyScheme", *mat);
+
+    auto newPass = mat->getTechniques()[1]->getPasses()[0];
+    auto vsSource = newPass->getVertexProgram()->getSource();
+    EXPECT_NE(vsSource.find("surface_diffuse_colour"), String::npos);
+
+    EXPECT_TRUE(shaderGen.removeShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
+}
