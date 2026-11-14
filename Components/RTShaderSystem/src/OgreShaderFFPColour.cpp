@@ -39,6 +39,9 @@ const String SRS_VERTEX_COLOUR = "FFP_Colour";
 FFPColour::FFPColour()
 {
     mResolveStageFlags  = 0;
+    mUseDiffuseColour   = false;
+    mSurfaceDiffuseColour = UniformParameterPtr();
+    mSurfaceDiffuseColourPS = UniformParameterPtr();
 }
 
 //-----------------------------------------------------------------------
@@ -83,6 +86,14 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
     // Resolve PS output diffuse color.
     mPSOutputDiffuse = psMain->resolveOutputParameter(Parameter::SPC_COLOR_DIFFUSE);
 
+    if (mUseDiffuseColour)
+    {
+        if (mVSOutputDiffuse)
+            mSurfaceDiffuseColour = vsProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
+        if (!mPSInputDiffuse)
+            mSurfaceDiffuseColourPS = psProgram->resolveParameter(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
+    }
+
     return true;
 }
 
@@ -113,11 +124,19 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     {
         vsDiffuse = mVSInputDiffuse;
         vsStage.callFunction("ENABLE_LINEAR_COLOUR", vsDiffuse);
+        if (mSurfaceDiffuseColour)
+        {
+            vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
+            vsStage.mul(mVSInputDiffuse, mSurfaceDiffuseColour, vsDiffuse);
+        }
     }
     else
     {
         vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
-        vsStage.assign(Vector4(1.0), vsDiffuse);
+        if (mSurfaceDiffuseColour)
+            vsStage.assign(mSurfaceDiffuseColour, vsDiffuse);
+        else
+            vsStage.assign(Vector4(1.0), vsDiffuse);
     }
 
     if (mVSOutputDiffuse)
@@ -148,7 +167,10 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
     else
     {
         psDiffuse = psMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE);
-        psStage.assign(Vector4(1.0), psDiffuse);
+        if (mSurfaceDiffuseColourPS)
+            psStage.assign(mSurfaceDiffuseColourPS, psDiffuse);
+        else
+            psStage.assign(Vector4(1.0), psDiffuse);
     }
 
     // Handle specular colour.
@@ -180,6 +202,7 @@ void FFPColour::copyFrom(const SubRenderState& rhs)
     const FFPColour& rhsColour = static_cast<const FFPColour&>(rhs);
 
     setResolveStageFlags(rhsColour.mResolveStageFlags);
+    mUseDiffuseColour = rhsColour.mUseDiffuseColour;
 }
 
 //-----------------------------------------------------------------------
@@ -189,6 +212,8 @@ bool FFPColour::preAddToRenderState(const RenderState* renderState, Pass* srcPas
 
     if (trackColour != 0)
         addResolveStageMask(FFPColour::SF_VS_INPUT_DIFFUSE);
+
+    mUseDiffuseColour = !srcPass->getLightingEnabled();
 
     return true;
 }
