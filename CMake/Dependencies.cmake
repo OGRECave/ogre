@@ -177,10 +177,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
       message(STATUS "Building Assimp")
       file(DOWNLOAD
-              https://github.com/assimp/assimp/archive/refs/tags/v6.0.5.tar.gz
-          ${PROJECT_BINARY_DIR}/v6.0.5.tar.gz)
+              https://github.com/assimp/assimp/archive/refs/tags/v6.0.6.tar.gz
+          ${PROJECT_BINARY_DIR}/v6.0.6.tar.gz)
       execute_process(COMMAND ${CMAKE_COMMAND}
-          -E tar xf v6.0.5.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+          -E tar xf v6.0.6.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
       # Assimp is only used for asset import, so favour size over import speed.
       # Override the configuration flags rather than the build type to keep
       # Debug builds debuggable and multi-config generators working.
@@ -196,10 +196,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           # rarely used for real-time assets.
           -DASSIMP_BUILD_IFC_IMPORTER=OFF
           -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
-          ${PROJECT_BINARY_DIR}/assimp-6.0.5
-          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-6.0.5)
+          ${PROJECT_BINARY_DIR}/assimp-6.0.6
+          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-6.0.6)
       execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/assimp-6.0.5 ${BUILD_COMMAND_OPTS})
+        --build ${PROJECT_BINARY_DIR}/assimp-6.0.6 ${BUILD_COMMAND_OPTS})
     endif()
 
     message(STATUS "Building Bullet")
