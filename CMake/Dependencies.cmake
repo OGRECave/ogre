@@ -68,10 +68,38 @@ if(NPROC EQUAL 0)
     set(NPROC 2)
 endif()
 
-set(BUILD_COMMAND_OPTS --target install -j ${NPROC} --config ${CMAKE_BUILD_TYPE})
+# Multi-config generators (Visual Studio, Xcode, Ninja Multi-Config) select the
+# configuration at build time, so the dependencies have to be installed for
+# every configuration up front. Release, RelWithDebInfo and MinSizeRel are ABI
+# compatible, hence Debug and Release cover all built-in configurations.
+# If CMAKE_BUILD_TYPE is set anyway - like the packaged SDK does - only that
+# configuration is needed and building the other one is a waste of time.
+get_property(OGRE_GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(OGRE_GENERATOR_IS_MULTI_CONFIG)
+  if(CMAKE_BUILD_TYPE)
+    set(OGRE_DEPENDENCY_CONFIGS ${CMAKE_BUILD_TYPE})
+  else()
+    set(OGRE_DEPENDENCY_CONFIGS Debug Release)
+  endif()
+endif()
+
+set(BUILD_COMMAND_OPTS --target install -j ${NPROC})
+
+macro(ogre_build_dependency _binary_dir)
+  if(OGRE_GENERATOR_IS_MULTI_CONFIG)
+    foreach(_config ${OGRE_DEPENDENCY_CONFIGS})
+      execute_process(COMMAND ${CMAKE_COMMAND}
+        --build ${_binary_dir} ${BUILD_COMMAND_OPTS} --config ${_config})
+    endforeach()
+  else()
+    # single-config generators baked the configuration in at configure time;
+    # CMAKE_BUILD_TYPE may well be empty, so there is no --config to pass
+    execute_process(COMMAND ${CMAKE_COMMAND}
+      --build ${_binary_dir} ${BUILD_COMMAND_OPTS})
+  endif()
+endmacro()
 
 set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
-  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
   -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
   -G ${CMAKE_GENERATOR}
   -DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}
@@ -79,6 +107,34 @@ set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
   -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
   -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # allow linking into a shared lib
   ${CROSS})
+
+if(NOT OGRE_GENERATOR_IS_MULTI_CONFIG)
+  list(APPEND BUILD_COMMAND_COMMON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+endif()
+
+# Dependencies built for a multi-config generator only provide Debug and
+# Release. If an imported target has Release but not one of the other built-in
+# configurations, map the latter to Release (they are ABI compatible) instead
+# of letting CMake fall back to the first imported configuration, which is
+# Debug. Config-less packages ("NONE") are left alone.
+macro(ogre_map_imported_config _target)
+  if(TARGET ${_target})
+    get_target_property(_aliased ${_target} ALIASED_TARGET)
+    get_target_property(_imported_configs ${_target} IMPORTED_CONFIGURATIONS)
+    if(NOT _aliased AND _imported_configs)
+      string(TOUPPER "${_imported_configs}" _imported_configs)
+      foreach(_config RelWithDebInfo MinSizeRel)
+        string(TOUPPER "${_config}" _config_upper)
+        if("RELEASE" IN_LIST _imported_configs AND NOT _config_upper IN_LIST _imported_configs)
+          set_target_properties(${_target} PROPERTIES MAP_IMPORTED_CONFIG_${_config_upper} Release)
+        endif()
+      endforeach()
+    endif()
+    unset(_aliased)
+    unset(_imported_configs)
+    unset(_config_upper)
+  endif()
+endmacro()
 
 # Set hardcoded path guesses for various platforms
 if (UNIX AND NOT EMSCRIPTEN)
@@ -100,10 +156,11 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -E tar xf pugixml-1.15.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # this will be linked into a shared lib
+        # Debug and Release are installed next to each other
+        -DPUGIXML_USE_POSTFIX=${OGRE_GENERATOR_IS_MULTI_CONFIG}
         ${PROJECT_BINARY_DIR}/pugixml-1.15
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/pugixml-1.15)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/pugixml-1.15 ${BUILD_COMMAND_OPTS})
+    ogre_build_dependency(${PROJECT_BINARY_DIR}/pugixml-1.15)
 
     #find_package(Freetype)
     if (NOT FREETYPE_FOUND)
@@ -129,8 +186,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.14.3
             ${PROJECT_BINARY_DIR}/freetype-2.14.3
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.14.3/objs)
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            --build ${PROJECT_BINARY_DIR}/freetype-2.14.3/objs ${BUILD_COMMAND_OPTS})
+        ogre_build_dependency(${PROJECT_BINARY_DIR}/freetype-2.14.3/objs)
     endif()
 
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
@@ -157,8 +213,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             ${SDL_AUDIO_OPTS}
             ${PROJECT_BINARY_DIR}/SDL2-2.32.10
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/SDL2-build)
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            --build ${PROJECT_BINARY_DIR}/SDL2-build ${BUILD_COMMAND_OPTS})
+        ogre_build_dependency(${PROJECT_BINARY_DIR}/SDL2-build)
     endif()
 
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
@@ -173,8 +228,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
           ${PROJECT_BINARY_DIR}/zlib-1.3.2
           WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zlib-1.3.2)
-      execute_process(COMMAND ${CMAKE_COMMAND}
-          --build ${PROJECT_BINARY_DIR}/zlib-1.3.2 ${BUILD_COMMAND_OPTS})
+      ogre_build_dependency(${PROJECT_BINARY_DIR}/zlib-1.3.2)
 
       message(STATUS "Building Assimp")
       file(DOWNLOAD
@@ -185,6 +239,12 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
       # Assimp is only used for asset import, so favour size over import speed.
       # Override the configuration flags rather than the build type to keep
       # Debug builds debuggable and multi-config generators working.
+      set(ASSIMP_POSTFIX_OPTS)
+      if(OGRE_GENERATOR_IS_MULTI_CONFIG)
+          # set explicitly rather than relying on the cached default, so that
+          # an already configured source tree cannot leave it empty
+          set(ASSIMP_POSTFIX_OPTS -DCMAKE_DEBUG_POSTFIX=d)
+      endif()
       execute_process(COMMAND ${BUILD_COMMAND_COMMON}
           "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG"
           "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-Os -g -DNDEBUG"
@@ -197,10 +257,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           # rarely used for real-time assets.
           -DASSIMP_BUILD_IFC_IMPORTER=OFF
           -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
+          ${ASSIMP_POSTFIX_OPTS}
           ${PROJECT_BINARY_DIR}/assimp-6.0.5
           WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-6.0.5)
-      execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/assimp-6.0.5 ${BUILD_COMMAND_OPTS})
+      ogre_build_dependency(${PROJECT_BINARY_DIR}/assimp-6.0.5)
     endif()
 
     message(STATUS "Building Bullet")
@@ -228,8 +288,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         ${PROJECT_BINARY_DIR}/bullet3-3.25
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bullet3-3.25)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/bullet3-3.25 ${BUILD_COMMAND_OPTS})
+    ogre_build_dependency(${PROJECT_BINARY_DIR}/bullet3-3.25)
     set(Bullet_ROOT ${OGREDEPS_PATH})
 endif()
 
@@ -325,14 +384,18 @@ macro_log_feature(SWIG_FOUND "SWIG" "Language bindings (Python, Java, C#) for OG
 
 # pugixml
 find_package(pugixml QUIET)
+ogre_map_imported_config(pugixml::pugixml)
+ogre_map_imported_config(pugixml::static)
 macro_log_feature(pugixml_FOUND "pugixml" "Needed for XMLConverter and DotScene Plugin" "https://pugixml.org/")
 
 # Find zlib
 find_package(ZLIB)
+ogre_map_imported_config(ZLIB::ZLIB)
 macro_log_feature(ZLIB_FOUND "zlib" "Simple data compression library" "http://www.zlib.net")
 
 # Assimp
 find_package(assimp QUIET)
+ogre_map_imported_config(assimp::assimp)
 macro_log_feature(assimp_FOUND "Assimp" "Needed for the AssimpLoader Plugin" "https://www.assimp.org/")
 
 # Bullet
@@ -373,6 +436,8 @@ if(NOT ANDROID AND NOT EMSCRIPTEN)
         INTERFACE_LINK_LIBRARIES "${SDL2_LIBRARIES}"
     )
   endif()
+  ogre_map_imported_config(SDL2::SDL2)
+  ogre_map_imported_config(SDL2::SDL2-static)
 
   if(SKBUILD AND NOT SDL2_FOUND)
     # the Python wheels ship OgreBites with the bundled SDL2 and must not be
