@@ -85,6 +85,32 @@ if(@OGRE_STATIC@)
     if(@OGRE_BUILD_COMPONENT_OVERLAY@ AND @ZLIB_FOUND@)
         find_package(ZLIB QUIET)
     endif()
+
+    # Bundled dependencies are only installed for Debug and Release. If one of
+    # them provides Release but not RelWithDebInfo or MinSizeRel, map those to
+    # Release; otherwise CMake would fall back to the first imported
+    # configuration, which is Debug.
+    foreach(_target IN ITEMS assimp::assimp pugixml::pugixml pugixml::static
+                             SDL2::SDL2 SDL2::SDL2-static ZLIB::ZLIB)
+        if(TARGET ${_target})
+            get_target_property(_aliased ${_target} ALIASED_TARGET)
+            get_target_property(_configs ${_target} IMPORTED_CONFIGURATIONS)
+            if(NOT _aliased AND _configs)
+                string(TOUPPER "${_configs}" _configs)
+                foreach(_config RelWithDebInfo MinSizeRel)
+                    string(TOUPPER "${_config}" _config_upper)
+                    if("RELEASE" IN_LIST _configs AND NOT _config_upper IN_LIST _configs)
+                        set_target_properties(${_target} PROPERTIES MAP_IMPORTED_CONFIG_${_config_upper} Release)
+                    endif()
+                endforeach()
+            endif()
+        endif()
+    endforeach()
+    unset(_target)
+    unset(_aliased)
+    unset(_configs)
+    unset(_config)
+    unset(_config_upper)
 endif()
 
 if(@OGRE_BUILD_COMPONENT_BITES@)
