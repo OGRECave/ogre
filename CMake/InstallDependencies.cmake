@@ -103,7 +103,16 @@ if (OGRE_INSTALL_DEPENDENCIES)
     endif()
 
     if (EXISTS ${OGRE_DEP_DIR}/bin/)
-      install(DIRECTORY ${OGRE_DEP_DIR}/bin/ DESTINATION ${OGRE_BIN_DIRECTORY})
+      # Bundled dependencies are installed for Debug and Release next to each
+      # other. The debug binaries use the postfix of the respective dependency,
+      # so keep them out of the SDK for the other configurations, where they
+      # cannot be loaded anyway.
+      install(DIRECTORY ${OGRE_DEP_DIR}/bin/ DESTINATION ${OGRE_BIN_DIRECTORY}
+        CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
+        PATTERN "*d.dll" EXCLUDE
+        PATTERN "*d.pdb" EXCLUDE)
+      install(DIRECTORY ${OGRE_DEP_DIR}/bin/ DESTINATION ${OGRE_BIN_DIRECTORY}
+        CONFIGURATIONS Debug)
     endif ()
   endif ()
 
