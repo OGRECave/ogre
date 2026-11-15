@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRenderQueueSortingGrouping.h"
 #include <algorithm>
-#include <unordered_map>
+#include <typeinfo>
 
 namespace Ogre {
 namespace {
@@ -367,7 +367,8 @@ namespace {
                 bySubMesh.reserve(it.second.size());
                 for (auto* rend : it.second)
                 {
-                    auto subEntity = dynamic_cast<SubEntity*>(rend);
+                    // as dynamic_cast, without walking the class hierarchy: SubEntity is never derived from
+                    auto subEntity = typeid(*rend) == typeid(SubEntity) ? static_cast<SubEntity*>(rend) : nullptr;
                     bySubMesh.emplace_back(subEntity ? subEntity->getSubMesh() : 0, rend);
                 }
                 std::stable_sort(bySubMesh.begin(), bySubMesh.end(),
