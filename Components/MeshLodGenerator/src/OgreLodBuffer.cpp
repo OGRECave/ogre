@@ -45,9 +45,10 @@ namespace Ogre
             vertexBuffer = std::make_shared<DefaultHardwareBuffer>(vertexCount * 3 * sizeof(float));
 
             // Lock the buffer for reading.
-            unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
-            unsigned char* vertex = vStart;
             size_t vSize = vbuf->getVertexSize();
+            unsigned char* vStart =
+                static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY)) + data->vertexStart * vSize;
+            unsigned char* vertex = vStart;
 
             const VertexElement* elemNormal = 0;
             HardwareVertexBufferSharedPtr vNormalBuf;
@@ -65,7 +66,8 @@ namespace Ogre
                     vNormal = vStart;
                 }  else {
                     vNormalBuf = data->vertexBufferBinding->getBuffer(elemNormal->getSource());
-                    vNormal = static_cast<unsigned char*>(vNormalBuf->lock(HardwareBuffer::HBL_READ_ONLY));
+                    vNormal = static_cast<unsigned char*>(vNormalBuf->lock(HardwareBuffer::HBL_READ_ONLY)) +
+                              data->vertexStart * vNormalBuf->getVertexSize();
                 }
                 vNormalSize = vNormalBuf->getVertexSize();
             }
