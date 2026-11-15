@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "PixelFormatTests.h"
 #include <cstdlib>
 #include <iomanip>
+#include "OgreBitwise.h"
 
 
 // Register the test suite
@@ -92,6 +93,28 @@ TEST_F(PixelFormatTests,FloatPackUnpack)
     PixelUtil::bulkPixelConversion(data2, PF_FLOAT16_RGBA, dst.ptr(), PF_FLOAT32_RGBA, 1);
 
     EXPECT_EQ(dst, ref);
+}
+//--------------------------------------------------------------------------
+TEST_F(PixelFormatTests,FloatGRChannelOrder)
+{
+    // red is the first channel in memory, as in PF_SHORT_GR and RG16F/RG32F
+    ColourValue src(0.25, 0.75, 0, 1);
+
+    float data32[2];
+    PixelUtil::packColour(src, PF_FLOAT32_GR, data32);
+    EXPECT_EQ(data32[0], 0.25f);
+    EXPECT_EQ(data32[1], 0.75f);
+
+    uint16 data16[2];
+    PixelUtil::packColour(src, PF_FLOAT16_GR, data16);
+    EXPECT_EQ(Bitwise::halfToFloat(data16[0]), 0.25f);
+    EXPECT_EQ(Bitwise::halfToFloat(data16[1]), 0.75f);
+
+    ColourValue dst;
+    PixelUtil::unpackColour(dst, PF_FLOAT32_GR, data32);
+    EXPECT_EQ(dst, src);
+    PixelUtil::unpackColour(dst, PF_FLOAT16_GR, data16);
+    EXPECT_EQ(dst, src);
 }
 //--------------------------------------------------------------------------
 // Pure 32 bit float precision brute force pixel conversion; for comparison
