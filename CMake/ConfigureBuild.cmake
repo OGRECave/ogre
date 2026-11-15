@@ -14,7 +14,7 @@
 #######################################################################
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE_LOWER)
-if(${BUILD_TYPE_LOWER} STREQUAL "debug")
+if(BUILD_TYPE_LOWER STREQUAL "debug")
   set(OGRE_DEBUG_MODE 1)
 endif()
 

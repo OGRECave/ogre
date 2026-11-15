@@ -92,9 +92,11 @@ set(OGRE_WORK_DIR ${PROJECT_BINARY_DIR})
 # Set up the basic build environment
 #####################################################################
 
-if (NOT CMAKE_BUILD_TYPE)
+get_property(OGRE_GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if (NOT CMAKE_BUILD_TYPE AND NOT OGRE_GENERATOR_IS_MULTI_CONFIG)
   # CMake defaults to leaving CMAKE_BUILD_TYPE empty. This screws up
-  # differentiation between debug and release builds.
+  # differentiation between debug and release builds. Multi-config generators
+  # pick the configuration at build time, so leave it empty for them.
   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif ()
 
