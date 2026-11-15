@@ -416,7 +416,7 @@ namespace Ogre
         {
             if(mUseLinearColours && entry.acType == GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY)
             {
-                auto colours = reinterpret_cast<const ColourValue*>(data + entry.physicalIndex);
+                auto colours = reinterpret_cast<const ColourValue*>(data);
                 for (size_t i = 0; i < entry.arraySize; ++i)
                 {
                     memcpy(&mConstants[entry.physicalIndex + i * sizeof(ColourValue)], colours[i].gammaToLinear().ptr(),
@@ -425,7 +425,6 @@ namespace Ogre
             }
             else
             {
-                size = size ? size : entry.arraySize * entry.elementCount * sizeof(float);
                 memcpy(&mConstants[entry.physicalIndex], data, size);
             }
             entry.hash = hash;
@@ -456,18 +455,23 @@ namespace Ogre
             break;
             case GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE_ARRAY:
                 data = (const char*)source->getLightPositionViewSpaceArray(ac.arraySize);
+                size = ac.arraySize * ac.elementCount * sizeof(float);
                 break;
             case GpuProgramParameters::ACT_LIGHT_DIRECTION_VIEW_SPACE_ARRAY:
                 data = (const char*)source->getLightDirectionViewSpaceArray(ac.arraySize);
+                size = ac.arraySize * ac.elementCount * sizeof(float);
                 break;
             case GpuProgramParameters::ACT_LIGHT_ATTENUATION_ARRAY:
                 data = (const char*)source->getLightAttenuationArray(ac.arraySize);
+                size = ac.arraySize * ac.elementCount * sizeof(float);
                 break;
             case GpuProgramParameters::ACT_SPOTLIGHT_PARAMS_ARRAY:
                 data = (const char*)source->getSpotlightParamsArray(ac.arraySize);
+                size = ac.arraySize * ac.elementCount * sizeof(float);
                 break;
             case GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY:
                 data = (const char*)source->getLightDiffuseColourPowerScaledArray(ac.arraySize);
+                size = ac.arraySize * ac.elementCount * sizeof(float);
                 break;
             default:
                 continue;

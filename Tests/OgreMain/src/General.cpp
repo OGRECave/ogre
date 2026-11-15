@@ -61,6 +61,7 @@ THE SOFTWARE.
 #include "OgreBillboard.h"
 #include "OgreParticleEmitter.h"
 #include "OgrePredefinedControllers.h"
+#include "OgreAutoParamDataSource.h"
 
 #include <random>
 using std::minstd_rand;
@@ -1041,4 +1042,25 @@ TEST(LinearControllerFunction, InputOnOrOutsideKeys)
     EXPECT_FLOAT_EQ(f.calculate(0.5), 20);
     EXPECT_FLOAT_EQ(f.calculate(0.75), 30);
     EXPECT_FLOAT_EQ(f.calculate(1), 40);
+}
+
+TEST(GpuSharedParameters, LightArrayAutoConstants)
+{
+    Light red, green;
+    red.setDiffuseColour(ColourValue::Red);
+    green.setDiffuseColour(ColourValue::Green);
+    LightList lights{&red, &green};
+    AutoParamDataSource source;
+    source.setCurrentLightList(&lights);
+
+    GpuSharedParameters params("lights");
+    params.setUseLinearColours(true);
+    params.addConstantDefinition("padding", GCT_FLOAT4);
+    params.addConstantDefinition("colours", GCT_FLOAT4, 2);
+    params.setAutoConstant("colours", GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED_ARRAY);
+    params._updateAutoParams(&source);
+
+    const float* colours = params.getFloatPointer(params.getConstantDefinition("colours").physicalIndex);
+    EXPECT_EQ(Vector4f(colours), Vector4f(1, 0, 0, 1));
+    EXPECT_EQ(Vector4f(colours + 4), Vector4f(0, 1, 0, 1));
 }
