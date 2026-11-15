@@ -510,7 +510,8 @@ void VertexIndexToShape::addStaticVertexData(const VertexData* vertex_data)
         HardwareVertexBufferSharedPtr vbuf = data->vertexBufferBinding->getBuffer(posElem->getSource());
         const unsigned int vSize = (unsigned int)vbuf->getVertexSize();
 
-        unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        unsigned char* vertex =
+            static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY)) + data->vertexStart * vSize;
         float* pReal;
         Vector3* curVertices = &mVertexBuffer[prev_size];
         const unsigned int vertexCount = (unsigned int)data->vertexCount;
@@ -555,7 +556,8 @@ void VertexIndexToShape::addAnimatedVertexData(const VertexData* vertex_data, co
         HardwareVertexBufferSharedPtr vbuf = data->vertexBufferBinding->getBuffer(posElem->getSource());
         const unsigned int vSize = (unsigned int)vbuf->getVertexSize();
 
-        unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        unsigned char* vertex =
+            static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY)) + data->vertexStart * vSize;
         float* pReal;
         Vector3* curVertices = &mVertexBuffer[prev_size];
         const unsigned int vertexCount = (unsigned int)data->vertexCount;
@@ -580,7 +582,8 @@ void VertexIndexToShape::addAnimatedVertexData(const VertexData* vertex_data, co
 
         HardwareVertexBufferSharedPtr vbuf = vertex_data->vertexBufferBinding->getBuffer(bneElem->getSource());
         const unsigned int vSize = (unsigned int)vbuf->getVertexSize();
-        unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY)) +
+                                vertex_data->vertexStart * vSize;
 
         unsigned char* pBone;
 
@@ -637,7 +640,8 @@ void VertexIndexToShape::addIndexData(IndexData* data, const unsigned int offset
 
     if (use32bitindexes)
     {
-        const unsigned int* pInt = static_cast<unsigned int*>(ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        const unsigned int* pInt =
+            static_cast<unsigned int*>(ibuf->lock(HardwareBuffer::HBL_READ_ONLY)) + data->indexStart;
         for (unsigned int k = 0; k < numTris; ++k)
         {
             mIndexBuffer[index_offset++] = offset + *pInt++;
@@ -648,7 +652,8 @@ void VertexIndexToShape::addIndexData(IndexData* data, const unsigned int offset
     }
     else
     {
-        const unsigned short* pShort = static_cast<unsigned short*>(ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        const unsigned short* pShort =
+            static_cast<unsigned short*>(ibuf->lock(HardwareBuffer::HBL_READ_ONLY)) + data->indexStart;
         for (unsigned int k = 0; k < numTris; ++k)
         {
             mIndexBuffer[index_offset++] = offset + static_cast<unsigned int>(*pShort++);
