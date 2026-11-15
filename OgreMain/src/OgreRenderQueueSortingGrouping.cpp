@@ -362,18 +362,19 @@ namespace {
                 if (!instanced)
                     continue;
 
-                std::unordered_map<SubMesh*, RenderableList> bySubMesh;
+                // a sort instead of a map of lists, which allocated per SubMesh every frame
+                std::vector<std::pair<SubMesh*, Renderable*>> bySubMesh;
+                bySubMesh.reserve(it.second.size());
                 for (auto* rend : it.second)
                 {
                     auto subEntity = dynamic_cast<SubEntity*>(rend);
-                    SubMesh* subMesh = subEntity ? subEntity->getSubMesh() : 0;
-                    bySubMesh[subMesh].push_back(rend);
+                    bySubMesh.emplace_back(subEntity ? subEntity->getSubMesh() : 0, rend);
                 }
-                it.second.clear();
-                for (auto& it2 : bySubMesh)
-                {
-                    it.second.insert(it.second.end(), it2.second.begin(), it2.second.end());
-                }
+                std::stable_sort(bySubMesh.begin(), bySubMesh.end(),
+                                 [](const std::pair<SubMesh*, Renderable*>& a,
+                                    const std::pair<SubMesh*, Renderable*>& b) { return a.first < b.first; });
+                for (size_t i = 0; i < bySubMesh.size(); i++)
+                    it.second[i] = bySubMesh[i].second;
             }
         }
     }
