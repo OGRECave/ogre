@@ -28,11 +28,11 @@ using namespace Ogre;
 %include std_pair.i
 %include std_map.i
 %include std_unordered_map.i
-#ifdef SWIGPYTHON
-%include std_multimap.i
 %include std_list.i
 %include std_set.i
 %include std_array.i
+#ifdef SWIGPYTHON
+%include std_multimap.i
 #endif
 %include std_vector.i
 %include exception.i
@@ -49,6 +49,9 @@ using namespace Ogre;
     };
     }
 %}
+%enddef
+#else
+%define PTR_TRAITS(T)
 %enddef
 #endif
  
@@ -284,11 +287,9 @@ typedef uint8_t uint8;
 %import "OgreMemoryAllocatorConfig.h"
 %include "OgreCommon.h"
 %template(NameValueMap) std::map<std::string, std::string>;
-#ifdef SWIGPYTHON
 %template(LightList) std::vector<Ogre::Light*>;
 %template(UnaryOptionList) std::map<std::string, bool>;
 %template(IndexMap) std::vector<unsigned short>;
-#endif
 ADD_REPR(TRect)
 %template(Rect) Ogre::TRect<long>;
 %template(FloatRect) Ogre::TRect<float>;
@@ -308,9 +309,7 @@ ADD_REPR(TRect)
 %ignore Ogre::Any::isEmpty; // deprecated
 %include "OgreAny.h"
 %ignore Ogre::Math::calculateTangentSpaceVector; // deprecated
-#ifdef SWIGPYTHON
 %template(PlaneList) std::vector<Ogre::Plane>;
-#endif
 %include "OgreMath.h"
 ADD_REPR(Degree)
 ADD_REPR(Radian)
@@ -612,11 +611,9 @@ ADD_REPR(Quaternion)
 %include "OgreSimpleSpline.h"
 %include "OgreRotationalSpline.h"
 // Geometric Primitives
-#ifdef SWIGPYTHON
 %template(Corners) std::array<Ogre::Vector3, 8>;
 %template(Vector3List) std::vector<Ogre::Vector3>;
 %template(Vector4List) std::vector<Ogre::Vector4>;
-#endif
 %include "OgreAxisAlignedBox.h"
 ADD_REPR(AxisAlignedBox)
 %include "OgreSphere.h"
@@ -624,9 +621,7 @@ ADD_REPR(AxisAlignedBox)
 ADD_REPR(Plane)
 %include "OgrePlaneBoundedVolume.h"
 // I/O
-#ifdef SWIGPYTHON
 %template(PlaneBoundedVolumeList) std::vector<Ogre::PlaneBoundedVolume>;
-#endif
 %include "OgreConfigOptionMap.h"
 %template(ConfigOptionMap) std::map<std::string, Ogre::ConfigOption>;
 %ignore Ogre::ConfigFile::load; // conflicting overloads
@@ -695,10 +690,8 @@ ADD_REPR(ColourValue)
 #endif
 %include "OgreBlendMode.h"
 %include "OgreRay.h"
-#ifdef SWIGPYTHON
 %template(SceneQueryMovableObjectPair) std::pair<Ogre::MovableObject*, Ogre::MovableObject*>;
 %template(SceneQueryMovableIntersectionList) std::list<std::pair<Ogre::MovableObject*, Ogre::MovableObject*> >;
-#endif
 %include "OgreSceneQuery.h"
 %template(RaySceneQueryResult) std::vector<Ogre::RaySceneQueryResultEntry>;
 #ifdef SWIGPYTHON
@@ -716,16 +709,14 @@ ADD_REPR(ColourValue)
 %ignore Ogre::GpuSharedParameters::getConstantDefinitionIterator;
 %template(GpuConstantDefinitionMap) std::map<std::string, Ogre::GpuConstantDefinition>;
 SHARED_PTR(GpuProgramParameters);
-#ifdef SWIGPYTHON
 namespace Ogre { struct GpuLogicalIndexUse; class GpuSharedParametersUsage; }
 %template(ConstantList) std::vector<Ogre::uchar>;
 %template(GpuLogicalIndexUseMap) std::map<size_t, Ogre::GpuLogicalIndexUse>;
 %ignore std::vector<Ogre::GpuSharedParametersUsage>::resize; // non default constructible
-%ignore std::vector<Ogre::GpuSharedParametersUsage>::vector;
+%ignore std::vector<Ogre::GpuSharedParametersUsage>::vector(size_type);
 %template(GpuSharedParamUsageList) std::vector<Ogre::GpuSharedParametersUsage>;
 %template(GpuConstantDefinitionPair) std::pair<std::string, Ogre::GpuConstantDefinition>;
 %template(GpuConstantDefinitionList) std::vector<std::pair<std::string, Ogre::GpuConstantDefinition> >;
-#endif
 %include "OgreGpuProgramParams.h"
 %ignore Ogre::Image::getFileExtFromMagic;
 %include "OgreImage.h"
@@ -764,24 +755,18 @@ SHARED_PTR(StringInterface);
         %typecheck(SWIG_TYPECHECK_INT64_PTR) void *pData ""
         #endif
 
-#ifdef SWIGPYTHON
         %template(ConstImagePtrList) std::vector<const Ogre::Image*>;
         %template(TextureList) std::vector<Ogre::TexturePtr>;
-#endif
         %include "OgreTexture.h"
         SHARED_PTR(GpuProgram);
         %ignore Ogre::GpuProgram::setAdjacencyInfoRequired;
         %include "OgreGpuProgram.h"
             SHARED_PTR(HighLevelGpuProgram);
             %include "OgreHighLevelGpuProgram.h"
-#ifdef SWIGPYTHON
 %template(StringSet) std::set<std::string>;
-#endif
 %include "OgreRenderSystemCapabilities.h"
 %ignore getPropertyName;
-#ifdef SWIGPYTHON
 %template(BoolStringPair) std::pair<bool, std::string>;
-#endif
 %include "OgreScriptCompiler.h"
 %ignore Ogre::TextureUnitState::setCubicTexture;
 %ignore Ogre::TextureUnitState::setCubicTextureName;
@@ -793,10 +778,8 @@ SHARED_PTR(StringInterface);
 %ignore Ogre::TextureUnitState::setTextureNameAlias;
 %ignore Ogre::TextureUnitState::getTextureNameAlias;
 %ignore Ogre::TextureUnitState::setAnimatedTextureName( const String* const, size_t, Real = 0 );
-#ifdef SWIGPYTHON
 %template(UIntPair) std::pair<Ogre::uint32, Ogre::uint32>;
 %template(UIntList) std::vector<Ogre::uint32>;
-#endif
 %include "OgreTextureUnitState.h"
 %template(ControllerFloat) Ogre::Controller<float>;
 %template(ControllerValueFloatPtr) Ogre::SharedPtr<Ogre::ControllerValue<float> >;
@@ -812,26 +795,20 @@ SHARED_PTR(Compositor);
 %ignore Ogre::CompositionTechnique::getTargetPass;
 %ignore Ogre::CompositionTechnique::getNumTargetPasses;
 %ignore Ogre::CompositionTechnique::getTargetPassIterator;
-#ifdef SWIGPYTHON
 %template(CompositionTargetPassList) std::vector<Ogre::CompositionTargetPass*>;
-#endif
 %include "OgreCompositionTechnique.h"
 %ignore Ogre::CompositionTargetPass::getPass;
 %ignore Ogre::CompositionTargetPass::getNumPasses;
 %ignore Ogre::CompositionTargetPass::getPassIterator;
-#ifdef SWIGPYTHON
 %template(CompositionPassList) std::vector<Ogre::CompositionPass*>;
-#endif
 %include "OgreCompositionTargetPass.h"
 SHARED_PTR(HardwareVertexBuffer);
 #ifdef SWIGPYTHON
 %template(VertexElementList) std::list<Ogre::VertexElement>;
 #endif
 %ignore Ogre::VertexElement::getBestColourVertexElementType;
-#ifdef SWIGPYTHON
-%template(VertexBufferBindingMap) std::map<unsigned short, Ogre::HardwareVertexBufferSharedPtr>;
+%template(VertexBufferBindingMap) std::map<unsigned short, Ogre::SharedPtr<Ogre::HardwareVertexBuffer> >; // not the typedef: breaks Java iterators
 %template(BindingIndexMap) std::map<unsigned short, unsigned short>;
-#endif
 %include "OgreHardwareVertexBuffer.h"
 SHARED_PTR(HardwareIndexBuffer);
 %include "OgreHardwareIndexBuffer.h"
@@ -848,12 +825,10 @@ SHARED_PTR(HardwarePixelBuffer);
 %ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool, Resource*) const;
 %ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool) const;
 %ignore Ogre::ResourceGroupManager::getResourceManagerIterator;
-#ifdef SWIGPYTHON
-%template(DataStreamList) std::list<Ogre::DataStreamPtr>;
+%template(DataStreamList) std::list<Ogre::SharedPtr<Ogre::DataStream> >; // not the typedef: breaks Java iterators
 PTR_TRAITS(Ogre::ResourceManager)
 %template(ResourceManagerMap) std::map<std::string, Ogre::ResourceManager*>;
 
-#endif
 %include "OgreResourceGroupManager.h"
 #if SWIG_VERSION < 0x030012 || defined(SWIGJAVA)
 // conflicts with overloaded versions (GpuProgram, Texture)
@@ -863,9 +838,7 @@ PTR_TRAITS(Ogre::ResourceManager)
 %ignore Ogre::ResourceManager::load;
 #endif
 %ignore Ogre::ResourceManager::getResourceIterator;
-#ifdef SWIGPYTHON
 %template(ResourceCreateOrRetrieveResult) std::pair<Ogre::ResourcePtr, bool>;
-#endif
 %include "OgreResourceManager.h"
     // ambiguity as enums are just ints
     %ignore Ogre::TextureManager::createManual(const String&, const String&,TextureType,uint,uint,int,PixelFormat,int);
@@ -880,16 +853,14 @@ PTR_TRAITS(Ogre::ResourceManager)
 %include "OgreKeyFrame.h"
 %ignore Ogre::Pose::getNormalsIterator;
 %ignore Ogre::Pose::getVertexOffsetIterator;
-#ifdef SWIGPYTHON
+#ifndef SWIGJAVA // Java std_map iterator typemaps fail for this one
 %template(VertexOffsetMap) std::map<Ogre::uint32, Ogre::Vector3>;
 #endif
 %include "OgrePose.h"
 %include "OgreAnimationTrack.h"
 %ignore Ogre::AnimationStateSet::getAnimationStateIterator;
 %ignore Ogre::AnimationStateSet::getEnabledAnimationStateIterator;
-#ifdef SWIGPYTHON
 %template(EnabledAnimationStateList) std::list<Ogre::AnimationState*>;
-#endif
 %include "OgreAnimationState.h"
 
 #ifdef SWIGPYTHON
@@ -908,7 +879,6 @@ PTR_TRAITS(Ogre::ResourceManager)
 %ignore Ogre::Animation::getVertexTrackIterator;
 %ignore Ogre::Animation::getNodeTrackIterator;
 %ignore Ogre::Animation::getNumericTrackIterator;
-#ifdef SWIGPYTHON
 PTR_TRAITS(Ogre::Animation)
 PTR_TRAITS(Ogre::NodeAnimationTrack)
 PTR_TRAITS(Ogre::NumericAnimationTrack)
@@ -918,7 +888,6 @@ PTR_TRAITS(Ogre::VertexAnimationTrack)
 %template(NumericTrackList) std::map<unsigned short, Ogre::NumericAnimationTrack*>;
 %template(VertexTrackList) std::map<unsigned short, Ogre::VertexAnimationTrack*>;
 %template(TrackHandleList) std::set<unsigned short>;
-#endif
 %include "OgreAnimation.h"
 SHARED_PTR(Skeleton);
 // deprecated
@@ -927,12 +896,10 @@ SHARED_PTR(Skeleton);
 %ignore Ogre::Skeleton::getBoneIterator;
 %ignore Ogre::Skeleton::getLinkedSkeletonAnimationSourceIterator;
 %template(BoneList) std::vector<Ogre::Bone*>;
-#ifdef SWIGPYTHON
 namespace Ogre { struct LinkedSkeletonAnimationSource; }
 %ignore std::vector<Ogre::LinkedSkeletonAnimationSource>::resize; // non default constructible
-%ignore std::vector<Ogre::LinkedSkeletonAnimationSource>::vector;
+%ignore std::vector<Ogre::LinkedSkeletonAnimationSource>::vector(size_type);
 %template(LinkedSkeletonAnimSourceList) std::vector<Ogre::LinkedSkeletonAnimationSource>;
-#endif
 %include "OgreSkeleton.h"
     %ignore Ogre::SkeletonInstance::getLinkedSkeletonAnimationSourceIterator;
     SHARED_PTR(SkeletonInstance);
@@ -970,10 +937,8 @@ SHARED_PTR(Material);
 %ignore Ogre::RenderSystem::getGlobalInstanceVertexBuffer;
 %ignore Ogre::RenderSystem::setScissorTest(bool, uint32, uint32 = 0, uint32 = 800, uint32 = 600);
 %include "OgreRenderSystem.h"
-#ifdef SWIGPYTHON
 PTR_TRAITS(Ogre::Texture)
 %template(UniqueTextureSet) std::set<Ogre::Texture*>;
-#endif
 %include "OgreCompositorManager.h"
 %include "OgreCompositorLogic.h"
 #ifdef SWIGJAVA
@@ -987,9 +952,7 @@ PTR_TRAITS(Ogre::Texture)
 %include "OgreMaterialManager.h"
 %include "OgreRenderable.h"
 %ignore Ogre::ShadowCaster::getShadowVolumeRenderableIterator;
-#ifdef SWIGPYTHON
 %template(ShadowRenderableList) std::vector<Ogre::ShadowRenderable*>;
-#endif
 %include "OgreShadowCaster.h"
 %extend Ogre::MovableObject {
   Entity* castEntity()
@@ -1010,9 +973,7 @@ PTR_TRAITS(Ogre::Texture)
         %ignore Ogre::RibbonTrail::getNodeIterator;
         %include "OgreRibbonTrail.h"
     %ignore Ogre::BillboardSet::setTextureCoords(const FloatRect*, uint16);
-#ifdef SWIGPYTHON
     %template(TextureCoordSets) std::vector<Ogre::FloatRect>;
-#endif
     %include "OgreBillboardSet.h"
     %include "OgreMovablePlane.h"
     %ignore Ogre::Light::setPosition;
@@ -1064,10 +1025,8 @@ PTR_TRAITS(Ogre::Texture)
         ADD_REPR(Camera)
     %include "OgreManualObject.h"
     %template(SubEntityList) std::vector<Ogre::SubEntity*>;
-#ifdef SWIGPYTHON
     PTR_TRAITS(Ogre::Entity)
 %template(EntitySet) std::set<Ogre::Entity*>;
-#endif
     %include "OgreEntity.h"
     %ignore Ogre::SubEntity::getAttachedObjectIterator;
     %ignore Ogre::SubEntity::setIndexDataStartIndex;
@@ -1077,16 +1036,12 @@ PTR_TRAITS(Ogre::Texture)
     %include "OgreSubEntity.h"
     %ignore Ogre::ParticleSystemRenderer::_createVisualData;
     %ignore Ogre::ParticleSystemRenderer::_destroyVisualData;
-#ifdef SWIGPYTHON
     %template(ParticleList) std::vector<Ogre::Particle*>;
-#endif
     %include "OgreParticleSystemRenderer.h"
     SHARED_PTR(ParticleSystem);
     %ignore Ogre::ParticleSystem::_getIterator;
     %include "OgreParticleSystem.h"
-#ifdef SWIGPYTHON
     %template(InstancedEntityVec) std::vector<Ogre::InstancedEntity*>;
-#endif
     %include "OgreInstancedEntity.h"
     %include "OgreInstanceBatch.h"
     %ignore Ogre::SimpleRenderable::setMaterial(const String&);
@@ -1120,9 +1075,7 @@ SHARED_PTR(Mesh);
 %ignore Ogre::Mesh::suggestTangentVectorBuildParams(VertexElementSemantic,unsigned short&,unsigned short&);
 %include "OgreMesh.h"
 %ignore Ogre::SubMesh::getBoneAssignmentIterator;
-#ifdef SWIGPYTHON
 %template(LODFaceList) std::vector<Ogre::IndexData*>;
-#endif
 %include "OgreSubMesh.h"
 %ignore Ogre::StaticGeometry::getRegionIterator;
 %ignore Ogre::StaticGeometry::Region::getLODIterator;
@@ -1162,16 +1115,12 @@ SHARED_PTR(Mesh);
     %include "OgrePatchMesh.h"
 %include "OgreMeshSerializer.h"
 %include "OgreMeshManager.h"
-#ifdef SWIGPYTHON
 %template(MeshLodUsageList) std::vector<Ogre::MeshLodUsage>;
-#endif
 %include "OgreLodStrategy.h"
 %include "OgrePixelCountLodStrategy.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
 %template(TextureUnitStateList) std::vector<Ogre::TextureUnitState*>;
-#ifdef SWIGPYTHON
 %template(PassSet) std::set<Ogre::Pass*>;
-#endif
 %include "OgrePass.h"
     %ignore Ogre::Technique::getGPUVendorRuleIterator;
     %ignore Ogre::Technique::getGPUDeviceNameRuleIterator;
@@ -1195,9 +1144,7 @@ SHARED_PTR(Mesh);
     }
 #endif
     %include "OgreRenderWindow.h"
-#ifdef SWIGPYTHON
     %template(BoundSurfaceList) std::vector<Ogre::RenderTexture*>;
-#endif
     %include "OgreRenderTexture.h"
 %ignore Ogre::Viewport::getActualDimensions(int&, int& ,int& ,int&) const;
 %include "OgreViewport.h"
@@ -1207,11 +1154,9 @@ SHARED_PTR(Mesh);
 %template(CompositorInstanceList) std::vector<Ogre::CompositorInstance*>;
 %include "OgreCompositorChain.h"
 %ignore Ogre::RenderQueueGroup::getIterator;
-#ifdef SWIGPYTHON
 %template(RenderableList) std::vector<Ogre::Renderable*>;
 PTR_TRAITS(Ogre::RenderPriorityGroup)
 %template(PriorityMap) std::map<unsigned short, Ogre::RenderPriorityGroup*>;
-#endif
 %include "OgreRenderQueueSortingGrouping.h"
 %ignore Ogre::SceneManager::getCameraIterator; // deprecated
 %ignore Ogre::SceneManager::getAnimationIterator;
@@ -1237,14 +1182,10 @@ PTR_TRAITS(Ogre::RenderPriorityGroup)
 %rename(SceneManager_Listener) Ogre::SceneManager::Listener;
 %template(MovableObjectMap) std::map<std::string, Ogre::MovableObject*>;
 %template(StaticGeometryMap) std::map<std::string, Ogre::StaticGeometry*>;
-#ifdef SWIGPYTHON
 %template(ConstCameraList) std::vector<const Ogre::Camera*>;
-#endif
 %template(CameraMap) std::map<std::string, Ogre::Camera*>;
-#ifdef SWIGPYTHON
 namespace Ogre { struct ShadowTextureConfig; }
 %template(ShadowTextureConfigList) std::vector<Ogre::ShadowTextureConfig>;
-#endif
 %include "OgreSceneManager.h"
 %include "OgreDefaultDebugDrawer.h"
 %include "OgreConfigDialog.h"
@@ -1281,12 +1222,10 @@ public:
     }
 }
 #endif
-#ifdef SWIGPYTHON
 PTR_TRAITS(Ogre::SceneManager)
 PTR_TRAITS(Ogre::MovableObjectFactory)
 %template(SceneManagerInstanceMap) std::map<std::string, Ogre::SceneManager*>;
 %template(MovableObjectFactoryMap) std::map<std::string, Ogre::MovableObjectFactory*>;
-#endif
 %include "OgreRoot.h"
 // dont wrap: not useful in high level languages
 // %include "OgreTimer.h"
