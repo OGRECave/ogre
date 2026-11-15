@@ -508,6 +508,10 @@ CS_VECTOR_OPS(4);
     PYBUFFER_TO_IMAGE_DATA(view, $2, $3, $4, $5, $1)
     PyBuffer_Release(&view);
 }
+// the Image only borrows the data, so keep the buffer alive as long as the Image references it
+%typemap(argout) (Ogre::uchar* data, Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth, Ogre::PixelFormat format) {
+    if (PyObject_SetAttrString(self, "_buffer", $input) < 0) SWIG_fail;
+}
 
 %typecheck(SWIG_TYPECHECK_POINTER) (Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth, Ogre::PixelFormat pixelFormat, void *pixelData) {
     $1 = PyObject_CheckBuffer($input);
@@ -517,6 +521,10 @@ CS_VECTOR_OPS(4);
     Py_buffer view;
     PYBUFFER_TO_IMAGE_DATA(view, $1, $2, $3, $4, $5)
     PyBuffer_Release(&view);
+}
+// the PixelBox only borrows the data, so keep the buffer alive as long as the PixelBox references it
+%typemap(argout) (Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth, Ogre::PixelFormat pixelFormat, void *pixelData) {
+    if (PyObject_SetAttrString(self, "_buffer", $input) < 0) SWIG_fail;
 }
 
 
