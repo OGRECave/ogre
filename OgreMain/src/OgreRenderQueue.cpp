@@ -255,7 +255,10 @@ namespace Ogre {
         VisibleObjectsBoundsInfo* visibleBounds)
     {
         // receiveShadows is a material property, so we can query it before LOD
-        bool receiveShadows = getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled() && mo->getReceivesShadows();
+        // only needed for shadows; getReceivesShadows visits all renderables of the object
+        bool receiveShadows = cam->getSceneManager()->isShadowTechniqueInUse() &&
+                              getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled() &&
+                              mo->getReceivesShadows();
 
         if(onlyShadowCasters && !mo->getCastShadows() && !receiveShadows)
             return;
