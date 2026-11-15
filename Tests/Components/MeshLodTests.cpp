@@ -108,6 +108,68 @@ TEST_F(MeshLodTests,MeshLodGenerator)
     }
 }
 //--------------------------------------------------------------------------
+/// places the vertices behind other data in the buffers, as in a buffer shared with other meshes
+static void addVertexPadding(VertexData* data, size_t padding)
+{
+    // copy, the bindings are replaced below
+    auto bindings = data->vertexBufferBinding->getBindings();
+    for (const auto& binding : bindings)
+    {
+        auto src = binding.second;
+        size_t vertexSize = src->getVertexSize();
+        auto dst = HardwareBufferManager::getSingleton().createVertexBuffer(
+            vertexSize, src->getNumVertices() + padding, src->getUsage(), src->hasShadowBuffer());
+
+        // positions far away from the mesh, which would change the result if read
+        std::vector<float> garbage(dst->getSizeInBytes() / sizeof(float), 1e5f);
+        dst->writeData(0, garbage.size() * sizeof(float), garbage.data(), true);
+        dst->copyData(*src, 0, padding * vertexSize, src->getSizeInBytes());
+        data->vertexBufferBinding->setBinding(binding.first, dst);
+    }
+    data->vertexStart += padding;
+}
+//--------------------------------------------------------------------------
+TEST_F(MeshLodTests, VertexStart)
+{
+    // edge lists for stencil shadows still require vertexStart 0
+    mMesh->freeEdgeList();
+    MeshPtr padded = mMesh->clone("MeshLodTestsPadded.mesh");
+    if (padded->sharedVertexData)
+        addVertexPadding(padded->sharedVertexData, 7);
+    for (auto subMesh : padded->getSubMeshes())
+    {
+        if (!subMesh->useSharedVertices)
+            addVertexPadding(subMesh->vertexData, 7);
+    }
+
+    LodConfig config;
+    setTestLodConfig(config);
+    config.advanced.useBackgroundQueue = false;
+    LodConfig paddedConfig(config);
+    paddedConfig.mesh = padded;
+
+    MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
+    gen.generateLodLevels(config);
+    gen.generateLodLevels(paddedConfig);
+
+    ASSERT_EQ(config.levels.size(), paddedConfig.levels.size());
+    for (size_t i = 0; i < config.levels.size(); i++)
+    {
+        EXPECT_EQ(config.levels[i].outSkipped, paddedConfig.levels[i].outSkipped);
+        EXPECT_EQ(config.levels[i].outUniqueVertexCount, paddedConfig.levels[i].outUniqueVertexCount);
+    }
+
+    ASSERT_EQ(mMesh->getNumSubMeshes(), padded->getNumSubMeshes());
+    for (size_t i = 0; i < mMesh->getNumSubMeshes(); i++)
+    {
+        const auto& lods = mMesh->getSubMesh(i)->mLodFaceList;
+        const auto& paddedLods = padded->getSubMesh(i)->mLodFaceList;
+        ASSERT_EQ(lods.size(), paddedLods.size());
+        for (size_t j = 0; j < lods.size(); j++)
+            EXPECT_EQ(lods[j]->indexCount, paddedLods[j]->indexCount);
+    }
+}
+//--------------------------------------------------------------------------
 void MeshLodTests::blockedWaitForLodGeneration(const MeshPtr& mesh)
 {
     bool success = false;
