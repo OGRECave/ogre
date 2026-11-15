@@ -24,11 +24,13 @@ if (OGRE_BUILD_TESTS)
         ${PROJECT_BINARY_DIR}/googletest-1.16.0
         -Dgtest_force_shared_crt=TRUE
         -DBUILD_GMOCK=FALSE
+        # Debug and Release are installed next to each other
+        -DCMAKE_DEBUG_POSTFIX=d
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-1.16.0)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        --build ${PROJECT_BINARY_DIR}/googletest-1.16.0 ${BUILD_COMMAND_OPTS})
+    ogre_build_dependency(${PROJECT_BINARY_DIR}/googletest-1.16.0)
   endif()
   find_package(GTest REQUIRED CONFIG)
+  ogre_map_imported_config(GTest::gtest)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
     # unit tests are go!
