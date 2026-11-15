@@ -7,6 +7,10 @@
 
 %include std_string.i
 %include exception.i 
+#ifdef SWIGPYTHON
+%include std_vector.i
+%include std_set.i
+#endif
 %import "Ogre.i"
 
 #define _OgreRTSSExport

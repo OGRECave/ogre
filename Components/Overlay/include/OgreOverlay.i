@@ -30,6 +30,9 @@
 %include exception.i
 #ifdef SWIGPYTHON
 %include factory.i
+%include std_vector.i
+%include std_list.i
+%include std_pair.i
 #endif
 %import "Ogre.i"
 
@@ -50,7 +53,9 @@ SHARED_PTR(Font);
 %include "OgreFont.h"
 %include "OgreFontManager.h"
 %ignore Ogre::Overlay::get2DElementsIterator;
+#ifndef SWIGJAVA // older std_list.i clashes with JDK 21 List.removeFirst
 %template(OverlayContainerList) std::list<Ogre::OverlayContainer*>;
+#endif
 %include "OgreOverlay.h"
 SHARED_PTR(OverlayElement);
 %extend Ogre::OverlayElement {

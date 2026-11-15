@@ -691,7 +691,9 @@ ADD_REPR(ColourValue)
 %include "OgreBlendMode.h"
 %include "OgreRay.h"
 %template(SceneQueryMovableObjectPair) std::pair<Ogre::MovableObject*, Ogre::MovableObject*>;
+#ifndef SWIGJAVA // older std_list.i clashes with JDK 21 List.removeFirst
 %template(SceneQueryMovableIntersectionList) std::list<std::pair<Ogre::MovableObject*, Ogre::MovableObject*> >;
+#endif
 %include "OgreSceneQuery.h"
 %template(RaySceneQueryResult) std::vector<Ogre::RaySceneQueryResultEntry>;
 #ifdef SWIGPYTHON
@@ -825,7 +827,9 @@ SHARED_PTR(HardwarePixelBuffer);
 %ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool, Resource*) const;
 %ignore Ogre::ResourceGroupManager::openResource(const String&, const String&, bool) const;
 %ignore Ogre::ResourceGroupManager::getResourceManagerIterator;
+#ifndef SWIGJAVA // older std_list.i clashes with JDK 21 List.removeFirst
 %template(DataStreamList) std::list<Ogre::SharedPtr<Ogre::DataStream> >; // not the typedef: breaks Java iterators
+#endif
 PTR_TRAITS(Ogre::ResourceManager)
 %template(ResourceManagerMap) std::map<std::string, Ogre::ResourceManager*>;
 
@@ -860,7 +864,9 @@ PTR_TRAITS(Ogre::ResourceManager)
 %include "OgreAnimationTrack.h"
 %ignore Ogre::AnimationStateSet::getAnimationStateIterator;
 %ignore Ogre::AnimationStateSet::getEnabledAnimationStateIterator;
+#ifndef SWIGJAVA // older std_list.i clashes with JDK 21 List.removeFirst
 %template(EnabledAnimationStateList) std::list<Ogre::AnimationState*>;
+#endif
 %include "OgreAnimationState.h"
 
 #ifdef SWIGPYTHON
