@@ -393,7 +393,10 @@ namespace {
             // Note that this pass and list are never destroyed until the
             // engine shuts down, or a pass is destroyed or has it's hash
             // recalculated, although the lists will be cleared
-            PassGroupRenderableMap::iterator i = mGrouped.emplace(pass, RenderableList()).first;
+            // look up first: emplace allocates a node even if the pass is already there
+            PassGroupRenderableMap::iterator i = mGrouped.find(pass);
+            if (i == mGrouped.end())
+                i = mGrouped.emplace(pass, RenderableList()).first;
 
             // Insert renderable
             i->second.push_back(rend);
