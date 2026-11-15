@@ -39,5 +39,30 @@ class SequenceTest(unittest.TestCase):
                 plane.getDistance(invalid)
 
 
+class BufferLifetimeTest(unittest.TestCase):
+    """Image and PixelBox only borrow the pixels, so the wrapper must keep the buffer alive."""
+
+    def test_buffer_lifetime(self):
+        import gc
+        import weakref
+
+        for wrap in ("Image", "PixelBox"):
+            # a memoryview is the stdlib buffer type that supports both ndim and weak references
+            data = memoryview(bytearray(8 * 8 * 4)).cast("B", (8, 8, 4))
+            ref = weakref.ref(data)
+            if wrap == "Image":
+                obj = Ogre.Image()
+                obj.loadDynamicImage(data)
+            else:
+                obj = Ogre.PixelBox(data)
+            del data
+            gc.collect()
+            self.assertIsNotNone(ref())
+            self.assertEqual(obj.getWidth(), 8)
+            del obj
+            gc.collect()
+            self.assertIsNone(ref())
+
+
 if __name__ == "__main__":
     unittest.main()
