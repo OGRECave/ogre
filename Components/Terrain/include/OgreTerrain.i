@@ -29,6 +29,7 @@ namespace Ogre { struct TerrainLayerSampler; class Terrain; }
 %template(TerrainList) std::vector<Ogre::Terrain*>;
 %template(UInt8Pair) std::pair<Ogre::uint8, Ogre::uint8>;
 %ignore Ogre::TerrainMaterialGenerator::setActiveProfile;
+SHARED_PTR(TerrainMaterialGenerator);
 %include "OgreTerrainMaterialGenerator.h"
 %include "OgreTerrainMaterialGeneratorA.h"
 
