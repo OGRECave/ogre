@@ -21,6 +21,7 @@ class _OgreBitesExport Gizmo : public InputListener
 {
 public:
     Gizmo(Ogre::SceneNode* sceneNode, GizmoOperation op, Ogre::Viewport* viewport);
+	~Gizmo();
 
     void setOperation(GizmoOperation op);
 
