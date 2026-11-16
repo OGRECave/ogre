@@ -16,6 +16,8 @@
 #include "OgreFileSystemLayer.h"
 #include "OgrePredefinedControllers.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreDistanceLodStrategy.h"
+#include "OgreLodStrategyManager.h"
 #include "OgreDefaultDebugDrawer.h"
 #include "OgreCompositorLogic.h"
 
@@ -1133,6 +1135,9 @@ SHARED_PTR(Mesh);
 %template(MeshLodUsageList) std::vector<Ogre::MeshLodUsage>;
 %include "OgreLodStrategy.h"
 %include "OgrePixelCountLodStrategy.h"
+%include "OgreDistanceLodStrategy.h"
+%ignore Ogre::LodStrategyManager::getIterator;
+%include "OgreLodStrategyManager.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
 %template(TextureUnitStateList) std::vector<Ogre::TextureUnitState*>;
 %template(PassSet) std::set<Ogre::Pass*>;
