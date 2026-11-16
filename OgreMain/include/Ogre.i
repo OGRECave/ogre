@@ -256,6 +256,7 @@ typedef uint8_t uint8;
 %csmethodmodifiers *::viewportDestroyed "public";
 %csmethodmodifiers *::viewportDimensionsChanged "public";
 %csmethodmodifiers *::viewportCameraChanged "public";
+%csmethodmodifiers *::createAnimableValue "public";
 %csmethodmodifiers Ogre::BillboardChain::preRender "public";
 #endif
 
@@ -871,6 +872,8 @@ PTR_TRAITS(Ogre::ResourceManager)
     %ignore Ogre::GpuProgramManager::getByName(const String&, const String&,bool) const;
     %include "OgreGpuProgramManager.h"
     %include "OgreHighLevelGpuProgramManager.h"
+SHARED_PTR(AnimableValue);
+%include "OgreAnimable.h"
 // animations
 %ignore Ogre::VertexPoseKeyFrame::getPoseReferenceIterator;
 %include "OgreKeyFrame.h"
