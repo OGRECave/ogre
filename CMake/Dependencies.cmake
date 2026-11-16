@@ -175,7 +175,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     set(OGREDEPS_FREETYPE_VERSION 2.14.3)
     set(OGREDEPS_SDL2_VERSION 2.32.10)
     set(OGREDEPS_ZLIB_VERSION 1.3.2)
-    set(OGREDEPS_ASSIMP_VERSION 6.0.5)
+    set(OGREDEPS_ASSIMP_VERSION 6.0.6)
     set(OGREDEPS_BULLET_VERSION 3.25)
 
     message(STATUS "Building pugixml")
@@ -249,7 +249,8 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
 
       message(STATUS "Building Assimp")
       ogre_download_dependency(ASSIMP_SOURCE_DIR assimp-${OGREDEPS_ASSIMP_VERSION}
-          https://github.com/assimp/assimp/archive/refs/tags/v${OGREDEPS_ASSIMP_VERSION}.tar.gz)
+          https://github.com/assimp/assimp/archive/refs/tags/v${OGREDEPS_ASSIMP_VERSION}.tar.gz
+          SHA256 5f7ed412b76575621df0525a762b31da5874afff352b3a890c6308db4ac7204c)
       # Assimp is only used for asset import, so favour size over import speed.
       # Override the configuration flags rather than the build type to keep
       # Debug builds debuggable and multi-config generators working.
