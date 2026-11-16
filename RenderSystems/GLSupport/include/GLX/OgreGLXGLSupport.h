@@ -84,20 +84,6 @@ namespace Ogre {
         Display* getXDisplay(void);
 
         /**
-         * Switch video modes
-         *
-         * @param width   Receiver for requested and final width
-         * @param height         Receiver for requested and final drawable height
-         * @param height         Receiver for requested and final drawable frequency
-         */
-        void switchMode (uint& width, uint& height, short& frequency);
-
-        /**
-         * Switch back to original video mode
-         */
-        void switchMode (void);
-
-        /**
          * Get the GLXFBConfig used to create a ::GLXContext
          *
          * @param drawable   GLXContext
@@ -161,9 +147,6 @@ namespace Ogre {
         Display* mGLDisplay; // used for GL/GLX commands
         Display* mXDisplay;  // used for other X commands and events
         bool mIsExternalDisplay;
-
-        VideoMode  mOriginalMode;
-        VideoMode  mCurrentMode;
 
         int mGLXVerMajor, mGLXVerMinor;
     };

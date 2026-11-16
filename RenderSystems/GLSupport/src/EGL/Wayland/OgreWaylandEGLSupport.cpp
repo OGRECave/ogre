@@ -31,17 +31,6 @@ void WaylandEGLSupport::doInit()
     // A connection that might be shared with the application for GL rendering:
     mGLDisplay = getGLDisplay();
 
-    if (mNativeDisplay == EGL_DEFAULT_DISPLAY)
-    {
-        // fake video mode
-        mCurrentMode.width = 0;
-        mCurrentMode.height = 0;
-        mCurrentMode.refreshRate = 0;
-        mVideoModes.push_back(mCurrentMode);
-    }
-
-    mOriginalMode = mCurrentMode;
-
     EGLConfig* glConfigs;
     int config, nConfigs = 0;
 

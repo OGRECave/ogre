@@ -20,7 +20,6 @@ public:
     bool mIsExternalDisplay;
 
 protected:
-    VideoModes mCbVideoModes;
     EGLWindow* mInitialWindow = nullptr;
 
     void start() override;

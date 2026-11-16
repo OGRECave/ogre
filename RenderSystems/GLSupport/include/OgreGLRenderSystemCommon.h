@@ -65,7 +65,6 @@ namespace Ogre {
         GLRTTManager *mRTTManager;
 
         void initConfigOptions() override;
-        void refreshConfig();
 
         typedef std::list<GLContext*> GLContextList;
         /// List of background thread contexts

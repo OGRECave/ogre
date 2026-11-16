@@ -13,10 +13,134 @@
 
 #include "SDLInputMapping.h"
 
+#include <algorithm>
+
 namespace OgreBites {
+
+static void initSDL()
+{
+    if (SDL_WasInit(SDL_INIT_VIDEO))
+        return;
+
+    if (SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt") > 0)
+        Ogre::LogManager::getSingleton().logMessage("[SDL] gamecontrollerdb.txt loaded");
+
+    SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+}
+
+static void normalizeVideoMode(Ogre::ConfigOption& opt)
+{
+    if (std::find(opt.possibleValues.begin(), opt.possibleValues.end(), opt.currentValue) != opt.possibleValues.end())
+        return;
+
+    auto pos = opt.currentValue.find(" x ");
+    if (pos == Ogre::String::npos)
+        return;
+
+    auto prefix = opt.currentValue.substr(0, pos + 3);
+    for (const auto& mode : opt.possibleValues)
+    {
+        if (mode.compare(0, prefix.size(), prefix) == 0)
+        {
+            opt.currentValue = mode;
+            return;
+        }
+    }
+}
+
+static void addVideoMode(const SDL_DisplayMode& mode,
+                         std::vector<Ogre::String>& modes,
+                         std::vector<Ogre::String>& frequencies)
+{
+    int bpp = SDL_BITSPERPIXEL(mode.format);
+    if (bpp <= 0)
+        bpp = 32;
+    else if (bpp > 16)
+        bpp = 32;
+
+    auto desc = Ogre::StringUtil::format("%d x %d @ %d-bit colour", mode.w, mode.h, bpp);
+    if (std::find(modes.begin(), modes.end(), desc) == modes.end())
+        modes.push_back(desc);
+
+    if (mode.refresh_rate > 0)
+    {
+        auto frequency = Ogre::StringConverter::toString(mode.refresh_rate);
+        if (std::find(frequencies.begin(), frequencies.end(), frequency) == frequencies.end())
+            frequencies.push_back(frequency);
+    }
+}
 
 ApplicationContextSDL::ApplicationContextSDL(const Ogre::String& appName) : ApplicationContextBase(appName)
 {
+}
+
+bool ApplicationContextSDL::oneTimeConfig()
+{
+    initSDL();
+
+    std::vector<Ogre::String> modes;
+    std::vector<Ogre::String> frequencies;
+
+    for (int display = 0; display < SDL_GetNumVideoDisplays(); ++display)
+    {
+        SDL_DisplayMode desktop;
+        if (SDL_GetDesktopDisplayMode(display, &desktop) == 0)
+            addVideoMode(desktop, modes, frequencies);
+
+        for (int i = 0; i < SDL_GetNumDisplayModes(display); ++i)
+        {
+            SDL_DisplayMode mode;
+            if (SDL_GetDisplayMode(display, i, &mode) == 0)
+                addVideoMode(mode, modes, frequencies);
+        }
+    }
+
+    if (modes.empty())
+    {
+        Ogre::LogManager::getSingleton().logWarning("[SDL] no display modes found");
+        return ApplicationContextBase::oneTimeConfig();
+    }
+
+    Ogre::LogManager::getSingleton().stream()
+        << "[SDL] found " << modes.size() << " display modes across "
+        << SDL_GetNumVideoDisplays() << " display(s)";
+
+    for (auto rs : mRoot->getAvailableRenderers())
+    {
+        // the option map is owned by the render system, which only exposes a const view
+        auto& options = const_cast<Ogre::ConfigOptionMap&>(rs->getConfigOptions());
+
+        auto opt = options.find("Video Mode");
+        if (opt == options.end())
+            continue;
+
+        opt->second.possibleValues = modes;
+        if (std::find(modes.begin(), modes.end(), opt->second.currentValue) == modes.end())
+            opt->second.currentValue = modes.front();
+
+        opt = options.find("Display Frequency");
+        if (opt != options.end())
+        {
+            opt->second.possibleValues = frequencies;
+            if (!frequencies.empty() &&
+                std::find(frequencies.begin(), frequencies.end(), opt->second.currentValue) == frequencies.end())
+                opt->second.currentValue = frequencies.front();
+        }
+    }
+
+    if (!ApplicationContextBase::oneTimeConfig())
+        return false;
+
+    // upgrade legacy config files that have no colour depth suffix
+    for (auto rs : mRoot->getAvailableRenderers())
+    {
+        auto& options = const_cast<Ogre::ConfigOptionMap&>(rs->getConfigOptions());
+        auto opt = options.find("Video Mode");
+        if (opt != options.end())
+            normalizeVideoMode(opt->second);
+    }
+
+    return true;
 }
 
 void ApplicationContextSDL::addInputListener(NativeWindowType* win, InputListener* lis)
@@ -34,12 +158,7 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
 {
     NativeWindowPair ret = {NULL, NULL};
 
-    if(!SDL_WasInit(SDL_INIT_VIDEO)) {
-        if(SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt") > 0)
-            Ogre::LogManager::getSingleton().logMessage("[SDL] gamecontrollerdb.txt loaded");
-
-        SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
-    }
+    initSDL();
 
     auto p = mRoot->getRenderSystem()->getRenderWindowDescription();
     miscParams.insert(p.miscParams.begin(), p.miscParams.end());

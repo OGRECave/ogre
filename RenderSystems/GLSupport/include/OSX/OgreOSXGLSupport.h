@@ -63,7 +63,6 @@ public:
     void* getProcAddress( const char *name ) const override;
     
     // Core Foundation Array callback function for sorting, must be static for the function ptr
-    static CFComparisonResult _compareModes (const void *val1, const void *val2, void *context);
     // Core Fondation Dictionary helper functions, also static for ease of use in above static
     static Boolean _getDictionaryBoolean(CFDictionaryRef dict, const void* key);
     static long _getDictionaryLong(CFDictionaryRef dict, const void* key);

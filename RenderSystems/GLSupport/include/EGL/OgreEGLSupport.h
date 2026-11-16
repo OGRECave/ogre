@@ -74,9 +74,6 @@ namespace Ogre {
 
             bool mIsExternalDisplay;
 
-            VideoMode mOriginalMode;
-            VideoMode mCurrentMode;
-
             EGLint mEGLMajor, mEGLMinor;
 
             bool hasEGL15;

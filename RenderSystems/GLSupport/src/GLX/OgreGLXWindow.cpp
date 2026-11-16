@@ -77,7 +77,6 @@ namespace Ogre
         Display *xDisplay = mGLSupport->getXDisplay();
         String title = name;
         uint samples = 0;
-        short frequency = 0;
         bool vsync = false;
         bool hidden = false;
         unsigned int vsyncInterval = 1;
@@ -120,9 +119,6 @@ namespace Ogre
             // Note: Some platforms support AA inside ordinary windows
             if((opt = miscParams->find("FSAA")) != end)
                 samples = StringConverter::parseUnsignedInt(opt->second);
-
-            if( (opt = miscParams->find("displayFrequency")) != end && opt->second != "N/A" )
-                frequency = (short)StringConverter::parseInt(opt->second);
 
             if((opt = miscParams->find("vsync")) != end)
                 vsync = StringConverter::parseBool(opt->second);
@@ -275,11 +271,6 @@ namespace Ogre
             left = top = 0;
         }
 
-        if (mIsFullScreen)
-        {
-            mGLSupport->switchMode (width, height, frequency);
-        }
-
         if (! mIsExternal)
         {
             XVisualInfo *visualInfo = mGLSupport->getVisualFromFBConfig (fbConfig);
@@ -333,17 +324,12 @@ namespace Ogre
         mActive = false;
 
         if (mIsFullScreen)
-        {
-            mGLSupport->switchMode();
             switchFullScreen(false);
-        }
     }
 
     //-------------------------------------------------------------------------------------------------//
     void GLXWindow::setFullscreen(bool fullscreen, uint width, uint height)
     {
-        short frequency = 0;
-
         if (mClosed || ! mIsTopLevel)
             return;
 
@@ -356,15 +342,6 @@ namespace Ogre
             LogManager::getSingleton().logMessage("GLXWindow::switchFullScreen: Your WM has no fullscreen support");
             return;
         }
-        else if (fullscreen)
-        {
-            mGLSupport->switchMode(width, height, frequency);
-        }
-        else
-        {
-            mGLSupport->switchMode();
-        }
-
         if (mIsFullScreen != fullscreen)
         {
             switchFullScreen(fullscreen);
