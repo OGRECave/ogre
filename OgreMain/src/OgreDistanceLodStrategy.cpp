@@ -160,6 +160,7 @@ namespace Ogre {
     DistanceLodSphereStrategy::DistanceLodSphereStrategy()
         : DistanceLodStrategyBase("distance_sphere")
     { }
+    DistanceLodSphereStrategy::~DistanceLodSphereStrategy() {}
     //-----------------------------------------------------------------------
     Real DistanceLodSphereStrategy::getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
@@ -191,6 +192,7 @@ namespace Ogre {
     DistanceLodBoxStrategy::DistanceLodBoxStrategy()
         : DistanceLodStrategyBase("distance_box")
     { }
+    DistanceLodBoxStrategy::~DistanceLodBoxStrategy() {}
     //-----------------------------------------------------------------------
     Real DistanceLodBoxStrategy::getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {

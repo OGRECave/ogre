@@ -132,6 +132,7 @@ namespace Ogre {
     public:
         /** Default constructor. */
         DistanceLodSphereStrategy();
+        ~DistanceLodSphereStrategy();
 
         Real getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const override;
 
@@ -165,6 +166,7 @@ namespace Ogre {
     public:
         /** Default constructor. */
         DistanceLodBoxStrategy();
+        ~DistanceLodBoxStrategy();
 
         Real getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const override;
 
