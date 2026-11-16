@@ -402,9 +402,11 @@ CS_VECTOR_OPS(4);
             %argument_fail(SWIG_TypeError, "float (Ogre::Radian) or Ogre::Degree", $symname, $argnum);
     }
 }
-// punch through overload resolution
-%typecheck(SWIG_TYPECHECK_POINTER) const Ogre::Radian& {
-    $1 = true; // actual check in the typemap
+// accept what the typemap accepts, but let a Real overload take plain floats first
+%typecheck(SWIG_TYPECHECK_DOUBLE) const Ogre::Radian& {
+    $1 = SWIG_CheckState(SWIG_ConvertPtr($input, 0, $descriptor, SWIG_POINTER_NO_NULL)) ||
+         SWIG_CheckState(SWIG_ConvertPtr($input, 0, $descriptor(Ogre::Degree*), SWIG_POINTER_NO_NULL)) ||
+         SWIG_CheckState(SWIG_AsVal_float($input, NULL));
 }
 
 %typemap(in) void*, Ogre::uchar* {
@@ -555,7 +557,14 @@ CS_VECTOR_OPS(4);
     }
 }
 %typecheck(SWIG_TYPECHECK_STRING) const TYPE& {
-    if (PySequence_Check($input))
+    if (SWIG_CheckState(SWIG_ConvertPtr($input, 0, $descriptor, SWIG_POINTER_NO_NULL))) {
+        $1 = true;
+    }
+    // do not treat other wrapped types as sequences, e.g. a ColourValue is not a Quaternion
+    else if (SWIG_Python_GetSwigThis($input)) {
+        $1 = false;
+    }
+    else if (PySequence_Check($input))
     {
         int len = PySequence_Length($input);
         $1 = (LEN_CHECK);
