@@ -305,6 +305,8 @@ Gizmo::Gizmo(SceneNode* sceneNode, GizmoOperation mode, Viewport* viewport) : mO
     mDragging = false;
 }
 
+Gizmo::~Gizmo() = default;
+
 void Gizmo::setTargetNode(SceneNode* target)
 {
     if (mGizmoNode && mGizmoNode->getParentSceneNode())

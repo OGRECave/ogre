@@ -52,7 +52,18 @@ namespace Ogre {
         ANIMBLEND_CUMULATIVE = 1
     };
     
-    struct LinkedSkeletonAnimationSource;
+    /// Link to another skeleton to share animations
+    struct LinkedSkeletonAnimationSource
+    {
+        String skeletonName;
+        SkeletonPtr pSkeleton;
+        Real scale;
+        LinkedSkeletonAnimationSource(const String& skelName, Real scl)
+            : skeletonName(skelName), scale(scl) {}
+            LinkedSkeletonAnimationSource(const String& skelName, Real scl,
+                const SkeletonPtr& skelPtr)
+                : skeletonName(skelName), pSkeleton(skelPtr), scale(scl) {}
+    };
 
     /** A collection of Bone objects used to animate a skinned mesh.
 
@@ -460,19 +471,6 @@ namespace Ogre {
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const override;
 
-    };
-
-    /// Link to another skeleton to share animations
-    struct LinkedSkeletonAnimationSource
-    {
-        String skeletonName;
-        SkeletonPtr pSkeleton;
-        Real scale;
-        LinkedSkeletonAnimationSource(const String& skelName, Real scl)
-            : skeletonName(skelName), scale(scl) {}
-            LinkedSkeletonAnimationSource(const String& skelName, Real scl, 
-                const SkeletonPtr& skelPtr)
-                : skeletonName(skelName), pSkeleton(skelPtr), scale(scl) {}
     };
     /** @} */
     /** @} */

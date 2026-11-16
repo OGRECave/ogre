@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __D3D11VIDEOMODELIST_H__
 
 #include "OgreD3D11Prerequisites.h"
+#include "OgreD3D11VideoMode.h"
 
 
 namespace Ogre 

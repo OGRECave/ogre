@@ -390,7 +390,7 @@ namespace OgreBites
                 ImGui::SetNextWindowPos(ImVec2(0, center.y), ImGuiCond_Always, ImVec2(0.f, 0.5f));
             else
                 ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-            ImGui::Begin(u8"\uf013 Configuration", NULL, flags);
+            ImGui::Begin(reinterpret_cast<const char*>(u8"\uf013 Configuration"), NULL, flags);
             Ogre::DrawRenderingSettings(mNextRenderer);
             ImGui::End();
 #endif
