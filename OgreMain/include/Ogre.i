@@ -919,6 +919,7 @@ namespace Ogre { struct LinkedSkeletonAnimationSource; }
     SHARED_PTR(SkeletonInstance);
     %include "OgreSkeletonInstance.h"
 %include "OgreSkeletonManager.h"
+%include "OgreSkeletonSerializer.h"
 %include "OgreRenderQueue.h"
 %include "OgreRenderOperation.h"
 %ignore Ogre::Material::getLodValueIterator;
