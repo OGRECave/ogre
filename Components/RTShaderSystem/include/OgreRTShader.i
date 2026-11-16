@@ -20,6 +20,8 @@
 %include "OgreShaderScriptTranslator.h"
 %template(SubRenderStateList) std::vector<Ogre::RTShader::SubRenderState*>;
 %template(SubRenderStateSet) std::set<Ogre::RTShader::SubRenderState*>;
+%ignore Ogre::SharedPtr<Ogre::RTShader::SubRenderStateAccessor>::operator const shared_ptr<Ogre::RTShader::SubRenderStateAccessor>&;
+%template(SubRenderStateAccessorPtr) Ogre::SharedPtr<Ogre::RTShader::SubRenderStateAccessor>;
 %include "OgreShaderSubRenderState.h"
 %include "OgreShaderProgramWriter.h"
 %ignore Ogre::RTShader::ShaderGenerator::getRenderState(const String&, const String&, unsigned short);
