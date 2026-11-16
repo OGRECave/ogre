@@ -10,6 +10,9 @@
 #include <OgreConfigFile.h>
 #include <OgreEntity.h>
 #include <OgreSubEntity.h>
+#include <OgreParticleSystemManager.h>
+#include <OgreParticleAffector.h>
+#include <OgreParticle.h>
 
 #include "RootWithoutRenderSystemFixture.h"
 
@@ -68,4 +71,37 @@ TEST_F(DotSceneTests, exportImport)
     FileSystemLayer::removeFile("DotSceneTest.scene");
 
     mRoot->getInstalledPlugins().front()->shutdown();
+}
+typedef RootWithoutRenderSystemFixture ParticleFXTests;
+
+TEST_F(ParticleFXTests, TextureAnimatorStart)
+{
+    String pluginsCfg = mFSLayer->getConfigFilePath("plugins.cfg");
+    ConfigFile cf;
+    cf.load(pluginsCfg);
+    auto pluginDir = cf.getSetting("PluginFolder");
+
+    try
+    {
+        mRoot->loadPlugin(pluginDir+"/Plugin_ParticleFX");
+    }
+    catch (const std::exception& e)
+    {
+        GTEST_SKIP() << "Plugin_ParticleFX not found";
+    }
+
+    auto affector = ParticleSystemManager::getSingleton()._createAffector("TextureAnimator", NULL);
+    affector->setParameter("texcoord_start", "4");
+    affector->setParameter("texcoord_count", "4");
+
+    Particle p;
+    affector->_initParticle(&p);
+    EXPECT_EQ(p.mTexcoordIndex, 4);
+
+    affector->setParameter("random_offset", "true");
+    affector->_initParticle(&p);
+    EXPECT_GE(p.mTexcoordIndex, 4);
+    EXPECT_LT(p.mTexcoordIndex, 8);
+
+    ParticleSystemManager::getSingleton()._destroyAffector(affector);
 }

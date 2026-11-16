@@ -90,13 +90,13 @@ public:
     //-----------------------------------------------------------------------
     void TextureAnimatorAffector::_initParticle(Particle* pParticle)
     {
-        pParticle->mTexcoordIndex = 0;
+        pParticle->mTexcoordIndex = mTexcoordStart;
 
         if (!mRandomStartOffset)
             return;
 
         pParticle->mRandomTexcoordOffset = Math::UnitRandom() * mTexcoordCount;
-        pParticle->mTexcoordIndex = pParticle->mRandomTexcoordOffset;
+        pParticle->mTexcoordIndex += pParticle->mRandomTexcoordOffset;
     }
 
     void TextureAnimatorAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
