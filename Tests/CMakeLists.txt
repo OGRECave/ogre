@@ -13,21 +13,19 @@ if (OGRE_BUILD_TESTS)
   ENABLE_TESTING()
   INCLUDE(CTest)
 
-  if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-1.16.0)
+  set(GTEST_VERSION 1.16.0)
+  if(NOT EXISTS ${PROJECT_BINARY_DIR}/googletest-${GTEST_VERSION})
     message(STATUS "Building gtest")
-    file(DOWNLOAD
-        https://github.com/google/googletest/releases/download/v1.16.0/googletest-1.16.0.tar.gz
-        ${PROJECT_BINARY_DIR}/release-1.16.0.tar.gz)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf release-1.16.0.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    ogre_download_dependency(GTEST_SOURCE_DIR googletest-${GTEST_VERSION}
+        https://github.com/google/googletest/releases/download/v${GTEST_VERSION}/googletest-${GTEST_VERSION}.tar.gz)
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
-        ${PROJECT_BINARY_DIR}/googletest-1.16.0
+        ${GTEST_SOURCE_DIR}
         -Dgtest_force_shared_crt=TRUE
         -DBUILD_GMOCK=FALSE
         # Debug and Release are installed next to each other
         -DCMAKE_DEBUG_POSTFIX=d
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-1.16.0)
-    ogre_build_dependency(${PROJECT_BINARY_DIR}/googletest-1.16.0)
+        WORKING_DIRECTORY ${GTEST_SOURCE_DIR})
+    ogre_build_dependency(${GTEST_SOURCE_DIR})
   endif()
   find_package(GTest REQUIRED CONFIG)
   ogre_map_imported_config(GTest::gtest)

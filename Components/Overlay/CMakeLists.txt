@@ -19,14 +19,12 @@ list(APPEND HEADER_FILES
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 if(OGRE_BUILD_COMPONENT_OVERLAY_IMGUI)
-  set(IMGUI_DIR "${PROJECT_BINARY_DIR}/imgui-1.92.9b" CACHE PATH "")
+  set(IMGUI_VERSION 1.92.9b)
+  set(IMGUI_DIR "${PROJECT_BINARY_DIR}/imgui-${IMGUI_VERSION}" CACHE PATH "")
   if(NOT EXISTS ${IMGUI_DIR})
     message(STATUS "Downloading imgui")
-    file(DOWNLOAD
-        https://github.com/ocornut/imgui/archive/v1.92.9b.tar.gz
-        ${PROJECT_BINARY_DIR}/imgui.tar.gz)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf imgui.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    ogre_download_dependency(IMGUI_DIR imgui-${IMGUI_VERSION}
+        https://github.com/ocornut/imgui/archive/v${IMGUI_VERSION}.tar.gz)
   endif()
   list(APPEND SOURCE_FILES
     ${IMGUI_DIR}/imgui.cpp

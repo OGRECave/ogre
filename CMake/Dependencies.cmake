@@ -99,6 +99,29 @@ macro(ogre_build_dependency _binary_dir)
   endif()
 endmacro()
 
+# ogre_download_dependency(<var> <dir> <url> [SHA256 <hash>])
+# Download the tarball at <url> and unpack it into PROJECT_BINARY_DIR. <dir> is
+# the top-level directory of the archive and also names the local copy, so
+# tag-only archive names like v1.0.tar.gz cannot clash. The path of the
+# unpacked sources is returned in <var>.
+function(ogre_download_dependency _var _dir _url)
+  cmake_parse_arguments(_arg "" "SHA256" "" ${ARGN})
+  set(_archive ${PROJECT_BINARY_DIR}/${_dir}.tar.gz)
+  set(_hash)
+  if(_arg_SHA256)
+    set(_hash EXPECTED_HASH SHA256=${_arg_SHA256})
+  endif()
+  file(DOWNLOAD ${_url} ${_archive} ${_hash} STATUS _status)
+  list(GET _status 0 _code)
+  if(NOT _code EQUAL 0)
+    list(GET _status 1 _msg)
+    message(FATAL_ERROR "Downloading ${_url} failed: ${_msg}")
+  endif()
+  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${_archive}
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+  set(${_var} ${PROJECT_BINARY_DIR}/${_dir} PARENT_SCOPE)
+endfunction()
+
 set(BUILD_COMMAND_COMMON ${CMAKE_COMMAND}
   -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
   -G ${CMAKE_GENERATOR}
@@ -148,33 +171,33 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OGRE_DEP_SEARCH_PATH})
 set(CMAKE_FRAMEWORK_PATH ${CMAKE_FRAMEWORK_PATH} ${OGRE_DEP_SEARCH_PATH})
 
 if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
+    set(OGREDEPS_PUGIXML_VERSION 1.15)
+    set(OGREDEPS_FREETYPE_VERSION 2.14.3)
+    set(OGREDEPS_SDL2_VERSION 2.32.10)
+    set(OGREDEPS_ZLIB_VERSION 1.3.2)
+    set(OGREDEPS_ASSIMP_VERSION 6.0.5)
+    set(OGREDEPS_BULLET_VERSION 3.25)
+
     message(STATUS "Building pugixml")
-    file(DOWNLOAD
-        https://github.com/zeux/pugixml/releases/download/v1.15/pugixml-1.15.tar.gz
-        ${PROJECT_BINARY_DIR}/pugixml-1.15.tar.gz)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf pugixml-1.15.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    ogre_download_dependency(PUGIXML_SOURCE_DIR pugixml-${OGREDEPS_PUGIXML_VERSION}
+        https://github.com/zeux/pugixml/releases/download/v${OGREDEPS_PUGIXML_VERSION}/pugixml-${OGREDEPS_PUGIXML_VERSION}.tar.gz)
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE # this will be linked into a shared lib
         # Debug and Release are installed next to each other
         -DPUGIXML_USE_POSTFIX=${OGRE_GENERATOR_IS_MULTI_CONFIG}
-        ${PROJECT_BINARY_DIR}/pugixml-1.15
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/pugixml-1.15)
-    ogre_build_dependency(${PROJECT_BINARY_DIR}/pugixml-1.15)
+        ${PUGIXML_SOURCE_DIR}
+        WORKING_DIRECTORY ${PUGIXML_SOURCE_DIR})
+    ogre_build_dependency(${PUGIXML_SOURCE_DIR})
 
     #find_package(Freetype)
     if (NOT FREETYPE_FOUND)
         message(STATUS "Building freetype")
-        file(DOWNLOAD
-            https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.gz
-            ${PROJECT_BINARY_DIR}/freetype-2.14.3.tar.gz)
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            -E tar xf freetype-2.14.3.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        ogre_download_dependency(FREETYPE_SOURCE_DIR freetype-${OGREDEPS_FREETYPE_VERSION}
+            https://download.savannah.gnu.org/releases/freetype/freetype-${OGREDEPS_FREETYPE_VERSION}.tar.gz)
         # patch toolchain for iOS
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy
             ${PROJECT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
-            freetype-2.14.3/builds/cmake/iOS.cmake
-            WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+            ${FREETYPE_SOURCE_DIR}/builds/cmake/iOS.cmake)
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
             -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE # disable third-party deps
@@ -183,10 +206,10 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
             -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE
             -DCMAKE_POLICY_VERSION_MINIMUM=3.12
             # workaround for broken iOS toolchain in freetype
-            -DPROJECT_SOURCE_DIR=${PROJECT_BINARY_DIR}/freetype-2.14.3
-            ${PROJECT_BINARY_DIR}/freetype-2.14.3
-            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/freetype-2.14.3/objs)
-        ogre_build_dependency(${PROJECT_BINARY_DIR}/freetype-2.14.3/objs)
+            -DPROJECT_SOURCE_DIR=${FREETYPE_SOURCE_DIR}
+            ${FREETYPE_SOURCE_DIR}
+            WORKING_DIRECTORY ${FREETYPE_SOURCE_DIR}/objs)
+        ogre_build_dependency(${FREETYPE_SOURCE_DIR}/objs)
     endif()
 
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
@@ -199,43 +222,34 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         endif()
 
         message(STATUS "Building SDL2")
-        file(DOWNLOAD
-            https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-2.32.10.tar.gz
-            ${PROJECT_BINARY_DIR}/SDL2-2.32.10.tar.gz
-            EXPECTED_HASH SHA256=5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165)
-        execute_process(COMMAND ${CMAKE_COMMAND}
-            -E tar xf SDL2-2.32.10.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+        ogre_download_dependency(SDL2_SOURCE_DIR SDL2-${OGREDEPS_SDL2_VERSION}
+            https://github.com/libsdl-org/SDL/releases/download/release-${OGREDEPS_SDL2_VERSION}/SDL2-${OGREDEPS_SDL2_VERSION}.tar.gz
+            SHA256 5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165)
         execute_process(COMMAND ${CMAKE_COMMAND}
             -E make_directory ${PROJECT_BINARY_DIR}/SDL2-build)
         execute_process(COMMAND ${BUILD_COMMAND_COMMON}
             -DSDL_STATIC=FALSE
             -DCMAKE_INSTALL_LIBDIR=lib
             ${SDL_AUDIO_OPTS}
-            ${PROJECT_BINARY_DIR}/SDL2-2.32.10
+            ${SDL2_SOURCE_DIR}
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/SDL2-build)
         ogre_build_dependency(${PROJECT_BINARY_DIR}/SDL2-build)
     endif()
 
     if(MSVC OR MINGW OR SKBUILD) # other platforms dont need this
       message(STATUS "Building zlib") # only needed for Assimp
-      file(DOWNLOAD
-          https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz
-          ${PROJECT_BINARY_DIR}/zlib-1.3.2.tar.gz
-          EXPECTED_HASH SHA256=bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16)
-      execute_process(COMMAND ${CMAKE_COMMAND}
-          -E tar xf zlib-1.3.2.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+      ogre_download_dependency(ZLIB_SOURCE_DIR zlib-${OGREDEPS_ZLIB_VERSION}
+          https://github.com/madler/zlib/releases/download/v${OGREDEPS_ZLIB_VERSION}/zlib-${OGREDEPS_ZLIB_VERSION}.tar.gz
+          SHA256 bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16)
       execute_process(COMMAND ${BUILD_COMMAND_COMMON}
           -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
-          ${PROJECT_BINARY_DIR}/zlib-1.3.2
-          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/zlib-1.3.2)
-      ogre_build_dependency(${PROJECT_BINARY_DIR}/zlib-1.3.2)
+          ${ZLIB_SOURCE_DIR}
+          WORKING_DIRECTORY ${ZLIB_SOURCE_DIR})
+      ogre_build_dependency(${ZLIB_SOURCE_DIR})
 
       message(STATUS "Building Assimp")
-      file(DOWNLOAD
-              https://github.com/assimp/assimp/archive/refs/tags/v6.0.5.tar.gz
-          ${PROJECT_BINARY_DIR}/v6.0.5.tar.gz)
-      execute_process(COMMAND ${CMAKE_COMMAND}
-          -E tar xf v6.0.5.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+      ogre_download_dependency(ASSIMP_SOURCE_DIR assimp-${OGREDEPS_ASSIMP_VERSION}
+          https://github.com/assimp/assimp/archive/refs/tags/v${OGREDEPS_ASSIMP_VERSION}.tar.gz)
       # Assimp is only used for asset import, so favour size over import speed.
       # Override the configuration flags rather than the build type to keep
       # Debug builds debuggable and multi-config generators working.
@@ -258,17 +272,14 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
           -DASSIMP_BUILD_IFC_IMPORTER=OFF
           -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
           ${ASSIMP_POSTFIX_OPTS}
-          ${PROJECT_BINARY_DIR}/assimp-6.0.5
-          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/assimp-6.0.5)
-      ogre_build_dependency(${PROJECT_BINARY_DIR}/assimp-6.0.5)
+          ${ASSIMP_SOURCE_DIR}
+          WORKING_DIRECTORY ${ASSIMP_SOURCE_DIR})
+      ogre_build_dependency(${ASSIMP_SOURCE_DIR})
     endif()
 
     message(STATUS "Building Bullet")
-    file(DOWNLOAD
-        https://github.com/bulletphysics/bullet3/archive/refs/tags/3.25.tar.gz
-        ${PROJECT_BINARY_DIR}/3.25.tar.gz)
-    execute_process(COMMAND ${CMAKE_COMMAND}
-        -E tar xf 3.25.tar.gz WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    ogre_download_dependency(BULLET_SOURCE_DIR bullet3-${OGREDEPS_BULLET_VERSION}
+        https://github.com/bulletphysics/bullet3/archive/refs/tags/${OGREDEPS_BULLET_VERSION}.tar.gz)
     execute_process(COMMAND ${BUILD_COMMAND_COMMON}
         -DBUILD_SHARED_LIBS=OFF
         -DINSTALL_LIBS=ON
@@ -286,9 +297,9 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -DCMAKE_DEBUG_POSTFIX= # need to remove postfix so default find_package detects Bullet correctly
         -DBUILD_CLSOCKET=OFF
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-        ${PROJECT_BINARY_DIR}/bullet3-3.25
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bullet3-3.25)
-    ogre_build_dependency(${PROJECT_BINARY_DIR}/bullet3-3.25)
+        ${BULLET_SOURCE_DIR}
+        WORKING_DIRECTORY ${BULLET_SOURCE_DIR})
+    ogre_build_dependency(${BULLET_SOURCE_DIR})
     set(Bullet_ROOT ${OGREDEPS_PATH})
 endif()
 
