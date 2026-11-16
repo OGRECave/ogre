@@ -731,6 +731,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::GpuSharedParameters::getConstantDefinitionIterator;
 %template(GpuConstantDefinitionMap) std::map<std::string, Ogre::GpuConstantDefinition>;
 SHARED_PTR(GpuProgramParameters);
+SHARED_PTR(GpuSharedParameters);
 namespace Ogre { struct GpuLogicalIndexUse; class GpuSharedParametersUsage; }
 %template(ConstantList) std::vector<Ogre::uchar>;
 %template(GpuLogicalIndexUseMap) std::map<size_t, Ogre::GpuLogicalIndexUse>;
@@ -740,6 +741,12 @@ namespace Ogre { struct GpuLogicalIndexUse; class GpuSharedParametersUsage; }
 %template(GpuConstantDefinitionPair) std::pair<std::string, Ogre::GpuConstantDefinition>;
 %template(GpuConstantDefinitionList) std::vector<std::pair<std::string, Ogre::GpuConstantDefinition> >;
 %include "OgreGpuProgramParams.h"
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<float>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<int>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<Ogre::uint>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<2, Ogre::Real>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<3, Ogre::Real>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<4, Ogre::Real>;
 %ignore Ogre::Image::getFileExtFromMagic;
 %include "OgreImage.h"
 %include "OgreBillboard.h"
