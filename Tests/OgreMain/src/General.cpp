@@ -1064,3 +1064,14 @@ TEST(GpuSharedParameters, LightArrayAutoConstants)
     EXPECT_EQ(Vector4f(colours), Vector4f(1, 0, 0, 1));
     EXPECT_EQ(Vector4f(colours + 4), Vector4f(0, 1, 0, 1));
 }
+
+TEST_F(SceneNodeTest, attachDuplicateName)
+{
+    auto light = mSceneMgr->createLight("obj");
+    auto camera = mSceneMgr->createCamera("obj");
+    SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    node->attachObject(light);
+    EXPECT_THROW(node->attachObject(camera), Exception);
+    EXPECT_FALSE(camera->isAttached());
+    mSceneMgr->destroyCamera(camera);
+}
