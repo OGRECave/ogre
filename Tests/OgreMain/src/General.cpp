@@ -1077,3 +1077,14 @@ TEST_F(SceneNodeTest, detachObjectFromBone)
     EXPECT_FALSE(sword->isAttached());
     EXPECT_TRUE(shield->isAttached());
 }
+
+TEST_F(SceneNodeTest, attachDuplicateName)
+{
+    auto light = mSceneMgr->createLight("obj");
+    auto camera = mSceneMgr->createCamera("obj");
+    SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    node->attachObject(light);
+    EXPECT_THROW(node->attachObject(camera), Exception);
+    EXPECT_FALSE(camera->isAttached());
+    mSceneMgr->destroyCamera(camera);
+}
