@@ -1064,3 +1064,30 @@ TEST(GpuSharedParameters, LightArrayAutoConstants)
     EXPECT_EQ(Vector4f(colours), Vector4f(1, 0, 0, 1));
     EXPECT_EQ(Vector4f(colours + 4), Vector4f(0, 1, 0, 1));
 }
+
+TEST(MaterialSerializer, TessellationProgramRefs)
+{
+    Root root;
+
+    String group = "General";
+    auto& gpm = GpuProgramManager::getSingleton();
+    gpm.createProgram("hs", group, "null", GPT_HULL_PROGRAM);
+    gpm.createProgram("ds", group, "null", GPT_DOMAIN_PROGRAM);
+
+    auto mat = std::make_shared<Material>(nullptr, "Material Name", 0, group);
+    auto pass = mat->createTechnique()->createPass();
+    pass->setGpuProgram(GPT_HULL_PROGRAM, gpm.getByName("hs", group));
+    pass->setGpuProgram(GPT_DOMAIN_PROGRAM, gpm.getByName("ds", group));
+
+    MaterialSerializer ser;
+    ser.queueForExport(mat);
+    auto str = ser.getQueuedAsString();
+
+    DataStreamPtr stream = std::make_shared<MemoryDataStream>("memory.material", &str[0], str.size());
+    MaterialManager::getSingleton().parseScript(stream, group);
+
+    auto mat2 = MaterialManager::getSingleton().getByName("Material Name", group);
+    ASSERT_TRUE(mat2);
+    EXPECT_TRUE(mat2->getTechnique(0)->getPass(0)->hasTessellationHullProgram());
+    EXPECT_TRUE(mat2->getTechnique(0)->getPass(0)->hasTessellationDomainProgram());
+}

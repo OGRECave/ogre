@@ -1391,13 +1391,13 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeTesselationHullProgramRef(const Pass* pPass)
     {
-        writeGpuProgramRef("tesselation_hull_program_ref",
+        writeGpuProgramRef("tessellation_hull_program_ref",
             pPass->getTessellationHullProgram(), pPass->getTessellationHullProgramParameters());
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeTesselationDomainProgramRef(const Pass* pPass)
     {
-        writeGpuProgramRef("tesselation_domain_program_ref",
+        writeGpuProgramRef("tessellation_domain_program_ref",
             pPass->getTessellationDomainProgram(), pPass->getTessellationDomainProgramParameters());
     }
     //-----------------------------------------------------------------------
