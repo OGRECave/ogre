@@ -1467,7 +1467,8 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No child object entry found named " + name,
                 "Entity::detachObjectFromBone");
         }
-        detachObjectImpl(*it);
+        MovableObject* obj = *it;
+        detachObjectImpl(obj);
         std::swap(*it, mChildObjectList.back());
         mChildObjectList.pop_back();
 
@@ -1475,7 +1476,7 @@ namespace Ogre {
         if (mParentNode)
             mParentNode->needUpdate();
 
-        return *it;
+        return obj;
     }
     //-----------------------------------------------------------------------
     void Entity::detachObjectFromBone(MovableObject* obj)
