@@ -16,6 +16,8 @@
 #include "OgreFileSystemLayer.h"
 #include "OgrePredefinedControllers.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreDistanceLodStrategy.h"
+#include "OgreLodStrategyManager.h"
 #include "OgreDefaultDebugDrawer.h"
 #include "OgreCompositorLogic.h"
 
@@ -254,6 +256,7 @@ typedef uint8_t uint8;
 %csmethodmodifiers *::viewportDestroyed "public";
 %csmethodmodifiers *::viewportDimensionsChanged "public";
 %csmethodmodifiers *::viewportCameraChanged "public";
+%csmethodmodifiers *::createAnimableValue "public";
 %csmethodmodifiers Ogre::BillboardChain::preRender "public";
 #endif
 
@@ -400,9 +403,11 @@ CS_VECTOR_OPS(4);
             %argument_fail(SWIG_TypeError, "float (Ogre::Radian) or Ogre::Degree", $symname, $argnum);
     }
 }
-// punch through overload resolution
-%typecheck(SWIG_TYPECHECK_POINTER) const Ogre::Radian& {
-    $1 = true; // actual check in the typemap
+// accept what the typemap accepts, but let a Real overload take plain floats first
+%typecheck(SWIG_TYPECHECK_DOUBLE) const Ogre::Radian& {
+    $1 = SWIG_CheckState(SWIG_ConvertPtr($input, 0, $descriptor, SWIG_POINTER_NO_NULL)) ||
+         SWIG_CheckState(SWIG_ConvertPtr($input, 0, $descriptor(Ogre::Degree*), SWIG_POINTER_NO_NULL)) ||
+         SWIG_CheckState(SWIG_AsVal_float($input, NULL));
 }
 
 %typemap(in) void*, Ogre::uchar* {
@@ -553,7 +558,14 @@ CS_VECTOR_OPS(4);
     }
 }
 %typecheck(SWIG_TYPECHECK_STRING) const TYPE& {
-    if (PySequence_Check($input))
+    if (SWIG_CheckState(SWIG_ConvertPtr($input, 0, $descriptor, SWIG_POINTER_NO_NULL))) {
+        $1 = true;
+    }
+    // do not treat other wrapped types as sequences, e.g. a ColourValue is not a Quaternion
+    else if (SWIG_Python_GetSwigThis($input)) {
+        $1 = false;
+    }
+    else if (PySequence_Check($input))
     {
         int len = PySequence_Length($input);
         $1 = (LEN_CHECK);
@@ -719,6 +731,7 @@ ADD_REPR(ColourValue)
 %ignore Ogre::GpuSharedParameters::getConstantDefinitionIterator;
 %template(GpuConstantDefinitionMap) std::map<std::string, Ogre::GpuConstantDefinition>;
 SHARED_PTR(GpuProgramParameters);
+SHARED_PTR(GpuSharedParameters);
 namespace Ogre { struct GpuLogicalIndexUse; class GpuSharedParametersUsage; }
 %template(ConstantList) std::vector<Ogre::uchar>;
 %template(GpuLogicalIndexUseMap) std::map<size_t, Ogre::GpuLogicalIndexUse>;
@@ -728,6 +741,12 @@ namespace Ogre { struct GpuLogicalIndexUse; class GpuSharedParametersUsage; }
 %template(GpuConstantDefinitionPair) std::pair<std::string, Ogre::GpuConstantDefinition>;
 %template(GpuConstantDefinitionList) std::vector<std::pair<std::string, Ogre::GpuConstantDefinition> >;
 %include "OgreGpuProgramParams.h"
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<float>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<int>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<Ogre::uint>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<2, Ogre::Real>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<3, Ogre::Real>;
+%template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<4, Ogre::Real>;
 %ignore Ogre::Image::getFileExtFromMagic;
 %include "OgreImage.h"
 %include "OgreBillboard.h"
@@ -860,6 +879,8 @@ PTR_TRAITS(Ogre::ResourceManager)
     %ignore Ogre::GpuProgramManager::getByName(const String&, const String&,bool) const;
     %include "OgreGpuProgramManager.h"
     %include "OgreHighLevelGpuProgramManager.h"
+SHARED_PTR(AnimableValue);
+%include "OgreAnimable.h"
 // animations
 %ignore Ogre::VertexPoseKeyFrame::getPoseReferenceIterator;
 %include "OgreKeyFrame.h"
@@ -919,6 +940,7 @@ namespace Ogre { struct LinkedSkeletonAnimationSource; }
     SHARED_PTR(SkeletonInstance);
     %include "OgreSkeletonInstance.h"
 %include "OgreSkeletonManager.h"
+%include "OgreSkeletonSerializer.h"
 %include "OgreRenderQueue.h"
 %include "OgreRenderOperation.h"
 %ignore Ogre::Material::getLodValueIterator;
@@ -1132,6 +1154,9 @@ SHARED_PTR(Mesh);
 %template(MeshLodUsageList) std::vector<Ogre::MeshLodUsage>;
 %include "OgreLodStrategy.h"
 %include "OgrePixelCountLodStrategy.h"
+%include "OgreDistanceLodStrategy.h"
+%ignore Ogre::LodStrategyManager::getIterator;
+%include "OgreLodStrategyManager.h"
 %ignore Ogre::Pass::getTextureUnitStateIterator; // deprecated
 %template(TextureUnitStateList) std::vector<Ogre::TextureUnitState*>;
 %template(PassSet) std::set<Ogre::Pass*>;
