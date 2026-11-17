@@ -1091,3 +1091,27 @@ TEST(MaterialSerializer, TessellationProgramRefs)
     EXPECT_TRUE(mat2->getTechnique(0)->getPass(0)->hasTessellationHullProgram());
     EXPECT_TRUE(mat2->getTechnique(0)->getPass(0)->hasTessellationDomainProgram());
 }
+
+TEST_F(SceneNodeTest, detachObjectFromBone)
+{
+    auto ent = mSceneMgr->createEntity("sinbad", "Sinbad.mesh");
+    auto sword = mSceneMgr->createLight("sword");
+    auto shield = mSceneMgr->createLight("shield");
+    ent->attachObjectToBone("Handle.L", sword);
+    ent->attachObjectToBone("Handle.R", shield);
+
+    EXPECT_EQ(ent->detachObjectFromBone("sword"), sword);
+    EXPECT_FALSE(sword->isAttached());
+    EXPECT_TRUE(shield->isAttached());
+}
+
+TEST_F(SceneNodeTest, attachDuplicateName)
+{
+    auto light = mSceneMgr->createLight("obj");
+    auto camera = mSceneMgr->createCamera("obj");
+    SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    node->attachObject(light);
+    EXPECT_THROW(node->attachObject(camera), Exception);
+    EXPECT_FALSE(camera->isAttached());
+    mSceneMgr->destroyCamera(camera);
+}
