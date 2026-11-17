@@ -1064,3 +1064,16 @@ TEST(GpuSharedParameters, LightArrayAutoConstants)
     EXPECT_EQ(Vector4f(colours), Vector4f(1, 0, 0, 1));
     EXPECT_EQ(Vector4f(colours + 4), Vector4f(0, 1, 0, 1));
 }
+
+TEST_F(SceneNodeTest, detachObjectFromBone)
+{
+    auto ent = mSceneMgr->createEntity("sinbad", "Sinbad.mesh");
+    auto sword = mSceneMgr->createLight("sword");
+    auto shield = mSceneMgr->createLight("shield");
+    ent->attachObjectToBone("Handle.L", sword);
+    ent->attachObjectToBone("Handle.R", shield);
+
+    EXPECT_EQ(ent->detachObjectFromBone("sword"), sword);
+    EXPECT_FALSE(sword->isAttached());
+    EXPECT_TRUE(shield->isAttached());
+}
