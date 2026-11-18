@@ -61,20 +61,9 @@ namespace OgreBites
 
     ConfigDialog::ConfigDialog() : mImpl(new ConfigDialog::PrivateData())
     {
-		#ifdef __MINGW32__
-			#ifdef OGRE_STATIC_LIB
-                mImpl->mHInstance = GetModuleHandle( NULL );
-			#else
-				#if OGRE_DEBUG_MODE == 1
-        		    mImpl->mHInstance = GetModuleHandle("OgreMain_d.dll");
-				#else
-					mImpl->mHInstance = GetModuleHandle("OgreMain.dll");
-				#endif
-			#endif
-		#else
-			static const TCHAR staticVar;
-			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &mImpl->mHInstance);
-		#endif
+
+		static const TCHAR staticVar=0;
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &mImpl->mHInstance);
 
         mImpl->mSelectedRenderSystem = 0;
     }
