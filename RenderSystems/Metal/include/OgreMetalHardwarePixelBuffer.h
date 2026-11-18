@@ -65,7 +65,8 @@ namespace Ogre {
         /// Should be called by HardwareBufferManager
         MetalHardwarePixelBuffer( uint32 width, uint32 height, uint32 depth,
                                   PixelFormat format, bool hwGamma,
-                                  HardwareBuffer::Usage usage );
+                                  HardwareBuffer::Usage usage,
+                                  Texture* parentTexture = nullptr );
 
         /// @copydoc HardwarePixelBuffer::blitFromMemory
         void blitFromMemory(const PixelBox &src, const Box &dstBox) override;
@@ -88,6 +89,7 @@ namespace Ogre {
         MetalTextureBuffer( __unsafe_unretained id<MTLTexture> renderTexture,
                             __unsafe_unretained id<MTLTexture> resolveTexture,
                             MetalDevice *device,
+                            MetalTexture *parentTexture,
                             const String &baseName, MTLTextureType target,
                             int width, int height, int depth, PixelFormat format,
                             int face, int level, Usage usage,

@@ -141,7 +141,7 @@ namespace Ogre {
         Texture(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
 
-        virtual ~Texture() {}
+        virtual ~Texture();
         
         /** Sets the type of texture; can only be changed before load() 
         */
@@ -420,6 +420,27 @@ namespace Ogre {
         */
         void convertToImage(Image& destImage, bool includeMipMaps = false);
         
+        /** Generates mip levels 1..mNumMipmaps from level 0.
+
+            Only has an effect when TU_AUTOMIPMAP is set and the texture has more
+            than one mip level. Automatic generation is normally deferred to the
+            next draw (see the render system's flush point); call this to force
+            it earlier, e.g. after a batch of updates or before reading back mip
+            levels.
+
+            Must not be called while a render pass is active on APIs that cannot
+            interrupt it (Vulkan; on Metal it ends the active render encoder).
+
+            The texture is no longer marked dirty afterwards, even if the render
+            system fails to generate the levels and throws.
+        */
+        void generateMipmaps();
+
+        /// Marks the mip levels as needing regeneration.
+        void _markMipmapsDirty();
+
+        bool _isMipmapsDirty() const { return mMipmapsDirty; }
+
         /** Retrieve a platform or API-specific piece of information from this texture.
             This method of retrieving information should only be used if you know what you're doing.
 
@@ -481,6 +502,7 @@ namespace Ogre {
         bool mInternalResourcesCreated;
         bool mMipmapsHardwareGenerated;
         bool mHwGamma;
+        bool mMipmapsDirty = false;
 
         String mFSAAHint;
 
@@ -501,6 +523,9 @@ namespace Ogre {
         /** Implementation of creating internal texture resources 
         */
         virtual void createInternalResourcesImpl(void) = 0;
+
+        /// Render-system specific implementation of generateMipmaps().
+        virtual void generateMipmapsImpl() {}
 
         /** Implementation of freeing internal texture resources 
         */

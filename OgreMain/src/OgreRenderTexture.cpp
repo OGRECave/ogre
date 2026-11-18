@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreTexture.h"
 
 namespace Ogre
 {
@@ -45,6 +46,27 @@ namespace Ogre
     RenderTexture::~RenderTexture()
     {
         mBuffer->_clearSliceRTT(0);
+    }
+
+    void RenderTexture::_endUpdate()
+    {
+        RenderTarget::_endUpdate();
+
+        if (Texture* tex = mBuffer->getParentTexture())
+            tex->_markMipmapsDirty();
+    }
+
+    void MultiRenderTarget::_endUpdate()
+    {
+        RenderTarget::_endUpdate();
+
+        for (RenderTexture* rt : mBoundSurfaces)
+        {
+            if (!rt)
+                continue;
+            if (Texture* tex = rt->mBuffer->getParentTexture())
+                tex->_markMipmapsDirty();
+        }
     }
 
     void RenderTexture::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)

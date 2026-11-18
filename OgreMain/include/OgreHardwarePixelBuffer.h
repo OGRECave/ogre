@@ -63,6 +63,8 @@ namespace Ogre {
         PixelBox mCurrentLock;
         /// The current locked box of this surface (entire surface coords)
         Box mLockedBox;
+        /// Owning texture, or nullptr for render buffers
+        Texture* mOwningTexture;
 
         typedef std::vector<RenderTexture*> SliceTRT;
         SliceTRT mSliceTRT;
@@ -85,7 +87,8 @@ namespace Ogre {
         /// Should be called by HardwareBufferManager
         HardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
                 PixelFormat mFormat,
-                HardwareBuffer::Usage usage, bool useShadowBuffer);
+                HardwareBuffer::Usage usage, bool useShadowBuffer,
+                Texture* parentTexture = nullptr);
         ~HardwarePixelBuffer();
 
         /** Make every lock method from HardwareBuffer available.
@@ -181,6 +184,11 @@ namespace Ogre {
             PixelBuffer.
         */
         RenderTexture *getRenderTarget(size_t slice=0) const;
+
+        /** Returns the owning texture, or nullptr for non-texture buffers.
+            Used to mark the texture's mip levels dirty after an upload.
+        */
+        Texture* getParentTexture() const { return mOwningTexture; }
         
         /// Gets the width of this buffer
         uint32 getWidth() const { return mWidth; }

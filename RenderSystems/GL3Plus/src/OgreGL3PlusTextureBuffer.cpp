@@ -49,7 +49,7 @@ namespace Ogre {
     GL3PlusTextureBuffer::GL3PlusTextureBuffer(GL3PlusTexture* parent,
                                                GLint face, GLint level, uint32 width, uint32 height,
                                                uint32 depth)
-        : GLHardwarePixelBufferCommon(width, height, depth, parent->getFormat(), (Usage)parent->getUsage()),
+        : GLHardwarePixelBufferCommon(width, height, depth, parent->getFormat(), (Usage)parent->getUsage(), parent),
           mTarget(parent->getGL3PlusTextureTarget()), mTextureID(parent->getGLID()), mLevel(level)
     {
         mRenderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
@@ -259,10 +259,8 @@ namespace Ogre {
 
         // TU_AUTOMIPMAP is only enabled when there are no custom mips
         // so we do not have to care about overwriting
-        if ((mUsage & TU_AUTOMIPMAP) && (mLevel == 0))
-        {
-            OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
-        }
+        if (mLevel == 0)
+            getParentTexture()->_markMipmapsDirty();
 
         // Restore defaults.
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
@@ -439,12 +437,8 @@ namespace Ogre {
         }
 
 
-        // Generate mipmaps
-        if (mUsage & TU_AUTOMIPMAP)
-        {
-            mRenderSystem->_getStateCacheManager()->bindGLTexture( mTarget, mTextureID );
-            OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
-        }
+        // Mark the mipmaps for regeneration
+        getParentTexture()->_markMipmapsDirty();
 
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(
             GL_DRAW_FRAMEBUFFER, isDepth ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, 0));

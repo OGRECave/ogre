@@ -403,6 +403,13 @@ namespace Ogre {
         /// Internal method to create a warning texture (bound when a texture unit is blank)
         const TexturePtr& _getWarningTexture();
 
+        /// Queues a texture for deferred mipmap generation (called by Texture)
+        void _notifyMipmapsDirty(Texture* tex);
+        /// Removes a texture from the deferred mipmap generation queue
+        void _removeMipmapsDirty(Texture* tex);
+        /// Generates mipmaps for all textures queued since the last flush
+        void _flushMipmaps();
+
         /// get the default sampler
         const SamplerPtr& getDefaultSampler();
 
@@ -421,6 +428,7 @@ namespace Ogre {
         TexturePtr mWarningTexture;
         SamplerPtr mDefaultSampler;
         std::map<String, SamplerPtr> mNamedSamplers;
+        std::vector<Texture*> mDirtyMipmapTextures;
     };
 
     /// Specialisation of TextureManager for offline processing. Cannot be used with an active RenderSystem.

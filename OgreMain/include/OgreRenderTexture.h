@@ -56,8 +56,12 @@ namespace Ogre
         PixelFormat suggestPixelFormat() const override;
 
     protected:
+        void _endUpdate() override;
+
         HardwarePixelBuffer *mBuffer;
         uint32 mZOffset;
+
+        friend class MultiRenderTarget;
     };
 
     /** This class represents a render target that renders to multiple RenderTextures
@@ -110,6 +114,8 @@ namespace Ogre
 
     protected:
         BoundSufaceList mBoundSurfaces;
+
+        void _endUpdate() override;
 
         /// Implementation of bindSurface, must be provided
         virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target) = 0;

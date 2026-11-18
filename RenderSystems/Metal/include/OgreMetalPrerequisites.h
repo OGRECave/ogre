@@ -64,6 +64,7 @@ namespace Ogre
     class MetalProgramFactory;
     class MetalRenderSystem;
     class MetalRenderTargetCommon;
+    class MetalTexture;
 
     // forward compatibility defines
     class MetalHardwareBufferCommon;

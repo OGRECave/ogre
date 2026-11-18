@@ -57,6 +57,8 @@ namespace Ogre {
         void createInternalResourcesImpl(void) override;
         /// @copydoc Resource::freeInternalResourcesImpl
         void freeInternalResourcesImpl(void) override;
+        /// @copydoc Texture::generateMipmapsImpl
+        void generateMipmapsImpl() override;
 
         HardwarePixelBufferPtr createSurface(uint32 face, uint32 mip, uint32 width, uint32 height,
                                              uint32 depth) override;
