@@ -394,10 +394,11 @@ TEST_F(SubMeshTests, ExtremesFromSharedVertices)
     MeshPtr mesh = MeshManager::getSingleton().createManual("ExtremesSharedVertices", RGN_DEFAULT);
     mesh->sharedVertexData = new VertexData();
     mesh->sharedVertexData->vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_POSITION);
-    auto vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 2, HBU_CPU_TO_GPU);
-    float positions[2][3] = {{0, 0, 0}, {1, 1, 0}};
+    auto vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 3, HBU_CPU_TO_GPU);
+    float positions[3][3] = {{9, 9, 9}, {0, 0, 0}, {1, 1, 0}};
     vertexBuffer->writeData(0, sizeof(positions), positions, true);
     mesh->sharedVertexData->vertexBufferBinding->setBinding(0, vertexBuffer);
+    mesh->sharedVertexData->vertexStart = 1;
     mesh->sharedVertexData->vertexCount = 2;
 
     SubMesh* subMesh = mesh->createSubMesh(); // shared vertices, no indices
