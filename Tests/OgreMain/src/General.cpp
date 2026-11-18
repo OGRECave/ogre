@@ -388,6 +388,23 @@ TEST_F(MeshTests, BoundsFromVertexStart)
     EXPECT_EQ(mesh->getBounds(), AxisAlignedBox(Vector3(1, 1, 0), Vector3(1, 1, 0)));
 }
 
+typedef RootWithoutRenderSystemFixture SubMeshTests;
+TEST_F(SubMeshTests, ExtremesFromSharedVertices)
+{
+    MeshPtr mesh = MeshManager::getSingleton().createManual("ExtremesSharedVertices", RGN_DEFAULT);
+    mesh->sharedVertexData = new VertexData();
+    mesh->sharedVertexData->vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+    auto vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 2, HBU_CPU_TO_GPU);
+    float positions[2][3] = {{0, 0, 0}, {1, 1, 0}};
+    vertexBuffer->writeData(0, sizeof(positions), positions, true);
+    mesh->sharedVertexData->vertexBufferBinding->setBinding(0, vertexBuffer);
+    mesh->sharedVertexData->vertexCount = 2;
+
+    SubMesh* subMesh = mesh->createSubMesh(); // shared vertices, no indices
+    subMesh->generateExtremes(2);
+    EXPECT_EQ(subMesh->extremityPoints, std::vector<Vector3>({Vector3(0, 0, 0), Vector3(1, 1, 0)}));
+}
+
 TEST_F(MeshSerializerBufferRange, ExportsUsedRange)
 {
     MeshPtr mesh = MeshManager::getSingleton().createManual("BufferRangeSrc", RGN_DEFAULT);
