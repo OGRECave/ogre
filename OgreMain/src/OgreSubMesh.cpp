@@ -234,8 +234,8 @@ namespace Ogre {
             findElementBySemantic (VES_POSITION);
         HardwareVertexBufferSharedPtr vbuf = vert->vertexBufferBinding->
             getBuffer (poselem->getSource ());
-        uint8 *vdata = (uint8 *)vbuf->lock (HardwareBuffer::HBL_READ_ONLY);
         size_t vsz = vbuf->getVertexSize ();
+        uint8 *vdata = (uint8 *)vbuf->lock (HardwareBuffer::HBL_READ_ONLY) + vert->vertexStart * vsz;
 
         std::vector<Cluster> boxes;
         boxes.reserve (count);
@@ -263,7 +263,7 @@ namespace Ogre {
         else
         {
             // just insert all indexes
-            for (size_t i = vert->vertexStart; i < vert->vertexCount; i++)
+            for (size_t i = 0; i < vert->vertexCount; i++)
             {
                 boxes [0].mIndices.insert (static_cast<int>(i));
             }
