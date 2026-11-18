@@ -517,7 +517,7 @@ namespace Ogre {
 
             This number includes the original model.
         */
-        ushort getNumLodLevels(void) const { return mMeshLodUsageList.size(); }
+        ushort getNumLodLevels(void) const { return static_cast<ushort>(mMeshLodUsageList.size()); }
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
 
