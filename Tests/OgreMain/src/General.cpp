@@ -1092,6 +1092,17 @@ TEST(MaterialSerializer, TessellationProgramRefs)
     EXPECT_TRUE(mat2->getTechnique(0)->getPass(0)->hasTessellationDomainProgram());
 }
 
+TEST(MaterialLoading, IterateRectLights)
+{
+    Root root("");
+    String src = "material Mat { technique { pass { iteration once_per_light rect } } }";
+    DataStreamPtr stream = std::make_shared<MemoryDataStream>("memory.material", &src[0], src.size());
+    MaterialManager::getSingleton().parseScript(stream, RGN_DEFAULT);
+
+    auto pass = MaterialManager::getSingleton().getByName("Mat")->getTechnique(0)->getPass(0);
+    EXPECT_EQ(pass->getOnlyLightType(), Light::LT_RECTLIGHT);
+}
+
 TEST_F(SceneNodeTest, detachObjectFromBone)
 {
     auto ent = mSceneMgr->createEntity("sinbad", "Sinbad.mesh");
