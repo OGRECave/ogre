@@ -450,8 +450,9 @@ namespace Ogre {
         }
         const VertexElement* elemPos = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
         HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(elemPos->getSource());
+        size_t vSize = vbuf->getVertexSize();
         HardwareBufferLockGuard vertexLock(vbuf, HardwareBuffer::HBL_READ_ONLY);
-        unsigned char* vertex = static_cast<unsigned char*>(vertexLock.pData);
+        unsigned char* vertex = static_cast<unsigned char*>(vertexLock.pData) + vertexData->vertexStart * vSize;
 
         if (!extendOnly){
             // init values
@@ -461,7 +462,6 @@ namespace Ogre {
             Vector3 basePos(pFloat[0], pFloat[1], pFloat[2]);
             outAABB.setExtents(basePos, basePos);
         }
-        size_t vSize = vbuf->getVertexSize();
         unsigned char* vEnd = vertex + vertexData->vertexCount * vSize;
         Real radiusSqr = outRadius * outRadius;
         // Loop through all vertices.

@@ -371,6 +371,23 @@ struct MeshSerializerBufferRange : public RootWithoutRenderSystemFixture
 {
 };
 
+typedef RootWithoutRenderSystemFixture MeshTests;
+TEST_F(MeshTests, BoundsFromVertexStart)
+{
+    MeshPtr mesh = MeshManager::getSingleton().createManual("BoundsVertexStart", RGN_DEFAULT);
+    mesh->sharedVertexData = new VertexData();
+    mesh->sharedVertexData->vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+    auto vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 2, HBU_CPU_TO_GPU);
+    float positions[2][3] = {{9, 9, 9}, {1, 1, 0}};
+    vertexBuffer->writeData(0, sizeof(positions), positions, true);
+    mesh->sharedVertexData->vertexBufferBinding->setBinding(0, vertexBuffer);
+    mesh->sharedVertexData->vertexStart = 1;
+    mesh->sharedVertexData->vertexCount = 1;
+
+    mesh->_updateBoundsFromVertexBuffers();
+    EXPECT_EQ(mesh->getBounds(), AxisAlignedBox(Vector3(1, 1, 0), Vector3(1, 1, 0)));
+}
+
 TEST_F(MeshSerializerBufferRange, ExportsUsedRange)
 {
     MeshPtr mesh = MeshManager::getSingleton().createManual("BufferRangeSrc", RGN_DEFAULT);
