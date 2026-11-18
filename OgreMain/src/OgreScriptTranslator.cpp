@@ -1875,7 +1875,11 @@ namespace Ogre{
                             mPass->setIteratePerLight(true, true, Light::LT_SPOTLIGHT);
                             break;
                         default:
-                            compiler->addError(*prop, (*it)->getValue() + " is not a valid light type (point, directional, or spot)");
+                            // no ID_RECT to keep the header ABI stable
+                            if ((*it)->getValue() == "rect")
+                                mPass->setIteratePerLight(true, true, Light::LT_RECTLIGHT);
+                            else
+                                compiler->addError(*prop, (*it)->getValue() + " is not a valid light type (point, directional, spot, or rect)");
                         }
                     };
 
