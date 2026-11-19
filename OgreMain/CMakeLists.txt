@@ -17,7 +17,13 @@ list(APPEND HEADER_FILES
     ${PROJECT_BINARY_DIR}/include/OgreBuildSettings.h
     ${PROJECT_BINARY_DIR}/include/OgreComponents.h
     ${PROJECT_BINARY_DIR}/include/OgreExports.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Ogre.i)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Ogre.i
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSwigCommon.i
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSwigCore.i
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSwigResources.i
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSwigMaterials.i
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSwigAnimation.i
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSwigScene.i)
 
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 

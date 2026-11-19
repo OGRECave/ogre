@@ -58,6 +58,7 @@ elseif(UNIX)
     set(PYTHON_LIBRARIES "")
 endif()
 
+file(GLOB SWIG_MODULE_Ogre_EXTRA_DEPS ${PROJECT_SOURCE_DIR}/OgreMain/include/OgreSwig*.i)
 swig_add_library(Ogre LANGUAGE python SOURCES ../../OgreMain/include/Ogre.i)
 swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
 ogre_python_module(Ogre)
