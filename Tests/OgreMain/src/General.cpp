@@ -1161,3 +1161,27 @@ TEST_F(SceneNodeTest, attachDuplicateName)
     EXPECT_FALSE(camera->isAttached());
     mSceneMgr->destroyCamera(camera);
 }
+
+TEST(GpuProgramParams, ShadowSceneDepthRangeArray)
+{
+    Root root("");
+    AutoParamDataSource source;
+    source.setCurrentSceneManager(root.createSceneManager());
+
+    auto constants = std::make_shared<GpuNamedConstants>();
+    auto& def = constants->map["ranges"];
+    def.constType = GCT_FLOAT4;
+    def.physicalIndex = 0;
+    def.elementSize = 4;
+    def.arraySize = 2;
+    constants->bufferSize = 8;
+
+    GpuProgramParameters params;
+    params._setNamedConstants(constants);
+    params.setNamedAutoConstant("ranges", GpuProgramParameters::ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY, 2);
+    params._updateAutoParams(&source, GPV_ALL);
+
+    const float* ranges = params.getFloatPointer(0);
+    EXPECT_EQ(Vector4f(ranges), Vector4f(source.getShadowSceneDepthRange(0).ptr()));
+    EXPECT_EQ(Vector4f(ranges + 4), Vector4f(source.getShadowSceneDepthRange(1).ptr()));
+}
