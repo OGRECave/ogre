@@ -531,6 +531,13 @@ CS_VECTOR_OPS(4);
 %typemap(argout) (Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth, Ogre::PixelFormat pixelFormat, void *pixelData) {
     if (PyObject_SetAttrString(self, "_buffer", $input) < 0) SWIG_fail;
 }
+// Python owns the buffer, so the Image must only borrow it
+%typemap(check) (Ogre::uchar* buffer, bool autoDelete) {
+    if ($1) $2 = false;
+}
+%typemap(argout) (Ogre::uchar* buffer, bool autoDelete) {
+    if ($1 && PyObject_SetAttrString(self, "_buffer", $input) < 0) SWIG_fail;
+}
 
 
 %define TYPEMAP_SEQUENCE_FOR(TYPE, LEN_CHECK, DESCRIPTION)
