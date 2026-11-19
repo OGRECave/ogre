@@ -397,7 +397,7 @@ def point_light(window_name: str, position = (0, 0, 0)):
 
     scn_mgr = _ctx.windows[window_name].scn_mgr
     if scn_mgr.hasLight("point_light"):
-        light_node = _ctx.scn_mgr.getLight("point_light").getParentSceneNode()
+        light_node = scn_mgr.getLight("point_light").getParentSceneNode()
     else:
         light = scn_mgr.createLight("point_light", Ogre.Light.LT_POINT)
         light_node = scn_mgr.getRootSceneNode().createChildSceneNode()
