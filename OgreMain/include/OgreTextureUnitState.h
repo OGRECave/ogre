@@ -314,7 +314,7 @@ namespace Ogre {
         */
         struct TextureEffect {
             TextureEffectType type;
-            float arg1, arg2;
+            float arg1;
             int subtype;
             WaveformType waveType;
             float base;
@@ -322,7 +322,6 @@ namespace Ogre {
             float phase;
             float amplitude;
             ControllerFloat* controller;
-            const Frustum* frustum;
         };
 
         /** Texture effects in a multimap paired array.
@@ -1097,6 +1096,9 @@ private:
 
         /// The index of the referenced texture if referencing an MRT in a compositor.
         uint32 mCompositorRefMrtIndex;
+
+        const Frustum* mProjectiveTexturingFrustum;
+        TexCoordCalcMethod mTexCoordCalcMethod;
 
         //-----------------------------------------------------------------------------
         // Complex members (those that can't be copied using memcpy) are at the end to 
