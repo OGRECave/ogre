@@ -46,13 +46,16 @@ class BufferLifetimeTest(unittest.TestCase):
         import gc
         import weakref
 
-        for wrap in ("Image", "PixelBox"):
+        for wrap in ("Image", "ImageConstructor", "PixelBox"):
             # a memoryview is the stdlib buffer type that supports both ndim and weak references
             data = memoryview(bytearray(8 * 8 * 4)).cast("B", (8, 8, 4))
             ref = weakref.ref(data)
             if wrap == "Image":
                 obj = Ogre.Image()
                 obj.loadDynamicImage(data)
+            elif wrap == "ImageConstructor":
+                # must not take ownership of the buffer, which is not allocated by Ogre
+                obj = Ogre.Image(Ogre.PF_BYTE_RGBA, 8, 8, 1, data)
             else:
                 obj = Ogre.PixelBox(data)
             del data
