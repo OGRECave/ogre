@@ -365,7 +365,18 @@ namespace Ogre
         NodeAnimationTrack* _clone(Animation* newParent) const;
         
         void _applyBaseKeyFrame(const KeyFrame* base) override;
-        
+
+        /** Sets the transform of the current node to be the 'initial state' ie that
+            position / orientation / scale to be used as a basis for delta values used
+            in keyframe animation.
+
+            If you never call this method, the initial state is the identity transform, ie do nothing.
+        */
+        void setInitialState(void);
+
+        /** Resets the position / orientation / scale of the node to it's initial state, see setInitialState for more info. */
+        void resetToInitialState(void) const;
+
     private:
         /// Specialised keyframe creation
         KeyFrame* createKeyFrameImpl(Real time) override;
@@ -386,6 +397,13 @@ namespace Ogre
         Node* mTargetNode;
         // Prebuilt splines, must be mutable since lazy-update in const method
         mutable Splines* mSplines;
+
+        /// The position to use as a base for keyframe animation
+        Vector3 mInitialPosition;
+        /// The orientation to use as a base for keyframe animation
+        Quaternion mInitialOrientation;
+        /// The scale to use as a base for keyframe animation
+        Vector3 mInitialScale;
     };
 
     /** Type of vertex animation.
