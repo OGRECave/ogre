@@ -351,6 +351,7 @@ namespace Ogre
         }
 
         mLoadingState.store(LOADSTATE_UNLOADED);
+        _dirtyState();
 
         // Notify manager
         // Note if we have gone from PREPARED to UNLOADED, then we haven't actually

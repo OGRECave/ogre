@@ -388,6 +388,18 @@ TEST_F(MeshTests, BoundsFromVertexStart)
     EXPECT_EQ(mesh->getBounds(), AxisAlignedBox(Vector3(1, 1, 0), Vector3(1, 1, 0)));
 }
 
+TEST_F(MeshTests, EntityAfterMeshUnload)
+{
+    auto sceneMgr = mRoot->createSceneManager();
+    auto entity = sceneMgr->createEntity("ogrehead.mesh");
+    auto mesh = entity->getMesh();
+
+    mesh->unload();
+    entity->_updateRenderQueue(sceneMgr->getRenderQueue());
+
+    EXPECT_TRUE(mesh->isLoaded());
+}
+
 typedef RootWithoutRenderSystemFixture SubMeshTests;
 TEST_F(SubMeshTests, ExtremesFromSharedVertices)
 {
