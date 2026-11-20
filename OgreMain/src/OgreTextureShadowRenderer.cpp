@@ -1085,7 +1085,11 @@ void SceneManager::TextureShadowRenderer::resolveShadowTexture(TextureUnitState*
 
     // set up projectors for all layers, fixed function does not support layered textures anyway
     size_t layers = std::max(shadowTex->getDepth(), shadowTex->getNumFaces());
-    layers = std::min(layers, mShadowTextureCameras.size() - shadowIndex); // clamp
+    if (mShadowTextureCameras.size() >= shadowIndex) {
+        layers = std::min(layers, mShadowTextureCameras.size() - shadowIndex); // clamp
+    } else {
+        layers = 0;
+    }
     for (size_t l = 0; l < layers; ++l)
         mSceneManager->mAutoParamDataSource->setTextureProjector(mShadowTextureCameras[shadowIndex + l],
                                                                  shadowTexUnitIndex + l);
