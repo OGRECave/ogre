@@ -1823,9 +1823,12 @@ namespace Ogre {
         // Get buffers for target
         HardwareVertexBufferSharedPtr destPosBuf = targetVertexData->vertexBufferBinding->getBuffer(destElemPos->getSource());
 
+        size_t srcStart = sourceVertexData->vertexStart;
+        size_t destStart = targetVertexData->vertexStart;
+
         // Lock source buffers for reading
         HardwareBufferLockGuard srcPosLock(srcPosBuf, HardwareBuffer::HBL_READ_ONLY);
-        srcElemPos->baseVertexPointerToElement(srcPosLock.pData, &pSrcPos);
+        srcElemPos->baseVertexPointerToElement(static_cast<uchar*>(srcPosLock.pData) + srcStart * srcPosBuf->getVertexSize(), &pSrcPos);
 
         // Do we have normals and want to blend them?
         bool includeNormals = blendNormals && srcElemNorm && destElemNorm;
@@ -1845,20 +1848,22 @@ namespace Ogre {
                 // Different buffer
                 srcNormLock.lock(srcNormBuf, HardwareBuffer::HBL_READ_ONLY);
             }
-            srcElemNorm->baseVertexPointerToElement(srcNormLock.pData ? srcNormLock.pData : srcPosLock.pData, &pSrcNorm);
+            auto pSrcNormBase = static_cast<uchar*>(srcNormLock.pData ? srcNormLock.pData : srcPosLock.pData);
+            srcElemNorm->baseVertexPointerToElement(pSrcNormBase + srcStart * srcNormStride, &pSrcNorm);
         }
 
         // Indices must be 4 bytes
         assert(srcElemBlendIndices->getType() == VET_UBYTE4 && "Blend indices must be VET_UBYTE4");
         HardwareBufferLockGuard srcIdxLock(srcIdxBuf, HardwareBuffer::HBL_READ_ONLY);
-        srcElemBlendIndices->baseVertexPointerToElement(srcIdxLock.pData, &pBlendIdx);
+        srcElemBlendIndices->baseVertexPointerToElement(static_cast<uchar*>(srcIdxLock.pData) + srcStart * srcIdxBuf->getVertexSize(), &pBlendIdx);
         HardwareBufferLockGuard srcWeightLock;
         if (srcWeightBuf != srcIdxBuf)
         {
             // Lock buffer
             srcWeightLock.lock(srcWeightBuf, HardwareBuffer::HBL_READ_ONLY);
         }
-        srcElemBlendWeights->baseVertexPointerToElement(srcWeightLock.pData ? srcWeightLock.pData : srcIdxLock.pData, &pBlendWeight);
+        auto pBlendWeightBase = static_cast<uchar*>(srcWeightLock.pData ? srcWeightLock.pData : srcIdxLock.pData);
+        srcElemBlendWeights->baseVertexPointerToElement(pBlendWeightBase + srcStart * srcWeightBuf->getVertexSize(), &pBlendWeight);
         unsigned short numWeightsPerVertex = VertexElement::getTypeCount(srcElemBlendWeights->getType());
 
         // Lock destination buffers for writing
@@ -1866,7 +1871,7 @@ namespace Ogre {
             (destNormBuf != destPosBuf && destPosBuf->getVertexSize() == destElemPos->getSize()) ||
             (destNormBuf == destPosBuf && destPosBuf->getVertexSize() == destElemPos->getSize() + destElemNorm->getSize()) ?
             HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL);
-        destElemPos->baseVertexPointerToElement(destPosLock.pData, &pDestPos);
+        destElemPos->baseVertexPointerToElement(static_cast<uchar*>(destPosLock.pData) + destStart * destPosBuf->getVertexSize(), &pDestPos);
         HardwareBufferLockGuard destNormLock;
         if (includeNormals)
         {
@@ -1876,7 +1881,8 @@ namespace Ogre {
                                                    ? HardwareBuffer::HBL_DISCARD
                                                    : HardwareBuffer::HBL_NORMAL);
             }
-            destElemNorm->baseVertexPointerToElement(destNormLock.pData ? destNormLock.pData : destPosLock.pData, &pDestNorm);
+            auto pDestNormBase = static_cast<uchar*>(destNormLock.pData ? destNormLock.pData : destPosLock.pData);
+            destElemNorm->baseVertexPointerToElement(pDestNormBase + destStart * destNormStride, &pDestNorm);
         }
 
         auto srcPosStride = srcPosBuf->getVertexSize();
@@ -1936,7 +1942,8 @@ namespace Ogre {
                 || (morphNormals && posElem->getSize() + normElem->getSize() == destBuf->getVertexSize())) &&
             "Positions (or positions & normals) must be in a buffer on their own for morphing");
         HardwareBufferLockGuard destLock(destBuf, HardwareBuffer::HBL_DISCARD);
-        float* pdst = static_cast<float*>(destLock.pData);
+        float* pdst = reinterpret_cast<float*>(static_cast<uchar*>(destLock.pData) +
+                                               targetVertexData->vertexStart * destBuf->getVertexSize());
 
         OptimisedUtil::getImplementation()->softwareVertexMorph(
             t, pb1, pb2, pdst,
@@ -1969,7 +1976,7 @@ namespace Ogre {
 
         // Have to lock in normal mode since this is incremental
         HardwareBufferLockGuard destLock(destBuf, HardwareBuffer::HBL_NORMAL);
-        float* pBase = static_cast<float*>(destLock.pData);
+        float* pBase = static_cast<float*>(destLock.pData) + targetVertexData->vertexStart * elemsPerVertex;
 
         // Iterate over affected vertices
         for (const auto & i : vertexOffsetMap)
