@@ -2475,6 +2475,16 @@ namespace Ogre{
                     }
                     break;
                 case ID_ANIM_TEXTURE:
+                {
+                    // a trailing gamma samples every frame as sRGB, as for the texture attribute
+                    bool sRGBRead = false;
+                    if (!prop->values.empty() && prop->values.back()->type == ANT_ATOM &&
+                        static_cast<AtomAbstractNode*>(prop->values.back().get())->id == ID_GAMMA)
+                    {
+                        sRGBRead = true;
+                        prop->values.pop_back();
+                    }
+
                     if(prop->values.size() < 3)
                     {
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
@@ -2528,7 +2538,11 @@ namespace Ogre{
                             }
                         }
                     }
+
+                    if (sRGBRead && mUnit->getNumFrames() > 0)
+                        mUnit->setHardwareGammaEnabled(true);
                     break;
+                }
                 case ID_CUBIC_TEXTURE:
                     if(prop->values.empty())
                     {

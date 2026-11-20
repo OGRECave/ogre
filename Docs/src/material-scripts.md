@@ -1046,7 +1046,7 @@ informs the renderer that you want the graphics hardware to perform gamma correc
 
 Sets the images to be used in an animated texture layer. There are 2 formats, one for implicitly determined image names, one for explicitly named images.
 @par
-Format1 (short): anim\_texture &lt;name&gt; &lt;numFrames&gt; &lt;duration&gt;
+Format1 (short): anim\_texture &lt;name&gt; &lt;numFrames&gt; &lt;duration&gt; \[gamma\]
 
 @copydetails Ogre::TextureUnitState::setAnimatedTextureName
 
@@ -1054,11 +1054,13 @@ Format1 (short): anim\_texture &lt;name&gt; &lt;numFrames&gt; &lt;duration&gt;
 Example: anim\_texture flame.jpg 5 2.5
 
 @par
-Format2 (long): anim\_texture &lt;frame1&gt; &lt;frame2&gt; ... &lt;duration&gt;
+Format2 (long): anim\_texture &lt;frame1&gt; &lt;frame2&gt; ... &lt;duration&gt; \[gamma\]
 @par
 Example: anim\_texture flamestart.jpg flamemore.png flameagain.jpg moreflame.jpg lastflame.tga 2.5
 
 This sets up the same duration animation but from 5 separately named image files. The first format is more concise, but the second is provided if you cannot make your images conform to the naming standard required for it. 
+@par
+In both formats, a trailing `gamma` samples every frame as sRGB, as the [gamma](#texture) option of the texture attribute does.
 @par
 Default: none
 
