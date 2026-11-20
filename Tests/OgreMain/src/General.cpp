@@ -388,6 +388,96 @@ TEST_F(MeshTests, BoundsFromVertexStart)
     EXPECT_EQ(mesh->getBounds(), AxisAlignedBox(Vector3(1, 1, 0), Vector3(1, 1, 0)));
 }
 
+TEST_F(MeshTests, PoseBlendFromVertexStart)
+{
+    VertexData vertexData;
+    vertexData.vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+    auto vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 2, HBU_CPU_TO_GPU);
+    float positions[2][3] = {};
+    vertexBuffer->writeData(0, sizeof(positions), positions, true);
+    vertexData.vertexBufferBinding->setBinding(0, vertexBuffer);
+    vertexData.vertexStart = 1;
+    vertexData.vertexCount = 1;
+
+    std::map<uint32, Vector3f> offsets = {{0, Vector3f(1, 1, 1)}}, normals;
+    Mesh::softwareVertexPoseBlend(1, offsets, normals, &vertexData);
+
+    vertexBuffer->readData(0, sizeof(positions), positions);
+    EXPECT_EQ(positions[1][0], 1);
+}
+
+TEST_F(MeshTests, MorphFromVertexStart)
+{
+    VertexData vertexData;
+    vertexData.vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+    auto vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 2, HBU_CPU_TO_GPU);
+    float positions[2][3] = {};
+    vertexBuffer->writeData(0, sizeof(positions), positions, true);
+    vertexData.vertexBufferBinding->setBinding(0, vertexBuffer);
+    vertexData.vertexStart = 1;
+    vertexData.vertexCount = 1;
+
+    auto keyFrame = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 1, HBU_CPU_TO_GPU);
+    float key[3] = {1, 1, 1};
+    keyFrame->writeData(0, sizeof(key), key, true);
+    Mesh::softwareVertexMorph(0, keyFrame, keyFrame, &vertexData);
+
+    vertexBuffer->readData(0, sizeof(positions), positions);
+    EXPECT_EQ(positions[1][0], 1);
+}
+
+TEST_F(MeshTests, SkinningFromVertexStart)
+{
+    VertexData src;
+    src.vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+    src.vertexDeclaration->addElement(1, 0, VET_UBYTE4, VES_BLEND_INDICES);
+    src.vertexDeclaration->addElement(1, 4, VET_FLOAT1, VES_BLEND_WEIGHTS);
+    auto srcPositions = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 2, HBU_CPU_TO_GPU);
+    float positions[2][3] = {{0, 0, 0}, {1, 1, 1}};
+    srcPositions->writeData(0, sizeof(positions), positions, true);
+    auto blendBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(8, 2, HBU_CPU_TO_GPU);
+    struct { uint8 indices[4]; float weight; } blend[2] = {{{0, 0, 0, 0}, 1}, {{0, 0, 0, 0}, 1}};
+    blendBuffer->writeData(0, sizeof(blend), blend, true);
+    src.vertexBufferBinding->setBinding(0, srcPositions);
+    src.vertexBufferBinding->setBinding(1, blendBuffer);
+    src.vertexStart = 1;
+    src.vertexCount = 1;
+
+    VertexData dst;
+    dst.vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+    auto dstPositions = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 2, HBU_CPU_TO_GPU);
+    float zeros[2][3] = {};
+    dstPositions->writeData(0, sizeof(zeros), zeros, true);
+    dst.vertexBufferBinding->setBinding(0, dstPositions);
+    dst.vertexStart = 1;
+    dst.vertexCount = 1;
+
+    const Affine3* matrices[1] = {&Affine3::IDENTITY};
+    Mesh::softwareVertexBlend(&src, &dst, matrices, 1, false);
+
+    dstPositions->readData(0, sizeof(positions), positions);
+    EXPECT_EQ(positions[1][0], 1);
+}
+
+TEST_F(MeshTests, PoseNormalsFromVertexStart)
+{
+    VertexData vertexData;
+    vertexData.vertexDeclaration->addElement(0, 0, VET_FLOAT3, VES_NORMAL);
+    auto vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(sizeof(float) * 3, 3, HBU_CPU_TO_GPU);
+    float normals[3][3] = {{0, 0, 0}, {0, 0, 0}, {1, 1, 1}};
+    vertexBuffer->writeData(0, sizeof(normals), normals, true);
+    vertexData.vertexBufferBinding->setBinding(0, vertexBuffer);
+    vertexData.vertexStart = 1;
+    vertexData.vertexCount = 2;
+
+    Pose pose(0);
+    pose.addVertex(0, Vector3f(0, 0, 0), Vector3f(0, 0, 1));
+
+    float poseData[2][6];
+    pose._getHardwareVertexBuffer(&vertexData)->readData(0, sizeof(poseData), poseData);
+    EXPECT_EQ(poseData[1][3], 1);
+}
+
 typedef RootWithoutRenderSystemFixture SubMeshTests;
 TEST_F(SubMeshTests, ExtremesFromSharedVertices)
 {

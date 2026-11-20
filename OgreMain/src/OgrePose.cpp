@@ -141,7 +141,8 @@ namespace Ogre {
                 HardwareBufferLockGuard origBufLock(origBuffer, HardwareBuffer::HBL_READ_ONLY);
                 float* pDst = pFloat + 3;
                 float* pSrc;
-                origNormElem->baseVertexPointerToElement(origBufLock.pData, &pSrc);
+                origNormElem->baseVertexPointerToElement(
+                    static_cast<uchar*>(origBufLock.pData) + origData->vertexStart * origBuffer->getVertexSize(), &pSrc);
                 for (size_t v = 0; v < numVertices; ++v)
                 {
                     memcpy(pDst, pSrc, sizeof(float)*3);
