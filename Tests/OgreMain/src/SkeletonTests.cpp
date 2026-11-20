@@ -1,0 +1,29 @@
+// This file is part of the OGRE project.
+// It is subject to the license terms in the LICENSE file found in the top-level directory
+// of this distribution and at https://www.ogre3d.org/licensing.
+// SPDX-License-Identifier: MIT
+
+#include <gtest/gtest.h>
+
+#include "RootWithoutRenderSystemFixture.h"
+
+#include "OgreEntity.h"
+#include "OgreMesh.h"
+#include "OgreMeshManager.h"
+#include "OgreSceneManager.h"
+#include "OgreSkeleton.h"
+#include "OgreSkeletonInstance.h"
+#include "OgreSkeletonManager.h"
+
+using namespace Ogre;
+
+typedef RootWithoutRenderSystemFixture SkeletonTests;
+
+TEST_F(SkeletonTests, linkedSkeletonAnimationSource)
+{
+    auto sceneMgr = mRoot->createSceneManager();
+    auto entity = sceneMgr->createEntity("jaiqua.mesh");
+    entity->getSkeleton()->addLinkedSkeletonAnimationSource("ninja.skeleton");
+    entity->refreshAvailableAnimationState();
+    EXPECT_TRUE(entity->getAnimationState("Stealth")); // animation from ninja.sekeleton
+}
