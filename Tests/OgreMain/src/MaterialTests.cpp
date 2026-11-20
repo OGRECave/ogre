@@ -110,3 +110,14 @@ TEST(MaterialTests, IterateRectLights)
     auto pass = MaterialManager::getSingleton().getByName("Mat")->getTechnique(0)->getPass(0);
     EXPECT_EQ(pass->getOnlyLightType(), Light::LT_RECTLIGHT);
 }
+
+TEST(MaterialTests, DestroyedAfterRoot)
+{
+    MaterialPtr material;
+    {
+        Root root("");
+        material = MaterialManager::getSingleton().create("Material", RGN_DEFAULT, true);
+        material->load();
+    }
+    material.reset();
+}

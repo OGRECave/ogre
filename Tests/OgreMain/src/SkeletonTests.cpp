@@ -17,7 +17,11 @@
 
 using namespace Ogre;
 
-typedef RootWithoutRenderSystemFixture SkeletonTests;
+class SkeletonTests : public RootWithoutRenderSystemFixture
+{
+protected:
+    MeshPtr mMesh;
+};
 
 TEST_F(SkeletonTests, linkedSkeletonAnimationSource)
 {
@@ -26,4 +30,15 @@ TEST_F(SkeletonTests, linkedSkeletonAnimationSource)
     entity->getSkeleton()->addLinkedSkeletonAnimationSource("ninja.skeleton");
     entity->refreshAvailableAnimationState();
     EXPECT_TRUE(entity->getAnimationState("Stealth")); // animation from ninja.sekeleton
+}
+
+TEST_F(SkeletonTests, MeshWithSkeletonDestroyedAfterRoot)
+{
+    mMesh = MeshManager::getSingleton().createManual("Mesh", RGN_DEFAULT);
+    auto skeleton = SkeletonManager::getSingleton().create("Skeleton", RGN_DEFAULT, true);
+    skeleton->load();
+    mMesh->_notifySkeleton(skeleton);
+
+    // drop Root while the fixture, and with it the Mesh and its Skeleton, live on
+    mRoot.reset();
 }
