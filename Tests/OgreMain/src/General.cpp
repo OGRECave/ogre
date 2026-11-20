@@ -869,6 +869,17 @@ TEST_F(SkeletonTests, linkedSkeletonAnimationSource)
     EXPECT_TRUE(entity->getAnimationState("Stealth")); // animation from ninja.sekeleton
 }
 
+TEST(Skeleton, ReleasedAfterRoot)
+{
+    SkeletonPtr skeleton;
+    {
+        Root root("");
+        skeleton = SkeletonManager::getSingleton().create("Skeleton", RGN_DEFAULT, true);
+        skeleton->load();
+    }
+    skeleton.reset();
+}
+
 TEST(MaterialLoading, LateShadowCaster)
 {
     Root root("");

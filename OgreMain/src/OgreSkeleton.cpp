@@ -58,7 +58,10 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Skeleton::~Skeleton()
     {
-        // have to call this here reather than in Resource destructor
+        // destroyed after SkeletonManager (e.g. still referenced by a Mesh that outlived Root)
+        if (!SkeletonManager::getSingletonPtr())
+            mCreator = NULL;
+        // have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         unload(); 
     }
