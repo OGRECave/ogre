@@ -333,11 +333,23 @@ namespace Ogre {
     {
         OGRE_LOCK_AUTO_MUTEX;
 
+        // Notify resource group manager while the resources still refer to this manager
+        ResourceGroupManager::getSingleton()._notifyAllResourcesRemoved(this);
+
+        // Resources are shared_ptr owned and can outlive the manager, e.g. a Mesh
+        // kept alive after Root was destroyed. Clear the back reference while the
+        // resources are still here so that a later destructor does not call back
+        // into an already destroyed manager.
+        for (auto& g : mResourcesWithGroup)
+            for (auto& r : g.second)
+                r.second->mCreator = 0;
+        for (auto& r : mResources)
+            r.second->mCreator = 0;
+
         mResources.clear();
         mResourcesWithGroup.clear();
         mResourcesByHandle.clear();
-        // Notify resource group manager
-        ResourceGroupManager::getSingleton()._notifyAllResourcesRemoved(this);
+        mMemoryUsage = 0;
     }
     //-----------------------------------------------------------------------
     void ResourceManager::removeUnreferencedResources(bool reloadableOnly)
