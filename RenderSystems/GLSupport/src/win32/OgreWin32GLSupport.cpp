@@ -240,20 +240,8 @@ namespace Ogre {
         LPCSTR dummyText = "OgreWglDummy";
 
 		HINSTANCE hinst = NULL;
-		#ifdef __MINGW32__
-			#ifdef OGRE_STATIC_LIB
-        		hinst = GetModuleHandle( NULL );
-			#else
-				#if OGRE_DEBUG_MODE == 1
-					hinst = GetModuleHandle("RenderSystem_GL3Plus_d.dll");
-				#else
-					hinst = GetModuleHandle("RenderSystem_GL3Plus.dll");
-				#endif
-			#endif
-		#else
-			static const TCHAR staticVar;
-			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hinst);
-		#endif
+		static const TCHAR staticVar=0;
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hinst);
         
         WNDCLASS dummyClass;
         memset(&dummyClass, 0, sizeof(WNDCLASS));
