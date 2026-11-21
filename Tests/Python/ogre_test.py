@@ -7,6 +7,11 @@ import unittest
 sys.path.insert(0, os.getcwd())
 import _Ogre as Ogre  # noqa: E402
 
+try:
+    import _Bites as Bites  # noqa: E402
+except ImportError:
+    Bites = None
+
 
 class SequenceTest(unittest.TestCase):
     def test_index_out_of_range(self):
@@ -65,6 +70,14 @@ class BufferLifetimeTest(unittest.TestCase):
             del obj
             gc.collect()
             self.assertIsNone(ref())
+
+
+@unittest.skipUnless(Bites, "OgreBites bindings not built")
+class CloseAppTest(unittest.TestCase):
+    def test_close_without_root_is_safe(self):
+        app = Bites.ApplicationContextBase("CloseAppTest")
+        app.closeApp()
+        app.closeApp()
 
 
 if __name__ == "__main__":
