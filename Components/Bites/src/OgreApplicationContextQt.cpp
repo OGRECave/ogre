@@ -22,6 +22,15 @@
 
 namespace OgreBites
 {
+    static QPoint mousePos(const QMouseEvent* mouse)
+    {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        return mouse->position().toPoint();
+#else
+        return mouse->pos();
+#endif
+    }
+
     static Event convert(const QEvent* in)
     {
         static QPoint lastMousePos;
@@ -66,8 +75,9 @@ namespace OgreBites
 
             {
                 auto* mouse = static_cast<const QMouseEvent*>(in);
-                out.button.x = mouse->x();
-                out.button.y = mouse->y();
+                auto pos = mousePos(mouse);
+                out.button.x = pos.x();
+                out.button.y = pos.y();
                 out.button.button = mouse->button();
 
                 if(out.button.button == Qt::RightButton)
@@ -83,12 +93,13 @@ namespace OgreBites
             out.type = MOUSEMOTION;
             {
                 auto* mouse = static_cast<const QMouseEvent*>(in);
-                out.motion.x = mouse->x();
-                out.motion.y = mouse->y();
-                out.motion.xrel = mouse->x() - lastMousePos.x();
-                out.motion.yrel = mouse->y() - lastMousePos.y();
+                auto pos = mousePos(mouse);
+                out.motion.x = pos.x();
+                out.motion.y = pos.y();
+                out.motion.xrel = pos.x() - lastMousePos.x();
+                out.motion.yrel = pos.y() - lastMousePos.y();
 
-                lastMousePos = mouse->pos();
+                lastMousePos = pos;
 
                 //out.motion.windowID = in.motion.windowID;
             }
@@ -105,11 +116,18 @@ namespace OgreBites
                 out.type = FINGERMOTION;
             {
                 auto* touch = static_cast<const QTouchEvent*>(in);
-                out.tfinger.x = touch->touchPoints()[0].pos().x();
-                out.tfinger.y = touch->touchPoints()[0].pos().y();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+                const auto& point = touch->points().first();
+                const auto pos = point.position();
+#else
+                const auto& point = touch->touchPoints().first();
+                const auto pos = point.pos();
+#endif
+                out.tfinger.x = pos.x();
+                out.tfinger.y = pos.y();
                 //out.tfinger.dx = in.tfinger.dx;
                 //out.tfinger.dy = in.tfinger.dy;
-                out.tfinger.fingerId = touch->touchPoints()[0].id();
+                out.tfinger.fingerId = point.id();
             }
             break;
         default:
