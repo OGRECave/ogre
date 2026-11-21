@@ -3,8 +3,10 @@
 import gc
 import os
 import sys
+import tempfile
 import unittest
 import weakref
+from pathlib import Path
 
 sys.path.insert(0, os.getcwd())
 import _Ogre as Ogre  # noqa: E402
@@ -98,6 +100,58 @@ class CloseAppTest(unittest.TestCase):
         app = Bites.ApplicationContextBase("CloseAppTest")
         app.closeApp()
         app.closeApp()
+
+
+def _plugins_cfg():
+    cwd = Path.cwd()
+    for path in (cwd / "plugins.cfg", cwd.parent / "bin" / "plugins.cfg"):
+        if path.is_file():
+            return path
+    return None
+
+
+@unittest.skipUnless(Bites and _plugins_cfg(), "plugins.cfg or OgreBites not found")
+class CameraManTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        root = Path(cls.tmp.name)
+        cls.root = Ogre.Root(str(_plugins_cfg()), str(root / "ogre.cfg"),
+                             str(root / "ogre.log"))
+        cls.scene = cls.root.createSceneManager("DefaultSceneManager")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.root.shutdown()
+        del cls.root
+        cls.tmp.cleanup()
+
+    def test_python_mouse_handlers_are_called_through_the_listener(self):
+        class Cam(Bites.CameraMan):
+            def __init__(self, node):
+                super().__init__(node)
+                self.calls = []
+
+            def mouseMoved(self, evt):
+                self.calls.append("moved")
+                return True
+
+            def mousePressed(self, evt):
+                self.calls.append("pressed")
+                return True
+
+        node = self.scene.getRootSceneNode().createChildSceneNode()
+        cam = Cam(node)
+        chain = Bites.InputListenerChain([cam])
+
+        moved = Bites.MouseMotionEvent()
+        moved.x, moved.y, moved.xrel, moved.yrel = 1, 2, 3, 4
+        pressed = Bites.MouseButtonEvent()
+        pressed.x, pressed.y, pressed.button, pressed.clicks = 1, 2, Bites.BUTTON_LEFT, 1
+
+        self.assertTrue(chain.mouseMoved(moved))
+        self.assertTrue(chain.mousePressed(pressed))
+        self.assertEqual(cam.calls, ["moved", "pressed"])
 
 
 if __name__ == "__main__":

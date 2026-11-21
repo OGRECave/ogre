@@ -76,6 +76,7 @@ JNIEnv* OgreJNIGetEnv();
 %ignore OgreBites::ApplicationContextBase::reconfigure;
 %include "OgreApplicationContextBase.h"
 %include "OgreApplicationContext.h"
+%feature("director") OgreBites::CameraMan;
 %include "OgreCameraMan.h"
 // deprecated
 %ignore OgreBites::TrayManager::getWidget(TrayLocation, unsigned int);
