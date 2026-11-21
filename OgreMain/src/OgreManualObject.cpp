@@ -483,7 +483,8 @@ ManualObject::ManualObject(const String& name)
     //-----------------------------------------------------------------------------
     const String& ManualObject::getMovableType(void) const
     {
-        return MOT_MANUAL_OBJECT;
+        static const String name = MOT_MANUAL_OBJECT;
+        return name;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::_updateRenderQueue(RenderQueue* queue)
@@ -716,12 +717,10 @@ ManualObject::ManualObject(const String& name)
         }
     }
     //-----------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------
-    const String MOT_MANUAL_OBJECT = "ManualObject";
-    //-----------------------------------------------------------------------------
     const String& ManualObjectFactory::getType(void) const
     {
-        return MOT_MANUAL_OBJECT;
+        static const String name = MOT_MANUAL_OBJECT;
+        return name;
     }
     //-----------------------------------------------------------------------------
     MovableObject* ManualObjectFactory::createInstanceImpl(

@@ -255,7 +255,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& Light::getMovableType(void) const
     {
-        return MOT_LIGHT;
+        static const String name = MOT_LIGHT;
+        return name;
     }
 #ifdef OGRE_NODELESS_POSITIONING
     //-----------------------------------------------------------------------
@@ -867,12 +868,10 @@ namespace Ogre {
         return isIntersect;
     }
     //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    const String MOT_LIGHT = "Light";
-    //-----------------------------------------------------------------------
     const String& LightFactory::getType(void) const
     {
-        return MOT_LIGHT;
+        static const String name = MOT_LIGHT;
+        return name;
     }
     //-----------------------------------------------------------------------
     MovableObject* LightFactory::createInstanceImpl( const String& name, 
