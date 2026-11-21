@@ -72,20 +72,8 @@ namespace Ogre {
             destroy();
 
 		HINSTANCE hInst = NULL;
-		#ifdef __MINGW32__
-			#ifdef OGRE_STATIC_LIB
-        		hInst = GetModuleHandle( NULL );
-			#else
-				#if OGRE_DEBUG_MODE == 1
-					hInst = GetModuleHandle("GLSupport_d.dll");
-				#else
-					hInst = GetModuleHandle("GLSupport.dll");
-				#endif
-			#endif
-		#else
-			static const TCHAR staticVar;
-			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
-		#endif
+		static const TCHAR staticVar = 0;
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
 
         mHWnd = 0;
         mName = name;
