@@ -80,6 +80,9 @@ void ApplicationContextBase::initApp()
 
 void ApplicationContextBase::closeApp()
 {
+    if (!mRoot)
+        return;
+
     shutdown();
     if (mRoot)
     {
@@ -149,15 +152,17 @@ void ApplicationContextBase::destroyRTShaderSystem()
     //mShaderGenerator->flushShaderCache();
 
     // Restore default scheme.
-    Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
-
-    // Unregister the material manager listener.
-    if (mMaterialMgrListener != NULL)
+    if (auto* matMgr = Ogre::MaterialManager::getSingletonPtr())
     {
-        Ogre::MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
-        delete mMaterialMgrListener;
-        mMaterialMgrListener = NULL;
+        matMgr->setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
+
+        // Unregister the material manager listener.
+        if (mMaterialMgrListener != NULL)
+            matMgr->removeListener(mMaterialMgrListener);
     }
+
+    delete mMaterialMgrListener;
+    mMaterialMgrListener = NULL;
 
     // Destroy RTShader system.
     if (mShaderGenerator != NULL)
@@ -644,15 +649,18 @@ void ApplicationContextBase::reconfigure(const Ogre::String &renderer, Ogre::Nam
 
 void ApplicationContextBase::shutdown()
 {
-    const auto& gpuMgr = Ogre::GpuProgramManager::getSingleton();
-    if (gpuMgr.getSaveMicrocodesToCache() && gpuMgr.isCacheDirty())
+    if (!mRoot)
+        return;
+
+    const auto* gpuMgr = Ogre::GpuProgramManager::getSingletonPtr();
+    if (gpuMgr && gpuMgr->getSaveMicrocodesToCache() && gpuMgr->isCacheDirty())
     {
         Ogre::String path = mFSLayer->getWritablePath(SHADER_CACHE_FILENAME);
         try
         {
             Ogre::DataStreamPtr ostream = Ogre::Root::createFileStream(path, "", true);
             Ogre::LogManager::getSingleton().logMessage("Writing shader cache to "+path);
-            gpuMgr.saveMicrocodeCache(ostream);
+            gpuMgr->saveMicrocodeCache(ostream);
             ostream->close();
         }
         catch (const Ogre::Exception&)
