@@ -15,7 +15,7 @@ jobs:
         sudo apt install -y libxrandr-dev \
           libgles2-mesa-dev mesa-common-dev libgl1-mesa-dev mesa-vulkan-drivers \
           libfreetype6-dev libpugixml-dev libassimp-dev libbullet-dev qtbase5-dev cargo \
-          nvidia-cg-dev glslang-dev spirv-tools spirv-headers libvulkan-volk-dev \
+          libsdl2-dev nvidia-cg-dev glslang-dev spirv-tools spirv-headers libvulkan-volk-dev \
           mono-mcs python3-dev \
           python3-lxml texlive-binaries texlive-base graphviz doxygen
         sudo pip3 install swig
