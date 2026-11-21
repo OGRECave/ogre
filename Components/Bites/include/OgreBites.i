@@ -33,6 +33,12 @@ namespace Ogre { typedef String DisplayString; }
 %template(InputListenerList) std::vector<OgreBites::InputListener*>;
 %feature("director") OgreBites::ApplicationContextBase;
 %feature("director") OgreBites::InputListener;
+#ifdef SWIGPYTHON
+// the chain only borrows its listeners, so keep the Python sequence alive with it
+%typemap(argout) (std::vector<OgreBites::InputListener*> chain) {
+    if (PyObject_SetAttrString(self, "_listeners", $input) < 0) SWIG_fail;
+}
+#endif
 %include "OgreInput.h"
 
 #ifdef HAVE_IMGUI

@@ -1,8 +1,10 @@
 """Tests of the Ogre Python bindings, run from the directory of the _Ogre module."""
 
+import gc
 import os
 import sys
 import unittest
+import weakref
 
 sys.path.insert(0, os.getcwd())
 import _Ogre as Ogre  # noqa: E402
@@ -70,6 +72,24 @@ class BufferLifetimeTest(unittest.TestCase):
             del obj
             gc.collect()
             self.assertIsNone(ref())
+
+
+@unittest.skipUnless(Bites, "OgreBites bindings not built")
+class ListenerChainTest(unittest.TestCase):
+    def test_chain_keeps_its_listeners_alive(self):
+        class Listener(Bites.InputListener):
+            pass
+
+        listener = Listener()
+        ref = weakref.ref(listener)
+        chain = Bites.InputListenerChain([listener])
+        del listener
+        gc.collect()
+        self.assertIsNotNone(ref())
+
+        del chain
+        gc.collect()
+        self.assertIsNone(ref())
 
 
 @unittest.skipUnless(Bites, "OgreBites bindings not built")
