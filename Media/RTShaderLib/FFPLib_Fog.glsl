@@ -88,5 +88,7 @@ void FFP_PixelFog(in float depth,
 {
 	float fogFactor = 0.0;
 	FFP_FogFactor(depth, fogParams, fogFactor);
-	oColor = mix(fogColor, baseColor, fogFactor);
+	// only the colour, as the fixed-function pipeline: mixing the alpha too would make
+	// transparent texels visible
+	oColor = vec4(mix(fogColor.rgb, baseColor.rgb, fogFactor), baseColor.a);
 }

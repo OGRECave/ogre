@@ -154,7 +154,10 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
         auto vsFogStage = vsMain->getStage(FFP_VS_FOG);
         vsFogStage.callFunction("FFP_FogFactor", In(mVSOutPos).w(), mFogParams, mVSOutFogFactor);
         //! [func_invoc]
-        psMain->getStage(FFP_VS_FOG).callBuiltin("mix", mFogColour, mPSOutDiffuse, mPSInFogFactor, mPSOutDiffuse);
+        // fog only changes the colour, as the fixed-function pipeline does: mixing the alpha
+        // too would make transparent texels visible
+        psMain->getStage(FFP_VS_FOG).callBuiltin("mix", In(mFogColour).xyz(), In(mPSOutDiffuse).xyz(),
+                                                 mPSInFogFactor, Out(mPSOutDiffuse).xyz());
     }
 
     return true;
