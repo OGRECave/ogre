@@ -77,6 +77,8 @@ namespace Ogre {
         mName = name;
         mMesh = mesh;
         _initialise();
+        // track unload/reload of the mesh, so SubEntities never outlive the SubMeshes
+        mMesh->addListener(this);
     }
     //-----------------------------------------------------------------------
     void Entity::loadingComplete(Resource* res)
@@ -86,6 +88,12 @@ namespace Ogre {
             // mesh loading has finished, we can construct ourselves now
             _initialise();
         }
+    }
+    //-----------------------------------------------------------------------
+    void Entity::unloadingComplete(Resource* res)
+    {
+        if (res == mMesh.get())
+            _deinitialise();
     }
     //-----------------------------------------------------------------------
     void Entity::_initialise(bool forceReinitialise)

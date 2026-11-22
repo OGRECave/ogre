@@ -831,6 +831,8 @@ namespace Ogre {
             complete.
         */
         void loadingComplete(Resource* res) override;
+        /// Resource::Listener hook to drop SubEntities when the Mesh is unloaded
+        void unloadingComplete(Resource* res) override;
 
         void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false) override;
 
