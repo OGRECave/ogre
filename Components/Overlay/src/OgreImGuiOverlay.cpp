@@ -112,8 +112,22 @@ void ImGuiOverlay::ImGUIRenderable::createMaterial()
     mTexUnit->setTextureFiltering(TFO_NONE);
     mTexUnit->setTextureAddressingMode(TAM_CLAMP);
 
+    // With linear colours the RTSS converts every sample of a non-gamma texture unit, which
+    // double-converts ImGui's colours when the texture is hardware gamma (e.g. an sRGB render
+    // target). ImGui draws either such textures or final colours, so skip the shader conversion
+    // and rely on the sampler's hardware gamma decoding where present. This assumes textures
+    // passed to ImGui::Image are already linear when they are not flagged as sRGB.
+    // The flag lives on the unit's texture, so the unit needs a gamma texture even though the
+    // texture to sample is bound per draw command.
 #if IMGUI_VERSION_NUM < 19200
+    // the atlas is drawn through the unit (ImGui does not pass a texture ID for it)
     mTexUnit->setTextureName("ImGui/FontTex");
+#else
+    // a 1x1 marker is enough here; only its gamma flag is used, never its storage
+    auto gammaMarker =
+        TextureManager::getSingleton().createManual("ImGui/GammaTex", RGN_INTERNAL, TEX_TYPE_2D, 1, 1, 0, PF_BYTE_RGBA);
+    gammaMarker->setHardwareGammaEnabled(true);
+    mTexUnit->setTexture(gammaMarker);
 #endif
 
     mMaterial->load();
@@ -386,6 +400,8 @@ void ImGuiOverlay::ImGUIRenderable::initialise(void)
     auto fontTex = TextureManager::getSingleton().createManual("ImGui/FontTex", RGN_INTERNAL, TEX_TYPE_2D,
                                                            width, height, 1, 1, PF_BYTE_RGBA);
     fontTex->getBuffer()->blitFromMemory(PixelBox(Box(0, 0, width, height), PF_BYTE_RGBA, pixels));
+    // the RTSS must not decode the atlas on top of the target's sRGB conversion
+    fontTex->setHardwareGammaEnabled(true);
 #endif
 
     createMaterial();
@@ -420,7 +436,12 @@ ImGuiOverlay::ImGUIRenderable::~ImGUIRenderable()
 #endif
 
     if(mMaterial)
+    {
         MaterialManager::getSingleton().remove(mMaterial);
+#if IMGUI_VERSION_NUM >= 19200
+        TextureManager::getSingleton().remove("ImGui/GammaTex", RGN_INTERNAL);
+#endif
+    }
     OGRE_DELETE mRenderOp.vertexData;
     OGRE_DELETE mRenderOp.indexData;
 }
