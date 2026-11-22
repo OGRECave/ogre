@@ -356,11 +356,6 @@ bool ImGuiOverlay::ImGUIRenderable::preRender(SceneManager* sm, RenderSystem* rs
 
             rsys->_render(mRenderOp);
 
-#if IMGUI_VERSION_NUM < 19200
-            if (drawCmd->GetTexID()) // reset to pass state
-                tu->setTextureName("ImGui/FontTex");
-#endif
-
             // Update counts
             mRenderOp.indexData->indexStart += drawCmd->ElemCount;
         }
