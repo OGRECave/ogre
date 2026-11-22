@@ -178,11 +178,12 @@ bool FFPFog::preAddToRenderState(const RenderState* renderState, Pass* srcPass, 
 {
     if (srcPass->getFogOverride())
     {
-        mFogMode         = srcPass->getFogMode();
+        mFogMode = srcPass->getFogMode();
     }
-    else if(SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager())
+    else if (Technique* tech = dstPass->getParent())
     {
-        mFogMode         = sceneMgr->getFogMode();
+        // shared by all scene managers, see SGScheme::synchronizeWithFogSettings
+        mFogMode = ShaderGenerator::getSingleton().getFogMode(tech->getSchemeName());
     }
 
     return mFogMode != FOG_NONE;

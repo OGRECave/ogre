@@ -1736,11 +1736,18 @@ void ShaderGenerator::SGScheme::synchronizeWithFogSettings()
 {
     SceneManager* sceneManager = ShaderGenerator::getSingleton().getActiveSceneManager();
 
-    if (sceneManager != NULL && sceneManager->getFogMode() != mFogMode)
+    if (sceneManager == NULL)
+        return;
+
+    // Like the light count, only invalidate when fog appears or its mode changes: a scene
+    // manager without fog renders the fogged shaders without fog through the neutral fog_params
+    // (see AutoParamDataSource::setFog), so dropping fog does not rebuild every technique.
+    FogMode fogMode = sceneManager->getFogMode();
+    if (fogMode != FOG_NONE && fogMode != mFogMode)
     {
         LogManager::getSingleton().stream(LML_TRIVIAL)
             << "RTSS: invalidating scheme " << mName << " - fog settings changed";
-        mFogMode = sceneManager->getFogMode();
+        mFogMode = fogMode;
         invalidate();
     }
 }

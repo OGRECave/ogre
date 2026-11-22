@@ -207,6 +207,20 @@ public:
         return getRenderState(schemeName, mat.getName(), mat.getGroup(), passIndex);
     }
 
+    /**
+    Get the fog mode the shaders of the given scheme were built for.
+
+    Unlike the active scene manager, this keeps the mode once a scene manager enabled it.
+    @param schemeName The scheme name to check.
+    */
+    FogMode getFogMode(const String& schemeName) const
+    {
+        if (auto scheme = getScheme(schemeName))
+            return scheme->mFogMode;
+
+        return FOG_NONE;
+    }
+
     /** 
     Add sub render state factory. Plugins or 3d party applications may implement sub classes of
     SubRenderState interface. Add the matching factory will allow the application to create instances 
@@ -730,10 +744,12 @@ private:
         RenderState* getRenderState(const String& materialName, const String& groupName, unsigned short passIndex);
 
     protected:
+        friend class ShaderGenerator;
+
         /** Synchronize the current light settings of this scheme with the current settings of the scene. */
         void synchronizeWithLightSettings();
 
-        /** Synchronize the fog settings of this scheme with the current settings of the scene. */
+        /** Synchronize the fog mode this scheme builds its shaders for with the active scene manager. */
         void synchronizeWithFogSettings();
 
 
@@ -746,7 +762,7 @@ private:
         bool mOutOfDate;
         // The global render state of this scheme.
         std::unique_ptr<RenderState> mRenderState;
-        // Current fog mode.
+        // The fog mode the shaders of this scheme are built for.
         FogMode mFogMode;
     };
 
