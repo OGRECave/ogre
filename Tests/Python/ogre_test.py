@@ -16,6 +16,11 @@ try:
 except ImportError:
     Bites = None
 
+try:
+    import numpy as np  # noqa: E402
+except ImportError:
+    np = None
+
 
 class SequenceTest(unittest.TestCase):
     def test_index_out_of_range(self):
@@ -46,6 +51,27 @@ class SequenceTest(unittest.TestCase):
         for invalid in ((0, 5), (0, 5, 0, 9), 5, (x for x in (0, 5, 0)), ("a", 1, 1)):
             with self.assertRaises(TypeError):
                 plane.getDistance(invalid)
+
+
+@unittest.skipUnless(np, "numpy not installed")
+class NumpyTest(unittest.TestCase):
+    def test_scalar_arguments(self):
+        # np.float32 and np.int64 are not float or int subclasses
+        pts = np.array([[1, 2, 3]], dtype=np.float32)
+        self.assertEqual(Ogre.Vector3(*pts[0]), Ogre.Vector3(1, 2, 3))
+        self.assertEqual(Ogre.Vector3(*np.arange(3)), Ogre.Vector3(0, 1, 2))
+        self.assertEqual(Ogre.Radian(np.float32(0.5)).valueRadians(), 0.5)
+        self.assertEqual(Ogre.MemoryDataStream(np.uint32(16)).size(), 16)
+
+        # floats select the float overload, integers the uint8 overload
+        buf = bytearray(4)
+        Ogre.PixelUtil.packColour(*np.array([1, 0, 0, 1], np.float32), Ogre.PF_BYTE_RGBA, buf)
+        self.assertEqual(list(buf), [255, 0, 0, 255])
+        Ogre.PixelUtil.packColour(*np.array([1, 0, 0, 1], np.uint8), Ogre.PF_BYTE_RGBA, buf)
+        self.assertEqual(list(buf), [1, 0, 0, 1])
+
+        with self.assertRaises(TypeError):
+            Ogre.MemoryDataStream(np.float32(16))
 
 
 class BufferLifetimeTest(unittest.TestCase):
