@@ -437,6 +437,18 @@ TEST_F(MeshTests, PoseNormalsFromVertexStart)
     EXPECT_EQ(poseData[1][3], 1);
 }
 
+TEST_F(MeshTests, EntityAfterMeshUnload)
+{
+    auto sceneMgr = mRoot->createSceneManager();
+    auto entity = sceneMgr->createEntity("ogrehead.mesh");
+
+    entity->getMesh()->unload();
+    EXPECT_EQ(entity->getNumSubEntities(), 0u);
+
+    entity->getMesh()->load();
+    EXPECT_GT(entity->getNumSubEntities(), 0u);
+}
+
 typedef RootWithoutRenderSystemFixture SubMeshTests;
 TEST_F(SubMeshTests, ExtremesFromSharedVertices)
 {
