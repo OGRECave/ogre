@@ -70,6 +70,54 @@ TEST_F(RTShaderSystem, createShaderBasedTechnique)
     EXPECT_TRUE(shaderGen.removeShaderBasedTechnique(mat->getTechniques()[0], "MyScheme"));
 }
 
+TEST_F(RTShaderSystem, FogModeSharedBetweenSceneManagers)
+{
+    auto& shaderGen = RTShader::ShaderGenerator::getSingleton();
+    auto fogged = mRoot->createSceneManager();
+    auto plain = mRoot->createSceneManager();
+    shaderGen.addSceneManager(fogged);
+    shaderGen.addSceneManager(plain);
+
+    auto mat = MaterialManager::getSingleton().create("TestMat", RGN_DEFAULT);
+    shaderGen.createShaderBasedTechnique(mat->getTechniques()[0], "MyScheme");
+    auto renderState = shaderGen.getRenderState("MyScheme");
+    renderState->setLightCountAutoUpdate(false);
+    auto vsName = [&]() { return mat->getTechniques()[1]->getPasses()[0]->getVertexProgramName(); };
+
+    // no fog: the shaders are built without it
+    shaderGen.validateScheme("MyScheme");
+    auto noFogVs = vsName();
+    EXPECT_EQ(shaderGen.getFogMode("MyScheme"), FOG_NONE);
+
+    // enabling fog builds the fogged shaders
+    fogged->setFog(FOG_LINEAR, ColourValue::Black, 0, 10, 20);
+    shaderGen.validateScheme("MyScheme");
+    auto fogVs = vsName();
+    EXPECT_NE(fogVs, noFogVs);
+    EXPECT_EQ(shaderGen.getFogMode("MyScheme"), FOG_LINEAR);
+
+    // like the light count, the mode is not dropped again: a scene manager without fog renders
+    // the fogged shaders unfogged through the neutral fog_params
+    shaderGen._setActiveSceneManager(plain);
+    shaderGen.validateScheme("MyScheme");
+    EXPECT_EQ(vsName(), fogVs);
+
+    fogged->setFog(FOG_NONE);
+    shaderGen._setActiveSceneManager(fogged);
+    shaderGen.validateScheme("MyScheme");
+    EXPECT_EQ(vsName(), fogVs);
+    EXPECT_EQ(shaderGen.getFogMode("MyScheme"), FOG_LINEAR);
+
+    // a different mode still rebuilds
+    fogged->setFog(FOG_EXP2, ColourValue::Black, 0.1, 0, 0);
+    shaderGen.validateScheme("MyScheme");
+    EXPECT_NE(vsName(), fogVs);
+    EXPECT_EQ(shaderGen.getFogMode("MyScheme"), FOG_EXP2);
+
+    shaderGen.removeSceneManager(fogged);
+    shaderGen.removeSceneManager(plain);
+}
+
 TEST_F(RTShaderSystem, MaterialSerializer)
 {
     auto& shaderGen = RTShader::ShaderGenerator::getSingleton();
