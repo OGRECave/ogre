@@ -782,6 +782,33 @@ TEST(Image, PVRTextureArray)
 }
 #endif
 
+#if OGRE_NO_DDS_CODEC == 0
+TEST(Image, DDSTruncated)
+{
+    Root root;
+
+    // "DDS " + header for a 2x2 RGBA8 image, followed by its 16 bytes of pixel data
+    uint32 dds[32 + 4] = {0x20534444, 124, 0x1007, 2, 2};
+    uint32 rgba8[] = {32, 0x41, 0, 32, 0xff, 0xff00, 0xff0000, 0xff000000, 0x1000};
+    std::copy(rgba8, rgba8 + 9, dds + 19);
+
+    auto load = [&](size_t size) {
+        Image img;
+        img.load(DataStreamPtr(new MemoryDataStream(dds, size)), "dds");
+    };
+
+    EXPECT_NO_THROW(load(sizeof(dds)));
+    EXPECT_THROW(load(sizeof(dds) - 1), InvalidParametersException); // pixel data cut short
+    EXPECT_THROW(load(127), InvalidParametersException);             // header cut short
+
+    // 8x8 DXT1 needs 4 blocks, only provide one. No RenderSystem, so it gets decompressed
+    dds[3] = dds[4] = 8;
+    dds[20] = 0x4;        // DDPF_FOURCC
+    dds[21] = 0x31545844; // DXT1
+    EXPECT_THROW(load(sizeof(dds) - 8), InvalidParametersException);
+}
+#endif
+
 struct UsePreviousResourceLoadingListener : public ResourceLoadingListener
 {
     bool resourceCollision(Resource *resource, ResourceManager *resourceManager) override { return false; }
