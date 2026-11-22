@@ -180,5 +180,30 @@ class CameraManTest(unittest.TestCase):
         self.assertEqual(cam.calls, ["moved", "pressed"])
 
 
+class EmptySharedPtrTest(unittest.TestCase):
+    """Python spells an empty SharedPtr as None."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.log = Ogre.LogManager()
+        cls.log.createLog("ogre_test.log", True, False, True)
+        cls.root = Ogre.Root("", "", "")
+
+    @classmethod
+    def tearDownClass(cls):
+        Ogre.MaterialManager.getSingleton().removeAll()
+        del cls.root, cls.log
+
+    def unit(self):
+        material = Ogre.MaterialManager.getSingleton().create(self.id(), Ogre.RGN_DEFAULT)
+        return material, material.createTechnique().createPass().createTextureUnitState()
+
+    def test_none_is_an_empty_argument(self):
+        _material, unit = self.unit()
+        unit._setTexturePtr(None)
+        with self.assertRaises(TypeError):
+            unit._setTexturePtr(5)
+
+
 if __name__ == "__main__":
     unittest.main()

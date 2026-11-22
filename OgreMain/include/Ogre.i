@@ -184,9 +184,42 @@ JNIEnv* OgreJNIGetEnv() {
 }
 %enddef
 
+// None and an empty SharedPtr are the same thing in Python
+%define SHARED_PTR_NONE(TYPE...)
+#ifdef SWIGPYTHON
+%typemap(in) const Ogre::SharedPtr<TYPE >& (Ogre::SharedPtr<TYPE > empty) {
+    if ($input == Py_None) {
+        $1 = &empty;
+    } else {
+        void* argp = 0;
+        int res = SWIG_ConvertPtr($input, &argp, $descriptor, SWIG_POINTER_NO_NULL);
+        if (!SWIG_IsOK(res))
+            %argument_fail(res, "$type", $symname, $argnum);
+        $1 = reinterpret_cast<$ltype>(argp);
+    }
+}
+%typemap(in) Ogre::SharedPtr<TYPE > {
+    if ($input != Py_None) {
+        void* argp = 0;
+        int res = SWIG_ConvertPtr($input, &argp, $&descriptor, SWIG_POINTER_NO_NULL);
+        if (!SWIG_IsOK(res))
+            %argument_fail(res, "$type", $symname, $argnum);
+        $1 = *reinterpret_cast<$&ltype>(argp);
+    }
+}
+%typecheck(SWIG_TYPECHECK_POINTER) const Ogre::SharedPtr<TYPE >& {
+    $1 = $input == Py_None || SWIG_CheckState(SWIG_ConvertPtr($input, 0, $descriptor, SWIG_POINTER_NO_NULL));
+}
+%typecheck(SWIG_TYPECHECK_POINTER) Ogre::SharedPtr<TYPE > {
+    $1 = $input == Py_None || SWIG_CheckState(SWIG_ConvertPtr($input, 0, $&descriptor, SWIG_POINTER_NO_NULL));
+}
+#endif
+%enddef
+
 %define SHARED_PTR(classname)
 // %shared_ptr(type);
 %ignore Ogre::SharedPtr<Ogre::classname >::operator const shared_ptr<Ogre::classname >&;
+SHARED_PTR_NONE(Ogre::classname)
 %template(classname ## Ptr) Ogre::SharedPtr<Ogre::classname >;
 %enddef
 
@@ -320,6 +353,7 @@ ADD_REPR(Radian)
 %template(RayTestResult) std::pair<bool, float>;
 %include "OgreStringVector.h"
 %template(StringList) std::vector<Ogre::String>;  // actual vector<T>
+SHARED_PTR_NONE(std::vector<Ogre::String>)
 %template(StringListPtr) Ogre::SharedPtr<std::vector<Ogre::String> >;
 %include "OgreFileSystemLayer.h"
 // Linear Algebra
@@ -819,6 +853,8 @@ SHARED_PTR(StringInterface);
 %template(UIntList) std::vector<Ogre::uint32>;
 %include "OgreTextureUnitState.h"
 %template(ControllerFloat) Ogre::Controller<float>;
+SHARED_PTR_NONE(Ogre::ControllerValue<float>)
+SHARED_PTR_NONE(Ogre::ControllerFunction<float>)
 %template(ControllerValueFloatPtr) Ogre::SharedPtr<Ogre::ControllerValue<float> >;
 %template(ControllerFunctionPtr) Ogre::SharedPtr<Ogre::ControllerFunction<float> >;
 %include "OgreControllerManager.h"
