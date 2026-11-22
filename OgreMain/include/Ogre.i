@@ -236,6 +236,7 @@ typedef uint8_t uint8;
 %csmethodmodifiers *::queryResult "public";
 %csmethodmodifiers *::createInstance "public";
 %csmethodmodifiers *::loadingComplete "public";
+%csmethodmodifiers *::unloadingComplete "public";
 %csmethodmodifiers *::getBoundingBox "public";
 %csmethodmodifiers *::getBoundingRadius "public";
 %csmethodmodifiers *::getMovableType "public";
