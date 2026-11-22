@@ -25,13 +25,14 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "RTShaderSRSTexturedFog.h"
-#include "OgreShaderFFPRenderState.h"
-#include "OgreShaderProgram.h"
-#include "OgreShaderParameter.h"
-#include "OgreShaderProgramSet.h"
 #include "OgreGpuProgram.h"
 #include "OgrePass.h"
+#include "OgreShaderFFPRenderState.h"
 #include "OgreShaderGenerator.h"
+#include "OgreShaderParameter.h"
+#include "OgreShaderProgram.h"
+#include "OgreShaderProgramSet.h"
+#include "OgreTechnique.h"
 #include "OgreTextureManager.h"
 
 
@@ -44,10 +45,8 @@ String RTShaderSRSTexturedFog::Type = "TexturedFog";
 
 //-----------------------------------------------------------------------
 RTShaderSRSTexturedFog::RTShaderSRSTexturedFog(RTShaderSRSTexturedFogFactory* factory)
+    : mFactory(factory), mFogMode(FOG_NONE), mPassOverrideParams(false), mBackgroundSamplerIndex(0)
 {
-    mFactory = factory;
-    mFogMode                = FOG_NONE;
-    mPassOverrideParams     = false;
 }
 
 //-----------------------------------------------------------------------
@@ -63,45 +62,34 @@ int RTShaderSRSTexturedFog::getExecutionOrder() const
     return FFP_FOG;
 }
 //-----------------------------------------------------------------------
-void RTShaderSRSTexturedFog::updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
-                                     const LightList* pLightList)
-{   
+void RTShaderSRSTexturedFog::updateGpuProgramsParams(Renderable* rend, const Pass* pass,
+                                                     const AutoParamDataSource* source,
+                                                     const LightList* pLightList)
+{
     if (mFogMode == FOG_NONE)
         return;
 
-    FogMode fogMode;
-    Real newFogStart, newFogEnd, newFogDensity;
-
-    //Check if this is an overlay element if so disable fog 
-    if ((rend->getUseIdentityView() == true) && (rend->getUseIdentityProjection() == true))
+    if (rend->getUseIdentityView() && rend->getUseIdentityProjection())
     {
-        fogMode         = FOG_NONE;
-        newFogStart     = 100000000;
-        newFogEnd       = 200000000;
-        newFogDensity   = 0;
+        // overlays are never fogged
+        setFogProperties(0, -1, 0);
+    }
+    else if (mPassOverrideParams)
+    {
+        setFogProperties(pass->getFogStart(), pass->getFogEnd(), pass->getFogDensity());
+    }
+    else if (SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager())
+    {
+        if (sceneMgr->getFogMode() != FOG_NONE)
+            setFogProperties(sceneMgr->getFogStart(), sceneMgr->getFogEnd(), sceneMgr->getFogDensity());
+        else
+            // the shaders are shared with the scene managers that do fog: stay neutral
+            setFogProperties(0, -1, 0);
     }
     else
     {
-        if (mPassOverrideParams)
-        {
-            fogMode         = pass->getFogMode();
-            newFogStart     = pass->getFogStart();
-            newFogEnd       = pass->getFogEnd();
-            newFogDensity   = pass->getFogDensity();
-        }
-        else
-        {
-            SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();
-        
-            fogMode         = sceneMgr->getFogMode();
-            newFogStart     = sceneMgr->getFogStart();
-            newFogEnd       = sceneMgr->getFogEnd();
-            newFogDensity   = sceneMgr->getFogDensity();                
-        }
+        setFogProperties(0, -1, 0);
     }
-
-    // Set fog properties.
-    setFogProperties(fogMode, newFogStart, newFogEnd, newFogDensity);
 
     mFogParams->setGpuParameter(mFogParamsValue);
 }
@@ -202,52 +190,36 @@ void RTShaderSRSTexturedFog::copyFrom(const SubRenderState& rhs)
 
 //-----------------------------------------------------------------------
 bool RTShaderSRSTexturedFog::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
-{   
-    if (mFactory == NULL)
+{
+    if (!mFactory)
         return false;
 
-    FogMode fogMode;
-    Real newFogStart, newFogEnd, newFogDensity;
+    // neutral by default, so a scene manager without fog leaves the colour as is
+    Real fogStart = 0, fogEnd = -1, fogDensity = 0;
 
-    if (srcPass->getFogOverride())
+    mPassOverrideParams = srcPass->getFogOverride();
+    if (mPassOverrideParams)
     {
-        fogMode         = srcPass->getFogMode();
-        newFogStart     = srcPass->getFogStart();
-        newFogEnd       = srcPass->getFogEnd();
-        newFogDensity   = srcPass->getFogDensity();
-        mPassOverrideParams = true;
+        mFogMode = srcPass->getFogMode();
+        fogStart = srcPass->getFogStart();
+        fogEnd = srcPass->getFogEnd();
+        fogDensity = srcPass->getFogDensity();
     }
     else
     {
-        SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();
-        
-        if (sceneMgr == NULL)
-        {
-            fogMode         = FOG_NONE;
-            newFogStart     = 0.0;
-            newFogEnd       = 0.0;
-            newFogDensity   = 0.0;
-        }
-        else
-        {
-            fogMode         = sceneMgr->getFogMode();
-            newFogStart     = sceneMgr->getFogStart();
-            newFogEnd       = sceneMgr->getFogEnd();
-            newFogDensity   = sceneMgr->getFogDensity();            
-        }
-        mPassOverrideParams = false;
+        // the mode is shared by all scene managers, see SGScheme::synchronizeWithFogSettings;
+        // the values are taken from the rendered one in updateGpuProgramsParams
+        mFogMode = ShaderGenerator::getSingleton().getFogMode(dstPass->getParent()->getSchemeName());
     }
 
-    // Set fog properties.
-    setFogProperties(fogMode, newFogStart, newFogEnd, newFogDensity);
-    
-    
-    // Override scene fog since it will happen in shader.
-    dstPass->setFog(true, FOG_NONE, ColourValue::White, newFogDensity, newFogStart, newFogEnd); 
+    setFogProperties(fogStart, fogEnd, fogDensity);
+
+    // the fog happens in the shader now
+    dstPass->setFog(true, FOG_NONE, ColourValue::White, fogDensity, fogStart, fogEnd);
 
     TextureUnitState* tus = dstPass->createTextureUnitState();
-    auto tex = TextureManager::getSingleton().load(
-        mFactory->getBackgroundTextureName(), RGN_DEFAULT, TEX_TYPE_CUBE_MAP);
+    auto tex = TextureManager::getSingleton().load(mFactory->getBackgroundTextureName(), RGN_DEFAULT,
+                                                   TEX_TYPE_CUBE_MAP);
     tus->setTexture(tex);
     mBackgroundSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
@@ -255,16 +227,12 @@ bool RTShaderSRSTexturedFog::preAddToRenderState(const RenderState* renderState,
 }
 
 //-----------------------------------------------------------------------
-void RTShaderSRSTexturedFog::setFogProperties(FogMode fogMode, 
-                             float fogStart, 
-                             float fogEnd, 
-                             float fogDensity)
+void RTShaderSRSTexturedFog::setFogProperties(Real fogStart, Real fogEnd, Real fogDensity)
 {
-    mFogMode            = fogMode;
-    mFogParamsValue.x   = fogDensity;
-    mFogParamsValue.y   = fogStart;
-    mFogParamsValue.z   = fogEnd;
-    mFogParamsValue.w   = fogEnd != fogStart ? 1 / (fogEnd - fogStart) : 0; 
+    mFogParamsValue.x = fogDensity;
+    mFogParamsValue.y = fogStart;
+    mFogParamsValue.z = fogEnd;
+    mFogParamsValue.w = fogEnd != fogStart ? 1 / (fogEnd - fogStart) : 0;
 }
 
 //-----------------------------------------------------------------------
