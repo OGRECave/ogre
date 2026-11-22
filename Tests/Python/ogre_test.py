@@ -204,6 +204,14 @@ class EmptySharedPtrTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             unit._setTexturePtr(5)
 
+    def test_an_empty_result_is_none(self):
+        manager = Ogre.MaterialManager.getSingleton()
+        self.assertIsNone(manager.getByName("missing", Ogre.RGN_DEFAULT))  # by value
+        _material, unit = self.unit()
+        self.assertIsNotNone(manager.getByName(self.id(), Ogre.RGN_DEFAULT))
+        self.assertIsNone(unit._getTexturePtr())  # by reference
+        unit._setTexturePtr(unit._getTexturePtr())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -213,6 +213,14 @@ JNIEnv* OgreJNIGetEnv() {
 %typecheck(SWIG_TYPECHECK_POINTER) Ogre::SharedPtr<TYPE > {
     $1 = $input == Py_None || SWIG_CheckState(SWIG_ConvertPtr($input, 0, $&descriptor, SWIG_POINTER_NO_NULL));
 }
+%typemap(out) Ogre::SharedPtr<TYPE > {
+    $result = static_cast<bool>($1) ? SWIG_NewPointerObj(new $1_ltype($1), $&1_descriptor, SWIG_POINTER_OWN)
+                                    : SWIG_Py_Void();
+}
+%typemap(out) const Ogre::SharedPtr<TYPE >&, Ogre::SharedPtr<TYPE >& {
+    $result = static_cast<bool>(*$1) ? SWIG_NewPointerObj(SWIG_as_voidptr($1), $1_descriptor, 0)
+                                     : SWIG_Py_Void();
+}
 #endif
 %enddef
 
