@@ -773,8 +773,14 @@ namespace Ogre {
     void AutoParamDataSource::setFog(FogMode mode, const ColourValue& colour,
         Real expDensity, Real linearStart, Real linearEnd)
     {
-        (void)mode; // ignored
         mFogColour = colour;
+        if (mode == FOG_NONE)
+        {
+            // neutral, so shaders that apply fog regardless of the mode leave the colour as is:
+            // exp(-0 * d) = 1 and the linear factor (z - d) * w = 1 + d >= 1
+            mFogParams = Vector4f(0, 0, -1, -1);
+            return;
+        }
         mFogParams[0] = expDensity;
         mFogParams[1] = linearStart;
         mFogParams[2] = linearEnd;

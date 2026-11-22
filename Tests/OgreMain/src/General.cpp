@@ -1163,6 +1163,22 @@ TEST(GpuSharedParameters, LightArrayAutoConstants)
     EXPECT_EQ(Vector4f(colours + 4), Vector4f(0, 1, 0, 1));
 }
 
+TEST(AutoParamDataSource, NeutralFogWithoutFog)
+{
+    // shaders that apply fog whatever the mode must leave the colour as is under FOG_NONE
+    AutoParamDataSource source;
+    source.setFog(FOG_NONE, ColourValue::Black, 0.5, 0, 1);
+    const Vector4f& p = source.getFogParams();
+    for (float d : {0.0f, 0.001f, 1.0f, 100.0f, 1e6f})
+    {
+        EXPECT_GE((p[2] - d) * p[3], 1.0f); // linear
+        EXPECT_EQ(std::exp(-d * p[0]), 1.0f); // exp
+    }
+
+    source.setFog(FOG_LINEAR, ColourValue::Black, 0.5, 10, 20);
+    EXPECT_EQ(source.getFogParams(), Vector4f(0.5, 10, 20, 0.1));
+}
+
 TEST_F(SceneNodeTest, detachObjectFromBone)
 {
     auto ent = mSceneMgr->createEntity("sinbad", "Sinbad.mesh");
