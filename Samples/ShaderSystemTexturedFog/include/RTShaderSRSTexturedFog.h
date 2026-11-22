@@ -63,7 +63,8 @@ public:
     /** 
     @see SubRenderState::updateGpuProgramsParams.
     */
-    void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList) override;
+    void updateGpuProgramsParams(Renderable* rend, const Pass* pass, const AutoParamDataSource* source,
+                                 const LightList* pLightList) override;
 
     /** 
     @see SubRenderState::copyFrom.
@@ -76,13 +77,12 @@ public:
     bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass) override;
 
     /** 
-    Set the fog properties this fog sub render state should emulate.
-    @param fogMode The fog mode to emulate (FOG_NONE, FOG_EXP, FOG_EXP2, FOG_LINEAR).
+    Set the fog parameters this fog sub render state should emulate.
     @param fogStart Start distance of fog, used for linear mode only.
     @param fogEnd End distance of fog, used for linear mode only.
     @param fogDensity Fog density used in exponential modes only.
     */
-    void setFogProperties(FogMode fogMode, float fogStart, float fogEnd, float fogDensity);
+    void setFogProperties(Real fogStart, Real fogEnd, Real fogDensity);
 
     static String Type;
 
@@ -105,45 +105,40 @@ protected:
     bool addFunctionInvocations(ProgramSet* programSet) override;
 
 // Attributes.
-protected:  
+protected:
     /// The factory which created the texture fog instance
-    RTShaderSRSTexturedFogFactory* mFactory;    
-    /// Fog formula. 
-    FogMode mFogMode;               
+    RTShaderSRSTexturedFogFactory* mFactory;
+    /// The fog mode the shaders were built for.
+    FogMode mFogMode;
     /// Fog parameters (density, start, end, 1/end-start).
-    Vector4 mFogParamsValue;        
+    Vector4 mFogParamsValue;
     /// True if the fog parameters should be taken from the pass.
-    bool mPassOverrideParams;   
-    /// The index of the background texture unit state in the pass 
+    bool mPassOverrideParams;
+    /// The index of the background texture unit state in the pass
     unsigned int mBackgroundSamplerIndex;
 
-    // World matrix parameter.  
-    UniformParameterPtr mWorldMatrix;               
-    // camera position parameter.       
-    UniformParameterPtr mCameraPos;             
-    // Fog parameters program parameter.    
-    UniformParameterPtr mFogParams;             
+    // World matrix parameter.
+    UniformParameterPtr mWorldMatrix;
+    // camera position parameter.
+    UniformParameterPtr mCameraPos;
+    // Fog parameters program parameter.
+    UniformParameterPtr mFogParams;
     // Vertex shader input position parameter.
-    ParameterPtr mVSInPos;              
-    // Fog colour parameter.    
-    ParameterPtr mFogColour;                
-    // Vertex shader output fog colour parameter.
-    ParameterPtr mVSOutFogFactor;       
-    // Pixel shader input fog factor.
-    ParameterPtr mPSInFogFactor;            
+    ParameterPtr mVSInPos;
+    // Fog colour parameter.
+    ParameterPtr mFogColour;
     // Vertex shader output depth.
-    ParameterPtr mVSOutDepth;           
+    ParameterPtr mVSOutDepth;
     // Pixel shader input depth.
-    ParameterPtr mPSInDepth;                
+    ParameterPtr mPSInDepth;
     // Vertex shader world position relative to camera.
-    ParameterPtr mVSOutPosView;         
+    ParameterPtr mVSOutPosView;
     // Pixel shader world position relative to camera.
-    ParameterPtr mPSInPosView;           
+    ParameterPtr mPSInPosView;
     // Pixel shader output diffuse colour.
-    ParameterPtr mPSOutDiffuse;         
+    ParameterPtr mPSOutDiffuse;
     //Background color texture parameter
-    ParameterPtr mBackgroundTextureSampler; 
-    
+    ParameterPtr mBackgroundTextureSampler;
 };
 
 
