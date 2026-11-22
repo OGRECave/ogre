@@ -160,6 +160,12 @@ namespace {
     const uint32 D3DFMT_R32F            = 114;
     const uint32 D3DFMT_G32R32F         = 115;
     const uint32 D3DFMT_A32B32G32R32F   = 116;
+
+    void readOrThrow(const DataStreamPtr& stream, void* buf, size_t count)
+    {
+        if (stream->read(buf, count) != count)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "DDS file is truncated: " + stream->getName());
+    }
 }
 
     //---------------------------------------------------------------------
@@ -764,7 +770,7 @@ namespace {
         Image* image = any_cast<Image*>(output);
         // Read 4 character code
         uint32 fileType;
-        stream->read(&fileType, sizeof(uint32));
+        readOrThrow(stream, &fileType, sizeof(uint32));
         flipEndian(&fileType, sizeof(uint32));
         
         if (FOURCC('D', 'D', 'S', ' ') != fileType)
@@ -774,7 +780,7 @@ namespace {
         
         // Read header in full
         DDSHeader header;
-        stream->read(&header, sizeof(DDSHeader));
+        readOrThrow(stream, &header, sizeof(DDSHeader));
 
         // Endian flip if required, all 32-bit values
         flipEndian(&header, 4, sizeof(DDSHeader) / 4);
@@ -831,7 +837,7 @@ namespace {
             if(header.pixelFormat.fourCC == FOURCC('D', 'X', '1', '0'))
             {
                 DDSExtendedHeader extHeader;
-                stream->read(&extHeader, sizeof(DDSExtendedHeader));
+                readOrThrow(stream, &extHeader, sizeof(DDSExtendedHeader));
 
                 // Endian flip if required, all 32-bit values
                 flipEndian(&extHeader, 4, sizeof(DDSExtendedHeader) / 4);
@@ -871,7 +877,7 @@ namespace {
                     // from which the 16-bit samples are calculated may have been
                     // 32-bit so can benefit from this.
                     DXTColourBlock block;
-                    stream->read(&block, sizeof(DXTColourBlock));
+                    readOrThrow(stream, &block, sizeof(DXTColourBlock));
                     flipEndian(&(block.colour_0), sizeof(uint16));
                     flipEndian(&(block.colour_1), sizeof(uint16));
                     // skip back since we'll need to read this again
@@ -964,7 +970,7 @@ namespace {
                                         sourceFormat == PF_DXT3)
                                     {
                                         // explicit alpha
-                                        stream->read(&eAlpha, sizeof(DXTExplicitAlphaBlock));
+                                        readOrThrow(stream, &eAlpha, sizeof(DXTExplicitAlphaBlock));
                                         flipEndian(eAlpha.alphaRow, sizeof(uint16), 4);
                                         unpackDXTAlpha(eAlpha, tempColours) ;
                                     }
@@ -972,13 +978,13 @@ namespace {
                                         sourceFormat == PF_DXT5)
                                     {
                                         // interpolated alpha
-                                        stream->read(&iAlpha, sizeof(DXTInterpolatedAlphaBlock));
+                                        readOrThrow(stream, &iAlpha, sizeof(DXTInterpolatedAlphaBlock));
                                         flipEndian(&(iAlpha.alpha_0), sizeof(uint16));
                                         flipEndian(&(iAlpha.alpha_1), sizeof(uint16));
                                         unpackDXTAlpha(iAlpha, tempColours) ;
                                     }
                                     // always read colour
-                                    stream->read(&col, sizeof(DXTColourBlock));
+                                    readOrThrow(stream, &col, sizeof(DXTColourBlock));
                                     flipEndian(&(col.colour_0), sizeof(uint16));
                                     flipEndian(&(col.colour_1), sizeof(uint16));
                                     unpackDXTColour(sourceFormat, col, tempColours);
@@ -1025,7 +1031,7 @@ namespace {
                         // load directly
                         // DDS format lies! sizeOrPitch is not always set for DXT!!
                         size_t dxtSize = PixelUtil::getMemorySize(width, height, depth, format);
-                        stream->read(destPtr, dxtSize);
+                        readOrThrow(stream, destPtr, dxtSize);
                         destPtr = static_cast<void*>(static_cast<uchar*>(destPtr) + dxtSize);
                     }
 
@@ -1037,7 +1043,7 @@ namespace {
                     {
                         for (size_t y = 0; y < height; ++y)
                         {
-                            stream->read(destPtr, dstPitch);
+                            readOrThrow(stream, destPtr, dstPitch);
                             destPtr = static_cast<void*>(static_cast<uchar*>(destPtr) + dstPitch);
                         }
                     }
