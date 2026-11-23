@@ -680,6 +680,47 @@ TEST(Image, FlipV)
     ASSERT_TRUE(!memcmp(img.getData(), ref.getData(), ref.getSize()));
 }
 
+TEST(Image, FlipAllFacesSlicesAndMipmaps)
+{
+    // 8 bytes per pixel: a cubemap with mipmaps and a volume
+    Image cube, volume;
+    cube.create(PF_FLOAT16_RGBA, 2, 2, 1, 6, 1);
+    volume.create(PF_FLOAT16_RGBA, 2, 2, 2);
+
+    for (Image* src : {&cube, &volume})
+    {
+        for (uint32 face = 0; face < src->getNumFaces(); face++)
+            for (uint32 mip = 0; mip <= src->getNumMipmaps(); mip++)
+            {
+                PixelBox box = src->getPixelBox(face, mip);
+                for (uint32 z = 0; z < box.getDepth(); z++)
+                    for (uint32 y = 0; y < box.getHeight(); y++)
+                        for (uint32 x = 0; x < box.getWidth(); x++)
+                            box.setColourAt(ColourValue(x, y, z, face * 2 + mip), x, y, z);
+            }
+
+        for (bool vertical : {false, true})
+        {
+            Image img = *src;
+            vertical ? img.flipAroundX() : img.flipAroundY();
+            ASSERT_EQ(img.getNumMipmaps(), src->getNumMipmaps());
+
+            for (uint32 face = 0; face < img.getNumFaces(); face++)
+                for (uint32 mip = 0; mip <= img.getNumMipmaps(); mip++)
+                {
+                    PixelBox box = img.getPixelBox(face, mip);
+                    uint32 w = box.getWidth(), h = box.getHeight();
+                    for (uint32 z = 0; z < box.getDepth(); z++)
+                        for (uint32 y = 0; y < h; y++)
+                            for (uint32 x = 0; x < w; x++)
+                                EXPECT_EQ(box.getColourAt(x, y, z),
+                                          ColourValue(vertical ? x : w - 1 - x, vertical ? h - 1 - y : y, z,
+                                                      face * 2 + mip));
+                }
+        }
+    }
+}
+
 TEST(Image, Resize)
 {
     ResourceGroupManager mgr;
