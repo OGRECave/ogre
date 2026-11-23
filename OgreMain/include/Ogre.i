@@ -581,6 +581,10 @@ CS_VECTOR_OPS(4);
 %typemap(argout) (Ogre::uchar* buffer, bool autoDelete) {
     if ($1 && PyObject_SetAttrString(self, "_buffer", $input) < 0) SWIG_fail;
 }
+// the returned PixelBox points into the data of self, so keep self alive as long as the PixelBox references it
+%typemap(ret) Ogre::PixelBox getPixelBox, Ogre::PixelBox getSubVolume {
+    if (PyObject_SetAttrString($result, "_owner", self) < 0) SWIG_fail;
+}
 
 
 %define TYPEMAP_SEQUENCE_FOR(TYPE, LEN_CHECK, DESCRIPTION)
