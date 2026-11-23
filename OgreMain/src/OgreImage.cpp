@@ -139,59 +139,38 @@ namespace Ogre {
     Image & Image::flipAroundY()
     {
         OgreAssert(mBuffer, "No image data loaded");
-        mNumMipmaps = 0; // Image operations lose precomputed mipmaps
+        OgreAssert(!PixelUtil::isCompressed(mFormat), "This method can not be used for compressed formats");
 
-        uint32 y;
-        switch (mPixelSize)
+        // flip every face and mipmap, so the mipmaps stay valid
+        for (uint32 face = 0; face < getNumFaces(); face++)
         {
-        case 1:
-            for (y = 0; y < mHeight; y++)
+            for (uint32 mip = 0; mip <= mNumMipmaps; mip++)
             {
-                std::reverse(mBuffer + mWidth * y, mBuffer + mWidth * (y + 1));
+                PixelBox box = getPixelBox(face, mip);
+                size_t rowSize = box.getWidth() * mPixelSize;
+                uchar* row = box.data;
+                for (uint32 y = 0; y < box.getHeight() * box.getDepth(); y++, row += rowSize)
+                {
+                    for (uchar *l = row, *r = row + rowSize - mPixelSize; l < r; l += mPixelSize, r -= mPixelSize)
+                        std::swap_ranges(l, l + mPixelSize, r);
+                }
             }
-            break;
-
-        case 2:
-            for (y = 0; y < mHeight; y++)
-            {
-                std::reverse((ushort*)mBuffer + mWidth * y, (ushort*)mBuffer + mWidth * (y + 1));
-            }
-            break;
-
-        case 3:
-            typedef uchar uchar3[3];
-            for (y = 0; y < mHeight; y++)
-            {
-                std::reverse((uchar3*)mBuffer + mWidth * y, (uchar3*)mBuffer + mWidth * (y + 1));
-            }
-            break;
-
-        case 4:
-            for (y = 0; y < mHeight; y++)
-            {
-                std::reverse((uint*)mBuffer + mWidth * y, (uint*)mBuffer + mWidth * (y + 1));
-            }
-            break;
-
-        default:
-            OGRE_EXCEPT( 
-                Exception::ERR_INTERNAL_ERROR,
-                "Unknown pixel depth",
-                "Image::flipAroundY" );
-            break;
         }
 
         return *this;
-
     }
 
     //-----------------------------------------------------------------------------
     Image & Image::flipAroundX()
     {
         OgreAssert(mBuffer, "No image data loaded");
-        
-        mNumMipmaps = 0; // Image operations lose precomputed mipmaps
-        PixelUtil::bulkPixelVerticalFlip(getPixelBox());
+
+        // flip every face and mipmap, so the mipmaps stay valid
+        for (uint32 face = 0; face < getNumFaces(); face++)
+        {
+            for (uint32 mip = 0; mip <= mNumMipmaps; mip++)
+                PixelUtil::bulkPixelVerticalFlip(getPixelBox(face, mip));
+        }
 
         return *this;
     }
