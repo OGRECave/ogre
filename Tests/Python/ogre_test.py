@@ -101,6 +101,23 @@ class BufferLifetimeTest(unittest.TestCase):
             gc.collect()
             self.assertIsNone(ref())
 
+    def test_pixelbox_keeps_image_alive(self):
+        img = Ogre.Image(Ogre.PF_BYTE_RGBA, 8, 8)
+        img.setColourAt(Ogre.ColourValue(1, 0, 0, 1), 0, 0, 0)
+        ref = weakref.ref(img)
+        box = img.getPixelBox()
+        del img
+        gc.collect()
+        self.assertIsNotNone(ref())
+        sub = box.getSubVolume(Ogre.Box(0, 0, 4, 4))
+        del box
+        gc.collect()
+        self.assertIsNotNone(ref())
+        self.assertEqual(sub.getColourAt(0, 0, 0), Ogre.ColourValue(1, 0, 0, 1))
+        del sub
+        gc.collect()
+        self.assertIsNone(ref())
+
 
 @unittest.skipUnless(Bites, "OgreBites bindings not built")
 class ListenerChainTest(unittest.TestCase):
