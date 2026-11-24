@@ -38,6 +38,8 @@ namespace Ogre {
 #elif OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && \
       OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 #   define __OGRE_HAVE_SSE  1
+#elif OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_WASM && defined(__wasm_simd128__)
+#   define __OGRE_HAVE_SSE  1
 #endif
 
 /* Define whether or not Ogre compiled with VFP support.
@@ -123,6 +125,8 @@ namespace Ogre {
             CPU_FEATURE_NEON            = 1 << 16,
 #elif OGRE_CPU == OGRE_CPU_MIPS         
             CPU_FEATURE_MSA             = 1 << 17,
+#elif OGRE_CPU == OGRE_CPU_WASM
+            CPU_FEATURE_SSE             = 1 << 0,
 #endif
 
             CPU_FEATURE_NONE            = 0

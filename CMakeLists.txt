@@ -274,6 +274,12 @@ elseif(EMSCRIPTEN)
 
   set(OGRE_CONFIG_THREADS "0" CACHE STRING "Threading is unstable on Emscripten" FORCE)
 
+  option(OGRE_CONFIG_ENABLE_WASM_SIMD
+         "Compile the Emscripten build with WebAssembly SIMD (wasm simd128)" OFF)
+  if(OGRE_CONFIG_ENABLE_WASM_SIMD)
+    add_compile_options(-msimd128)
+  endif()
+
   # Ogre reports errors with exceptions and recovers from some of them, which emscripten only
   # supports if all code, including the dependencies, is compiled with exception handling
   add_compile_options(-fwasm-exceptions)

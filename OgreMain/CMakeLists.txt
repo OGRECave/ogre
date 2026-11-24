@@ -227,6 +227,11 @@ add_native_precompiled_header(OgreMain "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURREN
 
 target_compile_options(OgreMain PRIVATE ${OGRE_FP_FLAGS})
 
+if(EMSCRIPTEN AND OGRE_CONFIG_ENABLE_WASM_SIMD)
+  # only needed to enable the SSE intrinsics header, which emscripten translates to wasm SIMD
+  target_compile_options(OgreMain PRIVATE -msse)
+endif()
+
 # install OgreMain
 ogre_config_lib(OgreMain TRUE)
 install(FILES ${HEADER_FILES}
