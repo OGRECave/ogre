@@ -151,6 +151,33 @@ JNIEnv* OgreJNIGetEnv() {
     if ($1) $3 = false;
 }
 
+#ifdef SWIGJAVA
+// NIOBUFFER maps a direct java.nio.ByteBuffer to the pointer without copying, see
+// https://www.swig.org/Doc4.4/Java.html#Java_typemaps_c_to_java_types
+%include <various.i>
+
+// raw pixel and stream buffers are passed as direct ByteBuffers. The buffer must be
+// allocated with allocateDirect() and stay alive as long as Ogre uses the memory.
+%apply unsigned char *NIOBUFFER { unsigned char * data }
+%apply unsigned char *NIOBUFFER { unsigned char * buffer }
+%apply unsigned char *NIOBUFFER { unsigned char * rgba }
+%apply unsigned char *NIOBUFFER { void * buf }
+%apply unsigned char *NIOBUFFER { const void * buf }
+%apply unsigned char *NIOBUFFER { void * pDest }
+%apply unsigned char *NIOBUFFER { void * pSource }
+%apply unsigned char *NIOBUFFER { const void * pSource }
+%apply unsigned char *NIOBUFFER { void * pixelData }
+%apply unsigned char *NIOBUFFER { void * pMem }
+%apply unsigned char *NIOBUFFER { void * buffer }
+%apply unsigned char *NIOBUFFER { void * dest }
+%apply unsigned char *NIOBUFFER { void * src }
+%apply unsigned char *NIOBUFFER { const void * src }
+%apply unsigned char *NIOBUFFER { void * dst }
+
+// PixelBox::data has no known size, so the generated getter would be unusable
+%ignore Ogre::PixelBox::data;
+#endif
+
 // convert c++ exceptions to language native exceptions
 %exception {
     try {
@@ -822,14 +849,13 @@ namespace Ogre { struct GpuLogicalIndexUse; class GpuSharedParametersUsage; }
 %template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<3, Ogre::Real>;
 %template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<4, Ogre::Real>;
 %ignore Ogre::Image::getFileExtFromMagic;
-#ifdef SWIGCSHARP
+#if defined(SWIGJAVA) || defined(SWIGCSHARP)
 // the passed in buffer belongs to the caller, so the Image must only borrow it
 %ignore Ogre::Image::Image(PixelFormat, uint32, uint32, uint32, uchar*, bool);
 %ignore Ogre::Image::Image(PixelFormat, uint32, uint32, uint32, uchar*);
 #endif
 %include "OgreImage.h"
-#ifdef SWIGCSHARP
-// the passed in buffer belongs to the caller, so the Image only borrows it
+#if defined(SWIGJAVA) || defined(SWIGCSHARP)
 %extend Ogre::Image {
     Image(Ogre::PixelFormat format, Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth, void* buffer)
     {
