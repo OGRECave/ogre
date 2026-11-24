@@ -122,6 +122,10 @@ JNIEnv* OgreJNIGetEnv() {
 
 #ifdef SWIGCSHARP
   %apply void *VOID_INT_PTR {void *}
+  // raw pixel and stream buffers are passed as an IntPtr, so that the caller can
+  // pin a managed array for the duration of the call
+  %apply void *VOID_INT_PTR {unsigned char *}
+  %apply void *VOID_INT_PTR {const unsigned char *}
 
   %typemap(csvarout) void * %{
     get {
@@ -818,7 +822,21 @@ namespace Ogre { struct GpuLogicalIndexUse; class GpuSharedParametersUsage; }
 %template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<3, Ogre::Real>;
 %template(setNamedConstant) Ogre::GpuSharedParameters::setNamedConstant<4, Ogre::Real>;
 %ignore Ogre::Image::getFileExtFromMagic;
+#ifdef SWIGCSHARP
+// the passed in buffer belongs to the caller, so the Image must only borrow it
+%ignore Ogre::Image::Image(PixelFormat, uint32, uint32, uint32, uchar*, bool);
+%ignore Ogre::Image::Image(PixelFormat, uint32, uint32, uint32, uchar*);
+#endif
 %include "OgreImage.h"
+#ifdef SWIGCSHARP
+// the passed in buffer belongs to the caller, so the Image only borrows it
+%extend Ogre::Image {
+    Image(Ogre::PixelFormat format, Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth, void* buffer)
+    {
+        return new Ogre::Image(format, width, height, depth, (Ogre::uchar*)buffer, false);
+    }
+}
+#endif
 %include "OgreBillboard.h"
 %ignore Ogre::Particle::hasOwnDimensions ; // deprecated
 %include "OgreParticle.h"
