@@ -123,7 +123,7 @@ PTR_TRAITS(Ogre::StaticGeometry)
 %include "OgreParticleSystemManager.h"
 %ignore Ogre::InstanceManager::getInstanceBatchIterator;
 %ignore Ogre::InstanceManager::getInstanceBatchMapIterator;
-%include "OgreInstanceManager.h" 
+%include "OgreInstanceManager.h"
 %ignore Ogre::StaticGeometry::getRegionIterator;
 %ignore Ogre::StaticGeometry::Region::getLODIterator;
 %ignore Ogre::StaticGeometry::MaterialBucket::getGeometryIterator;

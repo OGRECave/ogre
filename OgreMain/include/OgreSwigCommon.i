@@ -62,12 +62,12 @@ using namespace Ogre;
 %define PTR_TRAITS(T)
 %enddef
 #endif
- 
+
 // so swig correctly resolves "using std::*" declarations
 %inline %{
 using namespace std;
 %}
- 
+
 /* Parse the header file to generate wrappers */
 #define _OgreExport
 #define _OgrePrivate
@@ -144,7 +144,7 @@ JNIEnv* OgreJNIGetEnv() {
         $action
     }
 #ifdef SWIGPYTHON
-    catch (Swig::DirectorException &e) { 
+    catch (Swig::DirectorException &e) {
         SWIG_fail;
     }
     catch (std::length_error &e) {
