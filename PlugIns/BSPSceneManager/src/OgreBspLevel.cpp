@@ -36,14 +36,11 @@ THE SOFTWARE.
 #include "OgreQuake3Shader.h"
 #include "OgreMath.h"
 #include "OgreStringVector.h"
-#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreTextureUnitState.h"
 #include "OgreResourceGroupManager.h"
-#include "OgreHardwarePixelBuffer.h"
-#include "OgreBspSceneManager.h"
 
 namespace Ogre {
 

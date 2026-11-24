@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreParticleFXPlugin.h"
-#include "OgreRoot.h"
 #include "OgreParticleSystemManager.h"
 
 #include "OgrePointEmitterFactory.h"

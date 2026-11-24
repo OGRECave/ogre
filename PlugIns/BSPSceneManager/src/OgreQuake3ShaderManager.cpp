@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreQuake3ShaderManager.h"
 #include "OgreQuake3Shader.h"
 #include "OgreStringVector.h"
-#include "OgreException.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing

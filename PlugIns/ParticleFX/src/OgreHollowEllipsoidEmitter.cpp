@@ -28,7 +28,6 @@ THE SOFTWARE.
 // Original author: Tels <http://bloodgate.com>, released as public domain
 #include "OgreHollowEllipsoidEmitter.h"
 #include "OgreParticle.h"
-#include "OgreException.h"
 #include "OgreStringConverter.h"
 #include "OgreMath.h"
 

@@ -28,9 +28,6 @@ THE SOFTWARE.
 // Original author: Tels <http://bloodgate.com>, released as public domain
 #include "OgreCylinderEmitter.h"
 #include "OgreParticle.h"
-#include "OgreQuaternion.h"
-#include "OgreException.h"
-#include "OgreStringConverter.h"
 
 
 /* Implements an Emitter whose emitting points all lie inside a cylinder.
