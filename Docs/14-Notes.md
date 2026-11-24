@@ -138,6 +138,33 @@ Additionally, `Ogre.Degree` can be transparently used where `Ogre.Radian` is req
 
 Since 14.6, `PixelBox` requires a `memoryview` instead of a raw buffer. This enables 3D image formats through the bindings.
 
+## Zero copy buffers with C# and Java (since 14.6.4)
+
+Raw pixel and stream buffers are now passed without a copy instead of as opaque pointer types.
+In C# they are `System.IntPtr`, so the managed array has to be pinned for the duration of the call:
+
+```csharp
+GCHandle handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+try {
+    image.loadDynamicImage(handle.AddrOfPinnedObject(), width, height, 1, PixelFormat.PF_BYTE_RGB);
+} finally {
+    handle.Free();
+}
+```
+
+In Java they are `java.nio.ByteBuffer`, which has to be direct, i.e. allocated with
+`ByteBuffer.allocateDirect()`:
+
+```java
+ByteBuffer pixels = ByteBuffer.allocateDirect(width * height * 3);
+image.loadDynamicImage(pixels, width, height, 1, PixelFormat.PF_BYTE_RGB);
+```
+
+Both bindings only borrow the memory passed in this way and never free it, so a buffer passed to
+`Image` or `MemoryDataStream` must stay alive as long as that object uses it. The `Image`
+constructor taking a buffer always borrows it, regardless of any `autoDelete` argument; the
+`autoDelete` and `freeOnClose` flags are forced to `false` whenever a buffer is passed explicitly.
+
 ## Bites
 
 Since 14.2 `ApplicationContextBase::runRenderingSettingsDialog()` is available, that displays an ImGui based dialog to change the rendering settings.
