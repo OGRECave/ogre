@@ -49,7 +49,6 @@ endif()
 # evaluate the #ifdef SWIGPYTHON blocks in some of the .i files. Set the module
 # names explicitly, otherwise the build expects proxy files that SWIG never
 # generates and re-runs SWIG on every build.
-set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME Ogre)
 
 # weakly link libpython on Unix to allow relocation
 if(APPLE)
@@ -58,12 +57,28 @@ elseif(UNIX)
     set(PYTHON_LIBRARIES "")
 endif()
 
-swig_add_library(Ogre LANGUAGE python SOURCES ../../OgreMain/include/Ogre.i)
-swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
-ogre_python_module(Ogre)
+# Ogre.i is split into parts, built as separate modules _Ogre<Part> that compile in
+# parallel. All keep the SWIG module name "Ogre", so the classes stay Ogre.Ogre.*;
+# Ogre.py re-exports them as one module.
+set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME Ogre)
+file(GLOB OGRE_SWIG_PARTS_DEPS ${PROJECT_SOURCE_DIR}/OgreMain/include/OgreSwig*.i)
+set(_n 0)
+foreach(part Core Resources Materials Animation Scene)
+    math(EXPR _n "${_n} + 1")
+    set(_target Ogre${part})
+    set(SWIG_MODULE_${_target}_EXTRA_DEPS ${OGRE_SWIG_PARTS_DEPS})
+    swig_add_library(${_target} LANGUAGE python OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${_target}
+        SOURCES ../../OgreMain/include/Ogre.i)
+    set_target_properties(${_target} PROPERTIES DEBUG_POSTFIX ""
+        SWIG_COMPILE_DEFINITIONS OGRE_SWIG_PART=${_n}
+        SWIG_COMPILE_OPTIONS "-interface;_${_target}")
+    swig_link_libraries(${_target} OgreMain ${PYTHON_LIBRARIES})
+    install(TARGETS ${_target} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
+endforeach()
+configure_file(Ogre.py ${CMAKE_CURRENT_BINARY_DIR}/Ogre.py COPYONLY)
 
 # always install pure python modules
-install(FILES __init__.py Numpy.py HighPy.py DESTINATION ${PYTHON_SITE_PACKAGES})
+install(FILES __init__.py Ogre.py Numpy.py HighPy.py DESTINATION ${PYTHON_SITE_PACKAGES})
 
 if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     set_source_files_properties(../RTShaderSystem/include/OgreRTShader.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME RTShader)

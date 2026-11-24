@@ -92,7 +92,7 @@ if (OGRE_BUILD_TESTS)
     if(OGRE_BUILD_COMPONENT_PYTHON)
         add_test(NAME Test_Python_Ogre
             COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Python/ogre_test.py
-            WORKING_DIRECTORY $<TARGET_FILE_DIR:Ogre>)
+            WORKING_DIRECTORY $<TARGET_FILE_DIR:OgreCore>)
     endif()
 
     if(ANDROID)
