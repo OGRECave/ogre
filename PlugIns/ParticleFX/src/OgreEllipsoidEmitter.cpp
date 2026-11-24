@@ -28,8 +28,6 @@ THE SOFTWARE.
 // Original author: Tels <http://bloodgate.com>, released as public domain
 #include "OgreEllipsoidEmitter.h"
 #include "OgreParticle.h"
-#include "OgreException.h"
-#include "OgreStringConverter.h"
 
 
 /* Implements an Emitter whose emitting points all lie inside an ellipsoid.

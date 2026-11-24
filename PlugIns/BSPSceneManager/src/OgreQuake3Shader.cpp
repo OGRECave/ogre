@@ -27,15 +27,11 @@ THE SOFTWARE.
 */
 
 #include "OgreQuake3Shader.h"
-#include "OgreSceneManager.h"
 #include "OgreMaterial.h"
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreTextureUnitState.h"
-#include "OgreMath.h"
 #include "OgreLogManager.h"
-#include "OgreTextureManager.h"
-#include "OgreRoot.h"
 #include "OgreMaterialManager.h"
 
 namespace Ogre {

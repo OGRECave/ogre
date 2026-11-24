@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreBspNode.h"
 #include "OgreBspLevel.h"
 #include "OgreException.h"
-#include "OgreLogManager.h"
 
 namespace Ogre {
 

@@ -27,10 +27,8 @@ THE SOFTWARE.
 */
 #include "OgreColourImageAffector.h"
 #include "OgreParticleSystem.h"
-#include "OgreStringConverter.h"
 #include "OgreParticle.h"
 #include "OgreException.h"
-#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
     
