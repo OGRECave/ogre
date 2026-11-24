@@ -923,6 +923,8 @@ In general, you have to do the following changes compared to regular GLSL:
 - Use `vec2_splat(1.0)` instead of the `vec2(1.0)` single component constructor.
 - Use `f32vecN` instead of `highp vecN` types to denote full precision floats in the fragment shader.
   They can not be used as constructors, as `highp vecN(..)` is invalid GLSL; assign the components instead.
+  `OGRE_RELAXED_PRECISION` is defined where fragment shader math defaults to 16 bit, i.e. on GLSL ES, Vulkan and D3D11
+  (with `USE_OGRE_FROM_FUTURE`).
 
 Let's take a look at how to use the `OgreUnifiedShader.h` macros by starting with a simple GLSL shader:
 
