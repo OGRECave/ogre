@@ -49,8 +49,11 @@ namespace Ogre {
 #endif
 
 /* Define whether or not Ogre compiled with NEON support.
+   AArch64 always has NEON and defines __ARM_NEON, while __ARM_NEON__ is the
+   AArch32 spelling, so accept either.
  */
-#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_NEON__)
+#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && \
+    (defined(__ARM_NEON) || defined(__ARM_NEON__))
 #   define __OGRE_HAVE_NEON  1
 #endif
 
