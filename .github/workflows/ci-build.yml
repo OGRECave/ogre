@@ -40,7 +40,7 @@ jobs:
         cd build/bin && ./TestContext -rs "OpenGL 3+ Rendering Subsystem"
         ./TestContext -rs "OpenGL ES 2.x Rendering Subsystem"
         # verify that the python modules are loadable
-        cd ../lib && python -c "import _Ogre; import _RTShader; import _Bites"
+        cd ../lib && python -c "import _OgreCore, _OgreResources, _OgreMaterials, _OgreAnimation, _OgreScene, _RTShader, _Bites"
         # run the python tests, they import the modules from the current directory
         python ../../Tests/Python/ogre_test.py
         cd ../../
