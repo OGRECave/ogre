@@ -132,6 +132,21 @@ JNIEnv* OgreJNIGetEnv() {
   %}
 #endif
 
+// buffers passed in from a managed runtime are owned by the caller, so Ogre must
+// never free them. The check runs after the arguments were converted and also
+// covers overloads where the ownership flag was omitted and the C++ default
+// applies (e.g. the Image constructor, where it defaults to true).
+%typemap(check) (Ogre::uchar* buffer, bool autoDelete) {
+    if ($1) $2 = false;
+}
+%typemap(check) (Ogre::uchar* data, Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth,
+                 Ogre::PixelFormat format, bool autoDelete) {
+    if ($1) $6 = false;
+}
+%typemap(check) (void* pMem, size_t size, bool freeOnClose) {
+    if ($1) $3 = false;
+}
+
 // convert c++ exceptions to language native exceptions
 %exception {
     try {
@@ -574,16 +589,17 @@ CS_VECTOR_OPS(4);
 %typemap(argout) (Ogre::uint32 width, Ogre::uint32 height, Ogre::uint32 depth, Ogre::PixelFormat pixelFormat, void *pixelData) {
     if (PyObject_SetAttrString(self, "_buffer", $input) < 0) SWIG_fail;
 }
-// Python owns the buffer, so the Image must only borrow it
-%typemap(check) (Ogre::uchar* buffer, bool autoDelete) {
-    if ($1) $2 = false;
-}
+// keep the buffer alive as long as the Image references it
 %typemap(argout) (Ogre::uchar* buffer, bool autoDelete) {
     if ($1 && PyObject_SetAttrString(self, "_buffer", $input) < 0) SWIG_fail;
 }
 // the returned PixelBox points into the data of self, so keep self alive as long as the PixelBox references it
 %typemap(ret) Ogre::PixelBox getPixelBox, Ogre::PixelBox getSubVolume {
     if (PyObject_SetAttrString($result, "_owner", self) < 0) SWIG_fail;
+}
+// keep the stream buffer alive as long as the MemoryDataStream references it
+%typemap(argout) (void* pMem, size_t size, bool freeOnClose) {
+    if ($1 && PyObject_SetAttrString(self, "_buffer", $input) < 0) SWIG_fail;
 }
 
 
