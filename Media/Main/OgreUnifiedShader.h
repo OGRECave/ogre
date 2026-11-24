@@ -25,6 +25,8 @@
 #include "HLSL_SM4Support.hlsl"
 
 #if OGRE_HLSL >= 4 && defined(OGRE_FRAGMENT_SHADER) && defined(USE_OGRE_FROM_FUTURE)
+// fp16 safe code paths are needed
+#define OGRE_RELAXED_PRECISION
 // #define float min16float - redefining float itself overwrites RTSS cbuffer parts
 #define vec2 min16float2
 #define vec3 min16float3

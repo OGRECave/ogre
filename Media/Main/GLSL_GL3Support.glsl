@@ -7,6 +7,8 @@
 #if defined(OGRE_FRAGMENT_SHADER) && (defined(OGRE_GLSLES) || defined(VULKAN))
 // define default precisions for ES fragement shaders
 precision mediump float;
+// fp16 safe code paths are needed
+#define OGRE_RELAXED_PRECISION
 
 #if __VERSION__ > 100
 precision lowp sampler2DArray;
