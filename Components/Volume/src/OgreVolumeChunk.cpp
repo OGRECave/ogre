@@ -27,7 +27,6 @@ THE SOFTWARE.
 #include "OgreVolumeChunk.h"
 
 #include "OgreCamera.h"
-#include "OgreLogManager.h"
 #include "OgreConfigFile.h"
 #include "OgreVolumeIsoSurfaceMC.h"
 #include "OgreVolumeOctreeNodeSplitPolicy.h"
@@ -40,6 +39,7 @@ THE SOFTWARE.
 #include "OgreVolumeChunk.h"
 
 #include <cmath>
+#include <sstream>
 #include "OgreVolumeMeshBuilder.h"
 #include "OgreVolumeOctreeNode.h"
 #include "OgreMaterialManager.h"

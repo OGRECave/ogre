@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreColourValue.h"
 
-#include <istream>
 
 namespace Ogre
 {

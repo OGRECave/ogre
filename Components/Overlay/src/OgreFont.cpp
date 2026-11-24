@@ -39,13 +39,11 @@ THE SOFTWARE
 #include "OgreBillboardSet.h"
 #include "OgreBillboard.h"
 
-#include <cmath>
 
 #ifdef HAVE_FREETYPE
 #define generic _generic    // keyword for C++/CX
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include FT_GLYPH_H
 #undef generic
 #else
 #define STBTT_STATIC

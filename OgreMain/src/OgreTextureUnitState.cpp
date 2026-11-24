@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreControllerManager.h"
 #include "OgreTextureManager.h"
-#include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
     // allow operation without hardware support

@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreOverlay.h"
 #include "OgreOverlayContainer.h"
 #include "OgreOverlayManager.h"
-#include "OgreVector.h"
 #include "OgreSceneNode.h"
 #include "OgreRenderQueue.h"
 #include "OgreCamera.h"

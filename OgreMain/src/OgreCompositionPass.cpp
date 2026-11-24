@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreCompositionPass.h"
-#include "OgreRenderQueue.h"
 
 namespace Ogre {
 

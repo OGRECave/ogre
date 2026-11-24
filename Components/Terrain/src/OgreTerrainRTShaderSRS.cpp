@@ -7,11 +7,8 @@
 #include "OgrePass.h"
 #include "OgreShaderProgramSet.h"
 #include "OgreShaderParameter.h"
-#include "OgreMaterialSerializer.h"
-#include "OgreShaderGenerator.h"
 #include "OgreShaderFunction.h"
 #include "OgreShaderProgram.h"
-#include "OgreTerrainQuadTreeNode.h"
 #include "OgreTextureManager.h"
 
 namespace Ogre {

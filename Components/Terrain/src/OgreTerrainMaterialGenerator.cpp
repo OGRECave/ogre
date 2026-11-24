@@ -25,14 +25,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreDepthBuffer.h"
-#include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreRoot.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreTextureManager.h"
 #include "OgreTexture.h"
 #include "OgreTerrain.h"
-#include "OgreManualObject.h"
 #include "OgreCamera.h"
 #include "OgreViewport.h"
 #include "OgreRenderSystem.h"
