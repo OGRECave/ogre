@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreLogManager.h"
 
 #include "OgreGLSLShaderCommon.h"
 #include "OgreGLSLPreprocessor.h"

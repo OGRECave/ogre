@@ -28,7 +28,6 @@
 
 #include "OgreGL3PlusStateCacheManager.h"
 #include "OgreGL3PlusRenderSystem.h"
-#include "OgreRoot.h"
 
 // performance critical state
 // this one is per-context and can be unconditionally cached

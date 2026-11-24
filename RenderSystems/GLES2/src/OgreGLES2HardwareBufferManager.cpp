@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreGLES2RenderToVertexBuffer.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLVertexArrayObject.h"
-#include "OgreGLUtil.h"
 #include "OgreRoot.h"
 
 namespace Ogre {

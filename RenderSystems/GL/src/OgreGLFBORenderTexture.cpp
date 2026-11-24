@@ -30,8 +30,6 @@ THE SOFTWARE.
 #include "OgreGLFrameBufferObject.h"
 #include "OgreGLPixelFormat.h"
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-#include "OgreRoot.h"
 #include "OgreGLHardwarePixelBuffer.h"
 
 namespace Ogre {

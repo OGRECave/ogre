@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreRoot.h"
-#include "OgreGLES2Prerequisites.h"
 #include "OgreGLES2Plugin.h"
 
 namespace Ogre {

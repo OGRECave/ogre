@@ -28,7 +28,6 @@
 
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreRoot.h"
 
 namespace Ogre {
     

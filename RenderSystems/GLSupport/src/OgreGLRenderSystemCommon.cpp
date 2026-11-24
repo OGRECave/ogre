@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreGLContext.h"
 #include "OgreGLNativeSupport.h"
 #include "OgreGLRenderTexture.h"
-#include "OgreGLDepthBufferCommon.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #include "OgreEGLWindow.h"

@@ -34,8 +34,6 @@ THE SOFTWARE.
 #include "OgreGLPixelFormat.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-#include "OgreBitwise.h"
 #include "OgreGLFBORenderTexture.h"
 #include "OgreRoot.h"
 #include "OgreGLStateCacheManager.h"

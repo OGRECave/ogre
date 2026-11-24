@@ -30,16 +30,11 @@
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 #include "OgreStringConverter.h"
-#include "OgreGpuProgramManager.h"
 
 #include "OgreGLSLShader.h"
 
-#include "OgreGLSLPreprocessor.h"
 #include "OgreGLSLProgramManager.h"
-#include "OgreGLUtil.h"
-#include "OgreGLUniformCache.h"
 
-#include "OgreGL3PlusHardwareBufferManager.h"
 
 namespace Ogre {
 

@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreGLRenderToVertexBuffer.h"
 #include "OgreHardwareBuffer.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystemCapabilities.h"
 
 #ifndef GL_HALF_FLOAT
 #define GL_HALF_FLOAT                     0x140B

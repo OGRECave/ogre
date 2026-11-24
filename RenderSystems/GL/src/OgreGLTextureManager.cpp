@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreGLTextureManager.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
-#include "OgreGLCopyingRenderTexture.h"
+#include "OgreGLRenderTexture.h"
 #include "OgreGLTexture.h"
 #include "OgreGLPixelFormat.h"
 #include "OgreGLRenderSystem.h"

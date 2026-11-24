@@ -31,16 +31,12 @@
 
 #include "OgreTextureManager.h"
 
-#include "OgreGL3PlusHardwareBufferManager.h"
-#include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusTextureBuffer.h"
+#include "OgreGL3PlusHardwareBuffer.h"
 #include "OgreGL3PlusPixelFormat.h"
-#include "OgreGL3PlusFBORenderTexture.h"
+#include "OgreGLRenderTexture.h"
 #include "OgreGL3PlusStateCacheManager.h"
 
-#include "OgreGLSLMonolithicProgram.h"
-#include "OgreGLSLProgramManager.h"
-#include "OgreGLSLSeparableProgram.h"
 
 #include "OgreGL3PlusTexture.h"
 

@@ -27,12 +27,8 @@
 */
 
 #include "OgreGLSLSeparableProgram.h"
-#include "OgreStringConverter.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLProgramManager.h"
-#include "OgreGpuProgramManager.h"
-#include "OgreGLUtil.h"
-#include "OgreLogManager.h"
 #include "OgreGLUniformCache.h"
 #include "OgreGL3PlusStateCacheManager.h"
 

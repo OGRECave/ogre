@@ -27,8 +27,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreGL3PlusPixelFormat.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 
 #ifndef GL_EXT_texture_compression_s3tc
 #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT   0x83F0

@@ -27,8 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreGL3PlusFrameBufferObject.h"
-#include "OgreGL3PlusHardwarePixelBuffer.h"
-#include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGLDepthBufferCommon.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"

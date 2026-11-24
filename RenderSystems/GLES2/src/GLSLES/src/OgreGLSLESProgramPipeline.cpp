@@ -27,16 +27,13 @@
  */
 
 #include "OgreGLSLESProgramPipeline.h"
-#include "OgreStringConverter.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESProgramManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLUniformCache.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLUtil.h"
 #include "OgreRoot.h"
-#include "OgreGLNativeSupport.h"
 
 namespace Ogre
 {

@@ -29,10 +29,8 @@
 #include "OgreGLSLESProgramCommon.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreGpuProgramManager.h"
-#include "OgreGLUtil.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreRoot.h"
-#include "OgreGLNativeSupport.h"
 
 namespace Ogre {
     

@@ -26,10 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreGLCopyingRenderTexture.h"
-#include "OgreGLPixelFormat.h"
-#include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-#include "OgreRoot.h"
 #include "OgreGLHardwarePixelBuffer.h"
 
 namespace Ogre {

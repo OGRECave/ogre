@@ -27,9 +27,7 @@
 */
 
 #include "OgreGLSLProgram.h"
-#include "OgreGLSLShader.h"
 #include "OgreGpuProgramManager.h"
-#include "OgreGLSLShader.h"
 #include "OgreRoot.h"
 #include "OgreGLSLExtSupport.h"
 #include "OgreLogManager.h"

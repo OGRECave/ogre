@@ -28,9 +28,6 @@ THE SOFTWARE.
 
 #include "ps_1_4.h"
 #include "OgreException.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreRenderSystemCapabilities.h"
 #include "OgreLogManager.h"
 #include "ATI_FS_GLGpuProgram.h"
 
