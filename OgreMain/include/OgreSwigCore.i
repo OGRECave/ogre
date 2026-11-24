@@ -1,5 +1,5 @@
 // Ogre SWIG bindings: prerequisites, math, primitives, config, logging, data streams, archives, scene queries, frame listeners, controllers.
-// Part of Ogre.i.
+// Part of Ogre.i. The python bindings build each part as a separate module, see Components/Python.
 
 /* these are ordered by dependancy */
 %include "OgreBuildSettings.h"

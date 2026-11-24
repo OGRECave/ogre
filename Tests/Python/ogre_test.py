@@ -1,15 +1,21 @@
-"""Tests of the Ogre Python bindings, run from the directory of the _Ogre module."""
+"""Tests of the Ogre Python bindings, run from the directory of the _Ogre<Part> modules."""
 
 import gc
+import importlib
 import os
 import sys
 import tempfile
+import types
 import unittest
 import weakref
 from pathlib import Path
 
 sys.path.insert(0, os.getcwd())
-import _Ogre as Ogre  # noqa: E402
+
+# the bindings are split into several native modules, combine them like the Ogre.py facade does
+Ogre = types.ModuleType("Ogre")
+for part in ("Core", "Resources", "Materials", "Animation", "Scene"):
+    Ogre.__dict__.update(vars(importlib.import_module("_Ogre" + part)))
 
 try:
     import _Bites as Bites  # noqa: E402

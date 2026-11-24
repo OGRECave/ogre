@@ -1,5 +1,5 @@
 // Ogre SWIG bindings: animations, skeletons, meshes.
-// Part of Ogre.i.
+// Part of Ogre.i. The python bindings build each part as a separate module, see Components/Python.
 
 %feature("director") Ogre::LodListener;
 %include "OgreLodListener.h"

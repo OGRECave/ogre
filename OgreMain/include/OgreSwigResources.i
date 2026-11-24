@@ -1,5 +1,5 @@
 // Ogre SWIG bindings: pixel formats, images, hardware buffers, vertex data, resources, textures, gpu programs.
-// Part of Ogre.i.
+// Part of Ogre.i. The python bindings build each part as a separate module, see Components/Python.
 
 ADD_REPR(ColourValue)
 %ignore Ogre::PixelUtil::unpackColour(ColourValue*, PixelFormat, const void*);

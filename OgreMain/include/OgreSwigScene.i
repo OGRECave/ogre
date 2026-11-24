@@ -1,5 +1,12 @@
 // Ogre SWIG bindings: movable objects, nodes, lights, cameras, entities, particles, level of detail, scene manager, root.
-// Part of Ogre.i.
+// Part of Ogre.i. The python bindings build each part as a separate module, see Components/Python.
+
+#ifdef OGRE_SWIG_PART
+// built as a separate module: these traits are generated with the templates in OgreSwigAnimation.i
+PTR_TRAITS(Ogre::Animation)
+PTR_TRAITS(Ogre::AnimationState)
+PTR_TRAITS(Ogre::StaticGeometry)
+#endif
 
 %include "OgreBillboard.h"
 %ignore Ogre::Particle::hasOwnDimensions ; // deprecated

@@ -1,5 +1,5 @@
 // Ogre SWIG bindings: materials, texture units, passes, compositors, render system, render targets, render queue.
-// Part of Ogre.i.
+// Part of Ogre.i. The python bindings build each part as a separate module, see Components/Python.
 
 %feature("director") Ogre::RenderObjectListener;
 %include "OgreRenderObjectListener.h"

@@ -41,6 +41,11 @@ using namespace Ogre;
 %include exception.i
 %include typemaps.i
 
+#ifdef OGRE_SWIG_PART
+// each part is a separate module, emit swig::traits before the PTR_TRAITS blocks use it
+%fragment("StdTraits");
+#endif
+
 #ifdef SWIGPYTHON
 // std::map<K, T*> and std::set<T*> need these for T, unless a vector/list of T* is instantiated first
 %define PTR_TRAITS(T)
