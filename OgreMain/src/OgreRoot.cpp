@@ -41,15 +41,11 @@ THE SOFTWARE.
 #include "OgrePlugin.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreResourceBackgroundQueue.h"
-#include "OgreBillboardSet.h"
-#include "OgreBillboardChain.h"
-#include "OgreRibbonTrail.h"
 #include "OgreConvexBody.h"
 #include "OgreTimer.h"
 #include "OgreFrameListener.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreFileSystemLayer.h"
-#include "OgreStaticGeometry.h"
 #include "OgreSceneManagerEnumerator.h"
 
 #if OGRE_NO_DDS_CODEC == 0

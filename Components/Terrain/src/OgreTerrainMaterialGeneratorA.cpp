@@ -31,18 +31,14 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreTextureUnitState.h"
-#include "OgreGpuProgramManager.h"
 #include "OgreShadowCameraSetupPSSM.h"
 #include "OgreLogManager.h"
-#include "OgreHighLevelGpuProgram.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
-#include "OgreTextureManager.h"
 
 #include "OgreShaderGenerator.h"
 #include "OgreTerrainRTShaderSRS.h"
 
-#include <fstream>
 #include <string>
 
 namespace Ogre

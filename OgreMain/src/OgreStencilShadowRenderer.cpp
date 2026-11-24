@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "OgreStableHeaders.h"
-#include "OgreRectangle2D.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
 
 namespace Ogre {

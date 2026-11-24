@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreDistanceLodStrategy.h"
 #include "OgreViewport.h"
 
-#include <limits>
 
 namespace Ogre {
     DistanceLodStrategyBase::DistanceLodStrategyBase(const String& name)

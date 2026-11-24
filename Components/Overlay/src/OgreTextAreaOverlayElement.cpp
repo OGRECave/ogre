@@ -25,8 +25,6 @@ THE SOFTWARE
 -------------------------------------------------------------------------*/
 
 #include "OgreTextAreaOverlayElement.h"
-#include "OgreRoot.h"
-#include "OgreLogManager.h"
 #include "OgreOverlayManager.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"

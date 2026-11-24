@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 #include "OgreBorderPanelOverlayElement.h"
 #include "OgreMaterialManager.h"
-#include "OgreOverlayManager.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreException.h"

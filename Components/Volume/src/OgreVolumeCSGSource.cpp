@@ -25,7 +25,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreVolumeCSGSource.h"
-#include <algorithm>
 
 namespace Ogre {
 namespace Volume {

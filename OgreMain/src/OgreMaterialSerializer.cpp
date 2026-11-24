@@ -30,10 +30,6 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreExternalTextureSourceManager.h"
-#include "OgreLodStrategyManager.h"
-#include "OgreDistanceLodStrategy.h"
-#include "OgreHighLevelGpuProgram.h"
 #include "OgreRoot.h"
 
 namespace Ogre

@@ -30,9 +30,6 @@ THE SOFTWARE.
 #include "OgreCamera.h"
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
-#include "OgreLogManager.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 #include "OgreRay.h"
 #include "OgreTerrainAutoUpdateLod.h"
 

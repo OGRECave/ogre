@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreHighLevelGpuProgram.h"
 
 namespace {
     enum Programs

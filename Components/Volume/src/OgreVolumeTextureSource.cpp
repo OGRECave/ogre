@@ -25,9 +25,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreVolumeTextureSource.h"
-#include "OgreTextureManager.h"
-#include "OgreHardwarePixelBuffer.h"
-#include "OgreColourValue.h"
+#include "OgreImage.h"
+#include "OgreResourceGroupManager.h"
 #include "OgreMemoryAllocatorConfig.h"
 #include "OgreLogManager.h"
 #include "OgreTimer.h"

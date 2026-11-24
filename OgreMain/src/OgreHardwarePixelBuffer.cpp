@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreHardwarePixelBuffer.h"
-#include "OgreImage.h"
 
 namespace Ogre 
 {

@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreOptimisedUtil.h"
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
-#include "OgrePixelCountLodStrategy.h"
+#include "OgreLodStrategy.h"
 #include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre {

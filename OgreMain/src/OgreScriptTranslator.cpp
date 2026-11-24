@@ -41,7 +41,6 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreParticleSystem.h"
-#include "OgreHighLevelGpuProgram.h"
 #include "OgreGpuProgramUsage.h"
 
 namespace Ogre{
