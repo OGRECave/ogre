@@ -27,12 +27,8 @@ THE SOFTWARE.
 */
 
 #include "OgreGLFrameBufferObject.h"
-#include "OgreGLPixelFormat.h"
-#include "OgreLogManager.h"
-#include "OgreStringConverter.h"
+#include <sstream>
 #include "OgreRoot.h"
-#include "OgreGLHardwarePixelBuffer.h"
-#include "OgreGLFBORenderTexture.h"
 #include "OgreGLDepthBufferCommon.h"
 #include "OgreGLRenderSystemCommon.h"
 

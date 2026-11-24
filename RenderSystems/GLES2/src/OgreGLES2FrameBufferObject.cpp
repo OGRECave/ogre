@@ -27,13 +27,10 @@ THE SOFTWARE.
 */
 
 #include "OgreGLES2FrameBufferObject.h"
-#include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLDepthBufferCommon.h"
-#include "OgreGLUtil.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreGLNativeSupport.h"
 #include <sstream>
 
 namespace Ogre {

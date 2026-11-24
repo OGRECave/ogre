@@ -26,18 +26,12 @@
  -----------------------------------------------------------------------------
  */
 
-#include "OgreRenderSystem.h"
-#include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusPixelFormat.h"
-#include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGL3PlusStateCacheManager.h"
 #include "OgreGL3PlusRenderSystem.h"
 
 #include "OgreRoot.h"
-#include "OgreGLSLProgramManager.h"
-#include "OgreGLSLMonolithicProgram.h"
-#include "OgreGLSLSeparableProgram.h"
 
 namespace Ogre {
     GL3PlusRenderBuffer::GL3PlusRenderBuffer(

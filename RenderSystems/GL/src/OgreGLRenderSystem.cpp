@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreFrustum.h"
 #include "OgreGLTextureManager.h"
 #include "OgreGLHardwareBuffer.h"
-#include "OgreDefaultHardwareBufferManager.h"
 #include "OgreGLUtil.h"
 #include "OgreGLGpuProgram.h"
 #include "OgreGLGpuNvparseProgram.h"

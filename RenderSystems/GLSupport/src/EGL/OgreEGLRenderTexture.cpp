@@ -37,7 +37,6 @@ THE SOFTWARE.
 #include "OgreEGLContext.h"
 #include "OgreEGLSupport.h"
 
-#include <iostream>
 #include <climits>
 
 namespace Ogre {

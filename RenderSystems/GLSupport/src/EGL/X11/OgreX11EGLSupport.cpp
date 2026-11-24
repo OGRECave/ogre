@@ -29,8 +29,6 @@ THE SOFTWARE.
 
 #include "OgreException.h"
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-#include "OgreRoot.h"
 
 #include "OgreX11EGLSupport.h"
 #include "OgreX11EGLWindow.h"

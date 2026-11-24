@@ -27,8 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreSPIRVShaderFactory.h"
-#include "OgreLogManager.h"
-#include "OgreGLSLExtSupport.h"
 
 
 namespace Ogre {

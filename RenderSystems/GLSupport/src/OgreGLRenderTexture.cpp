@@ -30,7 +30,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLHardwarePixelBufferCommon.h"
 #include "OgreGLRenderSystemCommon.h"
 #include "OgreRoot.h"
-#include "OgreViewport.h"
 
 namespace Ogre {
 

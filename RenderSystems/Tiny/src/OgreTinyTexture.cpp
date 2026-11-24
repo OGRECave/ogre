@@ -4,10 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "OgreTinyTexture.h"
-#include "OgreTinyRenderSystem.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreTinyHardwarePixelBuffer.h"
-#include "OgreBitwise.h"
 #include "OgreTextureManager.h"
 
 namespace Ogre {

@@ -33,8 +33,6 @@ THE SOFTWARE.
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreGLUtil.h"
-#include "OgreGLNativeSupport.h"
 
 namespace Ogre {
 

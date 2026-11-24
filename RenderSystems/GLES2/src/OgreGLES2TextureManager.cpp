@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreGLRenderTexture.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
-#include "OgreGLES2StateCacheManager.h"
 #include "OgreGLES2PixelFormat.h"
 
 namespace Ogre {

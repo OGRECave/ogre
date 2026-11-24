@@ -27,10 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreGLPBRenderTexture.h"
 #include "OgreGLContext.h"
-#include "OgreGLPixelFormat.h"
-#include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-#include "OgreRoot.h"
 #include "OgreGLHardwarePixelBuffer.h"
 #include "OgreGLNativeSupport.h"
 

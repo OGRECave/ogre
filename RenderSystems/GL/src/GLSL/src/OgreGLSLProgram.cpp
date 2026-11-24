@@ -30,14 +30,12 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreRenderSystemCapabilities.h"
 #include "OgreStringConverter.h"
-#include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreLogManager.h"
 
 #include "OgreGLSLProgram.h"
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLSLLinkProgramManager.h"
-#include "OgreGLSLPreprocessor.h"
 
 namespace Ogre {
     namespace GLSL {

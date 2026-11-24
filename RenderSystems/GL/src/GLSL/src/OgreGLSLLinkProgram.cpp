@@ -28,10 +28,8 @@ THE SOFTWARE.
 
 #include "OgreGLSLExtSupport.h"
 #include "OgreGLSLLinkProgram.h"
-#include "OgreStringConverter.h"
 #include "OgreGLSLProgram.h"
 #include "OgreGLSLLinkProgramManager.h"
-#include "OgreException.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreGLSLProgramCommon.h"
 

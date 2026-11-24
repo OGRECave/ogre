@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreGLRenderToVertexBuffer.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreGLHardwareBuffer.h"
 #include "OgreRenderable.h"
 #include "OgreRoot.h"

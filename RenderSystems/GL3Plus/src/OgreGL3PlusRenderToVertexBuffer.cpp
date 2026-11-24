@@ -27,12 +27,10 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreGL3PlusRenderToVertexBuffer.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreRenderable.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreGLSLProgramManager.h"
-#include "OgreGLSLShader.h"
 
 namespace Ogre {
 

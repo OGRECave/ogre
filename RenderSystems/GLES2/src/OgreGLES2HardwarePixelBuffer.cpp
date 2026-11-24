@@ -33,18 +33,11 @@ THE SOFTWARE.
 
 #include "OgreGLES2PixelFormat.h"
 #include "OgreGLES2FBORenderTexture.h"
-#include "OgreGLUtil.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRoot.h"
-#include "OgreGLSLESProgramManager.h"
-#include "OgreGLSLESLinkProgram.h"
-#include "OgreGLSLESProgramPipeline.h"
-#include "OgreBitwise.h"
-#include "OgreGLNativeSupport.h"
 #include "OgreGLES2HardwareBuffer.h"
 #include "OgreGLES2Texture.h"
-#include "OgreLogManager.h"
 
 namespace Ogre {
     void GLES2TextureBuffer::blitToMemory(const Box &srcBox, const PixelBox &dst)

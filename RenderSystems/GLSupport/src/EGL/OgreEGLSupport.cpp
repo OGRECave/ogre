@@ -29,13 +29,9 @@ THE SOFTWARE.
 
 #include "OgreException.h"
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-#include "OgreRoot.h"
 
-#include "OgreRenderSystem.h"
 
 #include "OgreEGLSupport.h"
-#include "OgreEGLWindow.h"
 #if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
 #include "OgreEGLRenderTexture.h"
 #endif

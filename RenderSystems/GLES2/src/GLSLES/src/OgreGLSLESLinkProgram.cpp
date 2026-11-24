@@ -31,11 +31,8 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramManager.h"
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"
-#include "OgreStringConverter.h"
 #include "OgreRoot.h"
-#include "OgreGLUtil.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreGLNativeSupport.h"
 
 namespace Ogre {
 
