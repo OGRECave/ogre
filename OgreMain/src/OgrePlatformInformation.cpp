@@ -632,6 +632,26 @@ namespace Ogre {
         return cpuID;
     }
 
+#elif OGRE_CPU == OGRE_CPU_WASM
+
+    //---------------------------------------------------------------------
+    static uint _detectCpuFeatures(void)
+    {
+        // WebAssembly has no runtime feature detection, whether SIMD is
+        // available is decided at compile time. The SSE feature is what the
+        // translated-to-wasm-SIMD OptimisedUtil implementation asks for.
+        uint features = 0;
+#if defined(__wasm_simd128__)
+        features |= PlatformInformation::CPU_FEATURE_SSE;
+#endif
+        return features;
+    }
+    //---------------------------------------------------------------------
+    static String _detectCpuIdentifier(void)
+    {
+        return "WebAssembly";
+    }
+
 #else   // OGRE_CPU == OGRE_CPU_MIPS
 
     //---------------------------------------------------------------------
@@ -716,6 +736,9 @@ namespace Ogre {
 #elif OGRE_CPU == OGRE_CPU_MIPS
         pLog->logMessage(
                 " *          MSA: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MSA), true));
+#elif OGRE_CPU == OGRE_CPU_WASM
+        pLog->logMessage(
+                " *          SSE: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE), true));
 #endif
         pLog->logMessage("-------------------------");
 

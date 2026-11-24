@@ -214,6 +214,12 @@ This will not build the full SampleBrowser, but just a minimal Sample. The resul
 
 To prevent any cross-origin issues, start a local webserver as `python3 -m http.server 8000` and visit http://localhost:8000.
 
+WebAssembly SIMD is disabled by default. Pass `-DOGRE_CONFIG_ENABLE_WASM_SIMD=ON` to enable it, which
+vectors the CPU vertex processing (software skinning, morphing and shadow volume extrusion) with
+128-bit SIMD. The resulting module then requires a browser with WebAssembly SIMD support
+(Chrome 91+, Firefox 89+, Safari 16.4+), so disable it if you need to support older browsers or
+ship two builds and pick one via `WebAssembly.validate`.
+
 iOS OS
 ------
 
