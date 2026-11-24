@@ -503,6 +503,15 @@ namespace Ogre {
         parent = pSkel->getBone(parentHandle);
         child = pSkel->getBone(childHandle);
 
+        // A malformed file can attach a bone below one of its own descendants. The
+        // resulting cycle makes derived transform updates recurse until the stack
+        // overflows, so reject it before modifying the graph.
+        for (const Node* p = parent; p; p = p->getParent())
+        {
+            if (p == child)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Bone parent cycle detected");
+        }
+
         // attach
         parent->addChild(child);
 
