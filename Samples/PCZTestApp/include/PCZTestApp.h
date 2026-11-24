@@ -45,6 +45,7 @@ public:
     void cleanupContent() override
     {
         raySceneQuery.reset();
+        targetMO = 0;
     }
 
     void createSceneManager(void) override
