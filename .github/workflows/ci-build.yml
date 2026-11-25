@@ -42,21 +42,33 @@ jobs:
         sudo pip3 install swig
     - uses: actions/checkout@v6
     - name: Build
+      id: build
       run: |
         cmake -P ci-build.cmake
         cmake --build build -- -j 4
-    - name: Test
+    # run all test steps after a successful build, even if a previous one failed
+    - name: Unit Tests
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: build/bin/Test_Ogre
+    - name: Visual Tests GL3+
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      working-directory: build/bin
+      run: ./TestContext -rs "OpenGL 3+ Rendering Subsystem"
+    - name: Visual Tests GLES2
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      working-directory: build/bin
+      run: ./TestContext -rs "OpenGL ES 2.x Rendering Subsystem"
+    - name: Python Tests
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      working-directory: build/lib
       run: |
-        # run unit tests
-        build/bin/Test_Ogre
-        # run visual tests
-        cd build/bin && ./TestContext -rs "OpenGL 3+ Rendering Subsystem"
-        ./TestContext -rs "OpenGL ES 2.x Rendering Subsystem"
         # verify that the python modules are loadable
-        cd ../lib && python -c "import _Ogre; import _RTShader; import _Bites"
+        python -c "import _Ogre; import _RTShader; import _Bites"
         # run the python tests, they import the modules from the current directory
         python ../../Tests/Python/ogre_test.py
-        cd ../../
+    - name: Tools Tests
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: |
         # validate XMLConverter output
         build/bin/OgreXMLConverter Samples/Media/models/ninja.mesh && build/bin/OgreXMLConverter Samples/Media/models/ninja.skeleton
         python3 Tools/XMLConverter/docs/validate.py Samples/Media/models/ninja.mesh.xml
