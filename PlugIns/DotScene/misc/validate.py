@@ -9,4 +9,6 @@ root = etree.parse(sys.argv[1])
 if dtd.validate(root):
     print("validation successful")
 else:
+    print("validation errors")
     print(dtd.error_log.filter_from_errors())
+    sys.exit(1)
