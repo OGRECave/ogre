@@ -16,7 +16,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y python3-lxml
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 2
     - name: Lint
@@ -40,7 +40,7 @@ jobs:
           mono-mcs python3-dev \
           python3-lxml python3-numpy
         sudo pip3 install swig
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Build
       id: build
       run: |
@@ -83,7 +83,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y libx11-dev texlive-binaries texlive-base graphviz doxygen
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Build
       run: |
         cmake -Bbuild -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none .
@@ -96,8 +96,8 @@ jobs:
   android:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v6
-    - uses: actions/cache@v5
+    - uses: actions/checkout@v7
+    - uses: actions/cache@v6
       with:
         path: android-ndk-r25c
         key: ${{ runner.os }}-android-ndk-r25c
@@ -127,7 +127,7 @@ jobs:
     steps:
     - name: Install Dependencies
       run: brew update && brew install sdl2 pugixml
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Build
       run: |
         cmake -P ci-build.cmake
@@ -139,7 +139,7 @@ jobs:
   ios:
     runs-on: macos-15
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Build
       run: |
         cmake -P ci-build.cmake
@@ -154,7 +154,7 @@ jobs:
         sudo apt update
         sudo apt install -y libwayland-dev libwayland-egl1 pkg-config libegl-dev \
           qtwayland5 qtbase5-private-dev
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Build
       run: |
         cmake -Bbuild -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none -DOGRE_CONFIG_DOUBLE=ON -DOGRE_ASSERT_MODE=1 -DOGRE_PROFILING=ON -DOGRE_USE_WAYLAND=ON -DOGRE_RESOURCEMANAGER_STRICT=0 .
@@ -165,16 +165,16 @@ jobs:
       # TODO: Remove once ilammy/msvc-dev-cmd is updated to support Node.js 24
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         toolset: 14.2
-    - uses: actions/setup-python@v6
+    - uses: actions/setup-python@v7
       with:
         python-version: '3.10'
     - name: Cache SDKs
       id: cache-sdks
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           C:\Qt
@@ -183,7 +183,7 @@ jobs:
           C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib
         key: sdks-qt-6.8.3-cg-3.1-dxsdk-jun10
     - name: Cache Cargo
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ~\.cargo\registry\index
@@ -207,7 +207,7 @@ jobs:
         Start-Process -Wait -FilePath .\DXSDK_Jun10.exe -ArgumentList "/U"
     - name: Cache Built Dependencies
       id: cache-folder
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: ogredeps
         key: cache-${{ hashFiles('CMake/Dependencies.cmake') }}
