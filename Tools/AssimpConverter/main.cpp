@@ -59,6 +59,7 @@ R"HELP(Usage: OgreAssimpConverter [options] sourcefile [destination]
   Converts 3D-formats supported by assimp to native OGRE formats
 
 Available options:
+-h                  = Display this help
 -q                  = Quiet mode, less output
 -log filename       = name of the log file (default: 'OgreAssimp.log')
 -aniSpeedMod [0..1] = Factor to scale the animation speed (default: 1.0)
@@ -96,6 +97,7 @@ AssOptions parseArgs(int numArgs, char** args)
     UnaryOptionList unOpt;
     BinaryOptionList binOpt;
 
+    unOpt["-h"] = false;
     unOpt["-q"] = false;
     unOpt["-3ds_ani_fix"] = false;
     binOpt["-log"] = opts.logFile;
@@ -104,6 +106,12 @@ AssOptions parseArgs(int numArgs, char** args)
     binOpt["-max_edge_angle"] = "30";
 
     int startIndex = findCommandLineOpts(numArgs, args, unOpt, binOpt);
+
+    if (unOpt["-h"])
+    {
+        help();
+        exit(0);
+    }
 
     if (unOpt["-q"])
     {

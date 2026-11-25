@@ -74,6 +74,7 @@ R"HELP(Usage: OgreXMLConverter [options] sourcefile [destfile]
   Converts data between XML and OGRE binary formats.
 
 Available options:
+-h             = Display this help
 -v             = Display version information
 -merge [n0,n1] = Merge texcoordn0 with texcoordn1. The , separator must be
                  present, otherwise only n0 is provided assuming n1 = n0+1;
@@ -135,7 +136,7 @@ XmlOptions parseArgs(int numArgs, char **args)
     if (unOpt["-h"])
     {
         help();
-        exit(1);
+        exit(0);
     }
     if (unOpt["-q"])
     {

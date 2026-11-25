@@ -56,6 +56,7 @@ R"HELP(Usage: OgreMeshUpgrader [opts] sourcefile [destfile]
 
   Upgrades or downgrades .mesh file versions.
 
+-h             = Display this help
 -v             = Display version information
 -pack          = Pack normals and tangents as int_10_10_10_2
 -optvtxcache   = Reorder the indexes to optimise vertex cache utilisation
@@ -451,6 +452,7 @@ int main(int numargs, char** args)
         unOptList["-byte"] = true; // this is the only option now, dont error if specified
         unOptList["-e"] = true; // this is default, dont error if specified
 
+        unOptList["-h"] = false;
         unOptList["-el"] = false;
         unOptList["-t"] = false;
         unOptList["-tm"] = false;
@@ -471,6 +473,12 @@ int main(int numargs, char** args)
         binOptList["-log"] = "OgreMeshUpgrader.log";
 
         int startIdx = findCommandLineOpts(numargs, args, unOptList, binOptList);
+
+        if (unOptList["-h"])
+        {
+            help();
+            return 0;
+        }
 
 		if (unOptList["-v"])
 		{
