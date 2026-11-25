@@ -194,7 +194,7 @@ jobs:
       run: |
         curl -LO https://sdk.lunarg.com/sdk/download/1.3.296.0/windows/VulkanSDK-1.3.296.0-Installer.exe
         .\VulkanSDK-1.3.296.0-Installer.exe --accept-licenses --default-answer --confirm-command install
-        pip install swig
+        pip install swig lxml
     - name: Install SDKs
       if: steps.cache-sdks.outputs.cache-hit != 'true'
       run: |
@@ -212,6 +212,7 @@ jobs:
         path: ogredeps
         key: cache-${{ hashFiles('CMake/Dependencies.cmake') }}
     - name: Build
+      id: build
       run: |
         cmake -P ci-build.cmake
         cmake --build build --config RelWithDebInfo --target INSTALL --parallel
@@ -221,10 +222,44 @@ jobs:
         DXSDK_DIR: C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)
         Cg_HOME: C:\Program Files (x86)\NVIDIA Corporation\Cg
         CMAKE_PREFIX_PATH: C:\Qt\6.8.3\msvc2022_64\
-    - name: Test
+    # run all test steps after a successful build, even if a previous one failed
+    - name: Unit Tests
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
       run: |
         $env:PATH += ";build\gtest\lib"
         build\bin\RelWithDebInfo\Test_Ogre.exe
+    - name: Visual Tests D3D11
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      # TODO: make blocking once fixed: PlayPen_BillboardAccurateFacing fails as the default
+      # BillboardSet material uses lighting, but billboards have no normals
+      continue-on-error: true
+      timeout-minutes: 15
+      working-directory: build/bin/RelWithDebInfo
+      run: ./TestContext.exe -rs "Direct3D11 Rendering Subsystem"
+    - name: Python Tests
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      timeout-minutes: 10
+      working-directory: build/lib/RelWithDebInfo
+      shell: bash
+      env:
+        OGRE_DLL_DIR: ${{ github.workspace }}\build\bin\RelWithDebInfo
+      run: |
+        # verify that the python modules are loadable
+        python -c "import os; os.add_dll_directory(os.environ['OGRE_DLL_DIR']); import _Ogre; import _RTShader; import _Bites"
+        # run the python tests, they import the modules from the current directory
+        python ../../../Tests/Python/ogre_test.py
+    - name: Tools Tests
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      shell: bash
+      run: |
+        BIN=build/bin/RelWithDebInfo
+        # validate XMLConverter output
+        $BIN/OgreXMLConverter.exe Samples/Media/models/ninja.mesh && $BIN/OgreXMLConverter.exe Samples/Media/models/ninja.skeleton
+        python Tools/XMLConverter/docs/validate.py Samples/Media/models/ninja.mesh.xml
+        # reverse conversion
+        $BIN/OgreXMLConverter.exe Samples/Media/models/ninja.mesh.xml
+        # MeshUpgrader does not crash
+        $BIN/OgreMeshUpgrader.exe Samples/Media/models/ninja.mesh
     - name: zip SDK
       id: package
       shell: bash
