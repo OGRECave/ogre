@@ -9,6 +9,22 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y python3-lxml
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 2
+    - name: Lint
+      run: |
+        # check whitespace
+        git diff --check HEAD^
+        # validate DotScene DTD
+        python3 PlugIns/DotScene/misc/validate.py PlugIns/DotScene/misc/example.scene
   linux:
     runs-on: ubuntu-22.04
     steps:
@@ -25,8 +41,6 @@ jobs:
           python3-lxml python3-numpy texlive-binaries texlive-base graphviz doxygen
         sudo pip3 install swig
     - uses: actions/checkout@v6
-      with:
-        fetch-depth: 2
     - name: Build
       run: |
         cmake -P ci-build.cmake
@@ -54,10 +68,6 @@ jobs:
         build/bin/OgreXMLConverter Samples/Media/models/ninja.mesh.xml
         # MeshUpgrader does not crash
         build/bin/OgreMeshUpgrader Samples/Media/models/ninja.mesh
-        # validate DotScene DTD
-        python3 PlugIns/DotScene/misc/validate.py PlugIns/DotScene/misc/example.scene
-        # check whitespace
-        git diff --check HEAD^
   android:
     runs-on: ubuntu-22.04
     steps:
