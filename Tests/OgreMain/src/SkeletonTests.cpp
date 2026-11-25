@@ -7,6 +7,7 @@
 
 #include "RootWithoutRenderSystemFixture.h"
 
+#include "OgreBone.h"
 #include "OgreEntity.h"
 #include "OgreMesh.h"
 #include "OgreMeshManager.h"
@@ -41,4 +42,22 @@ TEST_F(SkeletonTests, MeshWithSkeletonDestroyedAfterRoot)
 
     // drop Root while the fixture, and with it the Mesh and its Skeleton, live on
     mRoot.reset();
+}
+
+TEST_F(SkeletonTests, boneParentCycleRejected)
+{
+    auto skeleton = SkeletonManager::getSingleton().create("Cycle", RGN_DEFAULT, true);
+    skeleton->prepare();
+    auto a = skeleton->createBone();
+    auto b = skeleton->createBone();
+    auto c = skeleton->createBone();
+
+    a->addChild(b);
+    b->addChild(c);
+    EXPECT_THROW(c->addChild(a), Exception); // a -> b -> c -> a
+    EXPECT_THROW(a->addChild(a), Exception);
+    EXPECT_FALSE(a->getParent());
+
+    // would recurse endlessly if the cycle had been accepted
+    c->_getDerivedPosition();
 }

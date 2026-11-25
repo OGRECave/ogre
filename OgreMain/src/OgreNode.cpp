@@ -278,6 +278,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::addChild(Node* child)
     {
+        // a child that is already one of our ancestors (or ourselves) would create a cycle
+        for (const Node* n = this; n; n = n->mParent)
+        {
+            if (n == child)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "Node '" + child->getName() + "' cannot be added as child of '" + getName() +
+                                "', as it is an ancestor of it");
+        }
+
         if (child->mParent)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
