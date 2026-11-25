@@ -158,7 +158,7 @@ struct _OgreLodExport LodData {
     };
 
     struct IndexBufferInfo {
-        size_t indexSize;
+        HardwareIndexBuffer::IndexType indexType;
         size_t indexCount;
         IndexBufferPointer buf; /// Used by output providers only!
         size_t prevOnlyIndexCount; /// Used by output providers only!
