@@ -489,7 +489,7 @@ int main(int numargs, char** args)
         if(numargs < 2 || numargs == startIdx)
         {
             help();
-            return -1;
+            return 1;
         }
 
         auto opts = parseOpts(unOptList, binOptList);
