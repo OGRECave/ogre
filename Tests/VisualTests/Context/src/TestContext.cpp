@@ -146,6 +146,8 @@ void TestContext::setup()
     // timestamp for the filename
     char temp[25];
     strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
+    // used in paths, so it must not contain ':' for Windows
+    Ogre::String filestamp = Ogre::String(temp);
 
     // A nicer formatted version for display.
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
@@ -153,7 +155,6 @@ void TestContext::setup()
 
     if(mOutputDir.empty())
     {
-        Ogre::String filestamp = Ogre::String(temp);
         // name for this batch (used for naming the directory, and uniquely identifying this batch)
         batchName = mTestSetName + "_" + filestamp;
 
