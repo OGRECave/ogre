@@ -28,12 +28,47 @@
 
 #include "OgreGLSLSeparableProgram.h"
 #include "OgreGLSLShader.h"
+#include "OgreLogManager.h"
 #include "OgreGLSLProgramManager.h"
 #include "OgreGLUniformCache.h"
 #include "OgreGL3PlusStateCacheManager.h"
 
 namespace Ogre
 {
+    /** Warn when a separable program mixes stages across the GLSL 410
+        explicit-varying-location boundary.
+
+        `GLSL_GL3Support.glsl` gives the varyings a `layout(location)` from
+        GLSL 410 on, where `ARB_separate_shader_objects` became core.  A 410+
+        stage need not use the unified macros, so this is only a possibility:
+        if it does and another stage is older, the separately linked stages
+        leave the unqualified varyings undefined and the frame renders black.
+        A monolithic link matches the interface by name, so it is not affected.
+    */
+    static void warnOnMixedInterfaceLocations(const GLShaderList& shaders,
+                                              const String& programName)
+    {
+        int firstVersion = -1;
+        for (auto shader : shaders)
+        {
+            if (!shader)
+                continue;
+
+            const int version =
+                static_cast<GLSLShader*>(shader)->getShaderVersion();
+            if (firstVersion < 0)
+                firstVersion = version;
+            else if ((version >= 410) != (firstVersion >= 410))
+            {
+                LogManager::getSingleton().stream(LML_WARNING)
+                    << "GLSL program: possible varying location mismatch between "
+                       "shader stages: avoid mixing #version 410+ and below:\n"
+                    << programName;
+                return;
+            }
+        }
+    }
+
     GLSLSeparableProgram::GLSLSeparableProgram(const GLShaderList& shaders) :
         GLSLProgram(shaders)
     {
@@ -46,6 +81,8 @@ namespace Ogre
 
     void GLSLSeparableProgram::compileAndLink()
     {
+        warnOnMixedInterfaceLocations(mShaders, getCombinedName());
+
         // Ensure no monolithic programs are in use.
         OGRE_CHECK_GL_ERROR(glUseProgram(0));
         OGRE_CHECK_GL_ERROR(glGenProgramPipelines(1, &mGLProgramPipelineHandle));
