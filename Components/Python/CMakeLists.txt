@@ -20,6 +20,13 @@ if(SWIG_VERSION VERSION_LESS "4.1")
     list(APPEND CMAKE_SWIG_FLAGS -Dfinal)
 endif()
 
+# SWIG 4.5 can emit PEP 484 stubs. With -builtin the proxy module has no
+# Python-level class or function definitions for type checkers to inspect,
+# so the stub is the only source of type information.
+if(SWIG_VERSION VERSION_GREATER_EQUAL "4.5")
+    list(APPEND CMAKE_SWIG_FLAGS -pyi)
+endif()
+
 if (APPLE AND NOT ANDROID)
     # we are using libc++ on OSX
     list(APPEND CMAKE_SWIG_FLAGS -D_LIBCPP_VERSION)
@@ -34,6 +41,9 @@ macro(ogre_python_module target)
     set_target_properties(${target} PROPERTIES DEBUG_POSTFIX "")
     install(TARGETS ${target} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
     install(FILES ${PROJECT_BINARY_DIR}/Components/Python/${target}.py DESTINATION ${PYTHON_SITE_PACKAGES})
+    if(SWIG_VERSION VERSION_GREATER_EQUAL "4.5")
+        install(FILES ${PROJECT_BINARY_DIR}/Components/Python/${target}.pyi DESTINATION ${PYTHON_SITE_PACKAGES})
+    endif()
 endmacro()
 
 if(MSVC)
@@ -63,7 +73,7 @@ swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
 ogre_python_module(Ogre)
 
 # always install pure python modules
-install(FILES __init__.py Numpy.py HighPy.py DESTINATION ${PYTHON_SITE_PACKAGES})
+install(FILES __init__.py Numpy.py HighPy.py py.typed DESTINATION ${PYTHON_SITE_PACKAGES})
 
 if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     set_source_files_properties(../RTShaderSystem/include/OgreRTShader.i PROPERTIES CPLUSPLUS ON SWIG_MODULE_NAME RTShader)
