@@ -17,7 +17,7 @@ jobs:
       run: docker build SDK -t pypi
     - name: Build
       run: |
-        docker run -e PYVER=${{ matrix.pyver }} -e SKBUILD_BUILD_OPTIONS=-j4 --rm -v `pwd`:/workspace pypi
+        docker run -e PYVER=${{ matrix.pyver }} -e SKBUILD_BUILD_OPTIONS=-j$(nproc) --rm -v `pwd`:/workspace pypi
         f=`ls *.whl`
         mv $f ${f/linux/manylinux_2_28}
         pip3 install twine pypi-attestations

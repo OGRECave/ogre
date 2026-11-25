@@ -45,7 +45,7 @@ jobs:
       id: build
       run: |
         cmake -P ci-build.cmake
-        cmake --build build -- -j 4
+        cmake --build build -- -j $(nproc)
     # run all test steps after a successful build, even if a previous one failed
     - name: Unit Tests
       if: ${{ !cancelled() && steps.build.outcome == 'success' }}
@@ -106,7 +106,7 @@ jobs:
     - name: Build
       run: |
         cmake -P ci-build.cmake
-        cmake --build build -- -j 4
+        cmake --build build -- -j $(nproc)
       env:
         ANDROID: true
     - name: zip SDK
@@ -158,7 +158,7 @@ jobs:
     - name: Build
       run: |
         cmake -Bbuild -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none -DOGRE_CONFIG_DOUBLE=ON -DOGRE_ASSERT_MODE=1 -DOGRE_PROFILING=ON -DOGRE_USE_WAYLAND=ON -DOGRE_RESOURCEMANAGER_STRICT=0 .
-        cmake --build build -- -j 4
+        cmake --build build -- -j $(nproc)
   windows:
     runs-on: windows-2022
     env:
