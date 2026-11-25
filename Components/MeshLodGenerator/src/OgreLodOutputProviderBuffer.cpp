@@ -76,9 +76,11 @@ namespace Ogre
 
     HardwareIndexBufferPtr LodOutputProviderBuffer::createIndexBufferImpl(size_t indexCount)
     {
-        auto indexType = indexCount - 1 <= std::numeric_limits<uint16>::max() ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT;
+        // See LodOutputProviderMesh::createIndexBufferImpl: always allocate 32-bit indices so
+        // that the element size used for the allocation matches the element size used by the
+        // write path, regardless of the source index buffer type.
         DefaultHardwareBufferManagerBase bfrMgr;
-        return bfrMgr.createIndexBuffer(indexType, indexCount, HBU_CPU_ONLY);
+        return bfrMgr.createIndexBuffer(HardwareIndexBuffer::IT_32BIT, indexCount, HBU_CPU_ONLY);
     }
 
     void LodOutputProviderBuffer::createSubMeshLodIndexData(size_t subMeshIndex, int lodIndex, const HardwareIndexBufferPtr & indexBuffer, size_t indexStart, size_t indexCount)
