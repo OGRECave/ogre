@@ -38,19 +38,15 @@ jobs:
           libsdl2-dev nvidia-cg-dev glslang-dev spirv-tools spirv-headers \
           libvulkan-dev libvulkan-volk-dev \
           mono-mcs python3-dev \
-          python3-lxml python3-numpy texlive-binaries texlive-base graphviz doxygen
+          python3-lxml python3-numpy
         sudo pip3 install swig
     - uses: actions/checkout@v6
     - name: Build
       run: |
         cmake -P ci-build.cmake
         cmake --build build -- -j 4
-        cmake --build build --target OgreDoc > /dev/null
     - name: Test
       run: |
-        # doxygen warnings check
-        cat build/doxygen_warnings.log
-        test ! -s build/doxygen_warnings.log
         # run unit tests
         build/bin/Test_Ogre
         # run visual tests
@@ -68,6 +64,23 @@ jobs:
         build/bin/OgreXMLConverter Samples/Media/models/ninja.mesh.xml
         # MeshUpgrader does not crash
         build/bin/OgreMeshUpgrader Samples/Media/models/ninja.mesh
+  docs:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y libx11-dev texlive-binaries texlive-base graphviz doxygen
+    - uses: actions/checkout@v6
+    - name: Build
+      run: |
+        cmake -Bbuild -DOGRE_BUILD_DEPENDENCIES=OFF -DSWIG_EXECUTABLE=none .
+        cmake --build build --target OgreDoc > /dev/null
+    - name: Test
+      run: |
+        # doxygen warnings check
+        cat build/doxygen_warnings.log
+        test ! -s build/doxygen_warnings.log
   android:
     runs-on: ubuntu-22.04
     steps:
