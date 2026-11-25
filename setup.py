@@ -91,7 +91,7 @@ def main():
         long_description=long_description,
         long_description_content_type="text/markdown",
         packages=["Ogre"],
-        package_data={},
+        package_data={"Ogre": ["py.typed", "*.pyi"]},
         maintainer="Pavel Rojtberg",
         ext_modules=EmptyListWithLength(),
         python_requires=">=3.6",
