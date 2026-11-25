@@ -102,7 +102,7 @@ Trusted by commercial studios and open-source communities for games, simulators,
 ## Join Our Community
 We believe in the power of collaboration.
 
-* **Engine Programming Q&A**: Ask technical questions in our [Forums](http://forums.ogre3d.org/) or on [Gitter](https://gitter.im/OGRECave/ogre).
+* **Engine Programming Q&A**: Ask technical questions in our [Forums](http://forums.ogre3d.org/) or on [Zulip](https://ogre3d.zulipchat.com/).
 * **Contribute**: Check out [good first issues](https://github.com/OGRECave/ogre/labels/good%20first%20issue) to get started. We welcome everything from bug fixes to new features.
 * **Support the project** via [Patreon](https://www.patreon.com/ogre1) to help fund continued development.
 
