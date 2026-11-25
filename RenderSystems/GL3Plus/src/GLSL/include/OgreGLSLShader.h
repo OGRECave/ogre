@@ -45,6 +45,10 @@ namespace Ogre {
                    const String& group, bool isManual, ManualResourceLoader* loader);
 		~GLSLShader();
 
+        /// The GLSL version this stage resolved to: its `#version`, or the
+        /// native version when it used the native version directive.
+        int getShaderVersion() const { return mShaderVersion; }
+
         void attachToProgramObject(const GLuint programObject) override;
         void detachFromProgramObject(const GLuint programObject) override;
 
