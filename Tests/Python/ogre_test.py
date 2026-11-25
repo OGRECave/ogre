@@ -9,6 +9,9 @@ import weakref
 from pathlib import Path
 
 sys.path.insert(0, os.getcwd())
+# Python 3.8+ on Windows ignores PATH when loading the DLLs of extension modules
+if "OGRE_DLL_DIR" in os.environ:
+    os.add_dll_directory(os.environ["OGRE_DLL_DIR"])
 import _Ogre as Ogre  # noqa: E402
 
 try:
