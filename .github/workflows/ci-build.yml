@@ -5,6 +5,9 @@ on:
     tags: ["v*"]
   pull_request:
     branches: [master]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   linux:
     runs-on: ubuntu-22.04
