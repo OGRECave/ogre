@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __Vector_H__
 
 
+#include "OgrePlatform.h"
 #include "OgrePrerequisites.h"
 #include "OgreMath.h"
 #include "OgreQuaternion.h"
@@ -68,8 +69,11 @@ namespace Ogre
     template <> struct _OgreExport VectorBase<2, Real>
     {
         VectorBase() {}
-        constexpr VectorBase(Real _x, Real _y) : x(_x), y(_y) {}
-        Real x, y;
+        constexpr VectorBase(Real _x, Real _y) : data{_x,_y} {}
+        union {
+			struct { Real x, y; };
+			Real data[2];
+		};
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
 
@@ -128,8 +132,11 @@ namespace Ogre
     template <> struct _OgreExport VectorBase<3, Real>
     {
         VectorBase() {}
-        constexpr VectorBase(Real _x, Real _y, Real _z) : x(_x), y(_y), z(_z) {}
-        Real x, y, z;
+        constexpr VectorBase(Real _x, Real _y, Real _z) : data{_x, _y, _z} {}
+        union {
+			struct { Real x, y, z; };
+			Real data[3];
+		};
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
 
@@ -257,8 +264,11 @@ namespace Ogre
     template <> struct _OgreExport VectorBase<4, Real>
     {
         VectorBase() {}
-        constexpr VectorBase(Real _x, Real _y, Real _z, Real _w) : x(_x), y(_y), z(_z), w(_w) {}
-        Real x, y, z, w;
+        constexpr VectorBase(Real _x, Real _y, Real _z, Real _w) : data{_x, _y, _z, _w} {}
+        union {
+			struct { Real x, y, z, w; };
+			Real data[4];
+		};
         Real* ptr() { return &x; }
         const Real* ptr() const { return &x; }
 
@@ -278,6 +288,7 @@ namespace Ogre
     {
     public:
         using VectorBase<dims, T>::ptr;
+        using VectorBase<dims, T>::data;
 
         /** Default constructor.
             @note It does <b>NOT</b> initialize the vector for efficiency.
@@ -300,7 +311,6 @@ namespace Ogre
         template<typename U>
         explicit Vector(const Vector<dims, U>& o) : Vector(o.ptr()) {}
 
-
         explicit Vector(T s)
         {
             for (int i = 0; i < dims; i++)
@@ -320,10 +330,10 @@ namespace Ogre
             return Vector<2, T>(ptr());
         }
 
-        T operator[](size_t i) const
+        OGRE_CPP20_CONSTEXPR T operator[](size_t i) const
         {
             assert(i < dims);
-            return ptr()[i];
+            return data[i];
         }
 
         T& operator[](size_t i)
@@ -332,10 +342,10 @@ namespace Ogre
             return ptr()[i];
         }
 
-        bool operator==(const Vector& v) const
+        OGRE_CPP20_CONSTEXPR bool operator==(const Vector& v) const
         {
             for (int i = 0; i < dims; i++)
-                if (ptr()[i] != v[i])
+                if (data[i] != v[i])
                     return false;
             return true;
         }
@@ -354,15 +364,15 @@ namespace Ogre
             return true;
         }
 
-        bool operator!=(const Vector& v) const { return !(*this == v); }
+        OGRE_CPP20_CONSTEXPR bool operator!=(const Vector& v) const { return !(*this == v); }
 
         /** Returns true if the vector's scalar components are all greater
             that the ones of the vector it is compared against.
         */
-        bool operator<(const Vector& rhs) const
+        OGRE_CPP20_CONSTEXPR bool operator<(const Vector& rhs) const
         {
             for (int i = 0; i < dims; i++)
-                if (!(ptr()[i] < rhs[i]))
+                if (!(data[i] < rhs[i]))
                     return false;
             return true;
         }
@@ -370,10 +380,10 @@ namespace Ogre
         /** Returns true if the vector's scalar components are all smaller
             that the ones of the vector it is compared against.
         */
-        bool operator>(const Vector& rhs) const
+        OGRE_CPP20_CONSTEXPR bool operator>(const Vector& rhs) const
         {
             for (int i = 0; i < dims; i++)
-                if (!(ptr()[i] > rhs[i]))
+                if (!(data[i] > rhs[i]))
                     return false;
             return true;
         }
