@@ -140,6 +140,11 @@ jobs:
     runs-on: macos-15
     steps:
     - uses: actions/checkout@v7
+    - name: Cache Built Dependencies
+      uses: actions/cache@v6
+      with:
+        path: ogredeps
+        key: ios-deps-${{ hashFiles('CMake/Dependencies.cmake', 'CMake/toolchain/ios.toolchain.xcode.cmake') }}
     - name: Build
       run: |
         cmake -P ci-build.cmake
