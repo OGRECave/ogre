@@ -176,7 +176,7 @@ int main(int numargs, char** args)
     if (numargs < 2)
     {
         help();
-        return -1;
+        return 1;
     }
 
     // Assume success
