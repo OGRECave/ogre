@@ -542,13 +542,10 @@ int main(int argc, char *argv[])
     }
     catch (Ogre::Exception& e)
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        MessageBoxA(NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_ICONERROR | MB_TASKMODAL);
-#else
+        // no MessageBox on Windows, as it would block automated runs
         std::cerr << "An exception has occurred: " << e.getFullDescription().c_str() << std::endl;
 
         return -1;
-#endif
     }
 
     return !tc.wasSuccessful();
