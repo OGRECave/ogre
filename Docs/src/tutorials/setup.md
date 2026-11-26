@@ -74,6 +74,26 @@ The second group of shared libraries are the plugins. %Ogre pushes a good portio
 On Windows, the library and configuration files for %Ogre can be found in the @c bin folder of the SDK.
 On Unix they are split into @c share/OGRE for configuration files, @c lib/ for libraries and  @c lib/OGRE for Plugins.
 
+## Running without a display {#setupHeadless}
+
+On Linux with the EGL backend you do not need `xvfb-run` to run an application on a machine without a display.
+If `DISPLAY` is unset or points to a server that does not exist, %Ogre renders into an EGL pbuffer instead of a window:
+
+```sh
+# before
+xvfb-run ./your_app --args
+
+# after
+DISPLAY=:123 ./your_app --args
+```
+
+@note A GLX-only build still requires a display.
+
+OgreBites::ApplicationContext uses SDL for windowing and input, so it still needs a video driver.
+For applications that only need the rendered image, derive from OgreBites::ApplicationContextBase or use Ogre::Root directly, and render into a texture created with Ogre::TU_RENDERTARGET.
+Ogre::RenderTarget::writeContentsToFile saves the result as an image, while Ogre::RenderTarget::copyContentsToMemory gives you the pixels.
+`Samples/Python/numpy_sample.ipynb` demonstrates this in Python.
+
 ## Configuration Files
 
 %Ogre uses several configuration files (\*.cfg) in the INI format. They control things like which plugins are loaded and where your application will search for resource files. We will briefly introduce you to each of these files. You'll slowly read more about them as you progress through the tutorials as well.
