@@ -449,6 +449,18 @@ TEST_F(MeshTests, EntityAfterMeshUnload)
     EXPECT_GT(entity->getNumSubEntities(), 0u);
 }
 
+TEST_F(MeshTests, CurvedPlaneOddSegmentsCentred)
+{
+    // single segment: the 4 corners are equidistant from the centre, so equally bent
+    MeshPtr mesh = MeshManager::getSingleton().createCurvedPlane(
+        "CurvedPlane", RGN_DEFAULT, Plane(Vector3::UNIT_Z, 0), 2, 2, 1, 1, 1, false, 0);
+
+    float pos[4][3];
+    mesh->sharedVertexData->vertexBufferBinding->getBuffer(0)->readData(0, sizeof(pos), pos);
+    for (auto& p : pos)
+        EXPECT_FLOAT_EQ(p[2], pos[0][2]);
+}
+
 typedef RootWithoutRenderSystemFixture SubMeshTests;
 TEST_F(SubMeshTests, ExtremesFromSharedVertices)
 {

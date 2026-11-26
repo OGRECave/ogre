@@ -678,8 +678,8 @@ namespace Ogre {
                 vec.y = (y * ySpace) - halfHeight;
 
                 // Here's where curved plane is different from standard plane.  Amazing, I know.
-                diff_x = (x - ((params.xsegments) / 2)) / static_cast<Real>((params.xsegments));
-                diff_y = (y - ((params.ysegments) / 2)) / static_cast<Real>((params.ysegments));
+                diff_x = Real(x) / params.xsegments - 0.5f;
+                diff_y = Real(y) / params.ysegments - 0.5f;
                 dist = std::sqrt(diff_x*diff_x + diff_y * diff_y );
                 vec.z = (-std::sin((1-dist) * (Math::PI/2)) * params.curvature) + params.curvature;
 
