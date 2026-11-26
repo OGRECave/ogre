@@ -406,6 +406,15 @@ namespace Ogre {
         mGLDisplay = val;
     }
 
+    void EGLSupport::releaseGLDisplay()
+    {
+        if (mGLDisplay != EGL_NO_DISPLAY)
+        {
+            eglTerminate(mGLDisplay);
+            mGLDisplay = EGL_NO_DISPLAY;
+        }
+    }
+
     GLPBuffer* EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN

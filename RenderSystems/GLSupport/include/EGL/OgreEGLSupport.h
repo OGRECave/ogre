@@ -81,6 +81,8 @@ namespace Ogre {
 
             bool hasEGL15;
             void initialiseExtensions();
+            /// terminate the display before the native one it was created from is closed
+            void releaseGLDisplay();
         public:
             EGLSupport(int profile);
 

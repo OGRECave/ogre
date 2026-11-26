@@ -67,17 +67,12 @@ void WaylandEGLSupport::doInit()
 
 WaylandEGLSupport::~WaylandEGLSupport()
 {
-    if (mNativeDisplay)
-    {
-        if (!mIsExternalDisplay)
-        {
-            wl_display_disconnect(mNativeDisplay);
-        }
-    }
+    // EGL keeps using the Wayland connection the display was created from.
+    releaseGLDisplay();
 
-    if (mGLDisplay)
+    if (mNativeDisplay && !mIsExternalDisplay)
     {
-        eglTerminate(mGLDisplay);
+        wl_display_disconnect(mNativeDisplay);
     }
 }
 
