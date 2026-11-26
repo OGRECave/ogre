@@ -97,14 +97,13 @@ namespace Ogre {
 
     X11EGLSupport::~X11EGLSupport()
     {
+        // EGL keeps using the X connection the display was created from, so the
+        // display has to be released before the connection is closed.
+        releaseGLDisplay();
+
         if (mNativeDisplay)
         {
             XCloseDisplay((Display*)mNativeDisplay);
-        }
-
-        if (mGLDisplay)
-        {
-            eglTerminate(mGLDisplay);
         }
     }
 
