@@ -528,7 +528,7 @@ namespace Ogre {
     void PixelUtil::unpackColour(uint8 *r, uint8 *g, uint8 *b, uint8 *a, PixelFormat pf,  const void* src)
     {
         const PixelFormatDescription &des = getDescriptionFor(pf);
-        if(des.flags & PFF_NATIVEENDIAN) {
+        if(isBitmaskPacked(des)) {
             // Shortcut for integer formats unpacking
             const unsigned int value = Bitwise::intRead(src, des.elemBytes);
             if(des.flags & PFF_LUMINANCE)
@@ -566,7 +566,7 @@ namespace Ogre {
         PixelFormat pf,  const void* src)
     {
         const PixelFormatDescription &des = getDescriptionFor(pf);
-        if(des.flags & PFF_NATIVEENDIAN) {
+        if(isBitmaskPacked(des)) {
             // Shortcut for integer formats unpacking
             const unsigned int value = Bitwise::intRead(src, des.elemBytes);
             if(des.flags & PFF_LUMINANCE)
