@@ -421,10 +421,15 @@ namespace Ogre {
     /*************************************************************************
     * Pixel packing/unpacking utilities
     */
+    /// formats described by bit masks, that fit the 32 bit packing below
+    static bool isBitmaskPacked(const PixelFormatDescription& des)
+    {
+        return (des.flags & PFF_NATIVEENDIAN) && des.elemBytes <= 4;
+    }
     void PixelUtil::packColour(const uint8 r, const uint8 g, const uint8 b, const uint8 a, const PixelFormat pf,  void* dest)
     {
         const PixelFormatDescription &des = getDescriptionFor(pf);
-        if(des.flags & PFF_NATIVEENDIAN) {
+        if(isBitmaskPacked(des)) {
             // Shortcut for integer formats packing
             unsigned int value = ((Bitwise::fixedToFixed(r, 8, des.rbits)<<des.rshift) & des.rmask) |
                 ((Bitwise::fixedToFixed(g, 8, des.gbits)<<des.gshift) & des.gmask) |
@@ -442,7 +447,7 @@ namespace Ogre {
     {
         // Catch-it-all here
         const PixelFormatDescription &des = getDescriptionFor(pf);
-        if(des.flags & PFF_NATIVEENDIAN) {
+        if(isBitmaskPacked(des)) {
             // Do the packing
             //std::cerr << dest << " " << r << " " << g <<  " " << b << " " << a << std::endl;
             const unsigned int value = ((Bitwise::floatToFixed(r, des.rbits)<<des.rshift) & des.rmask) |

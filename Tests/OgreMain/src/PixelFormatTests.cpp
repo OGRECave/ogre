@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include <cstdlib>
 #include <iomanip>
 #include "OgreBitwise.h"
+#include "OgreException.h"
 
 
 // Register the test suite
@@ -115,6 +116,13 @@ TEST_F(PixelFormatTests,FloatGRChannelOrder)
     EXPECT_EQ(dst, src);
     PixelUtil::unpackColour(dst, PF_FLOAT16_GR, data16);
     EXPECT_EQ(dst, src);
+}
+//--------------------------------------------------------------------------
+TEST_F(PixelFormatTests,WideFormatsNotPacked)
+{
+    // more than 32 bits per pixel, must not be silently skipped
+    uint16 data[4] = {};
+    EXPECT_THROW(PixelUtil::packColour(ColourValue::White, PF_R16G16B16A16_SNORM, data), UnimplementedException);
 }
 //--------------------------------------------------------------------------
 // Pure 32 bit float precision brute force pixel conversion; for comparison
