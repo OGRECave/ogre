@@ -369,9 +369,13 @@ namespace Ogre {
         assert (mGLDisplay);
 
         const char* propStr = eglQueryString(mGLDisplay, EGL_VENDOR);
+        if (!propStr)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "eglQueryString(EGL_VENDOR) failed");
         LogManager::getSingleton().stream() << "EGL_VENDOR = " << propStr;
 
         propStr = eglQueryString(mGLDisplay, EGL_VERSION);
+        if (!propStr)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "eglQueryString(EGL_VERSION) failed");
         LogManager::getSingleton().stream() << "EGL_VERSION = " << propStr;
 
         hasEGL15 = String(propStr).find("1.5") != String::npos;
@@ -385,7 +389,8 @@ namespace Ogre {
 
         // display extension
         propStr = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
-        ext << propStr;
+        if(propStr)
+            ext << propStr;
 
         LogManager::getSingleton().stream() << "EGL_EXTENSIONS = " << ext.str();
 
