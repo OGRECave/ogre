@@ -431,6 +431,12 @@ namespace Ogre
 
             ImportData& operator=(const ImportData& rhs)
             {
+                if (this == &rhs)
+                    return *this;
+
+                // free any data we own before taking rhs's
+                destroy();
+
                 // basic copy
                 terrainAlign = rhs.terrainAlign;
                 terrainSize = rhs.terrainSize;
