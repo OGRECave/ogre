@@ -58,6 +58,8 @@ THE SOFTWARE.
 #include "OgreBillboardSet.h"
 #include "OgreBillboard.h"
 #include "OgreParticleEmitter.h"
+#include "OgreParticleSystemManager.h"
+#include "OgreParticleSystemRenderer.h"
 #include "OgrePredefinedControllers.h"
 #include "OgreAutoParamDataSource.h"
 
@@ -1160,6 +1162,19 @@ TEST(ParticleEmitter, AngleAbove180EmitsInAllDirections)
     }
 
     Math::SetRandomValueProvider(NULL);
+}
+
+typedef RootWithoutRenderSystemFixture ParticleSystemTests;
+TEST_F(ParticleSystemTests, SelfAssignmentKeepsSettings)
+{
+    ParticleSystemManager::getSingleton()._initialise();
+    ParticleSystem ps("ps", RGN_DEFAULT);
+    ps.getRenderer()->setParameter("billboard_type", "oriented_self");
+
+    ParticleSystem& alias = ps;
+    ps = alias;
+
+    EXPECT_EQ(ps.getRenderer()->getParameter("billboard_type"), "oriented_self");
 }
 
 TEST(ConfigFile, MissingKeyReturnsDefault)
