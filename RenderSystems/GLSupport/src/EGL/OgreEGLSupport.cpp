@@ -408,11 +408,14 @@ namespace Ogre {
 
     void EGLSupport::releaseGLDisplay()
     {
-        if (mGLDisplay != EGL_NO_DISPLAY)
+        // A display obtained from the default native display is process-wide and
+        // shared by every render system plugin. EGL does not reference count it,
+        // so terminating it here would pull it from under the others.
+        if (mGLDisplay != EGL_NO_DISPLAY && mNativeDisplay != EGL_DEFAULT_DISPLAY)
         {
             eglTerminate(mGLDisplay);
-            mGLDisplay = EGL_NO_DISPLAY;
         }
+        mGLDisplay = EGL_NO_DISPLAY;
     }
 
     GLPBuffer* EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
