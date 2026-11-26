@@ -360,11 +360,9 @@ namespace Ogre {
 
     void EGLSupport::stop()
     {
-        if (mGLDisplay)
-        {
-            eglTerminate(mGLDisplay);
-            EGL_CHECK_ERROR
-        }
+        // The display is shared by every render system in the process and EGL
+        // does not reference count it, so it must outlive this subsystem.
+        // Terminate it in the platform destructor instead, like GLX does.
     }
 
     void EGLSupport::initialiseExtensions() {
