@@ -97,14 +97,14 @@ namespace Ogre {
 
     X11EGLSupport::~X11EGLSupport()
     {
-        if (mNativeDisplay)
-        {
-            XCloseDisplay((Display*)mNativeDisplay);
-        }
-
         if (mGLDisplay)
         {
             eglTerminate(mGLDisplay);
+        }
+
+        if (mNativeDisplay)
+        {
+            XCloseDisplay((Display*)mNativeDisplay);
         }
     }
 
