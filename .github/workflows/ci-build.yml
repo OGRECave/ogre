@@ -235,9 +235,6 @@ jobs:
         build\bin\RelWithDebInfo\Test_Ogre.exe
     - name: Visual Tests D3D11
       if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-      # TODO: make blocking once fixed: PlayPen_BillboardAccurateFacing fails as the default
-      # BillboardSet material uses lighting, but billboards have no normals
-      continue-on-error: true
       timeout-minutes: 15
       working-directory: build/bin/RelWithDebInfo
       run: ./TestContext.exe -rs "Direct3D11 Rendering Subsystem"
