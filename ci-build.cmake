@@ -97,6 +97,18 @@ if(DEFINED ENV{ANDROID})
     endif()
 endif()
 
+if(DEFINED ENV{WASM})
+    set(CMAKE_BUILD_TYPE Release)
+    set(RENDERSYSTEMS
+        -DOGRE_BUILD_RENDERSYSTEM_GLES2=TRUE)
+
+    set(OTHER
+        -DCMAKE_TOOLCHAIN_FILE=$ENV{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+        -DSWIG_EXECUTABLE=none
+        -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
+    set(BUILD_DEPS TRUE)
+endif()
+
 file(MAKE_DIRECTORY build)
 execute_process(COMMAND ${CMAKE_COMMAND}
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
