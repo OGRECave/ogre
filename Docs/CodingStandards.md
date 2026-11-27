@@ -16,7 +16,7 @@ This document describes the coding standards all developers are expected to adhe
     <li>Everything must be declared inside the namespace `Ogre`.</li>
 </ol>
 
-## Portablity
+## Portability
 
 <ol>
     <li>All code must be cross platform, ANSI C++. No dependencies on platform-specific headers and / or types are allowed (the only exception is when dealing with platform-specific features like windowing, which must be implemented for each platform separately).</li>
@@ -51,7 +51,7 @@ This document describes the coding standards all developers are expected to adhe
     <li>Preprocessor macros must be all upper case and prefixed with OGRE_</li>
     <li>Enums should be named in title case, enum values should be all upper case</li>
     <li>All classes and methods must be fully documented in English using Doxygen-compatible comments. Use the `@param` and `@return` directives to define inputs and outputs clearly, and `@note` to indicate points of interest.</li>
-    <li>Use verbose, descriptive names for classes, methods, variables - everything except trival counters. Code should be self-describing, don't be obtuse.</li>
+    <li>Use verbose, descriptive names for classes, methods, variables - everything except trivial counters. Code should be self-describing, don't be obtuse.</li>
 </ol>
 
 ## Style issues
