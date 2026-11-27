@@ -157,6 +157,9 @@ namespace Ogre {
 
         }
 
+        // script ended inside a duplicate shader
+        if (dummy && pShader)
+            OGRE_DELETE pShader;
     }
     //-----------------------------------------------------------------------
     Quake3Shader* Quake3ShaderManager::create( const String& name)
