@@ -151,6 +151,25 @@ jobs:
         set -o pipefail && cmake --build build | xcpretty
       env:
         IOS: true
+  emscripten:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v7
+    - uses: emscripten-core/setup-emsdk@v16
+      with:
+        version: 7.0.1
+        actions-cache-folder: emsdk-cache
+    - name: Cache Built Dependencies
+      uses: actions/cache@v6
+      with:
+        path: ogredeps
+        key: emscripten-deps-7.0.1-${{ hashFiles('CMake/Dependencies.cmake') }}
+    - name: Build
+      run: |
+        cmake -P ci-build.cmake
+        cmake --build build -- -j $(nproc)
+      env:
+        WASM: true
   custombuild:
     runs-on: ubuntu-22.04
     steps:

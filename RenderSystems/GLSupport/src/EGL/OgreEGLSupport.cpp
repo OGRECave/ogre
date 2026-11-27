@@ -374,20 +374,22 @@ namespace Ogre {
 
     void EGLSupport::stop()
     {
-        if (mGLDisplay)
-        {
-            eglTerminate(mGLDisplay);
-            EGL_CHECK_ERROR
-        }
+        // The display is shared by every render system in the process and EGL
+        // does not reference count it, so it must outlive this subsystem.
+        // Terminate it in the platform destructor instead, like GLX does.
     }
 
     void EGLSupport::initialiseExtensions() {
         assert (mGLDisplay);
 
         const char* propStr = eglQueryString(mGLDisplay, EGL_VENDOR);
+        if (!propStr)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "eglQueryString(EGL_VENDOR) failed");
         LogManager::getSingleton().stream() << "EGL_VENDOR = " << propStr;
 
         propStr = eglQueryString(mGLDisplay, EGL_VERSION);
+        if (!propStr)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "eglQueryString(EGL_VERSION) failed");
         LogManager::getSingleton().stream() << "EGL_VERSION = " << propStr;
 
         hasEGL15 = String(propStr).find("1.5") != String::npos;
@@ -396,7 +398,8 @@ namespace Ogre {
 
         // display extension
         propStr = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
-        ext << propStr;
+        if(propStr)
+            ext << propStr;
 
         LogManager::getSingleton().stream() << "EGL_EXTENSIONS = " << ext.str();
 
@@ -428,6 +431,18 @@ namespace Ogre {
     void EGLSupport::setGLDisplay( EGLDisplay val )
     {
         mGLDisplay = val;
+    }
+
+    void EGLSupport::releaseGLDisplay()
+    {
+        // A display obtained from the default native display is process-wide and
+        // shared by every render system plugin. EGL does not reference count it,
+        // so terminating it here would pull it from under the others.
+        if (mGLDisplay != EGL_NO_DISPLAY && mNativeDisplay != EGL_DEFAULT_DISPLAY)
+        {
+            eglTerminate(mGLDisplay);
+        }
+        mGLDisplay = EGL_NO_DISPLAY;
     }
 
     GLPBuffer* EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )

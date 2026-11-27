@@ -327,6 +327,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ParticleSystem& ParticleSystem::operator=(const ParticleSystem& rhs)
     {
+        if (this == &rhs)
+            return *this;
+
         // Blank this system's emitters & affectors
         removeAllEmitters();
         removeAllEmittedEmitters();

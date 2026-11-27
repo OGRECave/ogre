@@ -97,7 +97,7 @@ namespace Ogre {
 
     Win32EGLSupport::~Win32EGLSupport()
     {
-
+        releaseGLDisplay();
     }
 
     //Removed createEGLWindow because it was easier to call new Win32EGLWindow

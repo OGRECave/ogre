@@ -102,3 +102,16 @@ TEST_F(PageCoreTests,SimpleCreateSaveLoadWorld)
 }
 //--------------------------------------------------------------------------
 
+TEST_F(PageCoreTests, LoadSectionWithUnknownStrategy)
+{
+    PagedWorld* world = mPageManager->createWorld("World");
+    world->createSection("Grid2D", mSceneMgr, "Section");
+    world->save("unknownstrategy.world");
+    mPageManager->destroyWorld(world);
+
+    mPageManager->removeStrategy(mPageManager->getStrategy("Grid2D"));
+
+    auto stream = Root::openFileStream("unknownstrategy.world");
+    EXPECT_THROW(mPageManager->loadWorld(stream), ItemIdentityException);
+}
+//--------------------------------------------------------------------------
