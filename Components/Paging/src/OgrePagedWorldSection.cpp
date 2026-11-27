@@ -136,6 +136,11 @@ namespace Ogre
         String stratname;
         ser.read(&stratname);
         setStrategy(stratname);
+        if (!mStrategy)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Page strategy '" + stratname + "' does not exist!",
+                        "PagedWorldSection::load");
+        }
         // Page Strategy Data
         bool strategyDataOk = mStrategyData->load(ser);
         if (!strategyDataOk)
