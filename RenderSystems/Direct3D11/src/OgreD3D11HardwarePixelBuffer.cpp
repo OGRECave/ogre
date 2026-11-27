@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreBitwise.h"
+#include "OgreImage.h"
 
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
@@ -277,11 +278,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Box &dst)
     {
+        // D3D11 cannot scale while copying, so scale on the CPU
         if (src.getSize() != dst.getSize())
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "D3D11 device cannot copy a subresource - source and dest size are not the same and they have to be the same in DX11.",
-                "D3D11HardwarePixelBuffer::blitFromMemory");
+            std::vector<uint8> buffer(PixelUtil::getMemorySize(dst.getWidth(), dst.getHeight(), dst.getDepth(), src.format));
+            PixelBox scaled(dst.getWidth(), dst.getHeight(), dst.getDepth(), src.format, buffer.data());
+            Image::scale(src, scaled);
+            blitFromMemory(scaled, dst); // recursive call
+            return;
         }
 
         // convert to pixelbuffer's native format if necessary
