@@ -64,7 +64,6 @@ namespace Ogre
 
     class VulkanHardwarePixelBuffer : public HardwarePixelBuffer
     {
-        VulkanTextureGpu* mParent;
         uint8 mFace;
         uint32 mLevel;
         std::unique_ptr<VulkanHardwareBuffer> mStagingBuffer;
@@ -72,6 +71,8 @@ namespace Ogre
         void unlockImpl(void) override;
     public:
         VulkanHardwarePixelBuffer(VulkanTextureGpu* tex, uint32 width, uint32 height, uint32 depth, uint8 face, uint32 mip);
+        /// @copydoc HardwarePixelBuffer::getParentTexture
+        VulkanTextureGpu* getParentTexture() const;
         void blitFromMemory(const PixelBox& src, const Box& dstBox) override;
         void blitToMemory(const Box& srcBox, const PixelBox& dst) override;
     };
@@ -149,7 +150,8 @@ namespace Ogre
                              bool keepResolvedTexSynced = true,
                              ResourceAccess::ResourceAccess issueBarriers = ResourceAccess::ReadWrite );
 
-        void _autogenerateMipmaps( bool bUseBarrierSolver = false );
+        /// @copydoc Texture::generateMipmapsImpl
+        void generateMipmapsImpl() override;
 
         VkImageType getVulkanTextureType( void ) const;
 

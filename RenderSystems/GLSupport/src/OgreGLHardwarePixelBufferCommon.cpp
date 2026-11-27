@@ -31,8 +31,9 @@ namespace Ogre
 {
 GLHardwarePixelBufferCommon::GLHardwarePixelBufferCommon(uint32 inWidth, uint32 inHeight,
                                                        uint32 inDepth, PixelFormat inFormat,
-                                                       HardwareBuffer::Usage usage)
-    : HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false),
+                                                       HardwareBuffer::Usage usage,
+                                                       Texture* parentTexture)
+    : HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false, parentTexture),
       mBuffer(inWidth, inHeight, inDepth, inFormat),
       mGLInternalFormat(0)
 {

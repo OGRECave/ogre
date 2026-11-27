@@ -66,13 +66,6 @@ namespace Ogre {
         /// Map between device to buffer resources.
         DeviceToBufferResourcesMap  mMapDeviceToBufferResources;
                 
-        /// Mipmapping
-        bool mDoMipmapGen;
-        bool mHWMipmaps;
-
-        // The owner texture if exists.
-        D3D9Texture* mOwnerTexture;
-
         // Device access mutex.
         OGRE_STATIC_MUTEX(msDeviceAccessMutex);
 
@@ -106,6 +99,9 @@ namespace Ogre {
             D3D9Texture* ownerTexture);
         ~D3D9HardwarePixelBuffer();
 
+        /// Hides HardwarePixelBuffer::getParentTexture() to return the derived type
+        D3D9Texture* getParentTexture() const;
+
         /// Call this to associate a D3D surface or volume with this pixel buffer
         void bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *mSurface, IDirect3DSurface9* fsaaSurface,
                   bool writeGamma, uint fsaa, const String& srcName, IDirect3DBaseTexture9 *mipTex);
@@ -119,13 +115,6 @@ namespace Ogre {
     
         /// @copydoc HardwarePixelBuffer::blitToMemory
         void blitToMemory(const Box &srcBox, const PixelBox &dst);
-        
-        /// Internal function to update mipmaps on update of level 0
-        void _genMipmaps(IDirect3DBaseTexture9* mipTex);
-        
-        /// Function to set mipmap generation
-        void _setMipmapping(bool doMipmapGen, bool HWMipmaps);
-        
         
         /// Get rendertarget for z slice
         RenderTexture *getRenderTarget(size_t zoffset);

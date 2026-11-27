@@ -48,6 +48,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLVertexArrayObject.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
+#include "OgreTextureManager.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusStateCacheManager.h"
 #include "OgreGLSLProgramCommon.h"
@@ -915,6 +916,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_dispatchCompute(const Vector3i& workgroupDim)
     {
+        TextureManager::getSingleton()._flushMipmaps();
         // if(mComputeProgramExecutions <= compute_execution_cap)
 
         //FIXME give user control over when and what memory barriers are created
@@ -929,6 +931,8 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_render(const RenderOperation& op)
     {
+        TextureManager::getSingleton()._flushMipmaps();
+
         // Call super class.
         RenderSystem::_render(op);
 

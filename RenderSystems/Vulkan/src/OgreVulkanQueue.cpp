@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgrePixelFormat.h"
 #include "OgreStringConverter.h"
+#include "OgreTextureManager.h"
 
 #include "OgreVulkanUtils.h"
 #include "OgreVulkanDescriptorPool.h"
@@ -685,6 +686,13 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanQueue::endCopyEncoder( void )
     {
+        // A render target dirtied by RenderTexture::_endUpdate() may not have
+        // an open copy encoder yet, so flush before the early return. Skip
+        // while a render pass is open: the commit path runs the flush from
+        // endAllEncoders() after the pass has been ended.
+        if( mEncoderState != EncoderGraphicsOpen )
+            TextureManager::getSingleton()._flushMipmaps();
+
         if( mEncoderState != EncoderCopyOpen )
             return;
 
@@ -778,9 +786,10 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void VulkanQueue::endAllEncoders( const bool endRenderPassDesc )
     {
-        endCopyEncoder();
         endRenderEncoder( endRenderPassDesc );
         endComputeEncoder();
+        // last, so a pending mipmap flush runs outside the render pass
+        endCopyEncoder();
     }
     //-------------------------------------------------------------------------
     void VulkanQueue::notifyTextureDestroyed( VulkanTextureGpu *texture )

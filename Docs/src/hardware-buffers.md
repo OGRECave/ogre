@@ -420,6 +420,8 @@ A Texture can consist of multiple @ref Hardware-Pixel-Buffers, one for each comb
 
 @c mipmap is zero for the zeroth mipmap level, one for the first mipmap level, and so on. On textures that have automatic mipmap generation (@c TU_AUTOMIPMAP) only level 0 should be accessed, the rest will be taken care of by the rendering API.
 
+Automatic mipmap generation is deferred: uploading to level 0 only marks the texture, and all marked textures are regenerated once before the next draw. Call Ogre::Texture::generateMipmaps() to force generation immediately, for example before reading back a mip level other than 0. Direct reads of mip levels above 0 must call it first.
+
 A simple example of using getBuffer is
 
 ```cpp

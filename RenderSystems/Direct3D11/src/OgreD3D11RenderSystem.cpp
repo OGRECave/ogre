@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreD3D11RenderSystem.h"
 #include "OgreD3D11Prerequisites.h"
+#include "OgreTextureManager.h"
 #include "OgreD3D11DriverList.h"
 #include "OgreD3D11Driver.h"
 #include "OgreD3D11VideoModeList.h"
@@ -1753,6 +1754,8 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_dispatchCompute(const Vector3i& workgroupDim)
     {
+        TextureManager::getSingleton()._flushMipmaps();
+
         mDevice.GetImmediateContext()->CSSetShader(mBoundProgram[GPT_COMPUTE_PROGRAM]->getComputeShader(),
                                                     mClassInstances[GPT_COMPUTE_PROGRAM],
                                                     mNumClassInstances[GPT_COMPUTE_PROGRAM]);
@@ -1811,6 +1814,7 @@ namespace Ogre
 
     void D3D11RenderSystem::_render(const RenderOperation& op)
     {
+        TextureManager::getSingleton()._flushMipmaps();
 
         // Exit immediately if there is nothing to render
         if (op.vertexData==0 || op.vertexData->vertexCount == 0)

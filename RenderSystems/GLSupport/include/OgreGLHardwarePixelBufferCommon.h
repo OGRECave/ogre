@@ -69,7 +69,8 @@ public:
     /// Should be called by HardwareBufferManager
     GLHardwarePixelBufferCommon(uint32 mWidth, uint32 mHeight, uint32 mDepth,
                                PixelFormat mFormat,
-                               HardwareBuffer::Usage usage);
+                               HardwareBuffer::Usage usage,
+                               Texture* parentTexture = nullptr);
 
     virtual ~GLHardwarePixelBufferCommon();
 

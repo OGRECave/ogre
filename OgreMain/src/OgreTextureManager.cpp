@@ -56,6 +56,36 @@ namespace Ogre {
         // subclasses should unregister with resource group manager
 
     }
+    //-----------------------------------------------------------------------
+    void TextureManager::_notifyMipmapsDirty(Texture* tex)
+    {
+        // called only when the dirty flag transitions false -> true
+        mDirtyMipmapTextures.push_back(tex);
+    }
+    //-----------------------------------------------------------------------
+    void TextureManager::_removeMipmapsDirty(Texture* tex)
+    {
+        mDirtyMipmapTextures.erase(
+            std::remove(mDirtyMipmapTextures.begin(), mDirtyMipmapTextures.end(), tex),
+            mDirtyMipmapTextures.end());
+    }
+    //-----------------------------------------------------------------------
+    void TextureManager::_flushMipmaps()
+    {
+        // take one texture at a time instead of iterating a copy: a texture
+        // destroyed during generation removes itself from the queue, and if a
+        // generation throws, the textures not processed yet stay queued
+        while (!mDirtyMipmapTextures.empty())
+        {
+            Texture* tex = mDirtyMipmapTextures.back();
+            mDirtyMipmapTextures.pop_back();
+
+            // skip textures that were generated explicitly after being queued
+            if (tex->_isMipmapsDirty())
+                tex->generateMipmaps();
+        }
+    }
+    //-----------------------------------------------------------------------
     SamplerPtr TextureManager::createSampler(const String& name)
     {
         SamplerPtr ret = _createSamplerImpl();
