@@ -71,7 +71,7 @@ namespace Ogre {
 
     CocoaWindow::CocoaWindow() : GLWindow(), mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOriginPt(NSZeroPoint),
         mHasResized(false), mWindowTitle(""),
-        mUseOgreGLView(true), mContentScalingFactor(1.0), mStyleMask(NSResizableWindowMask|NSTitledWindowMask)
+        mUseOgreGLView(true), mContentScalingFactor([[NSScreen mainScreen] backingScaleFactor]), mStyleMask(NSResizableWindowMask|NSTitledWindowMask)
     {
         // Set vsync by default to save battery and reduce tearing
     }

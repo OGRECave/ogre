@@ -38,6 +38,7 @@ THE SOFTWARE.
 
 #import <UIKit/UIWindow.h>
 #import <UIKit/UIGraphics.h>
+#import <UIKit/UIScreen.h>
 #include "ARCMacros.h"
 #include "OgreDepthBuffer.h"
 
@@ -59,7 +60,7 @@ namespace Ogre {
             mUsingExternalView(false),
             mUsingExternalViewController(false),
             mIsContentScalingSupported(EAGLCurrentOSVersion >= 4.0),
-            mContentScalingFactor(1.0),
+            mContentScalingFactor([[UIScreen mainScreen] scale]),
             mGLSupport(glsupport),
             mContext(NULL),
             mWindow(nil),

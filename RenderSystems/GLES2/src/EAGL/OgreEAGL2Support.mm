@@ -57,7 +57,6 @@ namespace Ogre {
     ConfigOptionMap EAGL2Support::getConfigOptions(void)
     {
         ConfigOptionMap mOptions;
-        ConfigOption optContentScalingFactor;
         
         // Get the application frame size.  On all iPhones(including iPhone 4) this will be 320 x 480
         // The iPad, at least with iPhone OS 3.2 will report 768 x 1024
@@ -67,20 +66,10 @@ namespace Ogre {
         mVideoModes.push_back({320, 568, 0});
         mVideoModes.push_back({768, 1024, 0});
 
-        optContentScalingFactor.name = "Content Scaling Factor";
-        optContentScalingFactor.possibleValues.push_back( "1.0" );
-        optContentScalingFactor.possibleValues.push_back( "1.33" );
-        optContentScalingFactor.possibleValues.push_back( "1.5" );
-        optContentScalingFactor.possibleValues.push_back( "2.0" );
-        optContentScalingFactor.currentValue = StringConverter::toString([UIScreen mainScreen].scale);
-        optContentScalingFactor.immutable = false;
-        
         mFSAALevels.push_back(0);
         mFSAALevels.push_back(2);
         mFSAALevels.push_back(4);
         mFSAALevels.push_back(8);
-
-        mOptions[optContentScalingFactor.name] = optContentScalingFactor;
 
         return mOptions;
     }

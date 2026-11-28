@@ -118,7 +118,9 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
         getWindowSize(ret.native, widthPt, heightPt, scale);
         p.width = widthPt;
         p.height = heightPt;
-        p.miscParams["contentScalingFactor"] = Ogre::StringConverter::toString(scale);
+        // an explicit value from the render system options or the caller wins
+        if (p.miscParams.find("contentScalingFactor") == p.miscParams.end())
+            p.miscParams["contentScalingFactor"] = Ogre::StringConverter::toString(scale);
 #endif
     }
     else if (wmInfo.subsystem == SDL_SYSWM_X11)

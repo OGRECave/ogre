@@ -237,7 +237,7 @@ namespace Ogre
         | FSAA | 0 | concatenation of "FSAA" and "FSAAHint" as in  @ref _createRenderWindow  |
         | Video Mode | - | Window resolution |
         | Display Frequency | - | "displayFrequency" in  @ref _createRenderWindow |
-        | Content Scaling Factor | 1.0 | "contentScalingFactor" in  @ref _createRenderWindow |
+        | Content Scaling Factor | Auto | pixels per view point; "contentScalingFactor" in  @ref _createRenderWindow. "Auto" detects the scale of the monitor the window is created on |
         @param
         name The name of the option to alter.
         @param
@@ -414,7 +414,7 @@ namespace Ogre
         | useNVPerfHUD | true, false | false | Enable the use of nVidia NVPerfHUD | D3D |
         | depthBuffer | true, false | true | Use depth buffer | D3D |
         | NSOpenGLCPSurfaceOrder | -1 or 1 | 1 | [NSOpenGLCPSurfaceOrder](https://developer.apple.com/documentation/appkit/nsopenglcpsurfaceorder) | OSX |
-        | contentScalingFactor | Positive Float | The default content scaling factor of the screen | On IOS specifies the CAEAGLLayer content scaling factor. This can be useful to limit the resolution of the OpenGL ES backing store. For example, the iPhone 4's native resolution is 960 x 640\. Windows are always 320 x 480, if you would like to limit the display to 720 x 480, specify 1.5 as the scaling factor. | OSX, iOS, Android |
+        | contentScalingFactor | Positive Float | The default content scaling factor of the screen | On IOS specifies the CAEAGLLayer content scaling factor. This can be useful to limit the resolution of the OpenGL ES backing store. For example, the iPhone 4's native resolution is 960 x 640\. Windows are always 320 x 480, if you would like to limit the display to 720 x 480, specify 1.5 as the scaling factor. On Wayland it is the number of physical pixels per view point, which the backends use to allocate the backbuffer at native resolution. | OSX, iOS, Android, Wayland |
         | externalViewHandle | UIView pointer as an integer | 0 | External view handle, for rendering OGRE render in an existing view | iOS |
         | externalViewControllerHandle | UIViewController pointer as an integer | 0 | External view controller handle, for embedding OGRE in an existing view controller | iOS |
         | externalSharegroup | EAGLSharegroup pointer as an integer | 0 | External sharegroup, used to shared GL resources between contexts | iOS |
