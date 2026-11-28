@@ -16,6 +16,7 @@ class _OgrePrivate WaylandEGLWindow : public EGLWindow
 protected:
     WaylandEGLSupport* mGLSupport;
     wl_surface* mWlSurface;
+    float mContentScalingFactor = 1.0f;
 
     void initNativeCreatedWindow(const NameValuePairList* miscParams);
     void createNativeWindow(uint& width, uint& height);
@@ -28,6 +29,8 @@ public:
 
     void create(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                 const NameValuePairList* miscParams) override;
+
+    float getViewPointToPixelScale() override { return mContentScalingFactor; }
 };
 } // namespace Ogre
 

@@ -172,6 +172,7 @@ namespace OgreBites
 
             p.miscParams["externalWlDisplay"] = Ogre::StringConverter::toString(size_t(display));
             p.miscParams["externalWlSurface"] = Ogre::StringConverter::toString(size_t(surface));
+            p.miscParams["contentScalingFactor"] = Ogre::StringConverter::toString(window->devicePixelRatio());
 #endif
         }
         if (!mWindows.empty())

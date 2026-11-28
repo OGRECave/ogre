@@ -37,6 +37,9 @@ THE SOFTWARE.
 #include "OgrePixelFormat.h"
 #include "OgreVulkanTextureGpuManager.h"
 #include "OgreHardwarePixelBuffer.h"
+
+#include <cmath>
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android/native_window.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -348,14 +351,17 @@ namespace Ogre
         mTexture->_setCurrentImage( mSwapchainImages[imageIdx], imageIdx );
     }
 
-    void VulkanWindow::resize(uint width, uint height)
+    void VulkanWindow::resize(uint widthPt, uint heightPt)
     {
         if (mClosed)
             return;
 
-        if (width != 0 && height != 0)
+        if (widthPt != 0 && heightPt != 0)
         {
-            RenderWindow::resize(width, height);
+            // the compositor is told a size in view points, but the swapchain has to be
+            // allocated in physical pixels for a 1:1 mapping
+            RenderWindow::resize(std::lround(widthPt * mContentScalingFactor),
+                                 std::lround(heightPt * mContentScalingFactor));
         }
     }
 
@@ -478,8 +484,6 @@ namespace Ogre
         mVisible = true;
         mClosed = false;
         mHwGamma = false;
-        mWidth = width;
-        mHeight = height;
         mFSAA = 1;
 
         size_t wlDisplay = 0;
@@ -519,7 +523,17 @@ namespace Ogre
                 mHdrDisplay = StringConverter::parseBool( opt->second );
                 mHwGamma = mHdrDisplay; // hdr implies hw gamma
             }
+            opt = miscParams->find("contentScalingFactor");
+            if (opt != end)
+            {
+                const float scale = StringConverter::parseReal(opt->second);
+                if (scale > 0.0f)
+                    mContentScalingFactor = scale;
+            }
         }
+
+        mWidth = std::lround(width * mContentScalingFactor);
+        mHeight = std::lround(height * mContentScalingFactor);
 
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
         OgreAssert( mWindowHandle && wlDisplay, "externalWlSurface and externalWlDisplay required");
