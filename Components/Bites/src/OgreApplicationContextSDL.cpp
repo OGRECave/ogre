@@ -4,6 +4,7 @@
 
 #include "OgreApplicationContext.h"
 
+#include "OgreException.h"
 #include "OgreRoot.h"
 #include "OgreRenderWindow.h"
 
@@ -12,6 +13,11 @@
 #include <SDL_syswm.h>
 
 #include "SDLInputMapping.h"
+
+// OGRE_WAYLAND is only defined (as 1) for wayland builds
+#ifndef OGRE_WAYLAND
+#define OGRE_WAYLAND 0
+#endif
 
 namespace OgreBites {
 
@@ -38,7 +44,18 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
         if(SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt") > 0)
             Ogre::LogManager::getSingleton().logMessage("[SDL] gamecontrollerdb.txt loaded");
 
-        SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+        // The EGL backend is built for one windowing system only, so do not let
+        // SDL pick the other one (e.g. X11 on a Wayland session) unless the
+        // application chose a driver explicitly.
+        if (!SDL_getenv("SDL_VIDEODRIVER"))
+            SDL_setenv("SDL_VIDEODRIVER", OGRE_WAYLAND ? "wayland" : "x11", 1);
+#endif
+
+        if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
+            OGRE_EXCEPT(Ogre::Exception::ERR_RENDERINGAPI_ERROR,
+                        Ogre::String("SDL video initialization failed: ") + SDL_GetError());
+        SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
     }
 
     auto p = mRoot->getRenderSystem()->getRenderWindowDescription();
