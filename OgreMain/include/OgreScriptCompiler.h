@@ -129,7 +129,8 @@ namespace Ogre
 
     inline const String& AbstractNode::getString() const
     {
-        return type == ANT_ATOM ? static_cast<const AtomAbstractNode*>(this)->value : BLANKSTRING;
+        static const String blank;
+        return type == ANT_ATOM ? static_cast<const AtomAbstractNode*>(this)->value : blank;
     }
 
     /** This specific abstract node represents a script object */

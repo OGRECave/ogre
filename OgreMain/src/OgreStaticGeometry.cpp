@@ -789,7 +789,8 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     const String& StaticGeometry::Region::getMovableType(void) const
     {
-        return MOT_STATIC_GEOMETRY;
+        static const String name = MOT_STATIC_GEOMETRY;
+        return name;
     }
     //--------------------------------------------------------------------------
     void StaticGeometry::Region::_notifyCurrentCamera(Camera* cam)
@@ -1587,7 +1588,5 @@ namespace Ogre {
         o << "---------------" << std::endl;
         return o;
     }
-    //--------------------------------------------------------------------------
-    const String MOT_STATIC_GEOMETRY = "StaticGeometry";
 }
 

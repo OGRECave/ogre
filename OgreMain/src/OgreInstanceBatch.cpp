@@ -34,8 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const String MOT_INSTANCE_BATCH = "InstanceBatch";
-
     InstanceBatch::InstanceBatch( InstanceManager *creator, MeshPtr &meshReference,
                                     const MaterialPtr &material, size_t instancesPerBatch,
                                     const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
@@ -429,7 +427,8 @@ namespace Ogre
     //-----------------------------------------------------------------------
     const String& InstanceBatch::getMovableType(void) const
     {
-        return MOT_INSTANCE_BATCH;
+        static const String name = MOT_INSTANCE_BATCH;
+        return name;
     }
     //-----------------------------------------------------------------------
     void InstanceBatch::_notifyCurrentCamera( Camera* cam )

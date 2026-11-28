@@ -277,7 +277,11 @@ namespace Ogre {
         void setScheme(const String& schemeName, bool reuseTextures = true);
 
         /// Returns the name of the scheme this compositor is using.
-        const String& getScheme() const { return mTechnique ? mTechnique->getSchemeName() : BLANKSTRING; }
+        const String& getScheme() const
+        {
+            static const String blank;
+            return mTechnique ? mTechnique->getSchemeName() : blank;
+        }
 
         /** Notify this instance that the primary surface has been resized. 
 
