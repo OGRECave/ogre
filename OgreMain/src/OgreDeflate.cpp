@@ -37,7 +37,7 @@
 #include "OgreFileSystemUtil.h"
 #include "OgreRoot.h"
 
-#define MINIZ_HEADER_FILE_ONLY
+#define MINIZ_NO_STDIO
 #include <miniz.h>
 
 namespace Ogre

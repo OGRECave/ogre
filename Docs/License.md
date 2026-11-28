@@ -27,24 +27,24 @@ licenses when distributing an application since most require you to
 include the license in your documentation. All the license texts are
 included in the Docs/licenses folder.
 
-### zip
+### miniz
 
 <table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 
 <tr>
 <td style="width: 20%;">Original Authors:</td>
-<td>Rich Geldreich and Kuba Podgórski</td>
+<td>Rich Geldreich and Tenacious Software LLC</td>
 </tr>
 
 <tr>
 <td>Website:</td>
-<td>https://github.com/kuba--/zip</td>
+<td>https://github.com/richgel999/miniz</td>
 </tr>
 
 <tr>
 <td>Licensed Under:</td>
-<td><a href="https://unlicense.org/">Unlicense (Public Domain)</a></td>
+<td><a href="licenses/miniz.txt">MIT License</a></td>
 </tr>
 
 </tbody>

@@ -131,13 +131,13 @@ endif ()
 
 if (OGRE_CONFIG_ENABLE_ZIP)
   list(APPEND HEADER_FILES include/OgreZip.h)
-  list(APPEND SOURCE_FILES src/OgreZip.cpp src/zip/zip.c)
+  list(APPEND SOURCE_FILES src/OgreZip.cpp src/zip/miniz.c)
 
-  set_source_files_properties(src/zip/zip.c
+  set_source_files_properties(src/zip/miniz.c
     PROPERTIES COMPILE_DEFINITIONS MINIZ_NO_STDIO)
 
-  if(UNIX)
-    set_source_files_properties(src/OgreDeflate.cpp
+  if(UNIX OR MINGW)
+    set_source_files_properties(src/OgreDeflate.cpp src/OgreZip.cpp
       PROPERTIES COMPILE_FLAGS -Wno-unused-function)
   endif()
 

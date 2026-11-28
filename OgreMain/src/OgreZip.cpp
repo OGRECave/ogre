@@ -28,7 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #if OGRE_NO_ZIP_ARCHIVE == 0
-#include <zip.h>
+#define MINIZ_NO_STDIO
+#include <miniz.h>
 #include "OgreFileSystemUtil.h"
 
 namespace Ogre {
@@ -37,9 +38,9 @@ namespace {
     {
     protected:
         /// Handle to root zip file
-        zip_t* mZipFile;
+        mutable mz_zip_archive mZipArchive;
         MemoryDataStreamPtr mBuffer;
-        /// File list (since zziplib seems to only allow scanning of dir tree once)
+        /// File list, cached because the central directory is only scanned here
         FileInfoList mFileList;
         OGRE_AUTO_MUTEX;
     public:
@@ -85,7 +86,7 @@ namespace {
 }
     //-----------------------------------------------------------------------
     ZipArchive::ZipArchive(const String& name, const String& archType, const uint8* externBuf, size_t externBufSz)
-        : Archive(name, archType), mZipFile(0)
+        : Archive(name, archType), mZipArchive()
     {
         if(externBuf)
             mBuffer.reset(new MemoryDataStream(const_cast<uint8*>(externBuf), externBufSz));
@@ -99,30 +100,46 @@ namespace {
     void ZipArchive::load()
     {
         OGRE_LOCK_AUTO_MUTEX;
-        if (!mZipFile)
+        if (!mZipArchive.m_pState)
         {
             if(!mBuffer)
                 mBuffer.reset(new MemoryDataStream(_openFileStream(mName, std::ios::binary)));
 
-            mZipFile = zip_stream_open((const char*)mBuffer->getPtr(), mBuffer->size(), 0, 'r');
+            if (!mz_zip_reader_init_mem(&mZipArchive, mBuffer->getPtr(), mBuffer->size(), 0))
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "could not open zip archive " + mName + ": " +
+                                mz_zip_get_error_string(mz_zip_get_last_error(&mZipArchive)));
 
             // Cache names
-            int n = zip_entries_total(mZipFile);
-            for (int i = 0; i < n; ++i) {
+            mz_uint n = mz_zip_reader_get_num_files(&mZipArchive);
+            // ZIP filenames are length prefixed by a 16 bit field
+            std::vector<char> nameBuf(MZ_UINT16_MAX + 1);
+            for (mz_uint i = 0; i < n; ++i)
+            {
+                mz_zip_archive_file_stat stat;
+                if (!mz_zip_reader_file_stat(&mZipArchive, i, &stat))
+                    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                                "corrupt zip archive " + mName + ": " +
+                                    mz_zip_get_error_string(mz_zip_get_last_error(&mZipArchive)));
+
+                if (!mz_zip_reader_get_filename(&mZipArchive, i, nameBuf.data(), nameBuf.size()))
+                    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                                "corrupt zip archive " + mName + ": " +
+                                    mz_zip_get_error_string(mz_zip_get_last_error(&mZipArchive)));
+
                 FileInfo info;
                 info.archive = this;
-
-                zip_entry_openbyindex(mZipFile, i);
-
-                info.filename = zip_entry_name(mZipFile);
+                info.filename = nameBuf.data();
                 // Get basename / path
                 StringUtil::splitFilename(info.filename, info.basename, info.path);
 
                 // Get sizes
-                info.uncompressedSize = zip_entry_size(mZipFile);
-                info.compressedSize = zip_entry_comp_size(mZipFile);
+                info.uncompressedSize = stat.m_uncomp_size;
+                info.compressedSize = stat.m_comp_size;
 
-                if (zip_entry_isdir(mZipFile))
+                // miniz also honours the DOS directory attribute, but zip directories
+                // are the entries whose name ends in '/', which is what we strip below
+                if (!info.filename.empty() && info.filename.back() == '/')
                 {
                     info.filename = info.filename.substr(0, info.filename.length() - 1);
                     StringUtil::splitFilename(info.filename, info.basename, info.path);
@@ -136,7 +153,6 @@ namespace {
                     info.filename = info.basename;
                 }
 #endif
-                zip_entry_close(mZipFile);
                 mFileList.push_back(info);
             }
         }
@@ -145,10 +161,9 @@ namespace {
     void ZipArchive::unload()
     {
         OGRE_LOCK_AUTO_MUTEX;
-        if (mZipFile)
+        if (mZipArchive.m_pState)
         {
-            zip_close(mZipFile);
-            mZipFile = 0;
+            mz_zip_reader_end(&mZipArchive);
             mFileList.clear();
             mBuffer.reset();
         }
@@ -160,11 +175,13 @@ namespace {
         // zip is not threadsafe
         OGRE_LOCK_AUTO_MUTEX;
         String lookUpFileName = filename;
+        mz_uint32 entryIndex = 0;
 
 #if OGRE_RESOURCEMANAGER_STRICT
-        bool open = zip_entry_opencasesensitive(mZipFile, lookUpFileName.c_str()) == 0;
+        bool open = mz_zip_reader_locate_file_v2(&mZipArchive, lookUpFileName.c_str(), NULL,
+                                                 MZ_ZIP_FLAG_CASE_SENSITIVE, &entryIndex);
 #else
-        bool open = zip_entry_open(mZipFile, lookUpFileName.c_str()) == 0;
+        bool open = mz_zip_reader_locate_file_v2(&mZipArchive, lookUpFileName.c_str(), NULL, 0, &entryIndex);
         if (!open) // Try if we find the file
         {
             String basename, path;
@@ -174,7 +191,7 @@ namespace {
             {
                 Ogre::FileInfo info = fileNfo->at(0);
                 lookUpFileName = info.path + info.basename;
-                open = zip_entry_open(mZipFile, lookUpFileName.c_str()) == 0;
+                open = mz_zip_reader_locate_file_v2(&mZipArchive, lookUpFileName.c_str(), NULL, 0, &entryIndex);
             }
         }
 #endif
@@ -184,25 +201,31 @@ namespace {
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "could not open "+lookUpFileName);
         }
 
+        mz_zip_archive_file_stat stat;
+        if (!mz_zip_reader_file_stat(&mZipArchive, entryIndex, &stat))
+        {
+            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+                        "could not read " + lookUpFileName + ": " +
+                            mz_zip_get_error_string(mz_zip_get_last_error(&mZipArchive)));
+        }
+
         // Construct & return stream
-        size_t entrySize = zip_entry_size(mZipFile);
-        size_t compSize  = zip_entry_comp_size(mZipFile);
+        size_t entrySize = stat.m_uncomp_size;
+        size_t compSize  = stat.m_comp_size;
         // repetitive log files have a typical ratio of ~50:1, XML 30:1, images 5:1
         const size_t MAX_RATIO = 100;
         if ((entrySize > 0 && (compSize == 0 || entrySize / compSize > MAX_RATIO)) || compSize > mBuffer->size())
         {
-            zip_entry_close(mZipFile);
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "zip entry has suspicious compression ratio (possible decompression bomb): " + lookUpFileName);
         }
         auto ret = std::make_shared<MemoryDataStream>(lookUpFileName, entrySize, true, true);
 
-        if(zip_entry_noallocread(mZipFile, ret->getPtr(), ret->size()) < 0)
+        if (!mz_zip_reader_extract_to_mem_no_alloc(&mZipArchive, entryIndex, ret->getPtr(), ret->size(), 0,
+                                                   NULL, 0))
         {
-            zip_entry_close(mZipFile);
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "could not read "+lookUpFileName);
         }
-        zip_entry_close(mZipFile);
 
         return ret;
     }
