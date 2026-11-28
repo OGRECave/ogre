@@ -281,10 +281,9 @@ namespace Ogre {
         // D3D11 cannot scale while copying, so scale on the CPU
         if (src.getSize() != dst.getSize())
         {
-            std::vector<uint8> buffer(PixelUtil::getMemorySize(dst.getWidth(), dst.getHeight(), dst.getDepth(), src.format));
-            PixelBox scaled(dst.getWidth(), dst.getHeight(), dst.getDepth(), src.format, buffer.data());
-            Image::scale(src, scaled);
-            blitFromMemory(scaled, dst); // recursive call
+            Image scaled(src.format, dst.getWidth(), dst.getHeight(), dst.getDepth());
+            Image::scale(src, scaled.getPixelBox());
+            blitFromMemory(scaled.getPixelBox(), dst); // recursive call
             return;
         }
 
