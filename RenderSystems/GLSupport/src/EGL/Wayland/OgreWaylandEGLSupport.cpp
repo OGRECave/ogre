@@ -80,21 +80,33 @@ NativeDisplayType WaylandEGLSupport::getNativeDisplay()
 RenderWindow* WaylandEGLSupport::newWindow(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                                            const NameValuePairList* miscParams)
 {
+    if (miscParams)
+    {
+        NameValuePairList::const_iterator end = miscParams->end();
+
+        // A window from another backend cannot be presented here. Without this
+        // check it would be silently ignored and rendered into an offscreen
+        // surface instead.
+        if (miscParams->find("externalWindowHandle") != end || miscParams->find("parentWindowHandle") != end)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "externalWindowHandle/parentWindowHandle is not a Wayland window; "
+                        "recompile with OGRE_USE_WAYLAND=OFF");
+        }
+
+        if (miscParams->find("externalWlSurface") != end && miscParams->find("externalWlDisplay") == end)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "externalWlDisplay required with externalWlSurface");
+        }
+    }
+
     if (!mInitialWindow)
     {
         if (miscParams)
         {
-            NameValuePairList::const_iterator opt;
-            NameValuePairList::const_iterator end = miscParams->end();
-
-            if ((opt = miscParams->find("externalWlDisplay")) != end)
-            {
+            NameValuePairList::const_iterator opt = miscParams->find("externalWlDisplay");
+            if (opt != miscParams->end())
                 mNativeDisplay = reinterpret_cast<NativeDisplayType>(StringConverter::parseSizeT(opt->second));
-            }
-            else if (miscParams->find("externalWlSurface") != end)
-            {
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "externalWlDisplay required with externalWlSurface");
-            }
         }
 
         doInit();
