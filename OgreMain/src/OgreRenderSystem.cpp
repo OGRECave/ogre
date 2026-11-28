@@ -224,7 +224,9 @@ namespace Ogre {
         if((opt = mOptions.find("Display Frequency")) != end)
             miscParams.emplace("displayFrequency", opt->second.currentValue);
 
-        if((opt = mOptions.find("Content Scaling Factor")) != end)
+        // "Auto" means the window provider detects the scale of the monitor the
+        // window is created on; there is no usable value to pass along.
+        if ((opt = mOptions.find("Content Scaling Factor")) != end && opt->second.currentValue != "Auto")
             miscParams["contentScalingFactor"] = opt->second.currentValue;
 
         if((opt = mOptions.find("Rendering Device")) != end)
@@ -885,6 +887,20 @@ namespace Ogre {
         optHDRDisplay.possibleValues.push_back("Yes");
         optHDRDisplay.currentValue = optHDRDisplay.possibleValues[0];
         mOptions[optHDRDisplay.name] = optHDRDisplay;
+
+        // Windows are sized in view points while the backbuffer is allocated in
+        // pixels. "Auto" lets the window provider detect the scale of the monitor
+        // the window is created on; the list is for discoverability only, the
+        // value can be anything the backend understands.
+        if (mOptions.find("Content Scaling Factor") == mOptions.end())
+        {
+            ConfigOption optContentScaling;
+            optContentScaling.name = "Content Scaling Factor";
+            optContentScaling.immutable = false;
+            optContentScaling.possibleValues = {"Auto", "1.0", "1.25", "1.5", "1.75", "2.0", "3.0"};
+            optContentScaling.currentValue = optContentScaling.possibleValues.front();
+            mOptions[optContentScaling.name] = optContentScaling;
+        }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
         ConfigOption optStereoMode;
