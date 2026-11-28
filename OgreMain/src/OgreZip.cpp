@@ -34,12 +34,20 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace {
+    /// mz_zip_reader_init read callback, backed by an Ogre DataStream
+    static size_t readZipStream(void* opaque, mz_uint64 fileOfs, void* buf, size_t n)
+    {
+        auto* stream = static_cast<DataStream*>(opaque);
+        stream->seek(static_cast<size_t>(fileOfs));
+        return stream->read(buf, n);
+    }
+
     class ZipArchive : public Archive
     {
     protected:
         /// Handle to root zip file
         mutable mz_zip_archive mZipArchive;
-        MemoryDataStreamPtr mBuffer;
+        DataStreamPtr mStream;
         /// File list, cached because the central directory is only scanned here
         FileInfoList mFileList;
         OGRE_AUTO_MUTEX;
@@ -89,7 +97,7 @@ namespace {
         : Archive(name, archType), mZipArchive()
     {
         if(externBuf)
-            mBuffer.reset(new MemoryDataStream(const_cast<uint8*>(externBuf), externBufSz));
+            mStream.reset(new MemoryDataStream(const_cast<uint8*>(externBuf), externBufSz));
     }
     //-----------------------------------------------------------------------
     ZipArchive::~ZipArchive()
@@ -102,10 +110,13 @@ namespace {
         OGRE_LOCK_AUTO_MUTEX;
         if (!mZipArchive.m_pState)
         {
-            if(!mBuffer)
-                mBuffer.reset(new MemoryDataStream(_openFileStream(mName, std::ios::binary)));
+            if(!mStream)
+                mStream = _openFileStream(mName, std::ios::binary);
 
-            if (!mz_zip_reader_init_mem(&mZipArchive, mBuffer->getPtr(), mBuffer->size(), 0))
+            mZipArchive.m_pRead = readZipStream;
+            mZipArchive.m_pIO_opaque = mStream.get();
+
+            if (!mz_zip_reader_init(&mZipArchive, mStream->size(), 0))
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "could not open zip archive " + mName + ": " +
                                 mz_zip_get_error_string(mz_zip_get_last_error(&mZipArchive)));
@@ -165,7 +176,7 @@ namespace {
         {
             mz_zip_reader_end(&mZipArchive);
             mFileList.clear();
-            mBuffer.reset();
+            mStream.reset();
         }
     
     }
@@ -214,7 +225,7 @@ namespace {
         size_t compSize  = stat.m_comp_size;
         // repetitive log files have a typical ratio of ~50:1, XML 30:1, images 5:1
         const size_t MAX_RATIO = 100;
-        if ((entrySize > 0 && (compSize == 0 || entrySize / compSize > MAX_RATIO)) || compSize > mBuffer->size())
+        if ((entrySize > 0 && (compSize == 0 || entrySize / compSize > MAX_RATIO)) || compSize > mStream->size())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "zip entry has suspicious compression ratio (possible decompression bomb): " + lookUpFileName);
