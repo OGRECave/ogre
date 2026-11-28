@@ -20,15 +20,12 @@ GLNativeSupport* getGLSupport(int profile) { return new WaylandEGLSupport(profil
 
 WaylandEGLSupport::WaylandEGLSupport(int profile) : EGLSupport(profile)
 {
-    mIsExternalDisplay = false;
 }
 
 void WaylandEGLSupport::doInit()
 {
-    // A connection that is NOT shared to enable independent event processing:
-    mNativeDisplay = getNativeDisplay();
-
-    // A connection that might be shared with the application for GL rendering:
+    // the window provider supplies the connection; without one EGLSupport picks
+    // a device display instead, which is what an offscreen window renders into
     mGLDisplay = getGLDisplay();
 
     if (mNativeDisplay == EGL_DEFAULT_DISPLAY)
@@ -69,43 +66,20 @@ WaylandEGLSupport::~WaylandEGLSupport()
 {
     // EGL keeps using the Wayland connection the display was created from.
     releaseGLDisplay();
-
-    if (mNativeDisplay && !mIsExternalDisplay)
-    {
-        wl_display_disconnect(mNativeDisplay);
-    }
 }
 
 NativeDisplayType WaylandEGLSupport::getNativeDisplay()
 {
-    if (!mNativeDisplay)
-    {
-        mNativeDisplay = wl_display_connect(nullptr);
-        if (mNativeDisplay == nullptr)
-        {
-            LogManager::getSingleton().logWarning("Couldn't connect to Wayland display");
-            return mNativeDisplay;
-        }
-
-        if (mNativeDisplay == EGL_DEFAULT_DISPLAY)
-        {
-            LogManager::getSingleton().logWarning("Couldn't open Wayland display");
-            return mNativeDisplay;
-        }
-    }
-
+    // the connection belongs to the window provider; a surface created from it
+    // cannot be presented on a connection of our own
     return mNativeDisplay;
 }
 
 RenderWindow* WaylandEGLSupport::newWindow(const String& name, unsigned int width, unsigned int height, bool fullScreen,
                                            const NameValuePairList* miscParams)
 {
-    EGLWindow* window = new WaylandEGLWindow(this);
-
     if (!mInitialWindow)
     {
-        mInitialWindow = window;
-
         if (miscParams)
         {
             NameValuePairList::const_iterator opt;
@@ -114,16 +88,34 @@ RenderWindow* WaylandEGLSupport::newWindow(const String& name, unsigned int widt
             if ((opt = miscParams->find("externalWlDisplay")) != end)
             {
                 mNativeDisplay = (wl_display*)StringConverter::parseSizeT(opt->second);
-                mIsExternalDisplay = true;
+            }
+            else if (miscParams->find("externalWlSurface") != end)
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "externalWlDisplay required with externalWlSurface");
             }
         }
 
         doInit();
     }
 
+    // Without the window provider's display there is nothing to create a surface
+    // from, so render offscreen into a pbuffer like the X11 backend does when
+    // DISPLAY is missing.
+    bool offscreen = mNativeDisplay == EGL_DEFAULT_DISPLAY;
+    EGLWindow* window = offscreen ? new EGLWindow(this) : new WaylandEGLWindow(this);
+
+    if (!mInitialWindow)
+        mInitialWindow = window;
+
     window->create(name, width, height, fullScreen, miscParams);
 
     return window;
+}
+
+EGLDisplay WaylandEGLSupport::getGLDisplay()
+{
+    // the display is process-wide once created; do not initialize it again
+    return mGLDisplay != EGL_NO_DISPLAY ? mGLDisplay : EGLSupport::getGLDisplay();
 }
 
 void WaylandEGLSupport::start()
@@ -132,21 +124,6 @@ void WaylandEGLSupport::start()
         "******************************\n"
         "*** Starting EGL Subsystem ***\n"
         "******************************");
-}
-
-// WaylandEGLSupport::getGLDisplay sets up the native variable
-// then calls EGLSupport::getGLDisplay
-EGLDisplay WaylandEGLSupport::getGLDisplay()
-{
-    if (!mNativeDisplay)
-    {
-        mNativeDisplay = getNativeDisplay();
-    }
-    if (!mGLDisplay)
-    {
-        return EGLSupport::getGLDisplay();
-    }
-    return mGLDisplay;
 }
 
 } // namespace Ogre
