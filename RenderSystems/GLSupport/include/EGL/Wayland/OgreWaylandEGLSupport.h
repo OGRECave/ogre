@@ -16,9 +16,6 @@ namespace Ogre
 {
 class _OgrePrivate WaylandEGLSupport : public EGLSupport
 {
-public:
-    bool mIsExternalDisplay;
-
 protected:
     VideoModes mCbVideoModes;
     EGLWindow* mInitialWindow = nullptr;
@@ -31,9 +28,9 @@ public:
     WaylandEGLSupport(int profile);
     virtual ~WaylandEGLSupport();
 
+    /// the window provider's connection, null when rendering offscreen
     NativeDisplayType getNativeDisplay(void);
-    // This just sets the native variables needed by EGLSupport::getGLDisplay
-    // Then it calls EGLSupport::getGLDisplay to do the rest of the work.
+    /// obtain the EGL display, creating it on first use
     EGLDisplay getGLDisplay();
 
     RenderWindow* newWindow(const String& name, unsigned int width, unsigned int height, bool fullScreen,
