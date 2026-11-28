@@ -163,6 +163,21 @@ namespace Ogre {
                                         bool fullScreen,
                                         const NameValuePairList *miscParams)
     {
+        if (miscParams)
+        {
+            NameValuePairList::const_iterator end = miscParams->end();
+
+            // A Wayland window cannot be presented here. Without this check it
+            // would be silently ignored when no X display is available and the
+            // window would render into an offscreen surface instead.
+            if (miscParams->find("externalWlDisplay") != end || miscParams->find("externalWlSurface") != end)
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                            "externalWlDisplay/externalWlSurface is not an X11 window; "
+                            "recompile with OGRE_USE_WAYLAND=ON");
+            }
+        }
+
         EGLWindow* window =
             mNativeDisplay == EGL_DEFAULT_DISPLAY ? new EGLWindow(this) : new X11EGLWindow(this);
         window->create(name, width, height, fullScreen, miscParams);
