@@ -272,11 +272,11 @@ namespace Ogre {
     {
         // query selected config
         int Rsz, Gsz, Bsz, Asz, fsaa;
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_RED_SIZE, &Rsz);
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_BLUE_SIZE, &Gsz);
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_GREEN_SIZE, &Bsz);
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_ALPHA_SIZE, &Asz);
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_SAMPLES, &fsaa);
+        eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_RED_SIZE, &Rsz);
+        eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_BLUE_SIZE, &Gsz);
+        eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_GREEN_SIZE, &Bsz);
+        eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_ALPHA_SIZE, &Asz);
+        eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_SAMPLES, &fsaa);
 
         LogManager::getSingleton().logMessage(
             StringUtil::format("EGLWindow: colourBufferSize=%d/%d/%d/%d gamma=%d FSAA=%d", Rsz, Bsz, Gsz,

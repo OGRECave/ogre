@@ -55,7 +55,7 @@ namespace Ogre {
             virtual ~X11EGLSupport();
 
             NativeDisplayType getNativeDisplay(void);
-            XVisualInfo *getVisualFromFBConfig(::EGLConfig glConfig);
+            XVisualInfo *getVisualFromFBConfig(::EGLDisplay display, ::EGLConfig glConfig);
             Atom mAtomDeleteWindow;
             Atom mAtomFullScreen;
             Atom mAtomState;

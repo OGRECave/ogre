@@ -163,21 +163,34 @@ namespace Ogre {
 
     ::EGLConfig EGLSupport::getGLConfigFromContext(::EGLContext context)
     {
-        ::EGLConfig glConfig;
-        EGLint id = 0;
-        ::EGLConfig *configs;
-        EGLint numConfigs;
+        return getGLConfigFromContext(mGLDisplay, context);
+    }
 
-        if (eglQueryContext(mGLDisplay, context, EGL_CONFIG_ID, &id) == EGL_FALSE)
-        {
+    ::EGLConfig EGLSupport::getGLConfigFromContext(::EGLDisplay display, ::EGLContext context)
+    {
+        EGLint id = 0;
+        if (eglQueryContext(display, context, EGL_CONFIG_ID, &id) == EGL_FALSE || id == 0)
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to get config from context");
-            return 0;
-        }
         EGL_CHECK_ERROR
-        configs = getConfigs(&numConfigs);
-        glConfig = configs[id];
-        free(configs);
-        return glConfig;
+
+        EGLint numConfigs = 0;
+        if (eglGetConfigs(display, nullptr, 0, &numConfigs) == EGL_FALSE || numConfigs == 0)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to get configs");
+
+        std::vector<::EGLConfig> configs(numConfigs);
+        if (eglGetConfigs(display, configs.data(), numConfigs, &numConfigs) == EGL_FALSE)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to get configs");
+
+        // EGL_CONFIG_ID is an opaque identifier, not an index into eglGetConfigs()
+        for (EGLint i = 0; i < numConfigs; ++i)
+        {
+            EGLint configId = 0;
+            if (eglGetConfigAttrib(display, configs[i], EGL_CONFIG_ID, &configId) && configId == id)
+                return configs[i];
+        }
+
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Fail to find the config of the context");
+        return 0;
     }
 
     //------------------------------------------------------------------------
