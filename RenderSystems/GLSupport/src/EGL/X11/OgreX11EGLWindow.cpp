@@ -120,8 +120,12 @@ namespace Ogre {
 
     void X11EGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
     {
-        mEglDisplay = mGLSupport->getGLDisplay();//todo
-        XVisualInfo *visualInfo = mGLSupport->getVisualFromFBConfig(mEglConfig);
+        // when the application's context is used, the surface has to live on the
+        // display that context was created on, not on the support's own display
+        if (mEglDisplay == EGL_NO_DISPLAY)
+            mEglDisplay = mGLSupport->getGLDisplay();
+
+        XVisualInfo *visualInfo = mGLSupport->getVisualFromFBConfig(mEglDisplay, mEglConfig);
 
         // Create window on server
         mWindow = createXWindow(mNativeDisplay, mParentWindow, visualInfo, left, top, width, height,
@@ -132,7 +136,7 @@ namespace Ogre {
             finaliseTopLevel(mNativeDisplay, mWindow, left, top, width, height, title, mGLSupport->mAtomDeleteWindow);
         }
 
-        mEglSurface = createSurfaceFromWindow(mGLSupport->getGLDisplay(), mWindow);
+        mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
 
         XMapWindow((Display*)mNativeDisplay, (Window)mWindow);
 
@@ -309,6 +313,9 @@ namespace Ogre {
         }
 
         initNativeCreatedWindow(miscParams);
+
+        if (!mEglConfig && eglContext)
+            mEglConfig = mGLSupport->getGLConfigFromContext(mEglDisplay, eglContext);
 
         if (!mEglConfig)
         {

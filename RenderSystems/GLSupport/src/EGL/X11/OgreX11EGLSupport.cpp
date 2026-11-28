@@ -123,13 +123,11 @@ namespace Ogre {
         return mNativeDisplay;
     }
 
-    XVisualInfo *X11EGLSupport::getVisualFromFBConfig(::EGLConfig glConfig)
+    XVisualInfo *X11EGLSupport::getVisualFromFBConfig(::EGLDisplay glDisplay, ::EGLConfig glConfig)
     {
         XVisualInfo *vi, tmp;
         int vid, n;
-        ::EGLDisplay glDisplay;
 
-        glDisplay = getGLDisplay();
         mNativeDisplay = getNativeDisplay();
 
         if (eglGetConfigAttrib(glDisplay, glConfig, EGL_NATIVE_VISUAL_ID, &vid) == EGL_FALSE)
