@@ -13,6 +13,8 @@
 
 #include "OgreGLUtil.h"
 
+#include <EGL/eglext.h>
+
 namespace Ogre
 {
 
@@ -87,7 +89,7 @@ RenderWindow* WaylandEGLSupport::newWindow(const String& name, unsigned int widt
 
             if ((opt = miscParams->find("externalWlDisplay")) != end)
             {
-                mNativeDisplay = (wl_display*)StringConverter::parseSizeT(opt->second);
+                mNativeDisplay = reinterpret_cast<NativeDisplayType>(StringConverter::parseSizeT(opt->second));
             }
             else if (miscParams->find("externalWlSurface") != end)
             {
@@ -114,8 +116,28 @@ RenderWindow* WaylandEGLSupport::newWindow(const String& name, unsigned int widt
 
 EGLDisplay WaylandEGLSupport::getGLDisplay()
 {
-    // the display is process-wide once created; do not initialize it again
-    return mGLDisplay != EGL_NO_DISPLAY ? mGLDisplay : EGLSupport::getGLDisplay();
+    if (mGLDisplay != EGL_NO_DISPLAY)
+        return mGLDisplay;
+
+    if (mNativeDisplay == EGL_DEFAULT_DISPLAY)
+    {
+        // offscreen: there is no provider display, let EGL pick a device one
+        return EGLSupport::getGLDisplay();
+    }
+
+    // Prefer the wayland platform: it takes the wl_display as void*, so it works
+    // even where <EGL/eglplatform.h> selected another platform's native types (QNX).
+    static auto eglGetPlatformDisplay_ =
+        (PFNEGLGETPLATFORMDISPLAYEXTPROC)eglGetProcAddress("eglGetPlatformDisplayEXT");
+    if (!eglGetPlatformDisplay_)
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "EGL_EXT_platform_base required");
+    mGLDisplay = eglGetPlatformDisplay_(EGL_PLATFORM_WAYLAND_KHR, reinterpret_cast<void*>(mNativeDisplay), nullptr);
+    if (mGLDisplay == EGL_NO_DISPLAY || eglInitialize(mGLDisplay, &mEGLMajor, &mEGLMinor) == EGL_FALSE)
+    {
+        mGLDisplay = EGL_NO_DISPLAY;
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to initialise the wayland EGL display");
+    }
+    return mGLDisplay;
 }
 
 void WaylandEGLSupport::start()
