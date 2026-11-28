@@ -106,13 +106,16 @@ RenderWindow* WaylandEGLSupport::newWindow(const String& name, unsigned int widt
     {
         mInitialWindow = window;
 
-        NameValuePairList::const_iterator opt;
-        NameValuePairList::const_iterator end = miscParams->end();
-
-        if ((opt = miscParams->find("externalWlDisplay")) != end)
+        if (miscParams)
         {
-            mNativeDisplay = (wl_display*)StringConverter::parseSizeT(opt->second);
-            mIsExternalDisplay = true;
+            NameValuePairList::const_iterator opt;
+            NameValuePairList::const_iterator end = miscParams->end();
+
+            if ((opt = miscParams->find("externalWlDisplay")) != end)
+            {
+                mNativeDisplay = (wl_display*)StringConverter::parseSizeT(opt->second);
+                mIsExternalDisplay = true;
+            }
         }
 
         doInit();
