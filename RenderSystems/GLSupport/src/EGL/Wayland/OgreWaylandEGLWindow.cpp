@@ -23,7 +23,7 @@ WaylandEGLWindow::WaylandEGLWindow(WaylandEGLSupport* glsupport) : EGLWindow(gls
 {
     mGLSupport = glsupport;
     mWlSurface = nullptr;
-    mNativeDisplay = nullptr;
+    mNativeDisplay = EGL_DEFAULT_DISPLAY;
 }
 
 WaylandEGLWindow::~WaylandEGLWindow()
@@ -31,7 +31,7 @@ WaylandEGLWindow::~WaylandEGLWindow()
     if (mWindow && mIsTopLevel)
     {
         if (!mIsExternal)
-            wl_egl_window_destroy(mWindow);
+            wl_egl_window_destroy(reinterpret_cast<wl_egl_window*>(mWindow));
     }
     mWindow = nullptr;
 }
@@ -57,7 +57,7 @@ void WaylandEGLWindow::createNativeWindow(uint& width, uint& height)
 
     if (!mWindow)
     {
-        mWindow = wl_egl_window_create(mWlSurface, width, height);
+        mWindow = reinterpret_cast<NativeWindowType>(wl_egl_window_create(mWlSurface, width, height));
     }
 
     if (mWindow == EGL_NO_SURFACE)
@@ -71,8 +71,8 @@ void WaylandEGLWindow::createNativeWindow(uint& width, uint& height)
     }
 
     wl_surface_commit(mWlSurface);
-    wl_display_dispatch_pending(mNativeDisplay);
-    wl_display_flush(mNativeDisplay);
+    wl_display_dispatch_pending(reinterpret_cast<wl_display*>(mNativeDisplay));
+    wl_display_flush(reinterpret_cast<wl_display*>(mNativeDisplay));
 }
 
 void WaylandEGLWindow::resize(uint width, uint height)
@@ -92,14 +92,14 @@ void WaylandEGLWindow::resize(uint width, uint height)
     {
         if (mWindow)
         {
-            wl_egl_window_resize(mWindow, width, height, 0, 0);
+            wl_egl_window_resize(reinterpret_cast<wl_egl_window*>(mWindow), width, height, 0, 0);
 
             RenderWindow::resize(width, height);
 
             wl_surface_damage(mWlSurface, 0, 0, mWidth, mHeight);
             wl_surface_commit(mWlSurface);
-            wl_display_dispatch_pending(mNativeDisplay);
-            wl_display_flush(mNativeDisplay);
+            wl_display_dispatch_pending(reinterpret_cast<wl_display*>(mNativeDisplay));
+            wl_display_flush(reinterpret_cast<wl_display*>(mNativeDisplay));
         }
     }
 }
@@ -110,7 +110,7 @@ void WaylandEGLWindow::windowMovedOrResized()
         return;
 
     int width, height;
-    wl_egl_window_get_attached_size(mWindow, &width, &height);
+    wl_egl_window_get_attached_size(reinterpret_cast<wl_egl_window*>(mWindow), &width, &height);
     resize(width, height);
 }
 

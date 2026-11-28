@@ -54,12 +54,16 @@ namespace Ogre {
 
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
-#if defined(EGL_VERSION_1_5) && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN && \
+    defined(EGL_EXT_platform_base) && defined(EGL_EXT_platform_device) && \
+    defined(EGL_EXT_device_enumeration) && defined(EGL_EXT_device_query)
         static auto eglQueryDevicesEXT = (PFNEGLQUERYDEVICESEXTPROC)eglGetProcAddress("eglQueryDevicesEXT");
         static auto eglQueryDeviceStringEXT =
             (PFNEGLQUERYDEVICESTRINGEXTPROC)eglGetProcAddress("eglQueryDeviceStringEXT");
+        static auto eglGetPlatformDisplay_ =
+            (PFNEGLGETPLATFORMDISPLAYEXTPROC)eglGetProcAddress("eglGetPlatformDisplayEXT");
 
-        if(eglQueryDevicesEXT && mNativeDisplay == EGL_DEFAULT_DISPLAY)
+        if (eglQueryDevicesEXT && eglGetPlatformDisplay_ && mNativeDisplay == EGL_DEFAULT_DISPLAY)
         {
             int numDevices;
             eglQueryDevicesEXT(0, NULL, &numDevices);
@@ -67,10 +71,9 @@ namespace Ogre {
             std::vector<EGLDeviceEXT> devices(numDevices);
             eglQueryDevicesEXT(numDevices, devices.data(), &numDevices);
 
-            EGLAttrib attribs[] = {EGL_NONE};
             for(auto dev : devices)
             {
-                EGLDisplay display = eglGetPlatformDisplay(EGL_PLATFORM_DEVICE_EXT, dev, attribs);
+                EGLDisplay display = eglGetPlatformDisplay_(EGL_PLATFORM_DEVICE_EXT, dev, nullptr);
                 EGL_CHECK_ERROR
 
                 if(display != EGL_NO_DISPLAY && !mGLDisplay)

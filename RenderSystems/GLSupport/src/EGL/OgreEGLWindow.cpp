@@ -231,7 +231,17 @@ namespace Ogre {
         }
 #endif
 
+#ifdef OGRE_WAYLAND
+        // the platform entry point takes the wl_egl_window as void*, so it works
+        // even where <EGL/eglplatform.h> describes another platform (QNX)
+        static auto eglCreatePlatformWindowSurface_ = (PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC)
+            eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
+        if (!eglCreatePlatformWindowSurface_)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "EGL_EXT_platform_base required");
+        surface = eglCreatePlatformWindowSurface_(display, mEglConfig, reinterpret_cast<void*>(win), attrib_list);
+#else
         surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, attrib_list);
+#endif
         EGL_CHECK_ERROR
 
         if (surface == EGL_NO_SURFACE)
