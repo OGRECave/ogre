@@ -452,21 +452,19 @@ void ApplicationContextBase::_destroyWindow(const NativeWindowPair& win)
 void ApplicationContextBase::_fireInputEvent(const Event& event, uint32_t windowID) const
 {
     Event scaled = event;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+    // events arrive in view points, while Ogre uses pixels throughout
+    // (assumes all windows have the same scale)
+    float viewScale = getRenderWindow()->getViewPointToPixelScale();
     if (event.type == MOUSEMOTION)
     {
-        // assumes all windows have the same scale
-        float viewScale = getRenderWindow()->getViewPointToPixelScale();
         scaled.motion.x *= viewScale;
         scaled.motion.y *= viewScale;
     }
     else if(event.type == MOUSEBUTTONDOWN || event.type == MOUSEBUTTONUP)
     {
-        float viewScale = getRenderWindow()->getViewPointToPixelScale();
         scaled.button.x *= viewScale;
         scaled.button.y *= viewScale;
     }
-#endif
 
     for(const auto & li : mInputListeners)
     {

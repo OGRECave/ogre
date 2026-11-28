@@ -62,6 +62,7 @@ namespace Ogre
 
         bool mLowestLatencyVSync;
         bool mHdrDisplay;
+        float mContentScalingFactor = 1.0f;
 
         bool mVisible;
         bool mHidden;
@@ -132,6 +133,8 @@ namespace Ogre
         void resize(unsigned int widthPt, unsigned int heightPt) override;
 
         void windowMovedOrResized() override;
+
+        float getViewPointToPixelScale() override { return mContentScalingFactor; }
 
         void _setDevice( VulkanDevice *device );
 

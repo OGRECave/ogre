@@ -21,6 +21,21 @@
 
 namespace OgreBites {
 
+// returns the window size in view points and the scale to its pixel size
+static void getWindowSize(SDL_Window* win, int& width, int& height, float& scale)
+{
+    SDL_GetWindowSize(win, &width, &height);
+    scale = 1.0f;
+#if SDL_VERSION_ATLEAST(2, 26, 0)
+    int pixelWidth, pixelHeight;
+    SDL_GetWindowSizeInPixels(win, &pixelWidth, &pixelHeight);
+    if (width > 0 && pixelWidth > 0)
+        scale = float(pixelWidth) / width;
+    else if (height > 0 && pixelHeight > 0)
+        scale = float(pixelHeight) / height;
+#endif
+}
+
 ApplicationContextSDL::ApplicationContextSDL(const Ogre::String& appName) : ApplicationContextBase(appName)
 {
 }
@@ -70,6 +85,12 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
     }
 
     int flags = p.useFullScreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE;
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+    // ALLOW_HIGHDPI makes SDL size the Wayland drawable in physical pixels and
+    // enables wp_fractional_scale. Ogre still gets view point dimensions and
+    // allocates the backbuffer in pixels using contentScalingFactor.
+    flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+#endif
     int d = Ogre::StringConverter::parseInt(miscParams["monitorIndex"], 1) - 1;
     ret.native =
         SDL_CreateWindow(p.name.c_str(), SDL_WINDOWPOS_UNDEFINED_DISPLAY(d),
@@ -91,6 +112,13 @@ NativeWindowPair ApplicationContextSDL::createWindow(const Ogre::String& name, O
         Ogre::LogManager::getSingleton().logMessage("[SDL] Creating Wayland window");
         p.miscParams["externalWlDisplay"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.display));
         p.miscParams["externalWlSurface"] = Ogre::StringConverter::toString(size_t(wmInfo.info.wl.surface));
+
+        int widthPt, heightPt;
+        float scale;
+        getWindowSize(ret.native, widthPt, heightPt, scale);
+        p.width = widthPt;
+        p.height = heightPt;
+        p.miscParams["contentScalingFactor"] = Ogre::StringConverter::toString(scale);
 #endif
     }
     else if (wmInfo.subsystem == SDL_SYSWM_X11)

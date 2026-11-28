@@ -14,6 +14,7 @@
 #include <EGL/eglext.h>
 
 #include <chrono>
+#include <cmath>
 #include <thread>
 
 namespace Ogre
@@ -75,13 +76,17 @@ void WaylandEGLWindow::createNativeWindow(uint& width, uint& height)
     wl_display_flush(reinterpret_cast<wl_display*>(mNativeDisplay));
 }
 
-void WaylandEGLWindow::resize(uint width, uint height)
+void WaylandEGLWindow::resize(uint widthPt, uint heightPt)
 {
-
     if (mClosed)
     {
         return;
     }
+
+    // the compositor is told a size in view points, but the backbuffer has to
+    // be allocated in physical pixels for a 1:1 mapping (HiDPI / fractional scaling)
+    const uint width = std::lround(widthPt * mContentScalingFactor);
+    const uint height = std::lround(heightPt * mContentScalingFactor);
 
     if (mWidth == width && mHeight == height)
     {
@@ -109,9 +114,19 @@ void WaylandEGLWindow::windowMovedOrResized()
     if (mClosed || !mWindow)
         return;
 
+    // the attached size is already the physical backbuffer size
     int width, height;
     wl_egl_window_get_attached_size(reinterpret_cast<wl_egl_window*>(mWindow), &width, &height);
-    resize(width, height);
+    if (width <= 0 || height <= 0)
+        return;
+
+    const uint oldWidth = mWidth;
+    const uint oldHeight = mHeight;
+    RenderWindow::resize(width, height);
+    wl_surface_damage(mWlSurface, 0, 0, oldWidth, oldHeight);
+    wl_surface_commit(mWlSurface);
+    wl_display_dispatch_pending(reinterpret_cast<wl_display*>(mNativeDisplay));
+    wl_display_flush(reinterpret_cast<wl_display*>(mNativeDisplay));
 }
 
 void WaylandEGLWindow::create(const String& name, uint width, uint height, bool fullScreen,
@@ -192,6 +207,13 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
             mHwGamma = StringConverter::parseBool(opt->second);
         }
 
+        if ((opt = miscParams->find("contentScalingFactor")) != end)
+        {
+            const float scale = StringConverter::parseReal(opt->second);
+            if (scale > 0.0f)
+                mContentScalingFactor = scale;
+        }
+
         if ((opt = miscParams->find("hdrDisplay")) != end)
         {
             mHdrDisplay = StringConverter::parseBool(opt->second);
@@ -260,7 +282,12 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
         mGLSupport->switchMode(width, height, frequency);
     }
 
-    createNativeWindow(width, height);
+    // width/height are view points, while the EGL window and RenderWindow use
+    // the physical pixel size the compositor will map 1:1 to the display
+    uint pixelWidth = std::lround(width * mContentScalingFactor);
+    uint pixelHeight = std::lround(height * mContentScalingFactor);
+
+    createNativeWindow(pixelWidth, pixelHeight);
     mEglSurface = createSurfaceFromWindow(mGLSupport->getGLDisplay(), mWindow);
     mContext = createEGLContext(eglContext);
 
@@ -270,8 +297,8 @@ void WaylandEGLWindow::create(const String& name, uint width, uint height, bool 
     setVSyncEnabled(vsync);
 
     mName = name;
-    mWidth = width;
-    mHeight = height;
+    mWidth = pixelWidth;
+    mHeight = pixelHeight;
 
     finaliseWindow();
     wl_surface_commit(mWlSurface);
